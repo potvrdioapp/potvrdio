@@ -37,7 +37,7 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     console.warn(`[CREDIT ALERT] Merchant ${apiKey} has insufficient balance! Sending email alert.`);
   }
 
-  // Create 5-minute 1-time token for address edit link
+  // Create 24-hour single-use token for address edit link
   const token = tokenService.createToken({
     orderId: String(order_id),
     storeDomain: store_domain || 'my-shop.rs',

@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potvrdio Design System — Canlı Dokümantasyon & Bileşen Kütüphanesi</title>
+  
+  <!-- Google Fonts: Inter (Latin + Cyrillic tam set) & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Brand Identity */
+      --color-brand-teal: #14B8A6;
+      --color-brand-teal-glow: rgba(20, 184, 166, 0.25);
+      --color-brand-indigo: #6366F1;
+      --color-brand-pink: #EC4899;
+      --color-viber-purple: #7360F2;
+
+      /* Dark Obsidian Surfaces (Dashboard & Landing) */
+      --bg-dark-void: #070A13;
+      --bg-dark-elevated: #0D121F;
+      --bg-dark-glass: rgba(19, 26, 43, 0.75);
+      --border-dark-subtle: rgba(255, 255, 255, 0.08);
+      --border-dark-accent: rgba(20, 184, 166, 0.30);
+      --text-dark-primary: #F8FAFC;
+      --text-dark-secondary: #94A3B8;
+      --text-dark-muted: #64748B;
+
+      /* Light Logistics Surfaces (Mobile Address App) */
+      --bg-light-base: #FFFFFF;
+      --bg-light-card: #F8FAFC;
+      --border-light: #E2E8F0;
+      --text-light-primary: #0F172A;
+      --text-light-secondary: #475569;
+      --text-light-muted: #94A3B8;
+
+      /* Status & Semantic */
+      --status-success: #10B981;
+      --status-success-bg: rgba(16, 185, 129, 0.12);
+      --status-info: #3B82F6;
+      --status-info-bg: rgba(59, 130, 246, 0.12);
+      --status-warning: #F59E0B;
+      --status-warning-bg: rgba(245, 158, 11, 0.12);
+      --status-danger: #EF4444;
+      --status-danger-bg: rgba(239, 68, 68, 0.12);
+
+      /* Typography & Layout */
+      --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-alt-geometric: 'Manrope', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark-void);
+      color: var(--text-dark-primary);
+      font-family: var(--font-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation */
+    header.spec-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7, 10, 19, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-dark-subtle);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--color-brand-teal), var(--color-brand-indigo));
+      color: #fff;
+      font-weight: 900;
+      font-size: 1.25rem;
+      box-shadow: 0 0 16px var(--color-brand-teal-glow);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-title span {
+      color: var(--color-brand-teal);
+    }
+
+    .spec-version {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      background: rgba(20, 184, 166, 0.15);
+      color: var(--color-brand-teal);
+      border: 1px solid var(--border-dark-accent);
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    nav.spec-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    nav.spec-nav a {
+      color: var(--text-dark-secondary);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+    }
+
+    nav.spec-nav a:hover, nav.spec-nav a.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem;
+    }
+
+    .section-title-wrap {
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--color-brand-teal);
+      padding-left: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .section-desc {
+      color: var(--text-dark-secondary);
+      font-size: 0.95rem;
+      margin-top: 4px;
+    }
+
+    /* Section 1: Architecture Dual Theme Cards */
+    .dual-theme-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .theme-card-preview {
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .theme-card-preview:hover {
+      transform: translateY(-4px);
+    }
+
+    .dark-preview-card {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark-subtle);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .light-preview-card {
+      background: var(--bg-light-base);
+      color: var(--text-light-primary);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+    }
+
+    .theme-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 1rem;
+    }
+
+    .dark-preview-card .theme-tag {
+      background: rgba(99, 102, 241, 0.2);
+      color: #A5B4FC;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+    }
+
+    .light-preview-card .theme-tag {
+      background: #E2E8F0;
+      color: #334155;
+      border: 1px solid #CBD5E1;
+    }
+
+    /* Tokens Grid */
+    .tokens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .token-card {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .token-card:hover {
+      border-color: var(--color-brand-teal);
+      transform: scale(1.02);
+    }
+
+    .token-color-swatch {
+      height: 72px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 8px;
+    }
+
+    .token-info {
+      padding: 12px;
+    }
+
+    .token-name {
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .token-hex {
+      font-size: 0.75rem;
+      color: var(--text-dark-secondary);
+      font-family: var(--font-mono);
+      display: flex;
+      justify-content: space-between;
+      margin-top: 4px;
+    }
+
+    .token-usage {
+      font-size: 0.7rem;
+      color: var(--text-dark-muted);
+      margin-top: 6px;
+      line-height: 1.3;
+    }
+
+    /* Typography & Cyrillic Lab */
+    .lab-box {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .lab-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-dark-subtle);
+    }
+
+    .tab-btn-group {
+      display: flex;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-dark-subtle);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dark-secondary);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-primary);
+    }
+
+    .tab-btn.active {
+      background: var(--color-brand-teal);
+      color: #070A13;
+    }
+
+    .char-pill-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 1.25rem 0;
+    }
+
+    .char-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 58px;
+      transition: all 0.2s ease;
+    }
+
+    .char-pill:hover {
+      border-color: var(--color-brand-teal);
+      background: rgba(20, 184, 166, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .char-glyph {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .char-code {
+      font-size: 0.65rem;
+      font-family: var(--font-mono);
+      color: var(--text-dark-muted);
+      margin-top: 2px;
+    }
+
+    .lab-interactive-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 1.25rem;
+      font-family: var(--font-primary);
+      margin-top: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .lab-interactive-input:focus {
+      border-color: var(--color-brand-teal);
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+    }
+
+    /* Live Interactive Devices Grid (Simulator + Mobile App) */
+    .devices-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 2.5rem;
+      align-items: start;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Viber Frame */
+    .device-frame {
+      border-radius: 36px;
+      padding: 16px;
+      background: #111827;
+      border: 4px solid #374151;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .viber-screen {
+      background: #E8EBF0;
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+    }
+
+    .viber-topbar {
+      background: var(--color-viber-purple);
+      color: #fff;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .viber-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--color-viber-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .viber-header-info {
+      flex: 1;
+    }
+    .viber-header-info .name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .viber-header-info .sub {
+      font-size: 0.7rem;
+      opacity: 0.85;
+    }
+
+    .viber-chat-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .viber-bubble {
+      background: #fff;
+      border-radius: 16px;
+      border-top-left-radius: 4px;
+      padding: 16px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      color: #1E293B;
+    }
+
+    .viber-bubble-text {
+      font-size: 0.9rem;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+
+    .viber-bubble-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #F1F5F9;
+      color: #475569;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      font-size: 0.7rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .viber-btn {
+      width: 100%;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      margin-bottom: 8px;
+      text-decoration: none;
+      border: none;
+      font-family: var(--font-primary);
+    }
+
+    .viber-btn-approve {
+      background: var(--status-success);
+      color: #fff;
+    }
+    .viber-btn-approve:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    .viber-btn-edit {
+      background: #F8FAFC;
+      color: #334155;
+      border: 1px solid #CBD5E1;
+    }
+    .viber-btn-edit:hover {
+      background: #E2E8F0;
+    }
+
+    /* Mobile Address Web App Frame */
+    .mobile-app-screen {
+      background: var(--bg-light-base);
+      color: var(--text-light-primary);
+      border-radius: 24px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      overflow-y: auto;
+    }
+
+    .mobile-app-header {
+      background: #fff;
+      border-bottom: 1px solid var(--border-light);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mobile-app-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-light-primary);
+    }
+    .mobile-app-brand .mini-logo {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--color-brand-teal);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 900;
+    }
+
+    .token-timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #FEF3C7;
+      color: #92400E;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+    }
+
+    .mobile-app-content {
+      padding: 18px;
+    }
+
+    /* Zero-Blur Adres Bilgi Kartı */
+    .clean-summary-card {
+      background: var(--bg-light-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    .summary-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-light-secondary);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .summary-address-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-light-primary);
+      line-height: 1.4;
+    }
+
+    .mobile-input-group {
+      margin-bottom: 14px;
+    }
+
+    .mobile-label {
+      display: block;
+      font-size: 0.9375rem; /* 15px */
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text-light-primary);
+    }
+
+    .mobile-input {
+      width: 100%;
+      height: 48px; /* Touch target >= 48px */
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 0 14px;
+      font-size: 1rem; /* 16px to prevent iOS auto zoom bug */
+      font-family: var(--font-primary);
+      color: var(--text-light-primary);
+      background: #fff;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .mobile-input:focus {
+      border-color: var(--color-brand-teal);
+      box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+    }
+
+    .mobile-cta-btn {
+      width: 100%;
+      height: 52px; /* 52px ergonomic standard */
+      background: var(--color-brand-teal);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s ease, transform 0.1s ease;
+      font-family: var(--font-primary);
+      margin-top: 18px;
+    }
+
+    .mobile-cta-btn:hover {
+      background: #0D9488;
+    }
+    .mobile-cta-btn:active {
+      transform: scale(0.98);
+    }
+
+    .mobile-privacy-notice {
+      font-size: 0.75rem;
+      color: var(--text-light-muted);
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1.4;
+    }
+
+    /* Section: Merchant Dashboard UI Preview */
+    .dashboard-preview-card {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .metric-box {
+      background: var(--bg-dark-glass);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-dark-secondary);
+      font-weight: 500;
+    }
+
+    .metric-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 4px 0;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-delta {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--status-success);
+    }
+
+    /* Table */
+    .table-container {
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+    }
+
+    table.ds-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    table.ds-table th {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 16px;
+      color: var(--text-dark-secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-dark-subtle);
+    }
+
+    table.ds-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-dark-subtle);
+      color: var(--text-dark-primary);
+    }
+
+    table.ds-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+      letter-spacing: 0.02em;
+    }
+
+    .status-badge.approved {
+      background: var(--status-success-bg);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .status-badge.edited {
+      background: var(--status-info-bg);
+      color: #60A5FA;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .status-badge.fallback {
+      background: var(--status-warning-bg);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+    .approved .badge-dot { background: #34D399; }
+    .edited .badge-dot { background: #60A5FA; }
+    .fallback .badge-dot { background: #FBBF24; }
+
+    /* Interactive Component Specs */
+    .components-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .comp-card {
+      background: var(--bg-dark-elevated);
+      border: 1px solid var(--border-dark-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+    }
+
+    .comp-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .comp-desc {
+      font-size: 0.8rem;
+      color: var(--text-dark-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* Buttons Spec */
+    .btn-demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-primary-gradient {
+      background: linear-gradient(135deg, var(--color-brand-teal) 0%, var(--color-brand-indigo) 100%);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary-gradient:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px var(--color-brand-teal-glow);
+    }
+
+    .btn-disabled {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-dark-muted);
+      border: 1px solid var(--border-dark-subtle);
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.875rem;
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #10B981;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.25s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Footer */
+    footer.spec-footer {
+      border-top: 1px solid var(--border-dark-subtle);
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-dark-secondary);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      .dual-theme-grid, .devices-showcase, .metrics-row {
+        grid-template-columns: 1fr;
+      }
+      nav.spec-nav {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <span>✓</span> Token panoya kopyalandı!
+  </div>
+
+  <!-- Header -->
+  <header class="spec-header">
+    <div class="brand-group">
+      <div class="logo-badge">P</div>
+      <div class="brand-title">Potvrdio <span>Design System</span></div>
+      <span class="spec-version">v2.2 Production</span>
+    </div>
+    <nav class="spec-nav">
+      <a href="#dual-theme">Çift Tema</a>
+      <a href="#tokens">Token'lar</a>
+      <a href="#typography">Tipografi & Kiril</a>
+      <a href="#interactive">Mobil & Viber</a>
+      <a href="#dashboard">Dashboard</a>
+      <a href="#components">Bileşenler</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- Hero / Intro -->
+    <div style="margin-bottom: 3.5rem;">
+      <h1 style="font-size: 2.75rem; font-weight: 900; letter-spacing: -0.03em; margin-bottom: 0.75rem;">
+        Potvrdio <span style="background: linear-gradient(135deg, var(--color-brand-teal), var(--color-brand-indigo)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Canlı Tasarım Sistemi</span>
+      </h1>
+      <p style="color: var(--text-dark-secondary); font-size: 1.15rem; max-width: 860px;">
+        WooCommerce Balkan pazarı (Sırbistan, Bosna-Hersek, Karadağ, Hırvatistan ve Kuzey Makedonya) için optimize edilmiş; sub-1s açılış hızına sahip mobil form ve analitik odaklı Dark Obsidian Merchant Dashboard arayüz kılavuzu.
+      </p>
+    </div>
+
+    <!-- SECTION 1: DUAL THEME STRATEGY -->
+    <section id="dual-theme">
+      <div class="section-title-wrap">
+        <h2 class="section-title">1. Mimarî Vizyon: Çift Tema (Dual-Theme)</h2>
+        <p class="section-desc">Satıcı analitiği için prestijli koyu mod, müşteri mobildeyken sıfır-gecikmeli düz beyaz mod.</p>
+      </div>
+
+      <div class="dual-theme-grid">
+        <!-- Dark Obsidian Preview -->
+        <div class="theme-card-preview dark-preview-card">
+          <span class="theme-tag">Merchant Dashboard & Landing</span>
+          <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem;">Dark Obsidian</h3>
+          <p style="color: var(--text-dark-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Koyu zemin (#070A13), yarı saydam cam kartlar (backdrop-filter: blur), gradient CTA'lar ve gözü yormayan analitik odaklı estetik.
+          </p>
+          <div style="background: var(--bg-dark-glass); backdrop-filter: blur(12px); border: 1px solid var(--border-dark-subtle); border-radius: var(--radius-md); padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 0.8rem; color: var(--text-dark-secondary); font-weight: 600;">Sipariş #8492</span>
+              <span class="status-badge approved"><span class="badge-dot"></span>APPROVED</span>
+            </div>
+            <div style="font-size: 1.1rem; font-weight: 700;">4.850 RSD <span style="font-size: 0.8rem; color: var(--text-dark-muted); font-weight: 400;">(Kapıda Ödeme)</span></div>
+            <div style="font-size: 0.8rem; color: var(--text-dark-secondary); margin-top: 4px;">Teslimat: Bulevar Oslobođenja 42, Novi Sad</div>
+          </div>
+        </div>
+
+        <!-- Light Logistics Preview -->
+        <div class="theme-card-preview light-preview-card">
+          <span class="theme-tag">Mobile Address App</span>
+          <h3 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-light-primary);">Light Logistics</h3>
+          <p style="color: var(--text-light-secondary); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            Düz beyaz (#FFFFFF), sıfır blur efekti, harita kütüphanesi yok (YAGNI), 16px iOS fontu, sub-1s anında render garantisi.
+          </p>
+          <div style="background: var(--bg-light-card); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="font-size: 0.8rem; color: var(--text-light-secondary); font-weight: 600;">Provera Adrese Dostave</span>
+              <span style="font-size: 0.75rem; background: #E2E8F0; color: #334155; padding: 2px 8px; border-radius: 4px; font-weight: 700;">1 Adım</span>
+            </div>
+            <div style="font-size: 1rem; font-weight: 700; color: var(--text-light-primary);">Kralja Petra I 12, Beograd</div>
+            <div style="font-size: 0.8rem; color: var(--text-light-secondary); margin-top: 4px;">Alıcı: Marko Jovanović (+381 64 123 4567)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: COLOR TOKENS -->
+    <section id="tokens">
+      <div class="section-title-wrap">
+        <h2 class="section-title">2. Tasarım Token'ları & Renk Paleti</h2>
+        <p class="section-desc">Kopyalamak için karta tıklayın. Viber moru sadece resmi mesaj aksiyonlarına izoledir.</p>
+      </div>
+
+      <div class="tokens-grid">
+        <!-- Brand Teal -->
+        <div class="token-card" onclick="copyToken('--color-brand-teal', '#14B8A6')">
+          <div class="token-color-swatch" style="background: #14B8A6;"></div>
+          <div class="token-info">
+            <div class="token-name">--color-brand-teal</div>
+            <div class="token-hex"><span>#14B8A6</span><span>Ana Marka</span></div>
+            <div class="token-usage">Logo, Primary CTA, onay aksanları</div>
+          </div>
+        </div>
+
+        <!-- Brand Indigo -->
+        <div class="token-card" onclick="copyToken('--color-brand-indigo', '#6366F1')">
+          <div class="token-color-swatch" style="background: #6366F1;"></div>
+          <div class="token-info">
+            <div class="token-name">--color-brand-indigo</div>
+            <div class="token-hex"><span>#6366F1</span><span>Sekonder</span></div>
+            <div class="token-usage">Gradient bitişi, kart aksanları</div>
+          </div>
+        </div>
+
+        <!-- Viber Purple -->
+        <div class="token-card" onclick="copyToken('--color-viber-purple', '#7360F2')">
+          <div class="token-color-swatch" style="background: #7360F2;"></div>
+          <div class="token-info">
+            <div class="token-name">--color-viber-purple</div>
+            <div class="token-hex"><span>#7360F2</span><span>Yalnızca Viber</span></div>
+            <div class="token-usage">Viber UI header & simülatör butonları</div>
+          </div>
+        </div>
+
+        <!-- Dark Void -->
+        <div class="token-card" onclick="copyToken('--bg-dark-void', '#070A13')">
+          <div class="token-color-swatch" style="background: #070A13; border: 1px solid var(--border-dark-subtle);"></div>
+          <div class="token-info">
+            <div class="token-name">--bg-dark-void</div>
+            <div class="token-hex"><span>#070A13</span><span>Dashboard Arka Plan</span></div>
+            <div class="token-usage">Merkezi koyu zemin rengi</div>
+          </div>
+        </div>
+
+        <!-- Light Base -->
+        <div class="token-card" onclick="copyToken('--bg-light-base', '#FFFFFF')">
+          <div class="token-color-swatch" style="background: #FFFFFF;"></div>
+          <div class="token-info">
+            <div class="token-name">--bg-light-base</div>
+            <div class="token-hex"><span>#FFFFFF</span><span>Mobil Webview</span></div>
+            <div class="token-usage">Mobile-address-app temiz zemin</div>
+          </div>
+        </div>
+
+        <!-- Status Success -->
+        <div class="token-card" onclick="copyToken('--status-success', '#10B981')">
+          <div class="token-color-swatch" style="background: #10B981;"></div>
+          <div class="token-info">
+            <div class="token-name">--status-success</div>
+            <div class="token-hex"><span>#10B981</span><span>APPROVED</span></div>
+            <div class="token-usage">Doğrulanan siparişler & teslimat</div>
+          </div>
+        </div>
+
+        <!-- Status Info -->
+        <div class="token-card" onclick="copyToken('--status-info', '#3B82F6')">
+          <div class="token-color-swatch" style="background: #3B82F6;"></div>
+          <div class="token-info">
+            <div class="token-name">--status-info</div>
+            <div class="token-hex"><span>#3B82F6</span><span>EDITED_ADDRESS</span></div>
+            <div class="token-usage">Müşteri adresi güncelledi</div>
+          </div>
+        </div>
+
+        <!-- Status Warning -->
+        <div class="token-card" onclick="copyToken('--status-warning', '#F59E0B')">
+          <div class="token-color-swatch" style="background: #F59E0B;"></div>
+          <div class="token-info">
+            <div class="token-name">--status-warning</div>
+            <div class="token-hex"><span>#F59E0B</span><span>SMS_FALLBACK</span></div>
+            <div class="token-usage">Viber teslim edilemedi, SMS devrede</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: TYPOGRAPHY & CYRILLIC LAB -->
+    <section id="typography">
+      <div class="section-title-wrap">
+        <h2 class="section-title">3. Tipografi & Balkan Çoklu Alfabe Test Laboratuvarı</h2>
+        <p class="section-desc">
+          <code>Inter</code> font ailesi seçilmiştir. Sırpça (Latin) ve Kuzey Makedonya (Kiril) gliflerinin tarayıcıda doğrudan render testidir.
+        </p>
+      </div>
+
+      <div class="lab-box">
+        <div class="lab-toolbar">
+          <div class="tab-btn-group">
+            <button class="tab-btn active" onclick="setLocale('sr', this)">Sırpça (Latin)</button>
+            <button class="tab-btn" onclick="setLocale('mk', this)">Makedonca (Kiril)</button>
+            <button class="tab-btn" onclick="setLocale('en', this)">English</button>
+            <button class="tab-btn" onclick="setLocale('tr', this)">Türkçe</button>
+          </div>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dark-secondary);">
+            Font: <span style="color: var(--color-brand-teal); font-weight: 700;">Inter (Full Cyrillic Subsets)</span>
+          </div>
+        </div>
+
+        <!-- Macedonian Special Character Gliph Inspector -->
+        <div style="margin-bottom: 1.5rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-dark-secondary); text-transform: uppercase; letter-spacing: 0.04em;">
+            Makedonca Özel Kiril Glifleri Doğrulama Tablosu (U+0400..U+045F):
+          </div>
+          <div class="char-pill-grid">
+            <div class="char-pill"><span class="char-glyph">ѓ</span><span class="char-code">U+0453</span></div>
+            <div class="char-pill"><span class="char-glyph">ќ</span><span class="char-code">U+045C</span></div>
+            <div class="char-pill"><span class="char-glyph">ѕ</span><span class="char-code">U+0455</span></div>
+            <div class="char-pill"><span class="char-glyph">џ</span><span class="char-code">U+045F</span></div>
+            <div class="char-pill"><span class="char-glyph">љ</span><span class="char-code">U+0459</span></div>
+            <div class="char-pill"><span class="char-glyph">њ</span><span class="char-code">U+045A</span></div>
+            <div class="char-pill"><span class="char-glyph">Ѓ</span><span class="char-code">U+0403</span></div>
+            <div class="char-pill"><span class="char-glyph">Ќ</span><span class="char-code">U+040C</span></div>
+            <div class="char-pill"><span class="char-glyph">Ѕ</span><span class="char-code">U+0405</span></div>
+            <div class="char-pill"><span class="char-glyph">Џ</span><span class="char-code">U+040F</span></div>
+            <div class="char-pill"><span class="char-glyph">Љ</span><span class="char-code">U+0409</span></div>
+            <div class="char-pill"><span class="char-glyph">Њ</span><span class="char-code">U+040A</span></div>
+          </div>
+        </div>
+
+        <!-- Live Sample Block -->
+        <div id="locale-preview-box" style="background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-dark-subtle); border-radius: var(--radius-md); padding: 1.5rem;">
+          <div id="preview-heading" style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">
+            Proveri i Izmeni Adresu Dostave
+          </div>
+          <div id="preview-cta" style="font-size: 1.1rem; font-weight: 600; color: var(--color-brand-teal); margin-bottom: 0.5rem;">
+            🔘 Sačuvaj i Potvrdi Pošiljku
+          </div>
+          <div id="preview-legal" style="font-size: 0.85rem; color: var(--text-dark-secondary); line-height: 1.5;">
+            🔒 Vaši podaci se koriste isključivo za potvrdu ove porudžbine u skladu sa Zakonom o zaštiti podataka o ličnosti (ZZPL).
+          </div>
+        </div>
+
+        <!-- Interactive Typing Field -->
+        <div style="margin-top: 1.5rem;">
+          <label style="font-size: 0.8rem; color: var(--text-dark-secondary); font-weight: 600;">Serbest Metin Deneme Alanı (Canlı Glif Render):</label>
+          <input type="text" class="lab-interactive-input" value="Зачувај и потврди нарачка: ул. Македонија бр. 12, Скопје" id="custom-font-input">
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: INTERACTIVE COMPONENTS -->
+    <section class="section" id="interactive-components">
+      <div class="container">
+        <div class="badge badge-teal">Canlı Test Alanı</div>
+        <h2 class="section-title">4. Etkileşimli Bileşenler: Viber Simülatörü & Mobil Webview</h2>
+        <p class="section-desc">Müşterinin Viber mesajından tek tıkla onayladığı veya adres düzenleme sayfasına geçtiği canlı senaryo.</p>
+
+        <div class="simulator-grid">
+          <!-- DEVICE 1: VIBER CHAT SIMULATOR -->
+          <div>
+            <div style="text-align: center; margin-bottom: 12px; font-weight: 700; color: var(--color-viber-purple);">
+              1. Viber Mesaj Simülatörü (Webhook & Outbound)
+            </div>
+            <div class="device-frame">
+              <div class="viber-screen">
+                <div class="viber-topbar">
+                  <div class="viber-avatar">P</div>
+                  <div class="viber-header-info">
+                    <div class="name">Potvrdio Verification</div>
+                    <div class="sub">Verified Business Account</div>
+                  </div>
+                </div>
+
+                <div class="viber-chat-body">
+                  <div class="viber-bubble">
+                    <div class="viber-bubble-badge">WooCommerce Siparişi #8492</div>
+                    <div class="viber-bubble-text" id="viber-msg-text">
+                      Zdravo <strong>Marko</strong>! Tvoja porudžbina <strong>#8492</strong> u vrednosti od <strong>4.850 RSD</strong> (Plaćanje pouzećem) je primljena.<br><br>
+                      <strong>Adresa:</strong> Bulevar Oslobođenja 42, Novi Sad.<br><br>
+                      Da li je adresa tačna za slanje?
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <button class="viber-btn viber-btn-approve" onclick="simulateViberApprove()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                      <span id="viber-btn1-text">DA, ADRESA JE TAČNA</span>
+                    </button>
+                    <button class="viber-btn viber-btn-edit" onclick="simulateViberEdit()">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                      <span id="viber-btn2-text">IZMENI ADRESU</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DEVICE 2: MOBILE ADDRESS FORM (Zero-Blur, Pure Contrast) -->
+          <div>
+            <div style="text-align: center; margin-bottom: 12px; font-weight: 700; color: var(--color-brand-teal);">
+              2. Mobil Adres Düzeltme Formu (potvrdio.online/edit)
+            </div>
+            <div class="device-frame">
+              <div class="mobile-app-screen" id="mobile-app-container">
+                <div class="mobile-app-header">
+                  <div class="mobile-app-brand">
+                    <div class="mini-logo">P</div>
+                    <span>potvrdio.online</span>
+                  </div>
+                  <div class="token-timer-pill">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span id="token-timer">23:59:45</span>
+                  </div>
+                </div>
+
+                <div class="mobile-app-content">
+                  <!-- Zero-blur Static Summary Box (Replaced Heavy Map) -->
+                  <div class="clean-summary-card">
+                    <div class="summary-title">
+                      <span>Mevcut Teslimat Bilgisi</span>
+                      <span style="color: var(--status-info); font-weight: 700;">Sipariş #8492</span>
+                    </div>
+                    <div class="summary-address-text" id="mob-summary-addr">
+                      Bulevar Oslobođenja 42, 21000 Novi Sad
+                    </div>
+                  </div>
+
+                  <!-- Form Inputs (48px height, 16px font to prevent zoom) -->
+                  <div class="mobile-input-group">
+                    <label class="mobile-label" id="mob-lbl-street">Ulica i Broj (Sokak / No)</label>
+                    <input type="text" class="mobile-input" id="mob-inp-street" value="Bulevar Oslobođenja 42">
+                  </div>
+
+                  <div class="mobile-input-group">
+                    <label class="mobile-label" id="mob-lbl-city">Grad i Poštanski Broj (Şehir)</label>
+                    <input type="text" class="mobile-input" id="mob-inp-city" value="21000 Novi Sad">
+                  </div>
+
+                  <div class="mobile-input-group">
+                    <label class="mobile-label" id="mob-lbl-note">Napomena Kuriru (Sipariş Notu)</label>
+                    <input type="text" class="mobile-input" id="mob-inp-note" value="Interfon 4, zvoniti dva puta">
+                  </div>
+
+                  <!-- Primary CTA (52px Touch Target with CheckCheck Vector Icon) -->
+                  <button class="mobile-cta-btn" id="mob-submit-btn" onclick="submitMobileAddress()">
+                    <span id="mob-btn-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;">
+                        <path d="M18 6 7 17l-5-5"/>
+                        <path d="m22 10-7.5 7.5L13 16"/>
+                      </svg>
+                    </span>
+                    <span id="mob-btn-text">Sačuvaj i Potvrdi Pošiljku</span>
+                  </button>
+
+                  <div class="mobile-privacy-notice" id="mob-legal-notice">
+                    Vaši podaci se koriste isključivo za potvrdu ove porudžbine u skladu sa Zakonom o zaštiti podataka o ličnosti (ZZPL).
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: MERCHANT DASHBOARD PREVIEW -->
+    <section id="dashboard">
+      <div class="section-title-wrap">
+        <h2 class="section-title">5. Merchant Dashboard: Metrikler ve Doğrulama Logu</h2>
+        <p class="section-desc">SaaS paneli koyu tema estetiği, durum rozetleri ve canlı doğrulama tablosu.</p>
+      </div>
+
+      <div class="dashboard-preview-card">
+        <!-- Metrics -->
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-label">Toplam Doğrulanan (Bu Ay)</div>
+            <div class="metric-val">1.482</div>
+            <div class="metric-delta">↑ %94.2 Başarı Oranı</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Kurtarılan Kargo / Ciro</div>
+            <div class="metric-val">184.200 RSD</div>
+            <div class="metric-delta">≈ €1.570 / 96.500 MKD</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">Viber Açılma Oranı (İlk 3 Dk)</div>
+            <div class="metric-val">%91.8</div>
+            <div class="metric-delta">↑ Bölge Standardı</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-label">SMS Fallback İhtiyacı</div>
+            <div class="metric-val">%4.2</div>
+            <div class="metric-delta" style="color: var(--text-dark-secondary);">Düşük Maliyetli Düşüş</div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+          <table class="ds-table">
+            <thead>
+              <tr>
+                <th>Sipariş ID</th>
+                <th>Alıcı / Telefon</th>
+                <th>Teslimat Adresi</th>
+                <th>Tutar & Para Birimi</th>
+                <th>Kanal</th>
+                <th>Durum Rozeti</th>
+                <th>İşlem Zamanı</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family: var(--font-mono); font-weight: 700;">#8492</td>
+                <td>Marko Jovanović<br><span style="font-size: 0.75rem; color: var(--text-dark-muted);">+381 64 123 4567</span></td>
+                <td>Bulevar Oslobođenja 42, Novi Sad</td>
+                <td style="font-weight: 700;">4.850 RSD</td>
+                <td><span style="color: var(--color-viber-purple); font-weight: 600;">Viber API</span></td>
+                <td><span class="status-badge approved"><span class="badge-dot"></span>APPROVED</span></td>
+                <td style="color: var(--text-dark-secondary); font-size: 0.8rem;">Bugün, 14:22</td>
+              </tr>
+              <tr>
+                <td style="font-family: var(--font-mono); font-weight: 700;">#8491</td>
+                <td>Nikola Trajkovski<br><span style="font-size: 0.75rem; color: var(--text-dark-muted);">+389 70 987 654</span></td>
+                <td>ул. Партизански Одреди 15, Скопје</td>
+                <td style="font-weight: 700;">2.400 MKD</td>
+                <td><span style="color: var(--color-viber-purple); font-weight: 600;">Viber API</span></td>
+                <td><span class="status-badge edited"><span class="badge-dot"></span>EDITED_ADDRESS</span></td>
+                <td style="color: var(--text-dark-secondary); font-size: 0.8rem;">Bugün, 13:48</td>
+              </tr>
+              <tr>
+                <td style="font-family: var(--font-mono); font-weight: 700;">#8490</td>
+                <td>Ana Horvat<br><span style="font-size: 0.75rem; color: var(--text-dark-muted);">+385 91 555 1234</span></td>
+                <td>Ilica 140, Zagreb</td>
+                <td style="font-weight: 700;">48,00 EUR</td>
+                <td><span style="color: var(--status-warning); font-weight: 600;">SMS Gateway</span></td>
+                <td><span class="status-badge fallback"><span class="badge-dot"></span>SMS_FALLBACK</span></td>
+                <td style="color: var(--text-dark-secondary); font-size: 0.8rem;">Bugün, 11:15</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: CORE REUSABLE COMPONENTS -->
+    <section id="components">
+      <div class="section-title-wrap">
+        <h2 class="section-title">6. Çekirdek Bileşenler (Component Specs)</h2>
+        <p class="section-desc">Tüm projelere doğrudan aktarılabilecek standart buton, durum ve form durumları.</p>
+      </div>
+
+      <div class="components-grid">
+        <!-- CTA Buttons -->
+        <div class="comp-card">
+          <div class="comp-title">Primary CTA Butonları</div>
+          <div class="comp-desc">Masaüstü ve panel için gradient, hover'da scale(1.02) ve ışıma.</div>
+          <div class="btn-demo-row">
+            <button class="btn-primary-gradient">Kredi Satın Al</button>
+            <button class="btn-primary-gradient"><span class="spinner"></span> İşleniyor...</button>
+            <button class="btn-disabled">Devre Dışı</button>
+          </div>
+        </div>
+
+        <!-- Status Badges -->
+        <div class="comp-card">
+          <div class="comp-title">Durum Rozetleri (Status Badges)</div>
+          <div class="comp-desc">Monospace font, durum rengine göre %12 alpha zemin ve pulsing nokta.</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="status-badge approved"><span class="badge-dot"></span>APPROVED</span>
+            <span class="status-badge edited"><span class="badge-dot"></span>EDITED_ADDRESS</span>
+            <span class="status-badge fallback"><span class="badge-dot"></span>SMS_FALLBACK</span>
+            <span class="status-badge" style="background: var(--status-danger-bg); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.3);">
+              <span class="badge-dot" style="background: #F87171;"></span>TOKEN_EXPIRED
+            </span>
+          </div>
+        </div>
+
+        <!-- Touch Targets Specs -->
+        <div class="comp-card">
+          <div class="comp-title">Erişilebilirlik & Dokunmatik Boyutlar</div>
+          <div class="comp-desc">WCAG AA uyumlu minimum 48px - 52px buton ve input standartları.</div>
+          <div style="font-family: var(--font-mono); font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-dark-subtle);">
+            <div>• Input Height: <span style="color: var(--color-brand-teal);">48px</span></div>
+            <div>• Input Font: <span style="color: var(--color-brand-teal);">16px</span> (iOS Zoom-proof)</div>
+            <div>• Button Height: <span style="color: var(--color-brand-teal);">52px</span> (Ergonomic target)</div>
+            <div>• Minimum Kontrast: <span style="color: var(--color-brand-teal);">4.5:1</span> (Açık temada 15:1)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="spec-footer">
+    Potvrdio (potvrdio.online) Design System & Technical UI Specification • Balkan E-Ticaret ve COD Doğrulama Çözümü
+  </footer>
+
+  <!-- Script: Interactive Controls -->
+  <script>
+    // Copy token to clipboard
+    function copyToken(name, val) {
+      navigator.clipboard.writeText(val);
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `<span>✓</span> <strong>${name}</strong> (${val}) kopyalandı!`;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // Locale switcher for Typography Lab & Mobile Frames
+    const localeData = {
+      sr: {
+        heading: "Proveri i Izmeni Adresu Dostave",
+        cta: "Sačuvaj i Potvrdi Pošiljku",
+        legal: "Vaši podaci se koriste isključivo za potvrdu ove porudžbine u skladu sa Zakonom o zaštiti podataka o ličnosti (ZZPL).",
+        inputVal: "Proveri i izmeni adresu: Bulevar Oslobođenja 42, Novi Sad",
+        viberText: "Zdravo <strong>Marko</strong>! Tvoja porudžbina <strong>#8492</strong> u vrednosti od <strong>4.850 RSD</strong> (Plaćanje pouzećem) je primljena.<br><br><strong>Adresa:</strong> Bulevar Oslobođenja 42, Novi Sad.<br><br>Da li je adresa tačna za slanje?",
+        viberBtn1: "DA, ADRESA JE TAČNA",
+        viberBtn2: "IZMENI ADRESU",
+        mobTitle: "Trenutni Podaci o Isporuci",
+        mobAddr: "Bulevar Oslobođenja 42, 21000 Novi Sad",
+        mobStreet: "Ulica i Broj",
+        mobCity: "Grad i Poštanski Broj",
+        mobNote: "Napomena za kurira",
+        mobBtn: "Sačuvaj i Potvrdi Pošiljku"
+      },
+      mk: {
+        heading: "Провери и промени адреса за достава",
+        cta: "Зачувај и потврди нарачка",
+        legal: "Вашите податоци се користат исклучиво за потврда на оваа нарачка во согласност со Законот за заштита на личните податоци (LPDP).",
+        inputVal: "Зачувај и потврди нарачка: ул. Македонија бр. 12, Скопје",
+        viberText: "Здраво <strong>Никола</strong>! Твојата нарачка <strong>#8491</strong> во износ од <strong>2.400 MKD</strong> (Плаќање при достава) е примена.<br><br><strong>Адреса:</strong> ул. Партизански Одреди 15, Скопје.<br><br>Дали адресата е точна за испраќање?",
+        viberBtn1: "ДА, АДРЕСАТА Е ТОЧНА",
+        viberBtn2: "ПРОМЕНИ АДРЕСА",
+        mobTitle: "Моментални информации за достава",
+        mobAddr: "ул. Партизански Одреди 15, 1000 Скопје",
+        mobStreet: "Улица и број",
+        mobCity: "Град и поштенски код",
+        mobNote: "Забелешка за курирот",
+        mobBtn: "Зачувај и потврди нарачка"
+      },
+      en: {
+        heading: "Review & Edit Delivery Address",
+        cta: "Save & Confirm Order",
+        legal: "Your personal data is strictly processed to verify and fulfill this delivery in compliance with GDPR.",
+        inputVal: "Review and edit address: 42 Knez Mihailova St, Belgrade",
+        viberText: "Hello <strong>Nikola</strong>! Your order <strong>#8492</strong> with total <strong>4.850 RSD</strong> (Cash on Delivery) has been received.<br><br><strong>Address:</strong> Knez Mihailova 42, Belgrade.<br><br>Is this shipping address correct?",
+        viberBtn1: "YES, ADDRESS IS CORRECT",
+        viberBtn2: "EDIT ADDRESS",
+        mobTitle: "Current Delivery Information",
+        mobAddr: "Knez Mihailova 42, 11000 Belgrade",
+        mobStreet: "Street and House Number",
+        mobCity: "City and Postal Code",
+        mobNote: "Courier Delivery Note",
+        mobBtn: "Save & Confirm Order"
+      },
+      tr: {
+        heading: "Teslimat Adresini İncele ve Düzenle",
+        cta: "Güncelle ve Siparişi Onayla",
+        legal: "Kişisel verileriniz KVKK ve GDPR uyumlu olarak yalnızca bu siparişin doğrulanması ve teslimatı amacıyla işlenir.",
+        inputVal: "Teslimat adresini düzenle: Knez Mihailova 42, Belgrad",
+        viberText: "Merhaba <strong>Nikola</strong>! <strong>#8492</strong> numaralı, <strong>4.850 RSD</strong> tutarındaki kapıda ödeme siparişiniz alındı.<br><br><strong>Teslimat Adresi:</strong> Knez Mihailova 42, Belgrad.<br><br>Adresiniz kargolama için doğru mu?",
+        viberBtn1: "EVET, ADRES DOĞRU",
+        viberBtn2: "ADRESİ DÜZENLE",
+        mobTitle: "Mevcut Teslimat Bilgisi",
+        mobAddr: "Knez Mihailova 42, 11000 Belgrad",
+        mobStreet: "Cadde, Sokak ve No",
+        mobCity: "İlçe ve Posta Kodu",
+        mobNote: "Kuryeye Teslimat Notu",
+        mobBtn: "Güncelle ve Siparişi Onayla"
+      }
+    };
+
+    function setLocale(lang, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const data = localeData[lang];
+      document.getElementById('preview-heading').innerText = data.heading;
+      document.getElementById('preview-cta').innerText = data.cta;
+      document.getElementById('preview-legal').innerText = data.legal;
+      document.getElementById('custom-font-input').value = data.inputVal;
+
+      // Update Viber Screen
+      document.getElementById('viber-msg-text').innerHTML = data.viberText;
+      document.getElementById('viber-btn1-text').innerText = data.viberBtn1;
+      document.getElementById('viber-btn2-text').innerText = data.viberBtn2;
+
+      // Update Mobile Web App Screen
+      document.getElementById('mob-summary-addr').innerText = data.mobAddr;
+      document.getElementById('mob-lbl-street').innerText = data.mobStreet;
+      document.getElementById('mob-lbl-city').innerText = data.mobCity;
+      document.getElementById('mob-lbl-note').innerText = data.mobNote;
+      document.getElementById('mob-btn-text').innerText = data.mobBtn;
+      document.getElementById('mob-legal-notice').innerText = data.legal;
+    }
+
+    // Viber Simulations
+    function simulateViberApprove() {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `<span>✓</span> Viber: <strong>ACTION_APPROVE</strong> sinyali gönderildi! Sipariş Processing durumuna geçti.`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function simulateViberEdit() {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg> Viber: Adres düzeltme linki tıklandı -> Webview açılıyor.`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+
+      // Scroll to mobile screen smoothly
+      document.getElementById('mobile-app-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('mobile-app-container').style.outline = "3px solid var(--color-brand-teal)";
+      setTimeout(() => {
+        document.getElementById('mobile-app-container').style.outline = "none";
+      }, 1500);
+    }
+
+    // Submit Mobile Address Simulation
+    function submitMobileAddress() {
+      const btn = document.getElementById('mob-submit-btn');
+      const originalText = document.getElementById('mob-btn-text').innerText;
+      btn.innerHTML = `<span class="spinner" style="border-top-color: white; width: 16px; height: 16px; display:inline-block;"></span> <span>İşleniyor...</span>`;
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const toast = document.getElementById('toast');
+        toast.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg> WooCommerce: Sipariş adresi güncellendi ve kargoya onaylandı!`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+
+        setTimeout(() => {
+          const checkCheckSvg = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/></svg>`;
+          btn.innerHTML = `<span id="mob-btn-icon">${checkCheckSvg}</span> <span id="mob-btn-text">${originalText}</span>`;
+          btn.disabled = false;
+        }, 1000);
+      }, 800);
+    }
+
+    // Simulation Countdown for 24h Token
+    let seconds = 24 * 3600 - 15;
+    setInterval(() => {
+      seconds--;
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      document.getElementById('token-timer').innerText = 
+        `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }, 1000);
+  </script>
+</body>
+</html>

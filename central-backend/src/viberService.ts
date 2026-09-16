@@ -36,8 +36,8 @@ export class ViberService {
 
     console.log(`[VIBER GATEWAY] Sending Viber Message to ${payload.customerPhone} for Order #${payload.orderId}`);
     console.log(`[VIBER TEXT] Zdravo ${payload.customerName}! Vaša narudžbina #${payload.orderId} (Iznos: ${payload.totalAmount} ${payload.currency}) je primljena. Adresa: ${payload.address}, ${payload.city}.`);
-    console.log(`[BUTTON 1] ✅ DA, ADRESA JE TAČNA I POTVRĐUJEM`);
-    console.log(`[BUTTON 2] ✏️ IZMENI ADRESU -> ${editUrl}`);
+    console.log(`[BUTTON 1] [APPROVE] DA, ADRESA JE TAČNA I POTVRĐUJEM`);
+    console.log(`[BUTTON 2] [EDIT] IZMENI ADRESU -> ${editUrl}`);
 
     const logEntry = {
       id: messageId,

@@ -28,7 +28,14 @@ Potvrdio platformu, iki farklı kullanıcı kitlesinin zıt psikolojik ve teknik
 ### 1.2 Light Logistics Tema (Mobile Address App: `potvrdio.online/edit`)
 * **Kullanıcı:** Viber mesajındaki linke tıklayan kapıda ödeme (COD) alıcısı (teknik olmayan, yaşlı veya mobil cihazını dış mekanda kullanan tüketiciler).
 * **Görsel Dil:** Temiz, yüksek kontrastlı açık tema (`#FFFFFF` arka plan, `#F8FAFC` kartlar, `#0F172A` koyu metinler).
-* **Performans Kararı:** Düşük konfigürasyonlu Android cihazlarda ve Viber içi webview (in-app browser) içinde gecikmeyi sıfırlamak için `backdrop-filter: blur()` ve heavy CSS efektleri **kullanılmaz**. Düz net gölgeler ve 1s altında render garanti edilir.
+* **Performans Kararı:** Düşük konfigürasyonlu Android cihazlarda ve Viber içi webview (in-app browser) içinde gecikmeyi sıfırlamak için `backdrop-filter: blur()`, harita SDK'ları ve heavy CSS efektleri **kesinlikle kullanılmaz**. Düz net kenarlıklar, hafif gölgeler ve sub-1s render garanti edilir.
+
+### 1.3 Sıfır Emoji Standartı ve İkonografi Kuralı (Zero-Emoji Architecture Decision)
+* **Kural:** Proje genelinde (kod tabanı, Viber mesaj şablonları, mobil webview, dashboard, butonlar ve dokümantasyon dahil) hiçbir Unicode emojisi (`✅`, `✏️`, `📦`, `📍`, `🔒`, `🔘`, `⏱` vb.) **kesinlikle kullanılmaz**.
+* **Gerekçe:**
+  1. Emojiler Android, iOS, Windows ve in-app browser webview'lerinde farklı boyut, renk, glif ve dikey hizalama ile render edilir (layout shift ve görsel tutarsızlık yaratır).
+  2. B2B / micro-SaaS ve resmi sipariş doğrulama bağlamında emojiler spam veya gayriciddi algı yaratabilir.
+* **Standart:** Görsel gösterim gereken tüm alanlarda yalnızca **tek tip, vektörel ve semantik SVG ikonları** (`Lucide Icons` veya saf satır içi SVG) kullanılır.
 
 ---
 
@@ -37,6 +44,7 @@ Potvrdio platformu, iki farklı kullanıcı kitlesinin zıt psikolojik ve teknik
 ### 2.1 Marka Kimliği & Üçüncü Taraf Ayrıştırması
 * **Potvrdio Marka Rengi:** **Brand Teal (`#14B8A6`)** — Logo, ana CTA butonları ve marka vurgularında kullanılır.
 * **Viber Resmi Rengi:** **Viber Purple (`#7360F2`)** — **SADECE** Viber Business API ile doğrudan ilişkili UI elemanlarında (Viber mesaj simülatörü header'ı ve Viber aksiyon butonlarında) kullanılır. Kullanıcının ürünü "Viber'ın resmi yazılımı" sanmasını önlemek için marka kimliğinden kesin hatlarla ayrılmıştır.
+* **Kargo & Taşıyıcı Bağımsızlığı İlkesi:** Sayfa tasarımı; D Express, Post Express, Bex gibi yerel kargo firmalarının tescilli renk ve logolarını taklit etmez. Güven taklidi (brand impersonation) veya tüketiciyi yanıltma riskini sıfırlamak adına tamamen nötr, şeffaf ve mağaza odaklı bir "Sipariş Teslimat Doğrulama" dili kullanılır.
 
 ### 2.2 Primary & Brand Tokens
 | Token | Value / Hex | Açıklama / Kullanım |
@@ -70,14 +78,15 @@ Potvrdio platformu, iki farklı kullanıcı kitlesinin zıt psikolojik ve teknik
 | `--status-success` | `#10B981` (Emerald) | `APPROVED` / `DELIVERED` durumu |
 | `--status-info` | `#3B82F6` (Blue) | `EDITED_ADDRESS` / `IN_TRANSIT` durumu |
 | `--status-warning` | `#F59E0B` (Amber) | `SMS_FALLBACK` / `PENDING` durumu |
-| `--status-danger` | `#EF4444` (Red) | Token süresi doldu / `ERROR` durumları |
+| `--status-danger` | `#EF4444` (Red) | Token süresi doldu (24 saat / oturum aşımı) / `ERROR` durumları |
 
 ---
 
 ## 3. Tipografi ve Aralık (Spacing) Sistemi
 
 ### 3.1 Font Ailesi
-- **Primary Font:** `Plus Jakarta Sans`, sans-serif (Google Fonts)
+- **Primary Font:** `Inter`, sans-serif (Google Fonts) — Tüm Balkan dillerini, tam Latin ve yerel Kiril karakter setini (Makedonca'ya özgü `ѓ, ќ, ѕ, џ, љ, њ` dahil olmak üzere) eksiksiz ve yerel glif formlarıyla destekler. *(Alternatif Geometrik Font: `Manrope`)*.
+- **Tipografi Notu:** `Plus Jakarta Sans` Google Fonts üzerinde temel Kiril (`U+0400-U+045F`) bloğunu barındırmadığından ve Makedonca metinlerde sistem fontuna (fallback) düştüğünden ana font listesinden çıkarılmıştır.
 - **Monospace Font:** `JetBrains Mono` / `Fira Code` (API Key ve Log verileri için)
 
 ### 3.2 Tipografi Ölçeği
@@ -112,7 +121,7 @@ Potvrdio platformu, iki farklı kullanıcı kitlesinin zıt psikolojik ve teknik
 Tüm metin ve arka plan kombinasyonlarında **minimum 4.5:1 kontrast oranı** zorunludur:
 - Koyu temada metin rengi: `#FFFFFF` ve `#CBD5E1` (Koyu arka plan üzerinde minimum 7:1 kontrast).
 - Açık temada metin rengi: `#0F172A` (Beyaz arka plan üzerinde 15:1 kontrast).
-- Dokunmatik eleman boyutları (Touch Targets): Mobilde tüm buton ve input yükseklikleri **minimum 48px - 52px** olarak yapılandırılır.
+- Dokunmatik eleman boyutları (Touch Targets): Mobilde tüm buton ve input yükseklikleri **minimum 48px - 52px** olarak yapılandırılır (özellikle yaşlı ve tek elle kullanan alıcılar için ergonomik standard).
 
 ---
 
@@ -125,21 +134,23 @@ Tüm metin ve arka plan kombinasyonlarında **minimum 4.5:1 kontrast oranı** zo
 - **Engelli (Disabled State):** `opacity: 0.4; cursor: not-allowed; box-shadow: none;`
 
 ### 5.2 Viber Mesaj Simülatörü (Hero Widget)
-- **Header:** Viber Purple (`#7360F2`) zeminli resmi görünüm.
-- **Buton 1 (Onay):** Emerald Yeşil (`#10B981`) solid buton (`✅ DA, ADRESA JE TAČNA`).
-- **Buton 2 (Izmeni Adresu):** Dark glass border buton (`✏️ IZMENI ADRESU`).
+- **Header:** Viber Purple (`#7360F2`) zeminli simülasyon görünümü.
+- **Buton 1 (Onay):** Emerald Yeşil (`#10B981`) solid buton (`DA, ADRESA JE TAČNA`).
+- **Buton 2 (Izmeni Adresu):** Dark glass border buton (`IZMENI ADRESU`).
 - **Doğrulama Rozeti:** Viber resmi ticari markasını ihlal etmemek adına markadan bağımsız nötr "Doğrulanmış Gönderi" ibaresi kullanılır.
 
-### 5.3 Mobil Kargo Süreç Takipçisi & Harita Kartı (`mobile-address-app` — YENİ)
-Müşteri Viber linkine tıkladığında resmi bir kargo doğrulama sayfasında olduğunu hissettirmek amacıyla formun üst kısmına 3 adımlı bir süreç takipçisi ve dinamik konum haritası eklenir:
-1. **Adım 1:** `Porudžbina Primljena` (Sipariş Alındı — Tamamlandı)
-2. **Adım 2:** `Potvrda Adrese` (Adres Doğrulama — Aktif Adım)
-3. **Adım 3:** `Spremljeno za Kargo` (Kargoya Hazır — Beklemede)
+### 5.3 Mobil Teslimat Doğrulama Başlığı & Adres Özeti (`mobile-address-app`)
+> **Performans & Kapsam Kuralı (YAGNI):** Harita bileşeni (harita SDK'sı, tile sunucusu, geolocation) **kapsam dışıdır**. Düşük donanımlı Android ve Viber içi webview'de sıfır gecikme (sub-1s render) sağlamak amacıyla harita kartı yerine hafif ve salt CSS bir "Sipariş & Adres Bilgi Kartı" kullanılır. Hiçbir kargo firmasının (Post Express/D Express) görsel kimliği taklit edilmez.
+
+- **Sade Durum Başlığı:** Mağaza adı ve sipariş numarası (`#[SiparişNo] - Adres Doğrulama`).
+- **Hafif Adres Özet Kutusu:** Müşterinin WooCommerce siparişinde verdiği mevcut adres salt metin olarak gösterilir; altına tek tıkla "Adresim Doğru" veya formu düzenleme seçeneği sunulur.
+- **Token Geçerlilik Süresi:** Token'lar aceleye yer bırakmayacak şekilde **24 saat** geçerli (veya tıklandıktan sonra 30 dakika aktif oturum sağlayan) tek kullanımlık bağlantılardır. Form submit edildiğinde token otomatik tüketilir.
 
 ### 5.4 Mobil Form Elemanları (`potvrdio.online/edit`)
 - **Card Container:** `#FFFFFF` zemin, `border: 1px solid #E2E8F0`, `box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05)`.
 - **Input Focus State:** `border-color: #14B8A6`, `box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15)`.
-- **Hukuki Metin:** Formun altında yer alan zorunlu ZZPL gizlilik metni.
+- **Input Boyutları:** 16px font (iOS auto-zoom bug önleyici), 48px-52px yükseklik (erişilebilirlik garantisi).
+- **Hukuki Metin:** Formun altında yer alan zorunlu yerel veri koruma (ZZPL / GDPR / LPDP) gizlilik metni.
 
 ### 5.5 Merchant Dashboard Log Tablosu ve Boş Durum (Empty State)
 - **`APPROVED` Rozeti:** Arka plan `rgba(16, 185, 129, 0.1)`, Metin `#34D399`, Sınır `rgba(16, 185, 129, 0.2)`.
@@ -149,10 +160,53 @@ Müşteri Viber linkine tıkladığında resmi bir kargo doğrulama sayfasında 
 
 ---
 
-## 6. Bölgesel Dil ve Hukuki Uyum Standartları
+## 6. Bölgesel Dil, Alfabe ve Para Birimi Standartları
 
-* **Dil:** Sırpça / Hırvatça (`sr-RS`) Latin Alfabesi.
-* **Onay Metni:** `"Sačuvaj i Potvrdi Pošiljku"`
+Balkan pazarındaki 5 hedef ülke için iki temel alfabe ve yerel para birimleri desteklenir:
+
+### 6.1 Dil ve Alfabe Matrisi
+| Bölge / Pazar | Resmi Dil & Kod | Alfabe | Veri Koruma Mevzuatı |
+| :--- | :--- | :--- | :--- |
+| **Sırbistan** | Sırpça (`sr-RS`) | Latin | ZZPL (GDPR hizalı) |
+| **Bosna-Hersek** | Boşnakça / Hırvatça / Sırpça (`bs-BA`) | Latin | DPL (2025 revizyonu) |
+| **Hırvatistan** | Hırvatça (`hr-HR`) | Latin | AB GDPR |
+| **Karadağ** | Karadağca (`me-ME`) | Latin | PDPA |
+| **Kuzey Makedonya** | Makedonca (`mk-MK`) | **Kiril (Cyrillic)** | LPDP |
+| **Uluslararası / Expats** | İngilizce (`en-US`) | Latin | GDPR |
+| **Yönetim & Satıcı Destek** | Türkçe (`tr-TR`) | Latin | KVKK / GDPR |
+
+### 6.2 UI Metin Kopyaları (Microcopy)
+
+#### A. Sırpça / Hırvatça / Boşnakça (Latin):
+* **Onay Butonu:** `"Sačuvaj i Potvrdi Pošiljku"`
 * **Adres Başlığı:** `"Proveri i Izmeni Adresu Dostave"`
+* **Adres Doğru Butonu:** `"Adresa je Tačna"`
 * **Mobil Gizlilik Metni (ZZPL / GDPR):** `"Vaši podaci se koriste isključivo za potvrdu ove porudžbine."`
-* **Para Birimleri:** `RSD` (Sırp Dinarı), `EUR` (€), `BAM` (Bosna Markı).
+
+#### B. Makedonca (Kiril — Kuzey Makedonya):
+* **Onay Butonu:** `"Зачувај и потврди нарачка"`
+* **Adres Başlığı:** `"Провери и промени адреса за достава"`
+* **Adres Doğru Butonu:** `"Адресата е точна"`
+* **Mobil Gizlilik Metni (LPDP):** `"Вашите податоци се користат исклучиво за потврда на оваа нарачка."`
+
+#### C. İngilizce (English — Uluslararası):
+* **Onay Butonu:** `"Save & Confirm Order"`
+* **Adres Başlığı:** `"Review & Edit Delivery Address"`
+* **Adres Doğru Butonu:** `"Address is Correct"`
+* **Mobil Gizlilik Metni (GDPR):** `"Your data is strictly processed to verify and fulfill this delivery."`
+
+#### D. Türkçe (Turkish — Operasyon & Satıcı Dili):
+* **Onay Butonu:** `"Güncelle ve Siparişi Onayla"`
+* **Adres Başlığı:** `"Teslimat Adresini İncele ve Düzenle"`
+* **Adres Doğru Butonu:** `"Adres Doğru, Gönderin"`
+* **Mobil Gizlilik Metni (KVKK / GDPR):** `"Kişisel verileriniz yalnızca bu siparişin doğrulanması ve teslimatı amacıyla işlenir."`
+
+### 6.3 Desteklenen Para Birimleri
+* `RSD` (Sırp Dinarı — din. / RSD)
+* `EUR` (€ — Karadağ & Hırvatistan)
+* `BAM` (Bosna Hersek Değiştirilebilir Markı — KM)
+* `MKD` (Makedon Dinarı — ден / MKD)
+* `TRY` (Türk Lirası — ₺)
+* `USD` ($)
+
+> **Fazlandırma Notu:** Faz 1 ve 2 lansmanı öncelikli olarak en büyük COD hacmine sahip Sırbistan, Bosna-Hersek ve Karadağ/Hırvatistan (Latin) pazarında başlatılacak; Kuzey Makedonya (Kiril + MKD) altyapı hazırlığı tamamlanmış olarak bölgesel genişleme fazında devreye alınacaktır.

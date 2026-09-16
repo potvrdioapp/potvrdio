@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Sparkles, CheckCircle2, ShieldCheck, Zap,
-  ArrowRight, Calculator, Check, Info
+  ArrowRight, Calculator, Check, Info, Pencil
 } from 'lucide-react';
 
 export default function App() {
@@ -145,14 +145,15 @@ export default function App() {
                         class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
                         <CheckCircle2 class="w-4 h-4" />
-                        <span>✅ DA, ADRESA JE TAČNA I POTVRĐUJEM</span>
+                        <span>DA, ADRESA JE TAČNA I POTVRĐUJEM</span>
                       </button>
 
                       <button
                         onClick={() => setDemoStep('editing')}
                         class="w-full bg-slate-800 hover:bg-slate-700 text-teal-300 font-bold text-xs py-3 px-4 rounded-xl border border-teal-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        <span>✏️ IZMENI ADRESU (potvrdio.online)</span>
+                        <Pencil class="w-3.5 h-3.5" />
+                        <span>IZMENI ADRESU (potvrdio.online)</span>
                       </button>
                     </div>
                   )}

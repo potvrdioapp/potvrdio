@@ -29,7 +29,7 @@ export class TokenService {
 
   public createToken(sessionData: Omit<TokenSession, 'token' | 'expiresAt' | 'used'>): string {
     const token = crypto.randomBytes(16).toString('hex');
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes single-use token
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours single-use token (Balkan COD accessibility standard)
 
     const session: TokenSession = {
       ...sessionData,

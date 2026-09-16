@@ -59,17 +59,17 @@
 ### 3.3 Viber Mesajı ve İnteraktif Butonlar
 * **FR-3.1 (Dynamic Message Template):** Mesaj içeriği dinamik değişkenler içerir:
   > *"Zdravo [Ad]! Siparişiniz #[SiparişNo] alındı (Tutar: [Tutar] RSD).*  
-  > 📦 **Adresiniz:** [Sokak/Bina/Daire, Şehir]  
+  > **Adresiniz:** [Sokak/Bina/Daire, Şehir]  
   > *Siparişinizi kargolamamız için onaylayın:"*
-* **FR-3.2 (Button 1 - One-Click Approve):** `[ ✅ EVET, ADRES DOĞRU VE ONAYLIK ]`
+* **FR-3.2 (Button 1 - One-Click Approve):** `[ EVET, ADRES DOĞRU VE ONAYLIYORUM ]`
   * Tıklandığında Viber içinden Potvrdio sunucusuna `ACTION_APPROVE` sinyali atar. Sipariş serbest kalır.
-* **FR-3.3 (Button 2 - Edit Address Link):** `[ ✏️ ADRESİMİ DÜZELT ]`
+* **FR-3.3 (Button 2 - Edit Address Link):** `[ ADRESİMİ DÜZELT ]`
   * Tıklandığında müşteriyi `https://potvrdio.online/edit/...` adresine yönlendirir.
 
 ### 3.4 Mobil Adres Düzeltme Sayfası (Mobile Web App - potvrdio.online)
 * **FR-4.1 (Passwordless Token URL):** Müşteri linke tıkladığında şifre/giriş istemeden, sadece o siparişe özel şifrelenmiş geçici token URL ile açılır (Örn: `https://potvrdio.online/edit-address?token=xyz123`).
 * **FR-4.2 (Mobile Form UI):** Formda mevcut adres alanları (Şehir, Sokak & Bina No, Daire/Kat, Sipariş Notu) önceden dolu olarak gelir.
-* **FR-4.3 (Update & Release Flow):** Müşteri adresi güncelleyip **[ Kaydet ve Onayla ]** butonuna bastığı an:
+* **FR-4.3 (Update & Release Flow):** Müşteri adresi güncelleyip **[ Güncelle ve Siparişi Onayla ]** butonuna bastığı an:
   1. Potvrdio Central Server siparişi `APPROVED` olarak işaretler.
   2. Eklentiye webhook atarak WooCommerce'deki teslimat adresini günceller ve durumu `Processing` yapar.
 
@@ -129,7 +129,7 @@ Balkan bölgesindeki veri koruma yasalarına tam uyum sağlanacaktır:
 * **Bosna-Hersek (DPL) / Karadağ (PDPA) / Kuzey Makedonya (LPDP) / Hırvatistan (GDPR):**
   * Checkout alanına açık rıza onay seçeneği eklenir.
   * Viber mesajlarının altına tek tıkla abonelikten çıkma (`Opt-out`) bağlantısı koyulur.
-  * Mobil form linkleri 5 dakika geçerli tek kullanımlık (Single-Use Token) olarak üretilir.
+  * Mobil form linkleri 24 saat geçerli (veya ilk tıklandıktan sonra 30 dakika aktif oturum sağlayan) tek kullanımlık (Single-Use Token) olarak üretilir. Form submit edildiğinde token otomatik tüketilir.
 
 ---
 
