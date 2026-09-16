@@ -1,0 +1,170 @@
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import { ViberService } from './viberService';
+import { TokenService } from './tokenService';
+import { BillingService } from './billingService';
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+app.use(cors());
+app.use(express.json());
+
+const viberService = ViberService.getInstance();
+const tokenService = TokenService.getInstance();
+const billingService = BillingService.getInstance();
+
+// Healthcheck
+app.get('/health', (req: Request, res: Response) => {
+  res.json({ status: 'OK', service: 'Potvrdio Central Backend API', timestamp: new Date() });
+});
+
+/**
+ * 1. WooCommerce Intercepted Order Receiver
+ * Endpoint: POST /api/v1/orders/intercept
+ */
+app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
+  const apiKey = (req.headers['x-potvrdio-api-key'] as string) || 'demo_api_key_123';
+  const { order_id, store_domain, customer_name, customer_phone, billing_address, total_amount, currency } = req.body;
+
+  if (!order_id || !customer_phone) {
+    return res.status(400).json({ error: 'Missing required order fields' });
+  }
+
+  // Deduct 1 credit from merchant balance pool
+  const hasCredits = billingService.deductCredit(apiKey);
+  if (!hasCredits) {
+    console.warn(`[CREDIT ALERT] Merchant ${apiKey} has insufficient balance! Sending email alert.`);
+  }
+
+  // Create 5-minute 1-time token for address edit link
+  const token = tokenService.createToken({
+    orderId: String(order_id),
+    storeDomain: store_domain || 'my-shop.rs',
+    customerName: customer_name,
+    customerPhone: customer_phone,
+    address1: billing_address?.address_1 || '',
+    address2: billing_address?.address_2 || '',
+    city: billing_address?.city || 'Beograd',
+    postcode: billing_address?.postcode || '11000',
+    totalAmount: total_amount || 0,
+    currency: currency || 'RSD',
+  });
+
+  // Trigger Viber Business API verification message
+  const result = await viberService.sendVerificationMessage({
+    orderId: String(order_id),
+    storeDomain: store_domain || 'my-shop.rs',
+    customerName: customer_name,
+    customerPhone: customer_phone,
+    totalAmount: total_amount || 0,
+    currency: currency || 'RSD',
+    address: billing_address?.address_1 || '',
+    city: billing_address?.city || 'Beograd',
+    token,
+  });
+
+  res.json({
+    success: true,
+    message: 'Order intercepted and Viber message queued',
+    viberMessageId: result.messageId,
+    editUrl: result.editUrl,
+  });
+});
+
+/**
+ * 2. Viber Interactivity Callback / Webhook Simulation
+ * Endpoint: POST /api/v1/viber/webhook
+ */
+app.post('/api/v1/viber/webhook', (req: Request, res: Response) => {
+  const { order_id, action } = req.body;
+  if (!order_id || !action) {
+    return res.status(400).json({ error: 'Missing order_id or action' });
+  }
+
+  if (action === 'ACTION_APPROVE') {
+    viberService.markStatus(order_id, 'APPROVED');
+    console.log(`[ACTION_APPROVE] Customer approved order #${order_id} directly in Viber!`);
+    return res.json({ status: 'success', action: 'APPROVED', order_id });
+  }
+
+  res.json({ status: 'acknowledged' });
+});
+
+/**
+ * 3. Validate Token for Mobile Address App (potvrdio.online/edit)
+ * Endpoint: GET /api/v1/address-token/:token
+ */
+app.get('/api/v1/address-token/:token', (req: Request, res: Response) => {
+  const { token } = req.params;
+  const session = tokenService.validateToken(token);
+
+  if (!session) {
+    return res.status(404).json({ error: 'Link za izmenu adrese je istekao ili je već iskorišćen (Token expired or invalid)' });
+  }
+
+  res.json({
+    orderId: session.orderId,
+    customerName: session.customerName,
+    customerPhone: session.customerPhone,
+    address1: session.address1,
+    address2: session.address2,
+    city: session.city,
+    postcode: session.postcode,
+    totalAmount: session.totalAmount,
+    currency: session.currency,
+    expiresAt: session.expiresAt,
+  });
+});
+
+/**
+ * 4. Submit Mobile Address Form & Release WooCommerce Order
+ * Endpoint: POST /api/v1/address-token/:token/submit
+ */
+app.post('/api/v1/address-token/:token/submit', (req: Request, res: Response) => {
+  const { token } = req.params;
+  const { address_1, address_2, city, postcode, order_note } = req.body;
+
+  const session = tokenService.consumeToken(token);
+  if (!session) {
+    return res.status(400).json({ error: 'Nevažeći ili istekao token za slanje' });
+  }
+
+  viberService.markStatus(session.orderId, 'APPROVED');
+
+  console.log(`[ADDRESS UPDATED & APPROVED] Order #${session.orderId} updated to: ${address_1}, ${city}. Releasing order to Processing in WooCommerce!`);
+
+  res.json({
+    success: true,
+    message: 'Adresa uspešno ažurirana! Vaša pošiljka je potvrdjena.',
+    orderId: session.orderId,
+    updatedAddress: {
+      address_1,
+      address_2,
+      city,
+      postcode,
+    },
+    orderNote: order_note,
+  });
+});
+
+/**
+ * 5. Billing Webhook Handler (Paddle / Lemon Squeezy Merchant of Record)
+ * Endpoint: POST /api/v1/billing/webhook
+ */
+app.post('/api/v1/billing/webhook', (req: Request, res: Response) => {
+  const { merchant_api_key, package_type, amount_euro } = req.body;
+  
+  let credits = 600; // Starter €15
+  if (package_type === 'GROWTH') credits = 1875; // Growth €45
+  if (package_type === 'PRO') credits = 6000; // Pro €120
+  if (package_type === 'PRO_RESERVE') credits = 1800; // €29/mo
+
+  billingService.processWebhookTopUp(merchant_api_key || 'demo_api_key_123', amount_euro || 15, credits);
+
+  res.json({ status: 'success', message: 'Credits updated successfully' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 Potvrdio Central API Server listening on port ${PORT}`);
+});

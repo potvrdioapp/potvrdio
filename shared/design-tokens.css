@@ -1,0 +1,75 @@
+/**
+ * Potvrdio (potvrdio.online) Design System Tokens v2.0
+ * Dual Theme Architecture Specification
+ */
+
+:root {
+  /* Brand Identity (Potvrdio Signature) */
+  --color-brand-teal: #14b8a6;
+  --color-brand-indigo: #6366f1;
+  --color-brand-pink: #ec4899;
+
+  /* Viber Third-Party Official UI ONLY */
+  --color-viber-purple: #7360f2;
+
+  /* Dark Surface Hierarchy (Dashboard / Landing) */
+  --bg-dark-void: #070a13;
+  --bg-dark-elevated: #0d121f;
+  --bg-dark-glass: rgba(19, 26, 43, 0.75);
+  --border-dark-subtle: rgba(255, 255, 255, 0.08);
+  --border-dark-accent: rgba(20, 184, 166, 0.3);
+
+  /* Light Surface Hierarchy (Mobile Address Form) */
+  --bg-light-base: #ffffff;
+  --bg-light-card: #f8fafc;
+  --border-light: #e2e8f0;
+  --text-light-primary: #0f172a;
+  --text-light-secondary: #475569;
+
+  /* Semantics */
+  --status-success: #10b981;
+  --status-info: #3b82f6;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+
+  /* Typography & Grid Spacing */
+  --font-family-base: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+}
+
+/* Glassmorphism Utility Class (Dashboard/Landing Only) */
+.glass-card {
+  background: var(--bg-dark-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-dark-subtle);
+}
+
+/* Light Mobile App Card (Performance optimized - No Blur) */
+.card-mobile {
+  background: var(--bg-light-card);
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+
+/* Glow Utilities */
+.glow-brand {
+  box-shadow: 0 0 35px -5px rgba(20, 184, 166, 0.35);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.35);
+}
+
+.gradient-brand-text {
+  background: linear-gradient(135deg, #14b8a6 0%, #6366f1 50%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
