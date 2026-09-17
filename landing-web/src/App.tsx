@@ -107,9 +107,10 @@ export default function App() {
         viber_order_received: "Primili smo tvoju porudžbinu",
         viber_shipping_address: "ADRESA ZA DOSTAVU:",
         viber_confirm_prompt: "Molimo te da potvrdiš tačnost pre nego što paket predamo kuriru:",
-        viber_btn_yes: "DA, ADRESA JE TAČNA",
-        viber_btn_edit: "IZMENI ADRESU",
-        viber_success_msg: "Zabeleženo u sistemu. Podaci su prosleđeni u WooCommerce.",
+        viber_btn_yes: "POTVRDI KAO TAČNO (BEZ IZMENA)",
+        viber_btn_edit: "DODAJ BROJ STANA / IZMENI ADRESU",
+        viber_success_confirmed: "Potvrđeno bez izmena! Paket je spreman za štampu adresnice.",
+        viber_success_edited: "Adresa dopunjena! Dodat sprat i stan. WooCommerce ažuriran.",
         status_saved: "SAČUVANO: Paket nije poslat, 820 RSD u džepu",
         status_approved: "ODOBRENO: Štampaj Post Express adresnicu",
         status_waiting: "ČEKANJE: Ne pakovati paket iz magacina",
@@ -190,9 +191,10 @@ export default function App() {
         viber_order_received: "Ја примивме твојата нарачка",
         viber_shipping_address: "АДРЕСА ЗА ДОСТАВА:",
         viber_confirm_prompt: "Те молиме потврди ја точноста пред да го предадеме пакетот на курир:",
-        viber_btn_yes: "ДА, АДРЕСАТА Е ТОЧНА",
-        viber_btn_edit: "ИЗМЕНИ ЈА АДРЕСАТА",
-        viber_success_msg: "Забележано во системот. Податоците се испратени во WooCommerce.",
+        viber_btn_yes: "ПОТВРДИ КАКУ ШТО Е (БЕЗ ИЗМЕНИ)",
+        viber_btn_edit: "ДОДАЈ БРОЈ НА СТАН / ИЗМЕНИ АДРЕСА",
+        viber_success_confirmed: "Потврдено без измени! Пакетот е подготвен за достава.",
+        viber_success_edited: "Адресата е дополнета! Додаден кат и стан. WooCommerce е ажуриран.",
         status_saved: "ЗАШТЕДЕНО: Пакетот не е испратен, 820 RSD во џеб",
         status_approved: "ОДОБРЕНО: Печати адресар за достава",
         status_waiting: "ЧЕКАЊЕ: Не пакувај го пакетот од магацин",
@@ -273,9 +275,10 @@ export default function App() {
         viber_order_received: "We have received your order",
         viber_shipping_address: "SHIPPING ADDRESS:",
         viber_confirm_prompt: "Please confirm details before we hand over the parcel to the courier:",
-        viber_btn_yes: "YES, ADDRESS IS ACCURATE",
-        viber_btn_edit: "EDIT ADDRESS",
-        viber_success_msg: "Logged in system. Details forwarded to WooCommerce.",
+        viber_btn_yes: "CONFIRM ADDRESS AS-IS (NO EDITS)",
+        viber_btn_edit: "ADD APARTMENT / EDIT ADDRESS",
+        viber_success_confirmed: "Confirmed as-is! Order released to warehouse for printing.",
+        viber_success_edited: "Address corrected! Added floor & apartment details. WooCommerce synced.",
         status_saved: "SAVED: Parcel not dispatched, ~€7 saved in pocket",
         status_approved: "APPROVED: Print Post Express shipping label",
         status_waiting: "ON HOLD: Do not pack parcel from warehouse",
@@ -662,7 +665,14 @@ export default function App() {
                 <div className="p-2.5 rounded bg-[#1E1838] border border-[#46377B] font-mono text-[11px] text-[#C4B5FD] mb-3">
                   <span className="text-slate-400 block text-[10px]">{t('viber_shipping_address')}</span>
                   <span className="text-white font-medium">
-                    {simState === 'edited' ? (lang === 'sr' ? 'Bulevar Oslobođenja 42, Sprat 3, Stan 14' : '42 Liberation Blvd, 3rd Floor, Apt 14') : currentScenConfig.address[lang]}
+                    {simState === 'edited' ? (
+                      <span>
+                        {lang === 'sr' ? 'Bulevar Oslobođenja 42' : lang === 'mk' ? 'Бул. Партизански Одреди 42' : '42 Liberation Blvd'}
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold text-[10px] border border-blue-400/40 animate-pulse">
+                          + {lang === 'sr' ? 'Sprat 3, Stan 14' : lang === 'mk' ? 'Кат 3, Стан 14' : 'Floor 3, Apt 14'}
+                        </span>
+                      </span>
+                    ) : currentScenConfig.address[lang]}
                   </span>
                 </div>
                 <p className="text-[11px] text-[#DDD6FE]">
@@ -687,10 +697,15 @@ export default function App() {
                     <span>{t('viber_btn_edit')}</span>
                   </button>
                 </div>
+              ) : simState === 'edited' ? (
+                <div className="p-3 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
+                  <Check className="w-4 h-4 text-blue-400" />
+                  <span>{t('viber_success_edited')}</span>
+                </div>
               ) : (
                 <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
                   <Check className="w-4 h-4 text-emerald-400" />
-                  <span>{t('viber_success_msg')}</span>
+                  <span>{t('viber_success_confirmed')}</span>
                 </div>
               )}
             </div>
@@ -714,11 +729,17 @@ export default function App() {
                 {currentScenario === 1 && (
                   <>
                     <div className="text-neutral-300">[13:42:02] Viber Gateway: Transaction #VB-9201 dispatched (+381642918472). Status: DELIVERED.</div>
+                    {simState === 'confirmed' && (
+                      <>
+                        <div className="text-emerald-400 font-bold">[13:42:08] Viber Action: [DIRECT_CONFIRM] Customer approved address as-is without edits.</div>
+                        <div className="text-slate-200">[13:42:09] WooCommerce Hook: Order status changed -&gt; PROCESSING. Dispatch label ready.</div>
+                      </>
+                    )}
                     {simState === 'edited' && (
                       <>
-                        <div className="text-blue-400 font-bold">[13:42:15] Token Form: Customer updated street, apartment & notes.</div>
-                        <div className="text-slate-200">[13:42:16] WooCommerce shipping metadata overwritten safely.</div>
-                        <div className="text-emerald-300 font-semibold">[13:42:16] Order unblocked -&gt; PROCESSING. Dispatch label ready.</div>
+                        <div className="text-blue-400 font-bold">[13:42:12] Token Link Opened: Customer filled missing floor &amp; apartment form.</div>
+                        <div className="text-blue-300">[13:42:15] WooCommerce Metadata: Overwritten with '+ Sprat 3, Stan 14'.</div>
+                        <div className="text-emerald-300 font-semibold">[13:42:16] Order unblocked -&gt; PROCESSING. Clean manifest label generated.</div>
                       </>
                     )}
                   </>
