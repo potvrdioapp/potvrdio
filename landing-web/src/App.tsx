@@ -163,7 +163,34 @@ export default function App() {
         modal_floor: "Sprat",
         modal_apt: "Broj stana",
         modal_intercom: "Interfon / Napomena za kurira",
-        modal_btn_save: "Sačuvaj i Potvrdi Adresu"
+        modal_btn_save: "Sačuvaj i Potvrdi Adresu",
+        man_badge_bad: "BEZ POTVRDIO ALATA",
+        man_badge_good: "POTVRDIO VALIDIRANO",
+        man_label_header_bad: "STANDARDNA ADRESNICA",
+        man_label_header_good: "VERIFIKOVANA ADRESNICA",
+        man_recipient_bad: "PRIMALAC:",
+        man_recipient_good: "PRIMALAC (KUPAC POTVRDIO NA VIBERU):",
+        man_bad_warning: "NEMA BROJ ZGRADE, NEMA STAN",
+        man_bad_phone: "Tel: 063/123-xxx (Isključen telefon)",
+        man_good_apt: "Ulaz 2, Sprat 4, Stan 18 (Interfon radi)",
+        man_good_phone: "Tel: +381 63 948 2190 (Proveren prijem)",
+        man_cod: "OTKUPNINA: 3.200 RSD",
+        man_bad_return: "POVRAT: +410 RSD",
+        man_good_delivery: "ISPORUKA: 98.4%",
+        price_prepaid_header: "Prepaid Dopuna (Krediti nikada ne ističu)",
+        price_invoice_sub: "Faktura za pravna lica (RSD / EUR)",
+        price_badge_popular: "NAJČEŠĆE",
+        price_btn_select: "Izaberi",
+        price_pro_title: "Pro Reserve Pretplata",
+        price_per_month: "/ mesečno",
+        price_pro_desc: "Uključuje 1.800 verifikacija (~0.016 € po poruci). Prioritetna Viber linija sa direktnim prolazom bez čekanja.",
+        price_pro_feat1: "1.800 uključenih kredita / mesec",
+        price_pro_feat2: "Automatski oporavak napuštenih korpi",
+        price_pro_feat3: "HPOS i WP-CLI tehnička podrška",
+        calc_rate_ideal: "4% (Idealno)",
+        calc_rate_avg: "13% (Prosek Srbije)",
+        calc_rate_high: "25% (Kritičan gubitak)",
+        calc_freight_note: "Trošak duple poštarine (slanje + povrat):"
       },
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
@@ -256,7 +283,34 @@ export default function App() {
         modal_floor: "Кат",
         modal_apt: "Број на стан",
         modal_intercom: "Интерфон / Забелешка за курирот",
-        modal_btn_save: "Зачувај и Потврди Адреса"
+        modal_btn_save: "Зачувај и Потврди Адреса",
+        man_badge_bad: "БЕЗ POTVRDIO АЛАТКА",
+        man_badge_good: "POTVRDIO ВАЛИДИРАНО",
+        man_label_header_bad: "СТАНДАРДЕН АДРЕСАР",
+        man_label_header_good: "ВЕРИФИКУВАН АДРЕСАР",
+        man_recipient_bad: "ПРИМАЧ:",
+        man_recipient_good: "ПРИМАЧ (КУПУВАЧОТ ПОТВРДИ НА VIBER):",
+        man_bad_warning: "НЕМА БРОЈ НА ЗГРАДА, НЕМА СТАН",
+        man_bad_phone: "Тел: 063/123-xxx (Исклучен телефон)",
+        man_good_apt: "Влез 2, Кат 4, Стан 18 (Интерфон работи)",
+        man_good_phone: "Тел: +381 63 948 2190 (Проверен прием)",
+        man_cod: "ОТКУПНИНА: 3.200 RSD",
+        man_bad_return: "ВРАЌАЊЕ: +410 RSD",
+        man_good_delivery: "ИСПРАТИ: 98.4%",
+        price_prepaid_header: "Prepaid Дополнување (Кредитите никогаш не истекуваат)",
+        price_invoice_sub: "Фактура за правни лица (RSD / EUR)",
+        price_badge_popular: "НАЈЧЕСТО",
+        price_btn_select: "Избери",
+        price_pro_title: "Pro Reserve Претплата",
+        price_per_month: "/ месечно",
+        price_pro_desc: "Вклучува 1.800 верификации (~0.016 € по порака). Приоритетна Viber линија со директен премин.",
+        price_pro_feat1: "1.800 вклучени кредити / месец",
+        price_pro_feat2: "Автоматско враќање на напуштени кошнички",
+        price_pro_feat3: "HPOS и WP-CLI техничка поддршка",
+        calc_rate_ideal: "4% (Идеално)",
+        calc_rate_avg: "13% (Просек во регионот)",
+        calc_rate_high: "25% (Критична загуба)",
+        calc_freight_note: "Трошок за двојна поштарина (достава + враќање):"
       },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
@@ -349,7 +403,34 @@ export default function App() {
         modal_floor: "Floor",
         modal_apt: "Apartment",
         modal_intercom: "Intercom / Note for Courier",
-        modal_btn_save: "Save & Confirm Address"
+        modal_btn_save: "Save & Confirm Address",
+        man_badge_bad: "WITHOUT POTVRDIO TOOL",
+        man_badge_good: "POTVRDIO VERIFIED",
+        man_label_header_bad: "STANDARD SHIPPING LABEL",
+        man_label_header_good: "VERIFIED SHIPPING LABEL",
+        man_recipient_bad: "RECIPIENT:",
+        man_recipient_good: "RECIPIENT (CONFIRMED ON VIBER):",
+        man_bad_warning: "NO BUILDING NO, NO APARTMENT",
+        man_bad_phone: "Tel: 063/123-xxx (Unreachable phone)",
+        man_good_apt: "Entrance 2, Floor 4, Apt 18 (Working Intercom)",
+        man_good_phone: "Tel: +381 63 948 2190 (Delivery verified)",
+        man_cod: "COD: 3,200 RSD (~€27)",
+        man_bad_return: "RETURN PENALTY: +410 RSD",
+        man_good_delivery: "DELIVERY SUCCESS: 98.4%",
+        price_prepaid_header: "Prepaid Credits (Credits never expire)",
+        price_invoice_sub: "Invoices for Companies (RSD / EUR)",
+        price_badge_popular: "MOST POPULAR",
+        price_btn_select: "Select",
+        price_pro_title: "Pro Reserve Plan",
+        price_per_month: "/ month",
+        price_pro_desc: "Includes 1,800 verifications (~€0.016 / message). Priority Viber gateway with zero waiting queue.",
+        price_pro_feat1: "1,800 included credits / month",
+        price_pro_feat2: "Automated abandoned cart recovery",
+        price_pro_feat3: "HPOS & WP-CLI technical support",
+        calc_rate_ideal: "4% (Ideal)",
+        calc_rate_avg: "13% (Balkan Average)",
+        calc_rate_high: "25% (Critical Loss)",
+        calc_freight_note: "Double courier freight cost (shipping + return):"
       }
     };
 
@@ -882,7 +963,7 @@ export default function App() {
           {/* Unverified Bad Label */}
           <div className="glass-panel border-red-500/30 p-6 rounded-lg relative overflow-hidden">
             <div className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20">
-              BEZ POTVRDIO ALATA
+              {t('man_badge_bad')}
             </div>
             <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
               <XCircle className="w-4 h-4 text-red-400 shrink-0" />
@@ -891,23 +972,23 @@ export default function App() {
 
             <div className="thermal-label p-4 rounded text-xs space-y-3 select-none">
               <div className="flex justify-between border-b border-slate-300 pb-2">
-                <span className="font-bold">STANDARDNA ADRESNICA</span>
+                <span className="font-bold">{t('man_label_header_bad')}</span>
                 <span className="text-[11px]">PE-9948201-RS</span>
               </div>
               <div>
-                <div className="text-[10px] text-slate-500">PRIMALAC:</div>
+                <div className="text-[10px] text-slate-500">{t('man_recipient_bad')}</div>
                 <div className="font-bold text-slate-900">Goran Ninković</div>
                 <div>Bulevar Despota Stefana (kod crkve)</div>
                 <div className="text-red-600 font-bold text-[11px] flex items-center gap-1 mt-0.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
-                  <span>NEMA BROJ ZGRADE, NEMA STAN</span>
+                  <span>{t('man_bad_warning')}</span>
                 </div>
                 <div>11000 BEOGRAD</div>
-                <div>Tel: 063/123-xxx (Isključen telefon)</div>
+                <div>{t('man_bad_phone')}</div>
               </div>
               <div className="border-t border-slate-300 pt-2 flex justify-between items-center text-[11px]">
-                <span>OTKUPNINA: 3.200 RSD</span>
-                <span className="text-red-700 font-bold">POVRAT: +410 RSD</span>
+                <span>{t('man_cod')}</span>
+                <span className="text-red-700 font-bold">{t('man_bad_return')}</span>
               </div>
             </div>
 
@@ -919,7 +1000,7 @@ export default function App() {
           {/* Verified Good Label */}
           <div className="glass-panel border-emerald-500/30 p-6 rounded-lg relative overflow-hidden">
             <div className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
-              POTVRDIO VALIDIRANO
+              {t('man_badge_good')}
             </div>
             <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -928,23 +1009,23 @@ export default function App() {
 
             <div className="thermal-label p-4 rounded text-xs space-y-3 select-none">
               <div className="flex justify-between border-b border-slate-300 pb-2">
-                <span className="font-bold">VERIFIKOVANA ADRESNICA</span>
+                <span className="font-bold">{t('man_label_header_good')}</span>
                 <span className="text-[11px] font-bold text-emerald-800">POTVRDIO #7489</span>
               </div>
               <div>
-                <div className="text-[10px] text-slate-500">PRIMALAC (KUPAC POTVRDIO NA VIBERU):</div>
+                <div className="text-[10px] text-slate-500">{t('man_recipient_good')}</div>
                 <div className="font-bold text-slate-900">Goran Ninković</div>
                 <div>Bulevar Despota Stefana br. 114</div>
                 <div className="text-emerald-700 font-bold text-[11px] flex items-center gap-1 mt-0.5">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Ulaz 2, Sprat 4, Stan 18 (Interfon radi)</span>
+                  <span>{t('man_good_apt')}</span>
                 </div>
                 <div>11000 BEOGRAD</div>
-                <div>Tel: +381 63 948 2190 (Proveren prijem)</div>
+                <div>{t('man_good_phone')}</div>
               </div>
               <div className="border-t border-slate-300 pt-2 flex justify-between items-center text-[11px]">
-                <span>OTKUPNINA: 3.200 RSD</span>
-                <span className="text-emerald-800 font-bold">ISPORUKA: 98.4%</span>
+                <span>{t('man_cod')}</span>
+                <span className="text-emerald-800 font-bold">{t('man_good_delivery')}</span>
               </div>
             </div>
 
@@ -982,9 +1063,9 @@ export default function App() {
                 className="w-full h-2 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
               />
               <div className="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
-                <span>50 (Mala radnja)</span>
-                <span>750 (Rastući brend)</span>
-                <span>2.500+ (Veliki shop)</span>
+                <span>50 ({lang === 'sr' ? 'Mala radnja' : lang === 'mk' ? 'Мала продавница' : 'Small Store'})</span>
+                <span>750 ({lang === 'sr' ? 'Rastući brend' : lang === 'mk' ? 'Растечки бренд' : 'Growing Brand'})</span>
+                <span>2.500+ ({lang === 'sr' ? 'Veliki shop' : lang === 'mk' ? 'Голема продавница' : 'Enterprise Store'})</span>
               </div>
             </div>
 
@@ -1005,14 +1086,14 @@ export default function App() {
                 className="w-full h-2 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
               />
               <div className="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
-                <span>4% (Idealno)</span>
-                <span>13% (Prosek Srbije)</span>
-                <span>25% (Kritičan gubitak)</span>
+                <span>{t('calc_rate_ideal')}</span>
+                <span>{t('calc_rate_avg')}</span>
+                <span>{t('calc_rate_high')}</span>
               </div>
             </div>
 
             <div className="p-3 bg-[#070A13] rounded border border-white/10 text-xs font-mono flex flex-wrap justify-between items-center gap-2 text-slate-400">
-              <span>Trošak duple poštarine (slanje + povrat):</span>
+              <span>{t('calc_freight_note')}</span>
               <span className="text-white font-bold">780 RSD (~6.65 €)</span>
             </div>
           </div>
@@ -1026,7 +1107,7 @@ export default function App() {
                 {annualLossRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
               <div className="text-xs text-slate-400 font-mono mt-0.5">
-                (~{annualLossEur.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} € {lang === 'sr' ? '/ godišnje' : '/ year'})
+                (~{annualLossEur.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} € {lang === 'sr' ? '/ godišnje' : lang === 'mk' ? '/ годишно' : '/ year'})
               </div>
             </div>
 
@@ -1056,8 +1137,8 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-8 glass-panel rounded-lg overflow-hidden">
             <div className="px-5 py-3 border-b border-white/10 bg-[#0D121F] flex justify-between items-center text-xs font-mono">
-              <span className="font-bold text-white">Prepaid Dopuna (Krediti nikada ne ističu)</span>
-              <span className="text-slate-400">Faktura za pravna lica (RSD / EUR)</span>
+              <span className="font-bold text-white">{t('price_prepaid_header')}</span>
+              <span className="text-slate-400">{t('price_invoice_sub')}</span>
             </div>
 
             <div className="overflow-x-auto">
@@ -1068,7 +1149,7 @@ export default function App() {
                     <th className="p-4 font-normal">{t('th_deposit')}</th>
                     <th className="p-4 font-normal">{t('th_viber_rate')}</th>
                     <th className="p-4 font-normal">{t('th_sms_rate')}</th>
-                    <th className="p-4 font-normal text-right">Izbor</th>
+                    <th className="p-4 font-normal text-right">{t('price_btn_select')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10 text-slate-300">
@@ -1079,21 +1160,21 @@ export default function App() {
                     <td className="p-4 text-slate-400">0.048 €</td>
                     <td className="p-4 text-right">
                       <button onClick={playClickSound} className="px-3 py-1 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer">
-                        Izaberi
+                        {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
                   <tr className="bg-[#14B8A6]/5 hover:bg-[#14B8A6]/10 transition">
                     <td className="p-4 font-bold text-white flex items-center gap-2">
                       Growth Pool
-                      <span className="text-[9px] bg-[#14B8A6]/20 text-[#14B8A6] px-1.5 py-0.5 rounded border border-[#14B8A6]/30">NAJČEŠĆE</span>
+                      <span className="text-[9px] bg-[#14B8A6]/20 text-[#14B8A6] px-1.5 py-0.5 rounded border border-[#14B8A6]/30">{t('price_badge_popular')}</span>
                     </td>
                     <td className="p-4 font-bold text-white">45 €</td>
                     <td className="p-4 text-emerald-400 font-bold">0.024 €</td>
                     <td className="p-4 text-slate-400">0.042 €</td>
                     <td className="p-4 text-right">
                       <button onClick={playClickSound} className="px-3 py-1 rounded bg-[#14B8A6] hover:bg-[#0F766E] text-black font-bold text-[11px] transition cursor-pointer">
-                        Izaberi
+                        {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
@@ -1104,7 +1185,7 @@ export default function App() {
                     <td className="p-4 text-slate-400">0.038 €</td>
                     <td className="p-4 text-right">
                       <button onClick={playClickSound} className="px-3 py-1 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer">
-                        Izaberi
+                        {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
@@ -1121,27 +1202,27 @@ export default function App() {
           {/* Pro Reserve */}
           <div className="lg:col-span-4 glass-panel rounded-lg p-6 font-mono text-xs">
             <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-bold">{t('pro_tag')}</div>
-            <h3 className="text-base font-bold text-white font-sans">Pro Reserve Pretplata</h3>
+            <h3 className="text-base font-bold text-white font-sans">{t('price_pro_title')}</h3>
             <div className="mt-3 flex items-baseline gap-1">
               <span className="text-3xl font-bold text-white font-mono">29 €</span>
-              <span className="text-slate-400 text-xs">/ mesečno</span>
+              <span className="text-slate-400 text-xs">{t('price_per_month')}</span>
             </div>
             <p className="text-slate-400 text-[11px] mt-2 leading-relaxed">
-              Uključuje <strong className="text-white">1.800 verifikacija</strong> (~0.016 € po poruci). Prioritetna Viber linija sa direktnim prolazom bez čekanja.
+              {t('price_pro_desc')}
             </p>
 
             <ul className="space-y-2.5 my-5 text-slate-300 text-[11px]">
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>1.800 uključenih kredita / mesec</span>
+                <span>{t('price_pro_feat1')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>Automatski oporavak napuštenih korpi</span>
+                <span>{t('price_pro_feat2')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>HPOS i WP-CLI tehnička podrška</span>
+                <span>{t('price_pro_feat3')}</span>
               </li>
             </ul>
 
