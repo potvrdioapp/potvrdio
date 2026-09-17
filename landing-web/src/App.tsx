@@ -199,7 +199,35 @@ export default function App() {
         dev_status_note: "Potvrdio: Čeka Viber potvrdu kupca",
         dev_hpos_note: "Testirano na WooCommerce 7.0 do 9.x sa High-Performance Order Storage (HPOS) uključenim.",
         footer_sub: "— Regionalna infrastruktura za WooCommerce pouzeće",
-        footer_location: "Novi Sad / Beograd"
+        footer_location: "Novi Sad / Beograd",
+        top_gateway: "Viber Gateway RS: AKTIVAN",
+        top_protocol: "Protokol: ZZPL (RS) Član 12 & GDPR",
+        top_avg_penalty: "Avg. Dupla Poštarina: 780 RSD",
+        hero_no_sub: "0€ Pretplata",
+        stat_hold_val: "~780 RSD",
+        order_word: "Porudžbina",
+        dash_customer_name: "Jelena Kovačević",
+        dash_order_amount: "5.420 RSD",
+        dash_address: "Bulevar cara Lazara 78, sprat 4, stan 19, Novi Sad",
+        dash_courier: "Kurirska služba:",
+        dash_courier_val: "Post Express (Danas za sutra)",
+        dash_risk_label: "Rizik neuručenja:",
+        dash_risk_val: "790 RSD (Trošak magacina)",
+        dash_order_status_label: "Stanje narudžbine:",
+        dash_label_print_label: "Štampanje adresnice:",
+        dash_label_blocked: "BLOKIRANO (Zaštita od troška)",
+        term_log_cod: "(COD Plaćanje pouzećem)",
+        term_sms_log: 'SMS Fallback poslat: "Potvrdite porudžbinu na potvrdio.online..."',
+        term_saved_log: "[14:02:01] REZULTAT: Sačuvano 820 RSD duple poštarine!",
+        term_waiting_log: "> Čeka se odgovor kupca na Viberu...",
+        man_bad_name: "Goran Ninković",
+        man_bad_addr1: "Bulevar Despota Stefana (kod crkve)",
+        man_bad_city: "11000 BEOGRAD",
+        man_good_name: "Goran Ninković",
+        man_good_addr1: "Bulevar Despota Stefana br. 114",
+        man_good_city: "11000 BEOGRAD",
+        calc_freight_val: "780 RSD (~6.65 €)",
+        modal_badge: "Passwordless Token Verifikacija"
       },
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
@@ -328,7 +356,35 @@ export default function App() {
         dev_status_note: "Potvrdio: Се чека Viber потврда",
         dev_hpos_note: "Тестирано на WooCommerce 7.0 до 9.x со вклучен High-Performance Order Storage (HPOS).",
         footer_sub: "— Регионална инфраструктура за WooCommerce плаќање при преземање",
-        footer_location: "Скопје / Битола / Белград"
+        footer_location: "Скопје / Битола / Белград",
+        top_gateway: "Viber Gateway: АКТИВЕН",
+        top_protocol: "Протокол: Закон за лични податоци & GDPR",
+        top_avg_penalty: "Просечна двојна поштарина: 390 MKD",
+        hero_no_sub: "0€ Претплата",
+        stat_hold_val: "~390 MKD",
+        order_word: "Нарачка",
+        dash_customer_name: "Јелена Ковачевска",
+        dash_order_amount: "2.750 MKD",
+        dash_address: "Бул. Цар Лазар 78, кат 4, стан 19, Скопје",
+        dash_courier: "Курирска служба:",
+        dash_courier_val: "Post Express (Денес за утре)",
+        dash_risk_label: "Ризик од неиспорака:",
+        dash_risk_val: "790 RSD (Магацински трошок)",
+        dash_order_status_label: "Статус на нарачка:",
+        dash_label_print_label: "Печатење адресар:",
+        dash_label_blocked: "БЛОКИРАНО (Заштита од трошок)",
+        term_log_cod: "(COD Плаќање при преземање)",
+        term_sms_log: 'SMS Fallback испратен: "Потврдете ја нарачката на potvrdio.online..."',
+        term_saved_log: "[14:02:01] РЕЗУЛТАТ: Заштедени 820 RSD за двојна поштарина!",
+        term_waiting_log: "> Се чека одговор од купувачот на Viber...",
+        man_bad_name: "Горан Никовски",
+        man_bad_addr1: "Бул. Деспот Стефан (до црквата)",
+        man_bad_city: "1000 СКОПЈЕ",
+        man_good_name: "Горан Никовски",
+        man_good_addr1: "Бул. Деспот Стефан бр. 114",
+        man_good_city: "1000 СКОПЈЕ",
+        calc_freight_val: "390 MKD (~6.35 €)",
+        modal_badge: "Passwordless Token Верификација"
       },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
@@ -457,7 +513,35 @@ export default function App() {
         dev_status_note: "Potvrdio: Awaiting buyer Viber confirmation",
         dev_hpos_note: "Battle-tested on WooCommerce 7.0 through 9.x with High-Performance Order Storage (HPOS) enabled.",
         footer_sub: "— Regional Infrastructure for WooCommerce Cash on Delivery (COD)",
-        footer_location: "Belgrade / Novi Sad / Skopje"
+        footer_location: "Belgrade / Novi Sad / Skopje",
+        top_gateway: "Viber Gateway: ACTIVE",
+        top_protocol: "Protocol: Data Protection & GDPR Compliant",
+        top_avg_penalty: "Avg. Double Return Penalty: ~€7 (780 RSD)",
+        hero_no_sub: "€0 Subscription",
+        stat_hold_val: "~€7 (780 RSD)",
+        order_word: "Order",
+        dash_customer_name: "Jelena Kovacevic",
+        dash_order_amount: "5,420 RSD (~€46)",
+        dash_address: "78 Tsar Lazar Blvd, Apt 19, Novi Sad",
+        dash_courier: "Courier Network:",
+        dash_courier_val: "Post Express (Next-Day Delivery)",
+        dash_risk_label: "Non-Delivery Exposure:",
+        dash_risk_val: "790 RSD (~€7 Freight Loss)",
+        dash_order_status_label: "Order Status:",
+        dash_label_print_label: "Label Dispatch:",
+        dash_label_blocked: "HOLD / BLOCKED (Return Freight Guard)",
+        term_log_cod: "(COD Cash on Delivery)",
+        term_sms_log: 'SMS Fallback sent: "Confirm your order at potvrdio.online..."',
+        term_saved_log: "[14:02:01] RESULT: 820 RSD (~€7) double return freight saved!",
+        term_waiting_log: "> Waiting for customer response on Viber...",
+        man_bad_name: "Goran Ninkovic",
+        man_bad_addr1: "Despot Stefan Blvd (near church)",
+        man_bad_city: "11000 BELGRADE",
+        man_good_name: "Goran Ninkovic",
+        man_good_addr1: "114 Despot Stefan Blvd",
+        man_good_city: "11000 BELGRADE",
+        calc_freight_val: "~€6.65 (780 RSD)",
+        modal_badge: "Passwordless Token Verification"
       }
     };
 
@@ -474,7 +558,11 @@ export default function App() {
         en: "42 Liberation Blvd, Novi Sad"
       },
       orderId: "#RS-8492",
-      orderAmount: "4.890 RSD",
+      orderAmount: {
+        sr: "4.890 RSD",
+        mk: "2.450 MKD",
+        en: "4,890 RSD (~€41)"
+      }
     },
     2: {
       customer: "Nemanja Ilić",
@@ -484,7 +572,11 @@ export default function App() {
         en: "14 Nemanjica Blvd, Nis"
       },
       orderId: "#RS-8501",
-      orderAmount: "3.450 RSD",
+      orderAmount: {
+        sr: "3.450 RSD",
+        mk: "1.750 MKD",
+        en: "3,450 RSD (~€29)"
+      }
     },
     3: {
       customer: "Ana Jovanović",
@@ -494,7 +586,11 @@ export default function App() {
         en: "22 Prince Milos St, Kragujevac"
       },
       orderId: "#RS-8519",
-      orderAmount: "6.120 RSD",
+      orderAmount: {
+        sr: "6.120 RSD",
+        mk: "3.100 MKD",
+        en: "6,120 RSD (~€52)"
+      }
     }
   };
 
@@ -544,16 +640,16 @@ export default function App() {
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1.5 text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              <span className="font-medium text-white">Viber Gateway RS: AKTIVAN</span>
+              <span className="font-medium text-white">{t('top_gateway')}</span>
             </span>
             <span className="text-white/10">|</span>
             <span className="hidden sm:inline text-slate-400">{t('top_networks')}</span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-slate-400 hidden md:inline">Protokol: <span className="text-slate-200">ZZPL (RS) Član 12 &amp; GDPR</span></span>
+            <span className="text-slate-400 hidden md:inline">{t('top_protocol')}</span>
             <span className="text-white/10">|</span>
-            <span className="text-amber-400 font-medium">Avg. Dupla Poštarina: 780 RSD</span>
+            <span className="text-amber-400 font-medium">{t('top_avg_penalty')}</span>
           </div>
         </div>
       </aside>
@@ -631,7 +727,7 @@ export default function App() {
                 <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse"></span>
                 <span className="text-white font-medium">{t('hero_tag')}</span>
                 <span className="text-white/10">/</span>
-                <span className="text-emerald-400 font-mono">0€ Pretplata</span>
+                <span className="text-emerald-400 font-mono">{t('hero_no_sub')}</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-white leading-[1.18]">
@@ -666,7 +762,7 @@ export default function App() {
                 </div>
                 <div className="glass-panel p-3 rounded">
                   <div className="text-xs text-slate-400 mb-1">{t('stat_hold_cost')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-amber-400 tracking-tight">~780 RSD</div>
+                  <div className="text-xl sm:text-2xl font-bold text-amber-400 tracking-tight">{t('stat_hold_val')}</div>
                   <div className="text-[10px] text-slate-400 mt-1">{t('stat_hold_sub')}</div>
                 </div>
                 <div className="glass-panel p-3 rounded">
@@ -690,38 +786,38 @@ export default function App() {
               {/* Order Card */}
               <div className="bg-[#070A13] p-3.5 rounded border border-white/10 mb-4 font-mono text-xs space-y-2">
                 <div className="flex justify-between items-center text-[11px] text-slate-400 border-b border-white/10 pb-2">
-                  <span>Porudžbina #RS-8492</span>
+                  <span>{t('order_word')} #RS-8492</span>
                   <span>17. Sep 2026, 09:14</span>
                 </div>
                 <div className="flex justify-between items-center text-white pt-1">
-                  <span className="font-bold font-sans text-sm">Jelena Kovačević</span>
-                  <span className="text-[#14B8A6] font-bold">5.420 RSD</span>
+                  <span className="font-bold font-sans text-sm">{t('dash_customer_name')}</span>
+                  <span className="text-[#14B8A6] font-bold">{t('dash_order_amount')}</span>
                 </div>
                 <div className="text-[11px] text-slate-400 flex items-start gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
-                  <span>Bulevar cara Lazara 78, sprat 4, stan 19, Novi Sad</span>
+                  <span>{t('dash_address')}</span>
                 </div>
                 <div className="flex items-center justify-between pt-2 text-[11px]">
-                  <span className="text-slate-400">Kurirska služba:</span>
-                  <span className="text-white font-medium">Post Express (Danas za sutra)</span>
+                  <span className="text-slate-400">{t('dash_courier')}</span>
+                  <span className="text-white font-medium">{t('dash_courier_val')}</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">Rizik neuručenja:</span>
-                  <span className="text-red-400">790 RSD (Trošak magacina)</span>
+                  <span className="text-slate-400">{t('dash_risk_label')}</span>
+                  <span className="text-red-400">{t('dash_risk_val')}</span>
                 </div>
               </div>
 
               {/* Logistics State */}
               <div className="p-3 bg-[#0D121F] rounded border border-white/10 font-mono text-[11px] space-y-2 mb-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Stanje narudžbine:</span>
+                  <span className="text-slate-400">{t('dash_order_status_label')}</span>
                   <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
                     HOLD_WAITING_VIBER
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Štampanje adresnice:</span>
-                  <span className="text-red-400 font-semibold">BLOKIRANO (Zaštita od troška)</span>
+                  <span className="text-slate-400">{t('dash_label_print_label')}</span>
+                  <span className="text-red-400 font-semibold">{t('dash_label_blocked')}</span>
                 </div>
               </div>
 
@@ -827,7 +923,7 @@ export default function App() {
 
               <div className="bg-[#29204A] p-3.5 rounded-lg border border-[#46377B]">
                 <p className="mb-2">
-                  {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount}).
+                  {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount[lang]}).
                 </p>
                 <div className="p-2.5 rounded bg-[#1E1838] border border-[#46377B] font-mono text-[11px] text-[#C4B5FD] mb-3">
                   <span className="text-slate-400 block text-[10px]">{t('viber_shipping_address')}</span>
@@ -900,7 +996,7 @@ export default function App() {
               </div>
 
               <div className="mt-3 bg-[#070A13] p-3.5 rounded border border-white/10 space-y-1.5 h-64 overflow-y-auto text-[11px]">
-                <div className="text-neutral-400">[13:42:01] WC Order Created: {currentScenConfig.orderId} (COD Plaćanje pouzećem).</div>
+                <div className="text-neutral-400">[13:42:01] WC Order Created: {currentScenConfig.orderId} {t('term_log_cod')}.</div>
                 <div className="text-amber-400">[13:42:01] Potvrdio Hook: Order status switched to ON-HOLD. Label printing suspended.</div>
                 
                 {currentScenario === 1 && (
@@ -915,7 +1011,7 @@ export default function App() {
                     {simState === 'edited' && (
                       <>
                         <div className="text-blue-400 font-bold">[13:42:12] Token Link Opened: Customer filled missing floor &amp; apartment form.</div>
-                        <div className="text-blue-300">[13:42:15] WooCommerce Metadata: Overwritten with '+ Sprat 3, Stan 14'.</div>
+                        <div className="text-blue-300">[13:42:15] WooCommerce Metadata: Overwritten with '+ {lang === 'sr' ? `Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `Кат ${floorInput}, Стан ${aptInput}` : `Floor ${floorInput}, Apt ${aptInput}`}'.</div>
                         <div className="text-emerald-300 font-semibold">[13:42:16] Order unblocked -&gt; PROCESSING. Clean manifest label generated.</div>
                       </>
                     )}
@@ -925,9 +1021,9 @@ export default function App() {
                 {currentScenario === 2 && (
                   <>
                     <div className="text-amber-400">[13:42:02] Viber sent. No read receipt within 20 minutes.</div>
-                    <div className="text-amber-500">[13:42:22] SMS Fallback dispatched: "Potvrdite porudžbinu na potvrdio.online..."</div>
+                    <div className="text-amber-500">[13:42:22] {t('term_sms_log')}</div>
                     <div className="text-red-400">[14:02:00] 24h Expired: No customer action. Order safely CANCELLED.</div>
-                    <div className="text-emerald-400">[14:02:01] RESULT: 820 RSD courier double freight cost saved!</div>
+                    <div className="text-emerald-400">{t('term_saved_log')}</div>
                   </>
                 )}
 
@@ -946,7 +1042,7 @@ export default function App() {
                 )}
 
                 {simState === 'initial' && currentScenario !== 2 && (
-                  <div className="text-slate-400">&gt; Waiting for customer response on Viber...</div>
+                  <div className="text-slate-400">{t('term_waiting_log')}</div>
                 )}
               </div>
             </div>
@@ -1004,13 +1100,13 @@ export default function App() {
               </div>
               <div>
                 <div className="text-[10px] text-slate-500">{t('man_recipient_bad')}</div>
-                <div className="font-bold text-slate-900">Goran Ninković</div>
-                <div>Bulevar Despota Stefana (kod crkve)</div>
+                <div className="font-bold text-slate-900">{t('man_bad_name')}</div>
+                <div>{t('man_bad_addr1')}</div>
                 <div className="text-red-600 font-bold text-[11px] flex items-center gap-1 mt-0.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-red-600 shrink-0" />
                   <span>{t('man_bad_warning')}</span>
                 </div>
-                <div>11000 BEOGRAD</div>
+                <div>{t('man_bad_city')}</div>
                 <div>{t('man_bad_phone')}</div>
               </div>
               <div className="border-t border-slate-300 pt-2 flex justify-between items-center text-[11px]">
@@ -1041,13 +1137,13 @@ export default function App() {
               </div>
               <div>
                 <div className="text-[10px] text-slate-500">{t('man_recipient_good')}</div>
-                <div className="font-bold text-slate-900">Goran Ninković</div>
-                <div>Bulevar Despota Stefana br. 114</div>
+                <div className="font-bold text-slate-900">{t('man_good_name')}</div>
+                <div>{t('man_good_addr1')}</div>
                 <div className="text-emerald-700 font-bold text-[11px] flex items-center gap-1 mt-0.5">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span>{t('man_good_apt')}</span>
                 </div>
-                <div>11000 BEOGRAD</div>
+                <div>{t('man_good_city')}</div>
                 <div>{t('man_good_phone')}</div>
               </div>
               <div className="border-t border-slate-300 pt-2 flex justify-between items-center text-[11px]">
@@ -1121,7 +1217,7 @@ export default function App() {
 
             <div className="p-3 bg-[#070A13] rounded border border-white/10 text-xs font-mono flex flex-wrap justify-between items-center gap-2 text-slate-400">
               <span>{t('calc_freight_note')}</span>
-              <span className="text-white font-bold">780 RSD (~6.65 €)</span>
+              <span className="text-white font-bold">{t('calc_freight_val')}</span>
             </div>
           </div>
 
@@ -1374,7 +1470,7 @@ export default function App() {
             <div className="p-5 space-y-4">
               <div>
                 <div className="text-[10px] text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
-                  Passwordless Token Verifikacija
+                  {t('modal_badge')}
                 </div>
                 <h3 className="text-base font-bold text-white font-sans">{t('modal_title')}</h3>
                 <p className="text-[11px] text-slate-400 mt-1">{t('modal_subtitle')}</p>
