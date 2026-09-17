@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" fill="none" width="100%" height="100%">
+  <!-- Speech bubble with gap for checkmark -->
+  <!-- Bubble dimensions: x=20, y=56, w=228, h=156, rx=24, stroke=18, color=#361F6F -->
+  <path d="M 210 56 
+           L 44 56 
+           A 24 24 0 0 0 20 80 
+           L 20 188 
+           A 24 24 0 0 0 44 212 
+           L 68 212 
+           L 72 271 
+           L 118 212 
+           L 224 212 
+           A 24 24 0 0 0 248 188 
+           L 248 120" 
+        stroke="#361F6F" 
+        stroke-width="18" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+  <!-- Green Checkmark -->
+  <!-- Path: (86, 118) -> (137, 170) -> (284, 20) -->
+  <path d="M 86 118 L 137 170 L 284 20" 
+        stroke="#22AF75" 
+        stroke-width="19" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"/>
+</svg>

@@ -12,6 +12,7 @@ import {
   RotateCcw,
   AlertCircle
 } from 'lucide-react';
+import { PotvrdioLogo } from './components/PotvrdioLogo';
 
 interface OrderData {
   orderId: string;
@@ -534,18 +535,11 @@ export default function App() {
 
         {/* Top Header */}
         <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-teal-600 text-white font-black text-lg flex items-center justify-center shadow-sm">
-              P
-            </div>
-            <div>
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">
-                Potvrdio<span className="text-teal-600">.online</span>
-              </span>
-              <span className="block text-[10px] text-slate-500 font-bold tracking-wider uppercase">
-                {t.headerSub}
-              </span>
-            </div>
+          <div>
+            <PotvrdioLogo variant="horizontal" mode="light" />
+            <span className="block text-[10px] text-slate-500 font-bold tracking-wider uppercase pl-10 -mt-0.5">
+              {t.headerSub}
+            </span>
           </div>
 
           {/* Locale Selector Button */}

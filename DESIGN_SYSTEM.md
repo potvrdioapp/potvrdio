@@ -41,15 +41,26 @@ Potvrdio platformu, iki farklı kullanıcı kitlesinin zıt psikolojik ve teknik
 
 ## 2. Renk Paleti ve Tasarım Token'ları
 
-### 2.1 Marka Kimliği & Üçüncü Taraf Ayrıştırması
-* **Potvrdio Marka Rengi:** **Brand Teal (`#14B8A6`)** — Logo, ana CTA butonları ve marka vurgularında kullanılır.
+### 2.1 Marka Kimliği & Resmi Logo Standardı
+* **Potvrdio Resmi Logo Renkleri:**
+  - **Brand Deep Indigo/Purple (`#361F6F`):** Konuşma balonu çerçevesi ve tipografi ana rengi (Açık tema).
+  - **Brand Verification Green (`#22AF75`):** Doğrulama onay tiki (Checkmark). Hem açık hem koyu temada değişmeyen temel aksan.
+  - **Dark Mode Uyarlaması:** Koyu arka planda (`#070A13` / `#0D121F`) yüksek kontrast sağlamak amacıyla konuşma balonu ve yazı rengi beyaz (`#FFFFFF`), checkmark ise canlı yeşil (`#22AF75`) olarak render edilir.
+* **Resmi Logo Varlıkları (`shared/assets/` ve `/public` dizinleri):**
+  - `logo-icon-light.png` / `logo-icon-dark.png`: İkon rozeti (konuşma balonu + yeşil onay işareti).
+  - `logo-horizontal-light.png` / `logo-horizontal-dark.png`: Yatay kurumsal logo (ikon + potvrdio.online).
+  - `logo-stacked-light.png` / `logo-stacked-dark.png`: Orijinal dikey yerleşimli logo (üstte ikon, altta potvrdio).
+  - `logo-icon-light.svg` / `logo-icon-dark.svg`: Vektörel SVG ikonlar.
+  - `favicon.svg`, `favicon-32.png`, `favicon-64.png`, `favicon-192.png`: Tarayıcı ve mobil ikonları.
 * **Viber Resmi Rengi:** **Viber Purple (`#7360F2`)** — **SADECE** Viber Business API ile doğrudan ilişkili UI elemanlarında (Viber mesaj simülatörü header'ı ve Viber aksiyon butonlarında) kullanılır. Kullanıcının ürünü "Viber'ın resmi yazılımı" sanmasını önlemek için marka kimliğinden kesin hatlarla ayrılmıştır.
 * **Kargo & Taşıyıcı Bağımsızlığı İlkesi:** Sayfa tasarımı; D Express, Post Express, Bex gibi yerel kargo firmalarının tescilli renk ve logolarını taklit etmez. Güven taklidi (brand impersonation) veya tüketiciyi yanıltma riskini sıfırlamak adına tamamen nötr, şeffaf ve mağaza odaklı bir "Sipariş Teslimat Doğrulama" dili kullanılır.
 
 ### 2.2 Primary & Brand Tokens
 | Token | Value / Hex | Açıklama / Kullanım |
 | :--- | :--- | :--- |
-| `--color-brand-teal` | `#14B8A6` | Ana marka rengi, logo, primary CTA başlangıcı |
+| `--color-brand-purple` | `#361F6F` | Resmi logo ana rengi, tipografi ve konuşma balonu (Light) |
+| `--color-brand-green` | `#22AF75` | Resmi logo onay işareti (Checkmark) ve doğrulama aksanı |
+| `--color-brand-teal` | `#14B8A6` | Web platformu sekonder marka rengi, primary CTA başlangıcı |
 | `--color-brand-indigo` | `#6366F1` | Gradient geçişi, sekonder aksanlar |
 | `--color-brand-pink` | `#EC4899` | Grafik aksanları ve rozet vurguları |
 | `--color-viber-purple` | `#7360F2` | **Yalnızca** Viber mesaj UI elemanları |

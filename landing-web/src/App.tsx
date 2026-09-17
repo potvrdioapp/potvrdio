@@ -7,6 +7,7 @@ import {
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { PotvrdioLogo } from './components/PotvrdioLogo';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;
@@ -718,17 +719,12 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="w-8 h-8 rounded bg-[#0D121F] border border-[#14B8A6]/40 flex items-center justify-center text-[#14B8A6] shadow-inner shrink-0">
-              <CheckCircle2 className="w-4 h-4" />
+          <a href="#" className="flex items-center gap-3 group">
+            <PotvrdioLogo variant="horizontal" mode="dark" />
+            <div className="hidden sm:block pl-2 border-l border-white/10 text-[10px] font-mono text-slate-400">
+              {t('nav_sub')}
             </div>
-            <div>
-              <a href="#" className="font-mono font-bold text-sm text-white tracking-tight flex items-center gap-1">
-                potvrdio<span className="text-[#14B8A6]">.online</span>
-              </a>
-              <div className="text-[10px] font-mono text-slate-400 -mt-0.5 truncate max-w-[140px] sm:max-w-none">{t('nav_sub')}</div>
-            </div>
-          </div>
+          </a>
 
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs text-slate-400 font-medium">
@@ -1803,8 +1799,9 @@ export default function App() {
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#070A13] py-8 text-xs text-slate-400 font-mono mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-center md:text-left">
-          <div className="flex flex-col sm:flex-row items-center gap-2">
-            <span className="text-white font-bold">potvrdio.online</span>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <PotvrdioLogo variant="horizontal" mode="dark" />
+            <span className="text-white/20 hidden sm:inline">•</span>
             <span>{t('footer_sub')}</span>
           </div>
 

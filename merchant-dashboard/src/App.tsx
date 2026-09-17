@@ -3,6 +3,7 @@ import {
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers
 } from 'lucide-react';
+import { PotvrdioLogo } from './components/PotvrdioLogo';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'overview' | 'credits' | 'settings'>('overview');
@@ -34,14 +35,9 @@ export default function App() {
       <div className="flex">
         <aside className="w-64 bg-[#0d121f] border-r border-slate-800/80 min-h-screen p-5 flex flex-col justify-between hidden md:flex">
           <div className="space-y-6">
-            <div className="flex items-center gap-2.5 px-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-teal-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-teal-500/30">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <span className="font-extrabold text-lg tracking-tight text-white">Potvrdio<span className="text-teal-400">.online</span></span>
-                <span className="block text-[10px] text-slate-400 font-medium tracking-wide">MERCHANT DASHBOARD</span>
-              </div>
+            <div className="px-2">
+              <PotvrdioLogo variant="horizontal" mode="dark" />
+              <span className="block text-[10px] text-slate-400 font-medium tracking-wide mt-1 pl-10.5">MERCHANT DASHBOARD</span>
             </div>
 
             <nav className="space-y-1.5 pt-4">
