@@ -55,7 +55,7 @@ function playScannerBeep() {
   }
 }
 
-type Lang = 'sr' | 'en';
+type Lang = 'sr' | 'mk' | 'en';
 
 export default function App() {
   const [lang, setLang] = useState<Lang>('sr');
@@ -151,6 +151,89 @@ export default function App() {
         btn_dl_full: "Preuzmi Potvrdio WordPress Plugin (.zip)",
         btn_view_demo: "Pogledaj demo uživo"
       },
+      mk: {
+        top_networks: "Post Express, D Express, Cargo Express, Via Courier",
+        nav_sub: "Логистичка COD Заштита · WP v2.1",
+        nav_lab: "Симулација на терен",
+        nav_manifest: "Инспекција на адреса",
+        nav_calc: "Матрица на загуби",
+        nav_pricing: "Кредитен базен",
+        nav_dev: "API & HPOS",
+        btn_dl: "Преземи ZIP",
+        hero_tag: "WooCommerce Заштита на плаќање при преземање (COD)",
+        hero_title: "Купувачот нарачува со плаќање при преземање, не го презема пакетот. Вие плаќате и достава и враќање.",
+        hero_p: "Во регионот над 65% од e-commerce нарачките се со плаќање при преземање. Секоја петта вратена пратка ве чини меѓу 720 и 890 RSD чиста загуба. Potvrdio автоматски ја задржува нарачката во статус On-Hold, испраќа двонасочна Viber верификација и дозволува печатење на адресарот исклучиво по потврда на купувачот.",
+        hero_cta_primary: "Тестирај интерактивна верификација",
+        hero_free_credits: "бесплатни верификации вклучени со приклучокот",
+        stat_open_rate: "Одзив на порака",
+        stat_open_sub: "Viber во рок од 4 мин.",
+        stat_hold_cost: "Загуба по пакет",
+        stat_hold_sub: "Двојна курирска пошта",
+        stat_recovery: "Пад на вратени пратки",
+        stat_recovery_sub: "Од 14.8% на 2.5%",
+        hero_box_note: "Пакетот физички не се подигнува од магацин додека купувачот не кликне потврда на Viber. Со тоа ризикот се сведува на нула.",
+        lab_tag: "01 / Интерактивна лабораторија",
+        lab_title: "Испробајте 3 реални сценарија од балканската пракса",
+        lab_subtitle: "Кликнете на сценарио за да го видите однесувањето на Viber ботот и WooCommerce базата:",
+        scen1_title: "Нецелосна адреса (Скопје)",
+        scen1_desc: "Купувачот заборавил број на стан и кат. Ги корегира податоците со еден клик преку токен линк.",
+        scen2_title: "Купувачот се премисли (Битола)",
+        scen2_desc: "Купувачот ја игнорира Viber пораката и SMS. Пакетот останува во магацин, а продавачот заштедува 820 RSD.",
+        scen3_title: "Инстант 1-Click Потврда",
+        scen3_desc: "Верификација со еден допир. Webhook автоматски генерира адресар.",
+        scen_common_tag: "Вообичаено (62%)",
+        scen_saved_tag: "Избегнат трошок",
+        scen_fast_tag: "< 30 секунди",
+        viber_verified_title: "Верификација",
+        viber_verified_badge: "ВЕРИФИКУВАНО",
+        viber_greeting: "Здраво",
+        viber_order_received: "Ја примивме твојата нарачка",
+        viber_shipping_address: "АДРЕСА ЗА ДОСТАВА:",
+        viber_confirm_prompt: "Те молиме потврди ја точноста пред да го предадеме пакетот на курир:",
+        viber_btn_yes: "ДА, АДРЕСАТА Е ТОЧНА",
+        viber_btn_edit: "ИЗМЕНИ ЈА АДРЕСАТА",
+        viber_success_msg: "Забележано во системот. Податоците се испратени во WooCommerce.",
+        status_saved: "ЗАШТЕДЕНО: Пакетот не е испратен, 820 RSD во џеб",
+        status_approved: "ОДОБРЕНО: Печати адресар за достава",
+        status_waiting: "ЧЕКАЊЕ: Не пакувај го пакетот од магацин",
+        term_title: "Real-Time WP Event Terminal",
+        term_risk_status: "Статус на магацин",
+        btn_restart_sim: "Рестартирај тест",
+        man_tag: "02 / Физички адресар",
+        man_title: "Зошто куририте враќаат пакети? Анатомија на неисправна адреса",
+        man_p: "Курирот има просечно 45 секунди по адреса. Ако нема кат или стан, го означува како 'Неиспорачано'. Трошокот паѓа на продавачот.",
+        man_bad_title: "Стандарден WooCommerce Внос (Висок ризик)",
+        man_bad_footer: "Резултат: Курирот не може да ја најде зградата. Пакетот се враќа на продавачот. Загуба: 780 RSD.",
+        man_good_title: "Чист адресар по Viber потврда",
+        man_good_footer: "Резултат: Курирот го наоѓа интерфонот од прв обид. Купувачот го очекува пакетот.",
+        calc_tag: "03 / Математика на загуба",
+        calc_title: "Преметајте ги годишните загуби на курирски услуги",
+        calc_desc: "Калкулацијата ги зема предвид официјалните ценовници на курирските служби во регионот.",
+        calc_label_orders: "Месечен број на COD нарачки:",
+        calc_label_rate: "Процент на неиспорачани пакети:",
+        calc_loss_head: "Годишна директна загуба од поштарина",
+        calc_saved_head: "Нето заштедено со Potvrdio:",
+        calc_roi_note: "По одземање на трошокот за Viber кредити (ROI > 14x)",
+        price_tag: "04 / Кредитен базен (PAYG)",
+        price_title: "Без договори. Плаќате само за испратени пораки.",
+        price_desc: "Директен Viber Business API бара фиксни месечни закупнини од 150€+. Potvrdio ве обединува за најниска цена.",
+        th_tier: "Пакет",
+        th_deposit: "Износ за уплата",
+        th_viber_rate: "Viber цена",
+        th_sms_rate: "SMS Fallback",
+        price_note: "Фактурирање во денари/евра. Без автоматско одземање од картичка.",
+        pro_tag: "За продавници со > 300 нарачки",
+        btn_act_pro: "Активирај Pro Reserve",
+        leg_tag: "05 / Правна рамка",
+        leg_title: "Усогласеност со законите за заштита на лични податоци (GDPR / ZZPL)",
+        leg_p: "Испраќањето пораки функционира исклучиво врз основа на исполнување на купопродажниот договор.",
+        dev_tag: "Техничка интеграција",
+        dev_title: "Како изгледа кодот во WooCommerce?",
+        dl_title: "Запрете ги трошоците за враќање уште при следната достава",
+        dl_desc: "Преземете го бесплатниот ZIP, активирајте го во WordPress и добијте 25 бесплатни кредити.",
+        btn_dl_full: "Preuzmi Potvrdio WordPress Plugin (.zip)",
+        btn_view_demo: "Погледај го демато во живо"
+      },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
         nav_sub: "COD Protection Engine · WP v2.1",
@@ -245,6 +328,7 @@ export default function App() {
       customer: "Marko Petrović",
       address: {
         sr: "Bulevar Oslobođenja 42, Novi Sad",
+        mk: "Бул. Партизански Одреди 42, Скопје",
         en: "42 Liberation Blvd, Novi Sad"
       },
       orderId: "#RS-8492",
@@ -254,6 +338,7 @@ export default function App() {
       customer: "Nemanja Ilić",
       address: {
         sr: "Bulevar Nemanjića 14, Niš",
+        mk: "Ул. Широк Сокак 14, Битола",
         en: "14 Nemanjica Blvd, Nis"
       },
       orderId: "#RS-8501",
@@ -263,6 +348,7 @@ export default function App() {
       customer: "Ana Jovanović",
       address: {
         sr: "Kneza Miloša 22, Kragujevac",
+        mk: "Ул. Илинденска 22, Охрид",
         en: "22 Prince Milos St, Kragujevac"
       },
       orderId: "#RS-8519",
@@ -352,6 +438,12 @@ export default function App() {
                 className={`px-2 py-0.5 rounded font-bold transition-all ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
               >
                 SR
+              </button>
+              <button 
+                onClick={() => { playClickSound(); setLang('mk'); }} 
+                className={`px-2 py-0.5 rounded font-bold transition-all ${lang === 'mk' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+              >
+                MK
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('en'); }} 
