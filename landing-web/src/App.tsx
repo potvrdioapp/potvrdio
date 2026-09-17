@@ -1827,7 +1827,7 @@ export default function App() {
             <span className="text-white/20 hidden sm:inline">•</span>
             <span>{t('footer_location')}</span>
             <span className="text-white/20 hidden sm:inline">•</span>
-            <a href="mailto:kontakt@potvrdio.online" className="hover:text-white transition">kontakt@potvrdio.online</a>
+            <a href="mailto:info@potvrdio.online" className="hover:text-white transition">info@potvrdio.online</a>
           </div>
         </div>
       </footer>

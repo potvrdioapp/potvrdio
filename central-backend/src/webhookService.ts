@@ -2,7 +2,7 @@ import crypto from 'crypto';
 
 export interface WebhookPayload {
   order_id: number;
-  action: 'APPROVED' | 'UPDATED_ADDRESS';
+  action: 'APPROVED' | 'UPDATED_ADDRESS' | 'CANCELLED' | 'OUT_OF_CREDITS';
   updated_address?: {
     address_1?: string;
     address_2?: string;

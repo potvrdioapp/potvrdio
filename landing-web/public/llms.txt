@@ -27,4 +27,4 @@
   - Poverenik RS: https://www.poverenik.rs/sr-lat/
   - EUR-Lex GDPR: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679
   - AZLP MK: https://azlp.mk
-- Contact & Support: kontakt@potvrdio.online / privacy@potvrdio.online
+- Contact & Support: info@potvrdio.online / privacy@potvrdio.online

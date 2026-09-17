@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+vendor/
+woocommerce-plugin/vendor/
 
 # Build outputs
 dist/

@@ -18,7 +18,7 @@ export class ViberService {
     id: string;
     orderId: string;
     phone: string;
-    status: 'SENT' | 'DELIVERED' | 'READ' | 'APPROVED' | 'EDIT_CLICKED' | 'SMS_FALLBACK';
+    status: 'SENT' | 'DELIVERED' | 'READ' | 'APPROVED' | 'REJECTED' | 'EDIT_CLICKED' | 'SMS_FALLBACK';
     channel: 'VIBER' | 'SMS';
     sentAt: Date;
   }> = [];
@@ -62,7 +62,7 @@ export class ViberService {
     return { messageId, editUrl };
   }
 
-  public markStatus(orderId: string, status: 'APPROVED' | 'EDIT_CLICKED') {
+  public markStatus(orderId: string, status: 'APPROVED' | 'REJECTED' | 'EDIT_CLICKED') {
     const msg = this.messageLog.find(m => m.orderId === orderId);
     if (msg) {
       msg.status = status;

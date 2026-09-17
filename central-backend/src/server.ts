@@ -36,18 +36,28 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Missing required order fields' });
   }
 
-  // Deduct 1 credit from merchant balance pool
-  const hasCredits = billingService.deductCredit(apiKey);
-  if (!hasCredits) {
-    console.warn(`[CREDIT ALERT] Merchant ${apiKey} has insufficient balance! Sending email alert.`);
-  }
-
   // Store association for return webhook
   const apiSecret = (req.headers['x-potvrdio-api-secret'] as string) || 'demo_secret_456';
   orderStoreRegistry.set(String(order_id), {
     storeDomain: store_domain || 'http://localhost:3000',
     apiSecret,
   });
+
+  // Deduct 1 credit from merchant balance pool with emergency grace buffer
+  const creditStatus = billingService.deductCreditWithGrace(apiKey);
+  if (creditStatus.exhausted) {
+    console.warn(`[CREDIT ALERT] Merchant ${apiKey} has completely exhausted credits & grace buffer!`);
+    await webhookService.dispatchToWooCommerce(store_domain || 'http://localhost:3000', apiSecret, {
+      order_id: Number(order_id),
+      action: 'OUT_OF_CREDITS',
+      timestamp: Math.floor(Date.now() / 1000),
+    });
+    return res.status(402).json({
+      error: 'Krediti na nalogu su istekli. Molimo dopunite kredite na Potvrdio dashboard-u.',
+      creditsRemaining: 0,
+      exhausted: true
+    });
+  }
 
   // Create 24-hour single-use token for address edit link
   const token = tokenService.createToken({
@@ -110,6 +120,22 @@ app.post('/api/v1/viber/webhook', async (req: Request, res: Response) => {
     }
 
     return res.json({ status: 'success', action: 'APPROVED', order_id });
+  }
+
+  if (action === 'ACTION_CANCEL' || action === 'ACTION_REJECT') {
+    viberService.markStatus(order_id, 'REJECTED');
+    console.log(`[ACTION_CANCEL] Customer cancelled order #${order_id} directly in Viber!`);
+
+    const storeInfo = orderStoreRegistry.get(String(order_id));
+    if (storeInfo) {
+      await webhookService.dispatchToWooCommerce(storeInfo.storeDomain, storeInfo.apiSecret, {
+        order_id: Number(order_id),
+        action: 'CANCELLED',
+        timestamp: Math.floor(Date.now() / 1000),
+      });
+    }
+
+    return res.json({ status: 'success', action: 'CANCELLED', order_id });
   }
 
   res.json({ status: 'acknowledged' });
@@ -183,6 +209,33 @@ app.post('/api/v1/address-token/:token/submit', async (req: Request, res: Respon
       postcode,
     },
     orderNote: order_note,
+  });
+});
+
+/**
+ * 4b. Customer Cancels Order from Mobile Web Link
+ * Endpoint: POST /api/v1/address-token/:token/cancel
+ */
+app.post('/api/v1/address-token/:token/cancel', async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const session = tokenService.consumeToken(token);
+  if (!session) {
+    return res.status(400).json({ error: 'Nevažeći ili istekao token za otkazivanje' });
+  }
+
+  viberService.markStatus(session.orderId, 'REJECTED');
+  console.log(`[CUSTOMER CANCELLED VIA WEB] Order #${session.orderId} cancelled by customer via web link.`);
+
+  await webhookService.dispatchToWooCommerce(session.storeDomain, session.apiSecret || 'demo_secret_456', {
+    order_id: Number(session.orderId),
+    action: 'CANCELLED',
+    timestamp: Math.floor(Date.now() / 1000),
+  });
+
+  res.json({
+    success: true,
+    message: 'Porudžbina je uspešno otkazana. Prodavac i kurir su obavešteni.',
+    orderId: session.orderId,
   });
 });
 
