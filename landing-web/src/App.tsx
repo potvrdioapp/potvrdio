@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
-  RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText
+  RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
+  X, Lock, ExternalLink
 } from 'lucide-react';
 
 /* Web Audio API Micro Sound Effects */
@@ -61,6 +62,9 @@ export default function App() {
   const [lang, setLang] = useState<Lang>('sr');
   const [currentScenario, setCurrentScenario] = useState<number>(1);
   const [simState, setSimState] = useState<'initial' | 'confirmed' | 'edited'>('initial');
+  const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
+  const [floorInput, setFloorInput] = useState<string>('3');
+  const [aptInput, setAptInput] = useState<string>('14');
   
   // ROI Calculator States
   const [ordersCount, setOrdersCount] = useState<number>(450);
@@ -107,6 +111,8 @@ export default function App() {
         viber_order_received: "Primili smo tvoju porudžbinu",
         viber_shipping_address: "ADRESA ZA DOSTAVU:",
         viber_confirm_prompt: "Molimo te da potvrdiš tačnost pre nego što paket predamo kuriru:",
+        scen1_warning: "⚠️ Upozorenje: Nedostaje broj stana i sprat (Rizik neuručenja)",
+        scen2_warning: "⏱️ Poruka ignorisana. Nema odgovora 24h. Paket zadržan u skladištu!",
         viber_btn_yes: "DA, ADRESA JE TAČNA",
         viber_btn_edit: "IZMENI ADRESU",
         viber_success_confirmed: "Potvrđeno bez izmena! Paket je spreman za štampu adresnice.",
@@ -150,7 +156,14 @@ export default function App() {
         dl_title: "Zaustavite troškove povrata već u sledećoj turi slanja",
         dl_desc: "Preuzmite besplatan ZIP, aktivirajte ga u WordPress adminu i odmah dobijate 25 besplatnih verifikacionih sesija.",
         btn_dl_full: "Preuzmi Potvrdio WordPress Plugin (.zip)",
-        btn_view_demo: "Pogledaj demo uživo"
+        btn_view_demo: "Pogledaj demo uživo",
+        modal_title: "Ažuriranje adrese za dostavu",
+        modal_subtitle: "Dopunite podatke da kurir brže pronađe Vaš ulaz",
+        modal_street: "Ulica i broj",
+        modal_floor: "Sprat",
+        modal_apt: "Broj stana",
+        modal_intercom: "Interfon / Napomena za kurira",
+        modal_btn_save: "Sačuvaj i Potvrdi Adresu"
       },
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
@@ -191,6 +204,8 @@ export default function App() {
         viber_order_received: "Ја примивме твојата нарачка",
         viber_shipping_address: "АДРЕСА ЗА ДОСТАВА:",
         viber_confirm_prompt: "Те молиме потврди ја точноста пред да го предадеме пакетот на курир:",
+        scen1_warning: "⚠️ Упозорение: Недостасува број на стан и кат (Ризик од неиспорака)",
+        scen2_warning: "⏱️ Пораката е игнорирана. Нема одговор 24ч. Пакетот е задржан!",
         viber_btn_yes: "ДА, АДРЕСАТА Е ТОЧНА",
         viber_btn_edit: "ИЗМЕНИ ЈА АДРЕСАТА",
         viber_success_confirmed: "Потврдено без измени! Пакетот е подготвен за достава.",
@@ -234,7 +249,14 @@ export default function App() {
         dl_title: "Запрете ги трошоците за враќање уште при следната достава",
         dl_desc: "Преземете го бесплатниот ZIP, активирајте го во WordPress и добијте 25 бесплатни кредити.",
         btn_dl_full: "Preuzmi Potvrdio WordPress Plugin (.zip)",
-        btn_view_demo: "Погледај го демато во живо"
+        btn_view_demo: "Погледај го демато во живо",
+        modal_title: "Ажурирање на адреса за достава",
+        modal_subtitle: "Дополнете ги податоците за курирот побрзо да го најде вашиот влез",
+        modal_street: "Улица и број",
+        modal_floor: "Кат",
+        modal_apt: "Број на стан",
+        modal_intercom: "Интерфон / Забелешка за курирот",
+        modal_btn_save: "Зачувај и Потврди Адреса"
       },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
@@ -275,8 +297,12 @@ export default function App() {
         viber_order_received: "We have received your order",
         viber_shipping_address: "SHIPPING ADDRESS:",
         viber_confirm_prompt: "Please confirm details before we hand over the parcel to the courier:",
+        scen1_warning: "⚠️ Warning: Missing apartment & floor number (Delivery Failure Risk)",
+        scen2_warning: "⏱️ Customer ignored message. 24h expired. Parcel safely held in warehouse!",
         viber_btn_yes: "YES, ADDRESS IS ACCURATE",
         viber_btn_edit: "EDIT ADDRESS",
+        viber_success_confirmed: "Confirmed without edits! Parcel ready for shipping label printing.",
+        viber_success_edited: "Address updated! Floor and apartment added. WooCommerce updated.",
         status_saved: "SAVED: Parcel not dispatched, ~€7 saved in pocket",
         status_approved: "APPROVED: Print Post Express shipping label",
         status_waiting: "ON HOLD: Do not pack parcel from warehouse",
@@ -316,7 +342,14 @@ export default function App() {
         dl_title: "Halt return courier costs before tomorrow's dispatch",
         dl_desc: "Download the free ZIP plugin, activate inside WordPress admin, and get 25 free credits instantly.",
         btn_dl_full: "Download Potvrdio WordPress Plugin (.zip)",
-        btn_view_demo: "View live demo"
+        btn_view_demo: "View live demo",
+        modal_title: "Update Delivery Address",
+        modal_subtitle: "Complete missing details for fast courier delivery",
+        modal_street: "Street & Number",
+        modal_floor: "Floor",
+        modal_apt: "Apartment",
+        modal_intercom: "Intercom / Note for Courier",
+        modal_btn_save: "Save & Confirm Address"
       }
     };
 
@@ -361,16 +394,28 @@ export default function App() {
     playClickSound();
     setCurrentScenario(scenNum);
     setSimState('initial');
+    setShowAddressModal(false);
   };
 
   const handleSimAction = (action: 'confirm' | 'edit') => {
     playScannerBeep();
-    setSimState(action === 'confirm' ? 'confirmed' : 'edited');
+    if (action === 'edit') {
+      setShowAddressModal(true);
+    } else {
+      setSimState('confirmed');
+    }
   };
 
   const handleResetSim = () => {
     playClickSound();
     setSimState('initial');
+    setShowAddressModal(false);
+  };
+
+  const handleSaveModalAddress = () => {
+    playScannerBeep();
+    setSimState('edited');
+    setShowAddressModal(false);
   };
 
   // ROI Math
@@ -656,6 +701,22 @@ export default function App() {
             </div>
 
             <div className="space-y-3 text-xs leading-relaxed text-[#E6DDFA]">
+              {/* Scenario 1 Warning Banner */}
+              {currentScenario === 1 && simState === 'initial' && (
+                <div className="p-2.5 rounded bg-amber-500/20 border border-amber-400/40 text-amber-200 text-[11px] font-mono flex items-start gap-2 shadow-sm animate-pulse">
+                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <span>{t('scen1_warning')}</span>
+                </div>
+              )}
+
+              {/* Scenario 2 Warning Banner */}
+              {currentScenario === 2 && (
+                <div className="p-2.5 rounded bg-red-500/20 border border-red-400/40 text-red-200 text-[11px] font-mono flex items-start gap-2 shadow-sm">
+                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                  <span>{t('scen2_warning')}</span>
+                </div>
+              )}
+
               <div className="bg-[#29204A] p-3.5 rounded-lg border border-[#46377B]">
                 <p className="mb-2">
                   {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount}).
@@ -665,9 +726,9 @@ export default function App() {
                   <span className="text-white font-medium">
                     {simState === 'edited' ? (
                       <span>
-                        {lang === 'sr' ? 'Bulevar Oslobođenja 42' : lang === 'mk' ? 'Бул. Партизански Одреди 42' : '42 Liberation Blvd'}
+                        {currentScenConfig.address[lang]}
                         <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold text-[10px] border border-blue-400/40 animate-pulse">
-                          + {lang === 'sr' ? 'Sprat 3, Stan 14' : lang === 'mk' ? 'Кат 3, Стан 14' : 'Floor 3, Apt 14'}
+                          + {lang === 'sr' ? `Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `Кат ${floorInput}, Стан ${aptInput}` : `Floor ${floorInput}, Apt ${aptInput}`}
                         </span>
                       </span>
                     ) : currentScenConfig.address[lang]}
@@ -678,7 +739,17 @@ export default function App() {
                 </p>
               </div>
 
-              {simState === 'initial' ? (
+              {currentScenario === 2 ? (
+                <div className="p-3 rounded bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-mono text-center flex flex-col items-center gap-1">
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <XCircle className="w-4 h-4 text-red-400" />
+                    <span>{t('status_saved')}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-300 font-sans">
+                    {lang === 'sr' ? 'Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.' : lang === 'mk' ? 'Купувачот не одговори 24ч. Нарачката е откажана пред пакување.' : 'Customer ignored for 24h. Order cancelled before packing.'}
+                  </p>
+                </div>
+              ) : simState === 'initial' ? (
                 <div className="space-y-2 pt-1">
                   <button 
                     onClick={() => handleSimAction('confirm')} 
@@ -1171,6 +1242,97 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Address Edit Token Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0D121F] border border-[#14B8A6]/50 rounded-xl max-w-md w-full shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150">
+            
+            {/* Browser Header / URL bar */}
+            <div className="bg-[#070A13] px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+              <div className="flex items-center gap-2 text-[#14B8A6] font-mono">
+                <Lock className="w-3 h-3 text-emerald-400" />
+                <span className="text-slate-200">potvrdio.online/edit-address?token=vbr_9842</span>
+              </div>
+              <button 
+                onClick={() => setShowAddressModal(false)}
+                className="text-slate-400 hover:text-white transition p-1 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4">
+              <div>
+                <div className="text-[10px] text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
+                  Passwordless Token Verifikacija
+                </div>
+                <h3 className="text-base font-bold text-white font-sans">{t('modal_title')}</h3>
+                <p className="text-[11px] text-slate-400 mt-1">{t('modal_subtitle')}</p>
+              </div>
+
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded text-amber-300 text-[11px] flex items-start gap-2 font-sans">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <span>
+                  {lang === 'sr' ? '⚡ Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.' : lang === 'mk' ? '⚡ Пополнете кат и стан за курирот без застој да го најде вашиот влез.' : '⚡ Fill floor and apartment so the courier can find your entrance without delay.'}
+                </span>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">{t('modal_street')}</label>
+                  <input 
+                    type="text" 
+                    readOnly 
+                    value={currentScenConfig.address[lang]}
+                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-400 font-mono text-xs cursor-not-allowed"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] text-slate-200 font-bold mb-1">{t('modal_floor')}</label>
+                    <input 
+                      type="text" 
+                      value={floorInput}
+                      onChange={(e) => setFloorInput(e.target.value)}
+                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] text-slate-200 font-bold mb-1">{t('modal_apt')}</label>
+                    <input 
+                      type="text" 
+                      value={aptInput}
+                      onChange={(e) => setAptInput(e.target.value)}
+                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">{t('modal_intercom')}</label>
+                  <input 
+                    type="text" 
+                    defaultValue={lang === 'sr' ? 'Radi interfon, ime na zvonu Ninković' : lang === 'mk' ? 'Работи интерфон, име на ѕвоно Ниновиќ' : 'Intercom works, ring name Ninkovic'}
+                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-300 text-xs focus:outline-none focus:border-white/30 font-sans"
+                  />
+                </div>
+              </div>
+
+              <button 
+                onClick={handleSaveModalAddress}
+                className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg cursor-pointer mt-2"
+              >
+                <Check className="w-4 h-4" />
+                <span>{t('modal_btn_save')}</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 }
