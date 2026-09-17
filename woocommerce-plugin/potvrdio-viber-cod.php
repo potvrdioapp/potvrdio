@@ -74,6 +74,10 @@ class Potvrdio_Viber_COD {
         // B. FIELD REQUIREMENTS & PRIVACY CONSENT
         // =========================================================================
 
+        // System-wide: Force WooCommerce Checkout Phone Field Option to 'required' (removes '(optional)' in core & blocks)
+        add_filter('option_woocommerce_checkout_phone_field', array($this, 'force_phone_field_required_option'), 9999);
+        add_filter('default_option_woocommerce_checkout_phone_field', array($this, 'force_phone_field_required_option'), 9999);
+
         // Enforce Billing Phone as strictly required in form definition (Classic, Blocks & Custom Field Editors)
         add_filter('woocommerce_billing_fields', array($this, 'enforce_phone_required_on_checkout'), 99999, 1);
         add_filter('woocommerce_checkout_fields', array($this, 'enforce_all_checkout_fields_phone_required'), 99999, 1);
@@ -408,9 +412,9 @@ class Potvrdio_Viber_COD {
                 'en' => __('Phone number (for Viber delivery verification)', 'potvrdio-viber-cod'),
             ),
             'phone_placeholder' => array(
-                'sr' => __('Broj telefona (npr. 064 123 4567 za Viber potvrdu)', 'potvrdio-viber-cod'),
-                'mk' => __('Телефонски број (на пр. 070 123 456 за Viber потврда)', 'potvrdio-viber-cod'),
-                'en' => __('Phone number (for Viber verification)', 'potvrdio-viber-cod'),
+                'sr' => __('npr. 064 123 4567', 'potvrdio-viber-cod'),
+                'mk' => __('на пр. 070 123 456', 'potvrdio-viber-cod'),
+                'en' => __('e.g. +381 64 123 4567', 'potvrdio-viber-cod'),
             ),
             'thankyou_title' => array(
                 'sr' => __('Potvrdio: Porudžbina #{order_id} je na čekanju (On-Hold)', 'potvrdio-viber-cod'),
@@ -603,8 +607,18 @@ class Potvrdio_Viber_COD {
     }
 
     /**
+     * Force WooCommerce Checkout Phone Field Option to 'required'
+     *
+     * @param mixed $value Existing option value.
+     * @return string
+     */
+    public function force_phone_field_required_option($value) {
+        return 'required';
+    }
+
+    /**
      * Client-side Real-Time Phone Validation:
-     * Injected on checkout, funnels, and cart pages to guarantee the phone input is never skipped.
+     * Fully compatible with Gutenberg Block Checkout (floating labels) and classic checkout funnels.
      */
     public function inject_checkout_phone_enforcement_script() {
         $placeholder = $this->get_message('phone_placeholder');
@@ -612,18 +626,58 @@ class Potvrdio_Viber_COD {
         <script type="text/javascript">
         (function() {
             var potvrdioPlaceholder = <?php echo wp_json_encode($placeholder); ?>;
+
+            function fixPhoneInput(input, isCod) {
+                if (isCod) {
+                    input.setAttribute('required', 'required');
+                }
+
+                // Check if the input is rendered inside a Gutenberg Block or Floating-Label design
+                var isFloating = !!input.closest('.wc-block-components-text-input, .has-floating-label, [class*="floating-label"]');
+
+                if (isFloating) {
+                    // CRITICAL: Floating labels sit inside the field when empty and unfocused.
+                    // Setting a static placeholder causes the label and placeholder to collide and overlap!
+                    if (document.activeElement !== input) {
+                        input.removeAttribute('placeholder');
+                    }
+
+                    // Dynamically attach focus/blur listeners so placeholder ONLY appears when user focuses
+                    if (!input.dataset.potvrdioBound) {
+                        input.dataset.potvrdioBound = 'true';
+                        input.addEventListener('focus', function() {
+                            input.setAttribute('placeholder', potvrdioPlaceholder);
+                        });
+                        input.addEventListener('blur', function() {
+                            if (!input.value) {
+                                input.removeAttribute('placeholder');
+                            }
+                        });
+                    }
+
+                    // Clean up any remaining "(optional)" text in the floating label element
+                    var container = input.closest('.wc-block-components-text-input');
+                    var label = container ? container.querySelector('label') : document.querySelector('label[for="' + input.id + '"]');
+                    if (label && label.innerHTML && isCod) {
+                        if (/\((optional|opciono|опционално)\)/i.test(label.innerHTML)) {
+                            label.innerHTML = label.innerHTML.replace(/\s*\((optional|opciono|опционално)\)/gi, ' <span class="required" style="color:#d63638;">*</span>');
+                        }
+                    }
+                } else {
+                    // Classic non-floating checkouts: safe to set placeholder
+                    if (isCod && (!input.placeholder || input.placeholder.indexOf('Viber') !== -1)) {
+                        input.setAttribute('placeholder', potvrdioPlaceholder);
+                    }
+                }
+            }
+
             function checkCodPhone() {
                 var codRadio = document.querySelector('input[name="payment_method"][value="cod"]');
                 var isCod = codRadio ? codRadio.checked : true;
                 var phoneInputs = document.querySelectorAll('input[type="tel"], input[name*="phone"], input[id*="phone"], input[name*="mobile"]');
 
                 phoneInputs.forEach(function(input) {
-                    if (isCod) {
-                        input.setAttribute('required', 'required');
-                        if (!input.placeholder || input.placeholder.indexOf('Viber') === -1) {
-                            input.setAttribute('placeholder', potvrdioPlaceholder);
-                        }
-                    }
+                    fixPhoneInput(input, isCod);
                 });
             }
 
@@ -641,6 +695,15 @@ class Potvrdio_Viber_COD {
 
             if (window.jQuery) {
                 window.jQuery(document.body).on('updated_checkout payment_method_selected', checkCodPhone);
+            }
+
+            // MutationObserver to seamlessly handle Gutenberg React component re-renders
+            if (window.MutationObserver) {
+                var observer = new MutationObserver(function() {
+                    checkCodPhone();
+                });
+                var target = document.querySelector('.wp-block-woocommerce-checkout, form.checkout') || document.body;
+                observer.observe(target, { childList: true, subtree: true });
             }
         })();
         </script>
