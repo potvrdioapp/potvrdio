@@ -4,6 +4,8 @@ import {
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
   X, Lock, ExternalLink, Menu, Scale
 } from 'lucide-react';
+import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
+import { TermsConditionsModal } from './components/TermsConditionsModal';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;
@@ -63,6 +65,8 @@ export default function App() {
   const [currentScenario, setCurrentScenario] = useState<number>(1);
   const [simState, setSimState] = useState<'initial' | 'confirmed' | 'edited'>('initial');
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
+  const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [floorInput, setFloorInput] = useState<string>('3');
   const [aptInput, setAptInput] = useState<string>('14');
@@ -208,6 +212,10 @@ export default function App() {
         leg_ref_azlp: "AZLP Severna Makedonija",
         leg_ref_azlp_sub: "Agencija za zaštitu ličnih podataka (azlp.mk)",
         modal_legal_notice: "🔒 Kriptografski HMAC Token · Usklađeno sa Čl. 12 ZZPL RS & GDPR Art. 6",
+        footer_privacy: "Politika Privatnosti",
+        footer_terms: "Uslovi Korišćenja",
+        leg_action_privacy: "Politika Privatnosti (ZZPL & GDPR)",
+        leg_action_terms: "Uslovi Korišćenja SaaS Platforme",
         dev_code_comment: "// 1. Presretanje porudžbine u functions.php ili pluginu",
         dev_status_note: "Potvrdio: Čeka Viber potvrdu kupca",
         dev_hpos_note: "Testirano na WooCommerce 7.0 do 9.x sa High-Performance Order Storage (HPOS) uključenim.",
@@ -377,6 +385,10 @@ export default function App() {
         leg_ref_azlp: "АЗЛП Северна Македонија",
         leg_ref_azlp_sub: "Агенција за заштита на личните податоци (azlp.mk)",
         modal_legal_notice: "🔒 Криптографски HMAC Токен · Усогласено со Чл. 10 ZZLP MK & GDPR Art. 6",
+        footer_privacy: "Политика за Приватност",
+        footer_terms: "Услови за Користење",
+        leg_action_privacy: "Политика за Приватност (ZZLP & GDPR)",
+        leg_action_terms: "Услови за Користење на Платформата",
         dev_code_comment: "// 1. Интерцепција во functions.php или приклучок",
         dev_status_note: "Potvrdio: Се чека Viber потврда",
         dev_hpos_note: "Тестирано на WooCommerce 7.0 до 9.x со вклучен High-Performance Order Storage (HPOS).",
@@ -546,6 +558,10 @@ export default function App() {
         leg_ref_azlp: "AZLP North Macedonia",
         leg_ref_azlp_sub: "Personal Data Protection Agency (azlp.mk)",
         modal_legal_notice: "🔒 Cryptographic HMAC Token · Compliant with Art. 12 ZZPL & EU GDPR Art. 6",
+        footer_privacy: "Privacy Policy",
+        footer_terms: "Terms & Conditions",
+        leg_action_privacy: "Privacy Policy (ZZPL & GDPR)",
+        leg_action_terms: "SaaS Platform Terms & Conditions",
         dev_code_comment: "// 1. Intercept order inside functions.php or custom plugin",
         dev_status_note: "Potvrdio: Awaiting buyer Viber confirmation",
         dev_hpos_note: "Battle-tested on WooCommerce 7.0 through 9.x with High-Performance Order Storage (HPOS) enabled.",
@@ -1622,6 +1638,25 @@ export default function App() {
             </a>
           </div>
         </div>
+
+        {/* Full Legal Documents Action Row */}
+        <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4 font-mono text-xs">
+          <button 
+            onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
+            className="px-4 py-2.5 rounded glass-panel border border-[#14B8A6]/40 hover:border-[#14B8A6] text-white hover:text-teal-300 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{t('leg_action_privacy')}</span>
+          </button>
+
+          <button 
+            onClick={() => { playClickSound(); setShowTermsModal(true); }} 
+            className="px-4 py-2.5 rounded glass-panel border border-white/10 hover:border-white/30 text-slate-300 hover:text-white transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+          >
+            <FileText className="w-4 h-4 text-teal-400 shrink-0" />
+            <span>{t('leg_action_terms')}</span>
+          </button>
+        </div>
       </section>
 
       {/* SECTION 06: Download & Installation CTA */}
@@ -1652,14 +1687,31 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#070A13] py-8 text-xs text-slate-400 font-mono mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-center sm:text-left">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-center md:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-2">
             <span className="text-white font-bold">potvrdio.online</span>
             <span>{t('footer_sub')}</span>
           </div>
-          <div className="flex items-center gap-4">
+
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-slate-400">
+            <button 
+              onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
+              className="hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span>{t('footer_privacy')}</span>
+            </button>
+            <span className="text-white/20 hidden sm:inline">•</span>
+            <button 
+              onClick={() => { playClickSound(); setShowTermsModal(true); }} 
+              className="hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
+            >
+              <FileText className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+              <span>{t('footer_terms')}</span>
+            </button>
+            <span className="text-white/20 hidden sm:inline">•</span>
             <span>{t('footer_location')}</span>
-            <span>·</span>
+            <span className="text-white/20 hidden sm:inline">•</span>
             <a href="mailto:kontakt@potvrdio.online" className="hover:text-white transition">kontakt@potvrdio.online</a>
           </div>
         </div>
@@ -1754,12 +1806,31 @@ export default function App() {
               <div className="pt-2 text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1.5 text-center leading-normal">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span>{t('modal_legal_notice')}</span>
+                <button 
+                  onClick={() => { playClickSound(); setShowPrivacyModal(true); }}
+                  className="text-[#14B8A6] hover:underline cursor-pointer ml-1"
+                >
+                  [{t('footer_privacy')}]
+                </button>
               </div>
             </div>
 
           </div>
         </div>
       )}
+
+      {/* Legal Modals */}
+      <PrivacyPolicyModal 
+        isOpen={showPrivacyModal} 
+        onClose={() => setShowPrivacyModal(false)} 
+        lang={lang} 
+      />
+
+      <TermsConditionsModal 
+        isOpen={showTermsModal} 
+        onClose={() => setShowTermsModal(false)} 
+        lang={lang} 
+      />
     </div>
   );
 }
