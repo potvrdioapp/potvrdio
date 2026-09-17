@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown
+  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
+import { OnboardingModal } from './components/OnboardingModal';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;
@@ -67,6 +68,7 @@ export default function App() {
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
+  const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [floorInput, setFloorInput] = useState<string>('3');
@@ -760,14 +762,13 @@ export default function App() {
               </button>
             </div>
 
-            <a 
-              href="#preuzmi" 
-              onClick={playClickSound}
-              className="hidden sm:inline-flex btn-brand-cta text-white font-semibold text-xs px-3 sm:px-3.5 py-2 rounded transition-all items-center gap-1.5 shadow-sm min-h-[36px]"
+            <button 
+              onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
+              className="hidden sm:inline-flex btn-brand-cta text-white font-bold text-xs px-3 sm:px-3.5 py-2 rounded transition-all items-center gap-1.5 shadow-sm min-h-[36px] cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>{t('btn_dl')}</span>
-            </a>
+              <Rocket className="w-3.5 h-3.5 text-teal-300 shrink-0" />
+              <span>{lang === 'sr' ? 'Registracija (25 Kredita)' : lang === 'mk' ? 'Регистрација (25 Кредити)' : 'Register Store (25 Free)'}</span>
+            </button>
 
             {/* Mobile Hamburger Button */}
             <button
@@ -873,10 +874,13 @@ export default function App() {
                   <span>{t('hero_cta_primary')}</span>
                   <ArrowDown className="w-3.5 h-3.5" />
                 </a>
-                <div className="text-xs font-mono text-slate-400 flex items-center justify-center sm:justify-start gap-2 py-1">
-                  <span className="text-emerald-400 font-bold">25</span>
-                  <span>{t('hero_free_credits')}</span>
-                </div>
+                <button 
+                  onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
+                  className="px-5 py-3.5 sm:py-3 bg-[#0D121F] hover:bg-white/10 text-white border border-[#14B8A6]/40 hover:border-[#14B8A6] text-xs rounded font-bold transition inline-flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+                >
+                  <Rocket className="w-4 h-4 text-teal-300 shrink-0" />
+                  <span>{lang === 'sr' ? 'Aktiviraj 25 Besplatnih Verifikacija' : lang === 'mk' ? 'Активирај 25 Бесплатни Верификации' : 'Activate 25 Free Credits'}</span>
+                </button>
               </div>
 
               {/* Stats */}
@@ -1476,7 +1480,7 @@ export default function App() {
             </ul>
 
             <button 
-              onClick={playClickSound}
+              onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
               className="w-full btn-brand-cta text-white font-bold py-3 rounded text-xs transition shadow-sm cursor-pointer min-h-[44px]"
             >
               {t('btn_act_pro')}
@@ -1781,7 +1785,7 @@ export default function App() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
             <button 
-              onClick={playScannerBeep}
+              onClick={() => { playScannerBeep(); setShowOnboardingModal(true); }}
               className="w-full sm:w-auto px-6 py-3.5 sm:py-3 btn-brand-cta text-white font-bold text-xs rounded transition shadow-lg cursor-pointer min-h-[44px]"
             >
               {t('btn_dl_full')}
@@ -1941,6 +1945,14 @@ export default function App() {
         isOpen={showTermsModal} 
         onClose={() => setShowTermsModal(false)} 
         lang={lang} 
+      />
+
+      {/* Onboarding & Free Credits Modal */}
+      <OnboardingModal 
+        isOpen={showOnboardingModal}
+        onClose={() => setShowOnboardingModal(false)}
+        lang={lang}
+        playSuccessSound={playScannerBeep}
       />
     </div>
   );
