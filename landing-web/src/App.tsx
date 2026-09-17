@@ -71,10 +71,10 @@ export default function App() {
       sr: {
         top_networks: "Post Express, D Express, Bex, City Express",
         nav_sub: "Lojistička COD Zaštita · WP v2.1",
-        nav_lab: "Saha Simülatörü",
-        nav_manifest: "Adresnica İncelemesi",
-        nav_calc: "Kargo Zarar Matrisi",
-        nav_pricing: "Havuz Maliyeti",
+        nav_lab: "Simulacija na terenu",
+        nav_manifest: "Inspekcija adresnice",
+        nav_calc: "Matrica gubitka",
+        nav_pricing: "Bazen kredita",
         nav_dev: "API & HPOS",
         btn_dl: "Preuzmi ZIP",
         hero_tag: "WooCommerce Plaćanje Pouzećem (COD)",
@@ -98,6 +98,21 @@ export default function App() {
         scen2_desc: "Kupac ignoriše Viber poruku i SMS. Paket ostaje u skladištu, a prodavac štedi 820 RSD.",
         scen3_title: "Instant 1-Click Potvrda",
         scen3_desc: "Verifikacija u jednom dodiru. Webhook automatski generiše Post Express adresnicu.",
+        scen_common_tag: "Uobičajeno (62%)",
+        scen_saved_tag: "Izbegnut trošak",
+        scen_fast_tag: "< 30 sekundi",
+        viber_verified_title: "Verifikacija",
+        viber_verified_badge: "VERIFIKOVANO",
+        viber_greeting: "Zdravo",
+        viber_order_received: "Primili smo tvoju porudžbinu",
+        viber_shipping_address: "ADRESA ZA DOSTAVU:",
+        viber_confirm_prompt: "Molimo te da potvrdiš tačnost pre nego što paket predamo kuriru:",
+        viber_btn_yes: "DA, ADRESA JE TAČNA",
+        viber_btn_edit: "IZMENI ADRESU",
+        viber_success_msg: "Zabeleženo u sistemu. Podaci su prosleđeni u WooCommerce.",
+        status_saved: "SAČUVANO: Paket nije poslat, 820 RSD u džepu",
+        status_approved: "ODOBRENO: Štampaj Post Express adresnicu",
+        status_waiting: "ČEKANJE: Ne pakovati paket iz magacina",
         term_title: "Real-Time WP Event Terminal",
         term_risk_status: "Status Magacina",
         btn_restart_sim: "Restartuj test",
@@ -166,6 +181,21 @@ export default function App() {
         scen2_desc: "Customer ignores Viber and SMS. Parcel stays safely in storage; store saves 820 RSD.",
         scen3_title: "Instant 1-Click Approval",
         scen3_desc: "Immediate 1-tap verification. Webhook releases Post Express shipping manifest in seconds.",
+        scen_common_tag: "Common (62%)",
+        scen_saved_tag: "Cost Avoided",
+        scen_fast_tag: "< 30 seconds",
+        viber_verified_title: "Verification",
+        viber_verified_badge: "VERIFIED",
+        viber_greeting: "Hello",
+        viber_order_received: "We have received your order",
+        viber_shipping_address: "SHIPPING ADDRESS:",
+        viber_confirm_prompt: "Please confirm details before we hand over the parcel to the courier:",
+        viber_btn_yes: "YES, ADDRESS IS ACCURATE",
+        viber_btn_edit: "EDIT ADDRESS",
+        viber_success_msg: "Logged in system. Details forwarded to WooCommerce.",
+        status_saved: "SAVED: Parcel not dispatched, ~€7 saved in pocket",
+        status_approved: "APPROVED: Print Post Express shipping label",
+        status_waiting: "ON HOLD: Do not pack parcel from warehouse",
         term_title: "Real-Time WP Event Terminal",
         term_risk_status: "Warehouse Decision",
         btn_restart_sim: "Reset test",
@@ -213,19 +243,28 @@ export default function App() {
   const scenarios = {
     1: {
       customer: "Marko Petrović",
-      address: "Bulevar Oslobođenja 42, Novi Sad",
+      address: {
+        sr: "Bulevar Oslobođenja 42, Novi Sad",
+        en: "42 Liberation Blvd, Novi Sad"
+      },
       orderId: "#RS-8492",
       orderAmount: "4.890 RSD",
     },
     2: {
       customer: "Nemanja Ilić",
-      address: "Bulevar Nemanjića 14, Niš",
+      address: {
+        sr: "Bulevar Nemanjića 14, Niš",
+        en: "14 Nemanjica Blvd, Nis"
+      },
       orderId: "#RS-8501",
       orderAmount: "3.450 RSD",
     },
     3: {
       customer: "Ana Jovanović",
-      address: "Kneza Miloša 22, Kragujevac",
+      address: {
+        sr: "Kneza Miloša 22, Kragujevac",
+        en: "22 Prince Milos St, Kragujevac"
+      },
       orderId: "#RS-8519",
       orderAmount: "6.120 RSD",
     }
@@ -471,7 +510,7 @@ export default function App() {
           >
             <div className="flex items-center justify-between mb-1 font-mono">
               <span className={`font-bold ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario A</span>
-              <span className="text-[10px] text-emerald-400">Uobičajeno (62%)</span>
+              <span className="text-[10px] text-emerald-400">{t('scen_common_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen1_title')}</div>
             <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen1_desc')}</div>
@@ -483,7 +522,7 @@ export default function App() {
           >
             <div className="flex items-center justify-between mb-1 font-mono">
               <span className={`font-bold ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario B</span>
-              <span className="text-[10px] text-red-400">Izbegnut trošak</span>
+              <span className="text-[10px] text-red-400">{t('scen_saved_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen2_title')}</div>
             <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen2_desc')}</div>
@@ -495,7 +534,7 @@ export default function App() {
           >
             <div className="flex items-center justify-between mb-1 font-mono">
               <span className={`font-bold ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario C</span>
-              <span className="text-[10px] text-emerald-400">&lt; 30 sekundi</span>
+              <span className="text-[10px] text-emerald-400">{t('scen_fast_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen3_title')}</div>
             <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen3_desc')}</div>
@@ -514,8 +553,8 @@ export default function App() {
                 </div>
                 <div>
                   <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span>Potvrdio · Verifikacija</span>
-                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.5 rounded font-mono">VERIFIKOVANO</span>
+                    <span>Potvrdio · {t('viber_verified_title')}</span>
+                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.5 rounded font-mono">{t('viber_verified_badge')}</span>
                   </div>
                   <div className="text-[10px] font-mono text-[#A798CE]">Viber Business Gateway #782</div>
                 </div>
@@ -526,16 +565,16 @@ export default function App() {
             <div className="space-y-3 text-xs leading-relaxed text-[#E6DDFA]">
               <div className="bg-[#29204A] p-3.5 rounded-lg border border-[#46377B]">
                 <p className="mb-2">
-                  Zdravo <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! Primili smo tvoju porudžbinu <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount}).
+                  {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount}).
                 </p>
                 <div className="p-2.5 rounded bg-[#1E1838] border border-[#46377B] font-mono text-[11px] text-[#C4B5FD] mb-3">
-                  <span className="text-slate-400 block text-[10px]">ADRESA ZA DOSTAVU:</span>
+                  <span className="text-slate-400 block text-[10px]">{t('viber_shipping_address')}</span>
                   <span className="text-white font-medium">
-                    {simState === 'edited' ? 'Bulevar Oslobođenja 42, Sprat 3, Stan 14' : currentScenConfig.address}
+                    {simState === 'edited' ? (lang === 'sr' ? 'Bulevar Oslobođenja 42, Sprat 3, Stan 14' : '42 Liberation Blvd, 3rd Floor, Apt 14') : currentScenConfig.address[lang]}
                   </span>
                 </div>
                 <p className="text-[11px] text-[#DDD6FE]">
-                  Molimo te da potvrdiš tačnost pre nego što paket predamo kuriru:
+                  {t('viber_confirm_prompt')}
                 </p>
               </div>
 
@@ -546,20 +585,20 @@ export default function App() {
                     className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <Check className="w-4 h-4" />
-                    <span>DA, ADRESA JE TAČNA</span>
+                    <span>{t('viber_btn_yes')}</span>
                   </button>
                   <button 
                     onClick={() => handleSimAction('edit')} 
                     className="w-full bg-[#191A2B] hover:bg-[#252840] text-slate-200 py-2 rounded text-xs transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#14B8A6]" />
-                    <span>IZMENI ADRESU</span>
+                    <span>{t('viber_btn_edit')}</span>
                   </button>
                 </div>
               ) : (
                 <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
                   <Check className="w-4 h-4 text-emerald-400" />
-                  <span>Zabeleženo u sistemu. Podaci su prosleđeni u WooCommerce.</span>
+                  <span>{t('viber_success_msg')}</span>
                 </div>
               )}
             </div>
@@ -628,11 +667,11 @@ export default function App() {
                 <div className="text-slate-400 text-[10px] uppercase font-bold">{t('term_risk_status')}</div>
                 <div className="font-bold text-xs mt-0.5">
                   {currentScenario === 2 ? (
-                    <span className="text-emerald-400">SAČUVANO: Paket nije poslat, 820 RSD u džepu</span>
+                    <span className="text-emerald-400">{t('status_saved')}</span>
                   ) : simState !== 'initial' ? (
-                    <span className="text-emerald-400">ODOBRENO: Štampaj Post Express adresnicu</span>
+                    <span className="text-emerald-400">{t('status_approved')}</span>
                   ) : (
-                    <span className="text-amber-400">ČEKANJE: Ne pakovati paket iz magacina</span>
+                    <span className="text-amber-400">{t('status_waiting')}</span>
                   )}
                 </div>
               </div>
