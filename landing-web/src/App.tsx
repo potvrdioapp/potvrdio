@@ -190,7 +190,16 @@ export default function App() {
         calc_rate_ideal: "4% (Idealno)",
         calc_rate_avg: "13% (Prosek Srbije)",
         calc_rate_high: "25% (Kritičan gubitak)",
-        calc_freight_note: "Trošak duple poštarine (slanje + povrat):"
+        calc_freight_note: "Trošak duple poštarine (slanje + povrat):",
+        leg_item1_title: "1. Izvršenje ugovora (Član 12 ZZPL)",
+        leg_item1_desc: "Kupac je sam uneo broj na checkout stranici. Verifikacija adrese je neophodan korak za isporuku robe.",
+        leg_item2_title: "2. Automatsko brisanje (Retention 30 dana)",
+        leg_item2_desc: "Brojevi telefona i tokeni se automatski brišu i anonimizuju iz sistema 30 dana nakon isporuke pošiljke.",
+        dev_code_comment: "// 1. Presretanje porudžbine u functions.php ili pluginu",
+        dev_status_note: "Potvrdio: Čeka Viber potvrdu kupca",
+        dev_hpos_note: "Testirano na WooCommerce 7.0 do 9.x sa High-Performance Order Storage (HPOS) uključenim.",
+        footer_sub: "— Regionalna infrastruktura za WooCommerce pouzeće",
+        footer_location: "Novi Sad / Beograd"
       },
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
@@ -310,7 +319,16 @@ export default function App() {
         calc_rate_ideal: "4% (Идеално)",
         calc_rate_avg: "13% (Просек во регионот)",
         calc_rate_high: "25% (Критична загуба)",
-        calc_freight_note: "Трошок за двојна поштарина (достава + враќање):"
+        calc_freight_note: "Трошок за двојна поштарина (достава + враќање):",
+        leg_item1_title: "1. Исполнување на договор (Член 12 ZZPL)",
+        leg_item1_desc: "Купувачот сам го внесе бројот на checkout. Верификацијата на адреса е неопходен чекор за достава.",
+        leg_item2_title: "2. Автоматско бришење (Retention 30 дена)",
+        leg_item2_desc: "Телефонските броеви и токени автоматски се бришат и анонимизираат 30 дена по доставата.",
+        dev_code_comment: "// 1. Интерцепција во functions.php или приклучок",
+        dev_status_note: "Potvrdio: Се чека Viber потврда",
+        dev_hpos_note: "Тестирано на WooCommerce 7.0 до 9.x со вклучен High-Performance Order Storage (HPOS).",
+        footer_sub: "— Регионална инфраструктура за WooCommerce плаќање при преземање",
+        footer_location: "Скопје / Битола / Белград"
       },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
@@ -430,7 +448,16 @@ export default function App() {
         calc_rate_ideal: "4% (Ideal)",
         calc_rate_avg: "13% (Balkan Average)",
         calc_rate_high: "25% (Critical Loss)",
-        calc_freight_note: "Double courier freight cost (shipping + return):"
+        calc_freight_note: "Double courier freight cost (shipping + return):",
+        leg_item1_title: "1. Sales Contract Execution (Art. 12 / GDPR Art. 6)",
+        leg_item1_desc: "Customer willingly submitted their phone number at checkout. Address verification is a required step for physical order fulfillment.",
+        leg_item2_title: "2. Automatic Erasure (30-Day Data Retention)",
+        leg_item2_desc: "Phone numbers and tokens are automatically anonymized and purged from all gateway servers 30 days post-delivery.",
+        dev_code_comment: "// 1. Intercept order inside functions.php or custom plugin",
+        dev_status_note: "Potvrdio: Awaiting buyer Viber confirmation",
+        dev_hpos_note: "Battle-tested on WooCommerce 7.0 through 9.x with High-Performance Order Storage (HPOS) enabled.",
+        footer_sub: "— Regional Infrastructure for WooCommerce Cash on Delivery (COD)",
+        footer_location: "Belgrade / Novi Sad / Skopje"
       }
     };
 
@@ -1246,15 +1273,15 @@ export default function App() {
 
             <div className="space-y-3 font-mono text-xs pt-2">
               <div className="p-3.5 rounded glass-panel">
-                <div className="text-white font-bold mb-1">1. Izvršenje ugovora (Član 12 ZZPL)</div>
+                <div className="text-white font-bold mb-1">{t('leg_item1_title')}</div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
-                  Kupac je sam uneo broj na checkout stranici. Verifikacija adrese je neophodan korak za isporuku robe.
+                  {t('leg_item1_desc')}
                 </div>
               </div>
               <div className="p-3.5 rounded glass-panel">
-                <div className="text-white font-bold mb-1">2. Automatsko brisanje (Retention 30 dana)</div>
+                <div className="text-white font-bold mb-1">{t('leg_item2_title')}</div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
-                  Brojevi telefona i tokeni se automatski brišu i anonimizuju iz sistema 30 dana nakon isporuke pošiljke.
+                  {t('leg_item2_desc')}
                 </div>
               </div>
             </div>
@@ -1265,19 +1292,19 @@ export default function App() {
             <h2 className="text-2xl font-bold text-white tracking-tight">{t('dev_title')}</h2>
             
             <div className="bg-[#070A13] border border-white/10 rounded-lg p-4 font-mono text-xs text-slate-300 overflow-x-auto">
-              <div className="text-slate-400 text-[11px] mb-2">// 1. Interception filter u functions.php ili pluginu</div>
+              <div className="text-slate-400 text-[11px] mb-2">{t('dev_code_comment')}</div>
               <div className="text-[#14B8A6]">add_action('woocommerce_checkout_order_processed', function($order_id) &#123;</div>
               <div className="pl-4 text-slate-400">$order = wc_get_order($order_id);</div>
               <div className="pl-4 text-slate-400">if ($order-&gt;get_payment_method() === 'cod') &#123;</div>
-              <div className="pl-8 text-emerald-400">$order-&gt;update_status('on-hold', 'Potvrdio: Čeka Viber potvrdu kupca');</div>
+              <div className="pl-8 text-emerald-400">$order-&gt;update_status('on-hold', '{t('dev_status_note')}');</div>
               <div className="pl-8 text-slate-300">Potvrdio_Client::dispatch_viber_session($order);</div>
               <div className="pl-4 text-slate-400">&#125;</div>
               <div className="text-[#14B8A6]">&#125;);</div>
             </div>
 
             <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Testirano na WooCommerce 7.0 do 9.x sa High-Performance Order Storage (HPOS) uključenim.</span>
+              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span>{t('dev_hpos_note')}</span>
             </div>
           </div>
         </div>
@@ -1314,10 +1341,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-5 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
           <div className="flex items-center gap-2">
             <span className="text-white font-bold">potvrdio.online</span>
-            <span>— Regionalna infrastruktura za WooCommerce pouzeće</span>
+            <span>{t('footer_sub')}</span>
           </div>
           <div className="flex items-center gap-4">
-            <span>Novi Sad / Beograd</span>
+            <span>{t('footer_location')}</span>
             <span>·</span>
             <a href="mailto:kontakt@potvrdio.online" className="hover:text-white transition">kontakt@potvrdio.online</a>
           </div>
