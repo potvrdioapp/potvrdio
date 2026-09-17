@@ -3,9 +3,10 @@ import cors from 'cors';
 import { ViberService } from './viberService';
 import { TokenService } from './tokenService';
 import { BillingService } from './billingService';
+import { WebhookService } from './webhookService';
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4001;
 
 app.use(cors());
 app.use(express.json());
@@ -13,6 +14,10 @@ app.use(express.json());
 const viberService = ViberService.getInstance();
 const tokenService = TokenService.getInstance();
 const billingService = BillingService.getInstance();
+const webhookService = WebhookService.getInstance();
+
+// In-memory registry for intercepted store associations
+const orderStoreRegistry = new Map<string, { storeDomain: string; apiSecret: string }>();
 
 // Healthcheck
 app.get('/health', (req: Request, res: Response) => {
@@ -37,10 +42,18 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     console.warn(`[CREDIT ALERT] Merchant ${apiKey} has insufficient balance! Sending email alert.`);
   }
 
+  // Store association for return webhook
+  const apiSecret = (req.headers['x-potvrdio-api-secret'] as string) || 'demo_secret_456';
+  orderStoreRegistry.set(String(order_id), {
+    storeDomain: store_domain || 'http://localhost:3000',
+    apiSecret,
+  });
+
   // Create 24-hour single-use token for address edit link
   const token = tokenService.createToken({
     orderId: String(order_id),
-    storeDomain: store_domain || 'my-shop.rs',
+    storeDomain: store_domain || 'http://localhost:3000',
+    apiSecret,
     customerName: customer_name,
     customerPhone: customer_phone,
     address1: billing_address?.address_1 || '',
@@ -54,7 +67,7 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
   // Trigger Viber Business API verification message
   const result = await viberService.sendVerificationMessage({
     orderId: String(order_id),
-    storeDomain: store_domain || 'my-shop.rs',
+    storeDomain: store_domain || 'http://localhost:3000',
     customerName: customer_name,
     customerPhone: customer_phone,
     totalAmount: total_amount || 0,
@@ -76,7 +89,7 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
  * 2. Viber Interactivity Callback / Webhook Simulation
  * Endpoint: POST /api/v1/viber/webhook
  */
-app.post('/api/v1/viber/webhook', (req: Request, res: Response) => {
+app.post('/api/v1/viber/webhook', async (req: Request, res: Response) => {
   const { order_id, action } = req.body;
   if (!order_id || !action) {
     return res.status(400).json({ error: 'Missing order_id or action' });
@@ -85,6 +98,17 @@ app.post('/api/v1/viber/webhook', (req: Request, res: Response) => {
   if (action === 'ACTION_APPROVE') {
     viberService.markStatus(order_id, 'APPROVED');
     console.log(`[ACTION_APPROVE] Customer approved order #${order_id} directly in Viber!`);
+
+    // Notify WooCommerce store to transition order from on-hold to processing
+    const storeInfo = orderStoreRegistry.get(String(order_id));
+    if (storeInfo) {
+      await webhookService.dispatchToWooCommerce(storeInfo.storeDomain, storeInfo.apiSecret, {
+        order_id: Number(order_id),
+        action: 'APPROVED',
+        timestamp: Math.floor(Date.now() / 1000),
+      });
+    }
+
     return res.json({ status: 'success', action: 'APPROVED', order_id });
   }
 
@@ -121,7 +145,7 @@ app.get('/api/v1/address-token/:token', (req: Request, res: Response) => {
  * 4. Submit Mobile Address Form & Release WooCommerce Order
  * Endpoint: POST /api/v1/address-token/:token/submit
  */
-app.post('/api/v1/address-token/:token/submit', (req: Request, res: Response) => {
+app.post('/api/v1/address-token/:token/submit', async (req: Request, res: Response) => {
   const { token } = req.params;
   const { address_1, address_2, city, postcode, order_note } = req.body;
 
@@ -133,6 +157,20 @@ app.post('/api/v1/address-token/:token/submit', (req: Request, res: Response) =>
   viberService.markStatus(session.orderId, 'APPROVED');
 
   console.log(`[ADDRESS UPDATED & APPROVED] Order #${session.orderId} updated to: ${address_1}, ${city}. Releasing order to Processing in WooCommerce!`);
+
+  // Dispatch signed webhook to WooCommerce to update shipping address & transition to Processing
+  await webhookService.dispatchToWooCommerce(session.storeDomain, session.apiSecret || 'demo_secret_456', {
+    order_id: Number(session.orderId),
+    action: 'UPDATED_ADDRESS',
+    updated_address: {
+      address_1,
+      address_2,
+      city,
+      postcode,
+    },
+    order_note,
+    timestamp: Math.floor(Date.now() / 1000),
+  });
 
   res.json({
     success: true,
