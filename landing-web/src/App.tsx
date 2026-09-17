@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink
+  X, Lock, ExternalLink, Menu
 } from 'lucide-react';
 
 /* Web Audio API Micro Sound Effects */
@@ -63,6 +63,7 @@ export default function App() {
   const [currentScenario, setCurrentScenario] = useState<number>(1);
   const [simState, setSimState] = useState<'initial' | 'confirmed' | 'edited'>('initial');
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [floorInput, setFloorInput] = useState<string>('3');
   const [aptInput, setAptInput] = useState<string>('14');
   
@@ -635,9 +636,9 @@ export default function App() {
     <div className="min-h-[100dvh] flex flex-col blueprint-grid bg-[#070A13] text-[#CBD5E1] font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white">
       
       {/* Top Network & Legal Bar */}
-      <aside className="border-b border-white/10 bg-[#070A13]/90 px-4 py-1.5 text-xs">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono">
-          <div className="flex items-center gap-3">
+      <aside className="border-b border-white/10 bg-[#070A13]/90 px-3 sm:px-4 py-1.5 text-xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-mono">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span className="inline-flex items-center gap-1.5 text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               <span className="font-medium text-white">{t('top_gateway')}</span>
@@ -646,9 +647,9 @@ export default function App() {
             <span className="hidden sm:inline text-slate-400">{t('top_networks')}</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-4">
             <span className="text-slate-400 hidden md:inline">{t('top_protocol')}</span>
-            <span className="text-white/10">|</span>
+            <span className="text-white/10 hidden md:inline">|</span>
             <span className="text-amber-400 font-medium">{t('top_avg_penalty')}</span>
           </div>
         </div>
@@ -656,18 +657,18 @@ export default function App() {
 
       {/* Header Navigation */}
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#070A13]/90 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-[#0D121F] border border-[#14B8A6]/40 flex items-center justify-center text-[#14B8A6] shadow-inner">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 rounded bg-[#0D121F] border border-[#14B8A6]/40 flex items-center justify-center text-[#14B8A6] shadow-inner shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
             <div>
               <a href="#" className="font-mono font-bold text-sm text-white tracking-tight flex items-center gap-1">
                 potvrdio<span className="text-[#14B8A6]">.online</span>
               </a>
-              <div className="text-[10px] font-mono text-slate-400 -mt-0.5">{t('nav_sub')}</div>
+              <div className="text-[10px] font-mono text-slate-400 -mt-0.5 truncate max-w-[140px] sm:max-w-none">{t('nav_sub')}</div>
             </div>
           </div>
 
@@ -681,23 +682,23 @@ export default function App() {
           </nav>
 
           {/* Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="flex items-center bg-[#0D121F] border border-white/10 rounded p-0.5 text-xs font-mono">
               <button 
                 onClick={() => { playClickSound(); setLang('sr'); }} 
-                className={`px-2 py-0.5 rounded font-bold transition-all ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
               >
                 SR
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('mk'); }} 
-                className={`px-2 py-0.5 rounded font-bold transition-all ${lang === 'mk' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'mk' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
               >
                 MK
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('en'); }} 
-                className={`px-2 py-0.5 rounded font-bold transition-all ${lang === 'en' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'en' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
               >
                 EN
               </button>
@@ -706,75 +707,144 @@ export default function App() {
             <a 
               href="#preuzmi" 
               onClick={playClickSound}
-              className="btn-brand-cta text-white font-semibold text-xs px-3.5 py-2 rounded transition-all flex items-center gap-1.5 shadow-sm"
+              className="hidden sm:inline-flex btn-brand-cta text-white font-semibold text-xs px-3 sm:px-3.5 py-2 rounded transition-all items-center gap-1.5 shadow-sm min-h-[36px]"
             >
               <Download className="w-3.5 h-3.5" />
               <span>{t('btn_dl')}</span>
             </a>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => { playClickSound(); setMobileMenuOpen(!mobileMenuOpen); }}
+              className="md:hidden p-2 rounded-lg bg-[#0D121F] border border-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-[#14B8A6]" /> : <Menu className="w-5 h-5 text-white" />}
+            </button>
           </div>
 
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-b border-white/10 bg-[#070A13]/98 backdrop-blur-xl px-4 py-4 space-y-3 font-mono text-xs animate-in slide-in-from-top-2 duration-200">
+            <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">
+              {lang === 'sr' ? 'Navigacija' : lang === 'mk' ? 'Навигација' : 'Navigation'}
+            </div>
+            <a 
+              href="#lab" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+            >
+              <span>01. {t('nav_lab')}</span>
+              <ChevronRight className="w-4 h-4 text-slate-500" />
+            </a>
+            <a 
+              href="#manifest" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+            >
+              <span>02. {t('nav_manifest')}</span>
+              <ChevronRight className="w-4 h-4 text-slate-500" />
+            </a>
+            <a 
+              href="#kalkulator" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+            >
+              <span>03. {t('nav_calc')}</span>
+              <ChevronRight className="w-4 h-4 text-slate-500" />
+            </a>
+            <a 
+              href="#cenovnik" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+            >
+              <span>04. {t('nav_pricing')}</span>
+              <ChevronRight className="w-4 h-4 text-slate-500" />
+            </a>
+            <a 
+              href="#integracija" 
+              onClick={() => setMobileMenuOpen(false)} 
+              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+            >
+              <span>05. {t('nav_dev')}</span>
+              <ChevronRight className="w-4 h-4 text-slate-500" />
+            </a>
+
+            <div className="pt-2">
+              <a 
+                href="#preuzmi" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
+              >
+                <Download className="w-4 h-4" />
+                <span>{t('btn_dl_full')}</span>
+              </a>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
-      <section className="border-b border-white/10 bg-gradient-to-b from-[#0D121F] to-[#070A13] pt-14 pb-16">
-        <div className="max-w-7xl mx-auto px-5">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <section className="border-b border-white/10 bg-gradient-to-b from-[#0D121F] to-[#070A13] pt-10 sm:pt-14 pb-12 sm:pb-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
             
             {/* Left Column */}
-            <div className="lg:col-span-7 flex flex-col gap-5">
-              <div className="inline-flex items-center gap-2 border border-white/10 bg-[#0D121F] px-3 py-1 rounded text-xs font-mono text-slate-400 w-fit">
-                <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse"></span>
+            <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-5">
+              <div className="inline-flex items-center gap-2 border border-white/10 bg-[#0D121F] px-2.5 sm:px-3 py-1 rounded text-[11px] sm:text-xs font-mono text-slate-400 w-fit max-w-full flex-wrap">
+                <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse shrink-0"></span>
                 <span className="text-white font-medium">{t('hero_tag')}</span>
                 <span className="text-white/10">/</span>
                 <span className="text-emerald-400 font-mono">{t('hero_no_sub')}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-white leading-[1.18]">
+              <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-white leading-[1.2]">
                 {t('hero_title')}
               </h1>
 
-              <p className="text-sm leading-relaxed text-slate-400 max-w-2xl">
+              <p className="text-xs sm:text-sm leading-relaxed text-slate-400 max-w-2xl">
                 {t('hero_p')}
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <a 
                   href="#lab" 
                   onClick={playClickSound}
-                  className="btn-brand-cta text-white font-bold text-xs px-5 py-3 rounded transition-all inline-flex items-center gap-2"
+                  className="btn-brand-cta text-white font-bold text-xs px-5 py-3.5 sm:py-3 rounded transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                 >
                   <span>{t('hero_cta_primary')}</span>
                   <ArrowDown className="w-3.5 h-3.5" />
                 </a>
-                <div className="text-xs font-mono text-slate-400 flex items-center gap-2">
+                <div className="text-xs font-mono text-slate-400 flex items-center justify-center sm:justify-start gap-2 py-1">
                   <span className="text-emerald-400 font-bold">25</span>
                   <span>{t('hero_free_credits')}</span>
                 </div>
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-3 pt-6 border-t border-white/10 mt-3 font-mono">
-                <div className="glass-panel p-3 rounded">
-                  <div className="text-xs text-slate-400 mb-1">{t('stat_open_rate')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-white tracking-tight">89.6%</div>
-                  <div className="text-[10px] text-emerald-400 mt-1">{t('stat_open_sub')}</div>
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-white/10 mt-2 sm:mt-3 font-mono">
+                <div className="glass-panel p-2.5 sm:p-3 rounded">
+                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1">{t('stat_open_rate')}</div>
+                  <div className="text-base sm:text-2xl font-bold text-white tracking-tight">89.6%</div>
+                  <div className="text-[9px] sm:text-[10px] text-emerald-400 mt-0.5 truncate">{t('stat_open_sub')}</div>
                 </div>
-                <div className="glass-panel p-3 rounded">
-                  <div className="text-xs text-slate-400 mb-1">{t('stat_hold_cost')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-amber-400 tracking-tight">{t('stat_hold_val')}</div>
-                  <div className="text-[10px] text-slate-400 mt-1">{t('stat_hold_sub')}</div>
+                <div className="glass-panel p-2.5 sm:p-3 rounded">
+                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1">{t('stat_hold_cost')}</div>
+                  <div className="text-base sm:text-2xl font-bold text-amber-400 tracking-tight">{t('stat_hold_val')}</div>
+                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate">{t('stat_hold_sub')}</div>
                 </div>
-                <div className="glass-panel p-3 rounded">
-                  <div className="text-xs text-slate-400 mb-1">{t('stat_recovery')}</div>
-                  <div className="text-xl sm:text-2xl font-bold text-emerald-400 tracking-tight">-83%</div>
-                  <div className="text-[10px] text-slate-400 mt-1">{t('stat_recovery_sub')}</div>
+                <div className="glass-panel p-2.5 sm:p-3 rounded">
+                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1">{t('stat_recovery')}</div>
+                  <div className="text-base sm:text-2xl font-bold text-emerald-400 tracking-tight">-83%</div>
+                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate">{t('stat_recovery_sub')}</div>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Live Status Dashboard */}
-            <div className="lg:col-span-5 glass-panel rounded-lg p-5 shadow-2xl relative">
+            <div className="lg:col-span-5 glass-panel rounded-lg p-4 sm:p-5 shadow-2xl relative">
               <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded bg-[#14B8A6]"></span>
@@ -784,7 +854,7 @@ export default function App() {
               </div>
 
               {/* Order Card */}
-              <div className="bg-[#070A13] p-3.5 rounded border border-white/10 mb-4 font-mono text-xs space-y-2">
+              <div className="bg-[#070A13] p-3 sm:p-3.5 rounded border border-white/10 mb-4 font-mono text-xs space-y-2">
                 <div className="flex justify-between items-center text-[11px] text-slate-400 border-b border-white/10 pb-2">
                   <span>{t('order_word')} #RS-8492</span>
                   <span>17. Sep 2026, 09:14</span>
@@ -833,11 +903,11 @@ export default function App() {
       </section>
 
       {/* SECTION 01: Interactive Lab Simulator */}
-      <section id="lab" className="max-w-7xl mx-auto px-5 py-20 border-b border-white/10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+      <section id="lab" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div>
             <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('lab_tag')}</div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">{t('lab_title')}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('lab_title')}</h2>
           </div>
           <div className="text-xs text-slate-400 font-mono">
             {t('lab_subtitle')}
@@ -845,10 +915,10 @@ export default function App() {
         </div>
 
         {/* Scenario Selectors */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 sm:mb-8">
           <button 
             onClick={() => handleScenarioChange(1)} 
-            className={`text-left p-4 rounded glass-panel text-xs transition-all shadow-sm ${currentScenario === 1 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center justify-between mb-1 font-mono">
               <span className={`font-bold ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario A</span>
@@ -860,7 +930,7 @@ export default function App() {
 
           <button 
             onClick={() => handleScenarioChange(2)} 
-            className={`text-left p-4 rounded glass-panel text-xs transition-all ${currentScenario === 2 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center justify-between mb-1 font-mono">
               <span className={`font-bold ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario B</span>
@@ -872,7 +942,7 @@ export default function App() {
 
           <button 
             onClick={() => handleScenarioChange(3)} 
-            className={`text-left p-4 rounded glass-panel text-xs transition-all ${currentScenario === 3 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
           >
             <div className="flex items-center justify-between mb-1 font-mono">
               <span className={`font-bold ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario C</span>
@@ -884,24 +954,24 @@ export default function App() {
         </div>
 
         {/* Simulator Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start glass-panel p-6 rounded-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start glass-panel p-4 sm:p-6 rounded-lg">
           
           {/* Viber Phone Mockup Left */}
-          <div className="lg:col-span-5 bg-[#1E1838] border border-[#46377B] rounded-xl p-4 shadow-xl">
+          <div className="lg:col-span-5 bg-[#1E1838] border border-[#46377B] rounded-xl p-3.5 sm:p-4 shadow-xl">
             <div className="flex items-center justify-between border-b border-[#46377B] pb-3 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#7360F2] flex items-center justify-center text-white font-bold text-xs">
+                <div className="w-8 h-8 rounded-full bg-[#7360F2] flex items-center justify-center text-white font-bold text-xs shrink-0">
                   VB
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5 flex-wrap">
                     <span>Potvrdio · {t('viber_verified_title')}</span>
                     <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.5 rounded font-mono">{t('viber_verified_badge')}</span>
                   </div>
                   <div className="text-[10px] font-mono text-[#A798CE]">Viber Business Gateway #782</div>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-[#8B79B2]">13:42</span>
+              <span className="text-[10px] font-mono text-[#8B79B2] shrink-0">13:42</span>
             </div>
 
             <div className="space-y-3 text-xs leading-relaxed text-[#E6DDFA]">
@@ -921,7 +991,7 @@ export default function App() {
                 </div>
               )}
 
-              <div className="bg-[#29204A] p-3.5 rounded-lg border border-[#46377B]">
+              <div className="bg-[#29204A] p-3 sm:p-3.5 rounded-lg border border-[#46377B]">
                 <p className="mb-2">
                   {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount[lang]}).
                 </p>
@@ -946,7 +1016,7 @@ export default function App() {
               {currentScenario === 2 ? (
                 <div className="p-3 rounded bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-mono text-center flex flex-col items-center gap-1">
                   <div className="flex items-center gap-1.5 font-bold">
-                    <XCircle className="w-4 h-4 text-red-400" />
+                    <XCircle className="w-4 h-4 text-red-400 shrink-0" />
                     <span>{t('status_saved')}</span>
                   </div>
                   <p className="text-[10px] text-slate-300 font-sans">
@@ -957,14 +1027,14 @@ export default function App() {
                 <div className="space-y-2 pt-1">
                   <button 
                     onClick={() => handleSimAction('confirm')} 
-                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-md cursor-pointer min-h-[44px]"
                   >
                     <Check className="w-4 h-4" />
                     <span>{t('viber_btn_yes')}</span>
                   </button>
                   <button 
                     onClick={() => handleSimAction('edit')} 
-                    className="w-full bg-[#191A2B] hover:bg-[#252840] text-slate-200 py-2 rounded text-xs transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-[#191A2B] hover:bg-[#252840] text-slate-200 py-2.5 rounded text-xs transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer min-h-[42px]"
                   >
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#14B8A6]" />
                     <span>{t('viber_btn_edit')}</span>
@@ -972,12 +1042,12 @@ export default function App() {
                 </div>
               ) : simState === 'edited' ? (
                 <div className="p-3 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
-                  <Check className="w-4 h-4 text-blue-400" />
+                  <Check className="w-4 h-4 text-blue-400 shrink-0" />
                   <span>{t('viber_success_edited')}</span>
                 </div>
               ) : (
                 <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
-                  <Check className="w-4 h-4 text-emerald-400" />
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>{t('viber_success_confirmed')}</span>
                 </div>
               )}
@@ -989,13 +1059,13 @@ export default function App() {
             <div>
               <div className="flex items-center justify-between pb-2 border-b border-white/10 text-slate-400">
                 <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
                   <span className="text-white font-bold">{t('term_title')}</span>
                 </span>
-                <span className="text-[11px] text-slate-400">HMAC-SHA256 SIGNED</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-400">HMAC-SHA256 SIGNED</span>
               </div>
 
-              <div className="mt-3 bg-[#070A13] p-3.5 rounded border border-white/10 space-y-1.5 h-64 overflow-y-auto text-[11px]">
+              <div className="mt-3 bg-[#070A13] p-3 sm:p-3.5 rounded border border-white/10 space-y-1.5 h-56 sm:h-64 overflow-y-auto touch-scroll text-[10px] sm:text-[11px]">
                 <div className="text-neutral-400">[13:42:01] WC Order Created: {currentScenConfig.orderId} {t('term_log_cod')}.</div>
                 <div className="text-amber-400">[13:42:01] Potvrdio Hook: Order status switched to ON-HOLD. Label printing suspended.</div>
                 
@@ -1048,7 +1118,7 @@ export default function App() {
             </div>
 
             {/* Warehouse Decision Footer */}
-            <div className="p-3.5 bg-[#0D121F] rounded border border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div className="p-3 sm:p-3.5 bg-[#0D121F] rounded border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
                 <div className="text-slate-400 text-[10px] uppercase font-bold">{t('term_risk_status')}</div>
                 <div className="font-bold text-xs mt-0.5">
@@ -1063,7 +1133,7 @@ export default function App() {
               </div>
               <button 
                 onClick={handleResetSim} 
-                className="px-3 py-1.5 rounded bg-[#070A13] hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white text-[11px] transition flex items-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded bg-[#070A13] hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>{t('btn_restart_sim')}</span>
@@ -1075,25 +1145,25 @@ export default function App() {
       </section>
 
       {/* SECTION 02: Physical Manifest Label Inspector */}
-      <section id="manifest" className="max-w-7xl mx-auto px-5 py-20 border-b border-white/10">
-        <div className="max-w-3xl mb-12">
+      <section id="manifest" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+        <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('man_tag')}</div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">{t('man_title')}</h2>
-          <p className="text-sm text-slate-400 mt-2 leading-relaxed">{t('man_p')}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('man_title')}</h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">{t('man_p')}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
           {/* Unverified Bad Label */}
-          <div className="glass-panel border-red-500/30 p-6 rounded-lg relative overflow-hidden">
+          <div className="glass-panel border-red-500/30 p-4 sm:p-6 rounded-lg relative overflow-hidden">
             <div className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20">
               {t('man_badge_bad')}
             </div>
-            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+            <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
               <XCircle className="w-4 h-4 text-red-400 shrink-0" />
               <span>{t('man_bad_title')}</span>
             </h3>
 
-            <div className="thermal-label p-4 rounded text-xs space-y-3 select-none">
+            <div className="thermal-label p-3.5 sm:p-4 rounded text-xs space-y-3 select-none overflow-x-auto">
               <div className="flex justify-between border-b border-slate-300 pb-2">
                 <span className="font-bold">{t('man_label_header_bad')}</span>
                 <span className="text-[11px]">PE-9948201-RS</span>
@@ -1121,16 +1191,16 @@ export default function App() {
           </div>
 
           {/* Verified Good Label */}
-          <div className="glass-panel border-emerald-500/30 p-6 rounded-lg relative overflow-hidden">
+          <div className="glass-panel border-emerald-500/30 p-4 sm:p-6 rounded-lg relative overflow-hidden">
             <div className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
               {t('man_badge_good')}
             </div>
-            <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+            <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{t('man_good_title')}</span>
             </h3>
 
-            <div className="thermal-label p-4 rounded text-xs space-y-3 select-none">
+            <div className="thermal-label p-3.5 sm:p-4 rounded text-xs space-y-3 select-none overflow-x-auto">
               <div className="flex justify-between border-b border-slate-300 pb-2">
                 <span className="font-bold">{t('man_label_header_good')}</span>
                 <span className="text-[11px] font-bold text-emerald-800">POTVRDIO #7489</span>
@@ -1160,15 +1230,15 @@ export default function App() {
       </section>
 
       {/* SECTION 03: Return Freight Loss ROI Calculator */}
-      <section id="kalkulator" className="max-w-7xl mx-auto px-5 py-20 border-b border-white/10">
-        <div className="max-w-3xl mb-12">
+      <section id="kalkulator" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+        <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('calc_tag')}</div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">{t('calc_title')}</h2>
-          <p className="text-sm text-slate-400 mt-2">{t('calc_desc')}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('calc_title')}</h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2">{t('calc_desc')}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center glass-panel p-6 sm:p-8 rounded-lg">
-          <div className="lg:col-span-7 space-y-7">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center glass-panel p-4 sm:p-8 rounded-lg">
+          <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             <div>
               <div className="flex justify-between items-center text-xs font-mono mb-2">
                 <span className="text-white font-medium">{t('calc_label_orders')}</span>
@@ -1183,9 +1253,9 @@ export default function App() {
                 step="50" 
                 value={ordersCount} 
                 onChange={(e) => setOrdersCount(Number(e.target.value))}
-                className="w-full h-2 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
+                className="w-full h-3 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
               />
-              <div className="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+              <div className="flex justify-between text-[10px] sm:text-[11px] font-mono text-slate-400 mt-1.5 flex-wrap gap-1">
                 <span>50 ({lang === 'sr' ? 'Mala radnja' : lang === 'mk' ? 'Мала продавница' : 'Small Store'})</span>
                 <span>750 ({lang === 'sr' ? 'Rastući brend' : lang === 'mk' ? 'Растечки бренд' : 'Growing Brand'})</span>
                 <span>2.500+ ({lang === 'sr' ? 'Veliki shop' : lang === 'mk' ? 'Голема продавница' : 'Enterprise Store'})</span>
@@ -1206,9 +1276,9 @@ export default function App() {
                 step="1" 
                 value={failureRate} 
                 onChange={(e) => setFailureRate(Number(e.target.value))}
-                className="w-full h-2 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
+                className="w-full h-3 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
               />
-              <div className="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+              <div className="flex justify-between text-[10px] sm:text-[11px] font-mono text-slate-400 mt-1.5 flex-wrap gap-1">
                 <span>{t('calc_rate_ideal')}</span>
                 <span>{t('calc_rate_avg')}</span>
                 <span>{t('calc_rate_high')}</span>
@@ -1221,12 +1291,12 @@ export default function App() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-[#0D121F] border border-white/10 p-6 rounded-lg text-center space-y-5">
+          <div className="lg:col-span-5 bg-[#0D121F] border border-white/10 p-5 sm:p-6 rounded-lg text-center space-y-5">
             <div>
               <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
                 {t('calc_loss_head')}
               </div>
-              <div className="text-3xl font-mono font-bold text-red-400 mt-1 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-mono font-bold text-red-400 mt-1 tracking-tight">
                 {annualLossRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
               <div className="text-xs text-slate-400 font-mono mt-0.5">
@@ -1238,7 +1308,7 @@ export default function App() {
               <div className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider">
                 {t('calc_saved_head')}
               </div>
-              <div className="text-2xl font-mono font-bold text-emerald-400 mt-1">
+              <div className="text-xl sm:text-2xl font-mono font-bold text-emerald-400 mt-1">
                 {annualSavedRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
               <div className="text-[11px] text-slate-400 font-mono mt-1">
@@ -1250,64 +1320,64 @@ export default function App() {
       </section>
 
       {/* SECTION 04: Credit Pool PAYG Pricing */}
-      <section id="cenovnik" className="max-w-7xl mx-auto px-5 py-20 border-b border-white/10">
-        <div className="mb-12">
+      <section id="cenovnik" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+        <div className="mb-8 sm:mb-12">
           <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('price_tag')}</div>
-          <h2 className="text-2xl font-bold text-white tracking-tight">{t('price_title')}</h2>
-          <p className="text-sm text-slate-400 mt-2 max-w-2xl">{t('price_desc')}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('price_title')}</h2>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl">{t('price_desc')}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
           <div className="lg:col-span-8 glass-panel rounded-lg overflow-hidden">
-            <div className="px-5 py-3 border-b border-white/10 bg-[#0D121F] flex justify-between items-center text-xs font-mono">
+            <div className="px-4 sm:px-5 py-3 border-b border-white/10 bg-[#0D121F] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-mono">
               <span className="font-bold text-white">{t('price_prepaid_header')}</span>
-              <span className="text-slate-400">{t('price_invoice_sub')}</span>
+              <span className="text-slate-400 text-[11px]">{t('price_invoice_sub')}</span>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs font-mono">
+            <div className="overflow-x-auto touch-scroll">
+              <table className="w-full text-left text-xs font-mono min-w-[500px]">
                 <thead className="bg-[#070A13] text-slate-400 border-b border-white/10 text-[11px]">
                   <tr>
-                    <th className="p-4 font-normal">{t('th_tier')}</th>
-                    <th className="p-4 font-normal">{t('th_deposit')}</th>
-                    <th className="p-4 font-normal">{t('th_viber_rate')}</th>
-                    <th className="p-4 font-normal">{t('th_sms_rate')}</th>
-                    <th className="p-4 font-normal text-right">{t('price_btn_select')}</th>
+                    <th className="p-3.5 sm:p-4 font-normal">{t('th_tier')}</th>
+                    <th className="p-3.5 sm:p-4 font-normal">{t('th_deposit')}</th>
+                    <th className="p-3.5 sm:p-4 font-normal">{t('th_viber_rate')}</th>
+                    <th className="p-3.5 sm:p-4 font-normal">{t('th_sms_rate')}</th>
+                    <th className="p-3.5 sm:p-4 font-normal text-right">{t('price_btn_select')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10 text-slate-300">
                   <tr className="hover:bg-[#0D121F]/50 transition">
-                    <td className="p-4 font-bold text-white">Starter Pool</td>
-                    <td className="p-4 font-bold text-white">15 €</td>
-                    <td className="p-4 text-emerald-400 font-bold">0.026 €</td>
-                    <td className="p-4 text-slate-400">0.048 €</td>
-                    <td className="p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer">
+                    <td className="p-3.5 sm:p-4 font-bold text-white">Starter Pool</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-white">15 €</td>
+                    <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.026 €</td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">0.048 €</td>
+                    <td className="p-3.5 sm:p-4 text-right">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer min-h-[32px]">
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
                   <tr className="bg-[#14B8A6]/5 hover:bg-[#14B8A6]/10 transition">
-                    <td className="p-4 font-bold text-white flex items-center gap-2">
+                    <td className="p-3.5 sm:p-4 font-bold text-white flex items-center gap-2">
                       Growth Pool
                       <span className="text-[9px] bg-[#14B8A6]/20 text-[#14B8A6] px-1.5 py-0.5 rounded border border-[#14B8A6]/30">{t('price_badge_popular')}</span>
                     </td>
-                    <td className="p-4 font-bold text-white">45 €</td>
-                    <td className="p-4 text-emerald-400 font-bold">0.024 €</td>
-                    <td className="p-4 text-slate-400">0.042 €</td>
-                    <td className="p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1 rounded bg-[#14B8A6] hover:bg-[#0F766E] text-black font-bold text-[11px] transition cursor-pointer">
+                    <td className="p-3.5 sm:p-4 font-bold text-white">45 €</td>
+                    <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.024 €</td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">0.042 €</td>
+                    <td className="p-3.5 sm:p-4 text-right">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded bg-[#14B8A6] hover:bg-[#0F766E] text-black font-bold text-[11px] transition cursor-pointer min-h-[32px]">
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
                   <tr className="hover:bg-[#0D121F]/50 transition">
-                    <td className="p-4 font-bold text-white">Scale Volume</td>
-                    <td className="p-4 font-bold text-white">120 €</td>
-                    <td className="p-4 text-emerald-400 font-bold">0.020 €</td>
-                    <td className="p-4 text-slate-400">0.038 €</td>
-                    <td className="p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer">
+                    <td className="p-3.5 sm:p-4 font-bold text-white">Scale Volume</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-white">120 €</td>
+                    <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.020 €</td>
+                    <td className="p-3.5 sm:p-4 text-slate-400">0.038 €</td>
+                    <td className="p-3.5 sm:p-4 text-right">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer min-h-[32px]">
                         {t('price_btn_select')}
                       </button>
                     </td>
@@ -1316,14 +1386,14 @@ export default function App() {
               </table>
             </div>
 
-            <div className="p-4 bg-[#070A13] border-t border-white/10 text-[11px] text-slate-400 font-mono flex items-start gap-1.5">
+            <div className="p-3.5 sm:p-4 bg-[#070A13] border-t border-white/10 text-[11px] text-slate-400 font-mono flex items-start gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
               <span>{t('price_note')}</span>
             </div>
           </div>
 
           {/* Pro Reserve */}
-          <div className="lg:col-span-4 glass-panel rounded-lg p-6 font-mono text-xs">
+          <div className="lg:col-span-4 glass-panel rounded-lg p-5 sm:p-6 font-mono text-xs">
             <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-bold">{t('pro_tag')}</div>
             <h3 className="text-base font-bold text-white font-sans">{t('price_pro_title')}</h3>
             <div className="mt-3 flex items-baseline gap-1">
@@ -1351,7 +1421,7 @@ export default function App() {
 
             <button 
               onClick={playClickSound}
-              className="w-full btn-brand-cta text-white font-bold py-2.5 rounded text-xs transition shadow-sm cursor-pointer"
+              className="w-full btn-brand-cta text-white font-bold py-3 rounded text-xs transition shadow-sm cursor-pointer min-h-[44px]"
             >
               {t('btn_act_pro')}
             </button>
@@ -1360,11 +1430,11 @@ export default function App() {
       </section>
 
       {/* SECTION 05: Legal Framework & Code Integration */}
-      <section id="integracija" className="max-w-7xl mx-auto px-5 py-20 border-b border-white/10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <section id="integracija" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
           <div className="lg:col-span-6 space-y-4">
             <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">{t('leg_title')}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('leg_title')}</h2>
             <p className="text-xs text-slate-400 leading-relaxed">{t('leg_p')}</p>
 
             <div className="space-y-3 font-mono text-xs pt-2">
@@ -1385,9 +1455,9 @@ export default function App() {
 
           <div className="lg:col-span-6 space-y-4">
             <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('dev_tag')}</div>
-            <h2 className="text-2xl font-bold text-white tracking-tight">{t('dev_title')}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('dev_title')}</h2>
             
-            <div className="bg-[#070A13] border border-white/10 rounded-lg p-4 font-mono text-xs text-slate-300 overflow-x-auto">
+            <div className="bg-[#070A13] border border-white/10 rounded-lg p-3.5 sm:p-4 font-mono text-xs text-slate-300 overflow-x-auto touch-scroll">
               <div className="text-slate-400 text-[11px] mb-2">{t('dev_code_comment')}</div>
               <div className="text-[#14B8A6]">add_action('woocommerce_checkout_order_processed', function($order_id) &#123;</div>
               <div className="pl-4 text-slate-400">$order = wc_get_order($order_id);</div>
@@ -1407,24 +1477,24 @@ export default function App() {
       </section>
 
       {/* SECTION 06: Download & Installation CTA */}
-      <section id="preuzmi" className="max-w-7xl mx-auto px-5 py-20 text-center">
-        <div className="max-w-2xl mx-auto glass-panel p-8 sm:p-12 rounded-xl">
+      <section id="preuzmi" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 text-center">
+        <div className="max-w-2xl mx-auto glass-panel p-6 sm:p-12 rounded-xl">
           <div className="w-12 h-12 rounded bg-[#14B8A6]/10 border border-[#14B8A6]/30 text-[#14B8A6] flex items-center justify-center mx-auto mb-4">
             <Download className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{t('dl_title')}</h2>
+          <h2 className="text-xl sm:text-3xl font-bold text-white tracking-tight">{t('dl_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-3 max-w-md mx-auto">{t('dl_desc')}</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
             <button 
               onClick={playScannerBeep}
-              className="w-full sm:w-auto px-6 py-3 btn-brand-cta text-white font-bold text-xs rounded transition shadow-lg cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 sm:py-3 btn-brand-cta text-white font-bold text-xs rounded transition shadow-lg cursor-pointer min-h-[44px]"
             >
               {t('btn_dl_full')}
             </button>
             <a 
               href="#lab" 
-              className="w-full sm:w-auto px-5 py-3 bg-[#0D121F] hover:bg-white/10 text-white border border-white/10 text-xs rounded font-mono transition"
+              className="w-full sm:w-auto px-5 py-3.5 sm:py-3 bg-[#0D121F] hover:bg-white/10 text-white border border-white/10 text-xs rounded font-mono transition inline-flex items-center justify-center min-h-[44px]"
             >
               {t('btn_view_demo')}
             </a>
@@ -1434,8 +1504,8 @@ export default function App() {
 
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#070A13] py-8 text-xs text-slate-400 font-mono mt-auto">
-        <div className="max-w-7xl mx-auto px-5 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px]">
-          <div className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-2">
             <span className="text-white font-bold">potvrdio.online</span>
             <span>{t('footer_sub')}</span>
           </div>
@@ -1449,25 +1519,25 @@ export default function App() {
 
       {/* Address Edit Token Modal */}
       {showAddressModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0D121F] border border-[#14B8A6]/50 rounded-xl max-w-md w-full shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-[#0D121F] border border-[#14B8A6]/50 rounded-xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150">
             
             {/* Browser Header / URL bar */}
-            <div className="bg-[#070A13] px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-              <div className="flex items-center gap-2 text-[#14B8A6] font-mono">
-                <Lock className="w-3 h-3 text-emerald-400" />
-                <span className="text-slate-200">potvrdio.online/edit-address?token=vbr_9842</span>
+            <div className="bg-[#070A13] px-3.5 sm:px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
+              <div className="flex items-center gap-2 text-[#14B8A6] font-mono truncate mr-2">
+                <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
+                <span className="text-slate-200 truncate">potvrdio.online/edit-address?token=vbr_9842</span>
               </div>
               <button 
                 onClick={() => setShowAddressModal(false)}
-                className="text-slate-400 hover:text-white transition p-1 cursor-pointer"
+                className="text-slate-400 hover:text-white transition p-1 cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-5 space-y-4">
+            <div className="p-4 sm:p-5 space-y-3.5 overflow-y-auto touch-scroll">
               <div>
                 <div className="text-[10px] text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
                   {t('modal_badge')}
@@ -1490,7 +1560,7 @@ export default function App() {
                     type="text" 
                     readOnly 
                     value={currentScenConfig.address[lang]}
-                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-400 font-mono text-xs cursor-not-allowed"
+                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-400 font-mono text-xs cursor-not-allowed min-h-[40px]"
                   />
                 </div>
 
@@ -1501,7 +1571,7 @@ export default function App() {
                       type="text" 
                       value={floorInput}
                       onChange={(e) => setFloorInput(e.target.value)}
-                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6]"
+                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
                     />
                   </div>
                   <div>
@@ -1510,7 +1580,7 @@ export default function App() {
                       type="text" 
                       value={aptInput}
                       onChange={(e) => setAptInput(e.target.value)}
-                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6]"
+                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
                     />
                   </div>
                 </div>
@@ -1520,14 +1590,14 @@ export default function App() {
                   <input 
                     type="text" 
                     defaultValue={lang === 'sr' ? 'Radi interfon, ime na zvonu Ninković' : lang === 'mk' ? 'Работи интерфон, име на ѕвоно Ниновиќ' : 'Intercom works, ring name Ninkovic'}
-                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-300 text-xs focus:outline-none focus:border-white/30 font-sans"
+                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-300 text-xs focus:outline-none focus:border-white/30 font-sans min-h-[40px]"
                   />
                 </div>
               </div>
 
               <button 
                 onClick={handleSaveModalAddress}
-                className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg cursor-pointer mt-2"
+                className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg cursor-pointer mt-2 min-h-[44px]"
               >
                 <Check className="w-4 h-4" />
                 <span>{t('modal_btn_save')}</span>
@@ -1540,3 +1610,4 @@ export default function App() {
     </div>
   );
 }
+
