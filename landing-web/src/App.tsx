@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink, Menu, Scale
+  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
@@ -67,6 +67,7 @@ export default function App() {
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [floorInput, setFloorInput] = useState<string>('3');
   const [aptInput, setAptInput] = useState<string>('14');
@@ -1656,6 +1657,116 @@ export default function App() {
             <FileText className="w-4 h-4 text-teal-400 shrink-0" />
             <span>{t('leg_action_terms')}</span>
           </button>
+        </div>
+      </section>
+
+      {/* SECTION 05.5: Frequently Asked Questions (FAQ & AI GEO Indexing) */}
+      <section id="faq" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center space-y-2 mb-10">
+            <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider">
+              {lang === 'sr' ? '06 / Često Postavljana Pitanja' : lang === 'mk' ? '06 / Често Поставувани Прашања' : '06 / Frequently Asked Questions'}
+            </div>
+            <h2 className="text-xl sm:text-3xl font-bold text-white tracking-tight">
+              {lang === 'sr' ? 'Sve što treba da znate o Potvrdio COD verifikaciji' : lang === 'mk' ? 'Сè што треба да знаете за Potvrdio COD верификацијата' : 'Everything you need to know about Potvrdio COD verification'}
+            </h2>
+            <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
+              {lang === 'sr' ? 'Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.' : lang === 'mk' ? 'Одговори на клучните технички и правни прашања.' : 'Answers to key technical, legal, and operational questions.'}
+            </p>
+          </div>
+
+          <div className="space-y-3 font-sans">
+            {[
+              {
+                q: {
+                  sr: "Kako Potvrdio tačno sprečava troškove nepreuzetih paketa pri plaćanju pouzećem?",
+                  mk: "Како Potvrdio ги спречува трошоците за непреземени пакети при плаќање при преземање?",
+                  en: "How does Potvrdio eliminate uncollected Cash on Delivery (COD) parcel return costs?"
+                },
+                a: {
+                  sr: "Potvrdio presreće WooCommerce porudžbine plaćene pouzećem na checkout-u, automatski ih stavlja na status On-Hold i šalje kupcu dvosmernu Viber poruku sa zahtevom za verifikaciju adrese. Paket se pakuje i predaje kurirskoj službi (Post Express, Bex, D Express, Cargo) tek nakon što kupac potvrdi tačnost adrese i spremnost za preuzimanje.",
+                  mk: "Potvrdio ги пресретнува WooCommerce нарачките со плаќање при преземање, ги става во статус On-Hold и испраќа Viber порака. Пакетот се пакува и испраќа исклучиво по потврда на купувачот.",
+                  en: "Potvrdio intercepts Cash on Delivery orders at WooCommerce checkout, flags them as On-Hold, and initiates an automated 2-way Viber verification session. Parcels are packed and dispatched to courier services only post-buyer confirmation."
+                }
+              },
+              {
+                q: {
+                  sr: "Da li je Viber verifikacija adrese zakonski usklađena sa ZZPL RS i EU GDPR?",
+                  mk: "Дали Viber верификацијата е усогласена со законите за заштита на податоци (ZZLP MK & GDPR)?",
+                  en: "Is Viber address verification fully compliant with Serbian ZZPL and EU GDPR?"
+                },
+                a: {
+                  sr: "Da, Potvrdio funkcioniše isključivo na osnovu Člana 12 Zakona o zaštiti podataka o ličnosti RS (Službeni glasnik 87/2018), Člana 10 ZZLP Severne Makedonije i Člana 6(1)(b) EU GDPR. Obrada telefona i adrese je ugovorna obaveza za isporuku kupljene robe. Svi podaci se automatski brišu i anonimizuju 30 dana nakon dostave.",
+                  mk: "Да, верификацијата функционира исклучиво врз основа на Член 10 од Законот за заштита на личните податоци (АЗЛП) и GDPR Art. 6.1.b. Податоците автоматски се бришат 30 дена по доставата.",
+                  en: "Yes. Processing is grounded under Article 12 of Serbian ZZPL (Official Gazette 87/2018), Article 10 of MK ZZLP, and EU GDPR Art. 6(1)(b) for remote sales contract execution. Buyer data is automatically anonymized and purged 30 days post-delivery."
+                }
+              },
+              {
+                q: {
+                  sr: "Šta se dešava ako kupac nema instaliran Viber ili ne odgovara na poruku?",
+                  mk: "Што се случува ако купувачот нема Viber или не одговара на пораката?",
+                  en: "What happens if the customer does not have Viber installed or ignores the message?"
+                },
+                a: {
+                  sr: "Ako kupac nema Viber ili ignoriše poruku duže od 4 minuta, Potvrdio automatski aktivira SMS fallback rutu i šalje SMS poruku sa jedinstvenim jednokratnim token linkom za izmenu i potvrdu adrese.",
+                  mk: "Ако купувачот нема Viber или не одговори во рок од 4 минути, Potvrdio автоматски активира SMS fallback со токен линк за потврда.",
+                  en: "If the buyer lacks Viber or ignores the message within 4 minutes, Potvrdio automatically triggers an SMS fallback verification link with a single-use token."
+                }
+              },
+              {
+                q: {
+                  sr: "Da li postoje fiksne mesečne pretplate i skriveni troškovi?",
+                  mk: "Дали постојат фиксни месечни претплати или скриени трошоци?",
+                  en: "Are there fixed monthly subscription retainers or hidden fees?"
+                },
+                a: {
+                  sr: "Ne. Osnovni PAYG kreditni bazen funkcioniše po principu plaćanja samo utrošenih verifikacija, bez mesečnih ugovora i fiksnih taksi. Kupljeni krediti nema rok trajanja i nikada ne ističu. Za radnje sa preko 300 porudžbina mesečno dostupan je opcion Pro Reserve plan.",
+                  mk: "Не. Основниот PAYG базен функционира без претплата. Кредитите никогаш не истекуваат. За поголеми продавници достапен е Pro Reserve план.",
+                  en: "No. The core PAYG credit pool operates with zero fixed retainers or aggregator contracts. Purchased credits never expire. Pro Reserve plans are optional for high-volume stores (>300 monthly orders)."
+                }
+              },
+              {
+                q: {
+                  sr: "Da li je Potvrdio eklentija kompatibilna sa WooCommerce HPOS (High-Performance Order Storage)?",
+                  mk: "Дали е компатибилен со High-Performance Order Storage (HPOS)?",
+                  en: "Is the Potvrdio plugin fully compatible with WooCommerce High-Performance Order Storage (HPOS)?"
+                },
+                a: {
+                  sr: "Da, eklentija je u potpunosti testirana i podržava HPOS u verzijama WooCommerce 7.0 do 9.x sa uključenom bazičnom ili naprednom tabličnom strukturom porudžbina.",
+                  mk: "Да, приклучокот е целосно тестиран и поддржува HPOS во WooCommerce 7.0 до 9.x.",
+                  en: "Yes, the plugin is battle-tested and fully supports High-Performance Order Storage (HPOS) across WooCommerce 7.0 through 9.x."
+                }
+              }
+            ].map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div 
+                  key={idx} 
+                  className="rounded-lg glass-panel border border-white/10 overflow-hidden transition-all duration-150"
+                >
+                  <button
+                    onClick={() => {
+                      playClickSound();
+                      setOpenFaqIndex(isOpen ? null : idx);
+                    }}
+                    className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-3 text-white font-bold text-xs sm:text-sm cursor-pointer hover:bg-white/5 transition"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <HelpCircle className="w-4 h-4 text-[#14B8A6] shrink-0" />
+                      <span>{faq.q[lang]}</span>
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-[#14B8A6]' : ''}`} />
+                  </button>
+
+                  {isOpen && (
+                    <div className="px-4 sm:px-5 pb-4 pt-1 text-slate-300 text-xs leading-relaxed border-t border-white/5 bg-[#070A13]/40 font-mono">
+                      {faq.a[lang]}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

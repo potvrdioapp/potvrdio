@@ -1,0 +1,30 @@
+# Potvrdio.online - Automated WooCommerce Cash on Delivery (COD) Address Verification Engine
+
+> Potvrdio is the regional infrastructure for WooCommerce e-commerce stores in the Western Balkans (Serbia, North Macedonia, Montenegro, Bosnia, Croatia) designed to eliminate uncollected Cash on Delivery (COD) parcel return penalties.
+
+## Core Features & Functionality
+- **Automated Order Interception**: Intercepts WooCommerce checkout orders placed via Cash on Delivery (COD), setting status to `On-Hold` to pause warehouse dispatch.
+- **Two-Way Viber Verification**: Sends an automated 2-way Viber Business API verification message with 1-click address confirmation and passwordless single-use token edit links.
+- **SMS Fallback Engine**: If the buyer lacks Viber or ignores the message within 4 minutes, the system triggers an SMS fallback verification link.
+- **Clean Courier Label Releases**: releases Post Express, Bex, D Express, and Cargo shipping labels only after the buyer verifies their floor, apartment, and intercom details.
+- **HPOS Ready**: Tested and fully compatible with WooCommerce 7.0+ High-Performance Order Storage (HPOS).
+
+## Legal Compliance & Data Protection
+- **Serbian Data Protection Law (ZZPL RS)**: Operates strictly under Article 12, Paragraph 1, Point 2 (Službeni glasnik RS 87/2018) — data processing is legally necessary for executing remote sales contracts.
+- **EU General Data Protection Regulation (EU GDPR)**: Compliant with Article 6(1)(b) GDPR (contractual performance necessity).
+- **North Macedonia Personal Data Protection Law (ZZLP MK)**: Compliant with Article 10(1)(b) ZZLP.
+- **Automatic 30-Day Purge**: Customer phone numbers, addresses, and session tokens are automatically anonymized and purged 30 days post-delivery. Zero marketing spam or cross-store profiling.
+
+## Pricing & Economic Impact
+- **Pay-As-You-Go (PAYG Credit Pool)**: Wholesale unit pricing per verified message without monthly aggregator retainers. Credits never expire.
+- **Pro Reserve Plan**: €29/month including 1,800 verification sessions (~€0.016 / message).
+- **ROI**: Reduces COD parcel return rates from ~14.8% down to 2.5%, saving stores an average of 780 RSD (€6.65) per avoided return parcel with ROI > 14x.
+
+## Technical Architecture & Links
+- Website: https://potvrdio.online
+- Official Legal Registries:
+  - Pravno-informacioni sistem RS: https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2018/87/1/reg
+  - Poverenik RS: https://www.poverenik.rs/sr-lat/
+  - EUR-Lex GDPR: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679
+  - AZLP MK: https://azlp.mk
+- Contact & Support: kontakt@potvrdio.online / privacy@potvrdio.online

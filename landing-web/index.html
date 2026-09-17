@@ -4,12 +4,129 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Potvrdio · Operativna COD Verifikacija za WooCommerce</title>
-    <meta name="description" content="Eliminišite troškove nepreuzetih paketa pri plaćanju pouzećem. Verifikujte COD porudžbine i ponudite instant izmenu adrese na potvrdio.online putem Viber-a." />
-    
-    <!-- Tipografi: Inter (Kiril + Latin tam destek) ve JetBrains Mono -->
+    <meta name="description" content="Eliminišite troškove nepreuzetih paketa pri plaćanju pouzećem. Verifikujte COD porudžbine i ponudite instant izmenu adrese na potvrdio.online putem Viber-a i SMS-a." />
+    <meta name="keywords" content="WooCommerce COD, plaćanje pouzećem, verifikacija adrese, Viber bot WooCommerce, Post Express adresnica, zaštita od povrata paketa, Srbija e-commerce, Makedonija COD, ZZPL Član 12, GDPR compliance" />
+    <meta name="author" content="Potvrdio.online" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Canonical & Multi-language Hreflang Tags -->
+    <link rel="canonical" href="https://potvrdio.online/" />
+    <link rel="alternate" hreflang="sr" href="https://potvrdio.online/?lang=sr" />
+    <link rel="alternate" hreflang="mk" href="https://potvrdio.online/?lang=mk" />
+    <link rel="alternate" hreflang="en" href="https://potvrdio.online/?lang=en" />
+    <link rel="alternate" hreflang="x-default" href="https://potvrdio.online/" />
+
+    <!-- Open Graph / Facebook / Viber Link Preview -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://potvrdio.online/" />
+    <meta property="og:title" content="Potvrdio · Operativna COD Verifikacija za WooCommerce" />
+    <meta property="og:description" content="Automatska Viber & SMS verifikacija narudžbina pouzećem. Zaustavite troškove nepreuzetih paketa i duple poštarine u Srbiji i regionu." />
+    <meta property="og:site_name" content="Potvrdio.online" />
+    <meta property="og:locale" content="sr_RS" />
+    <meta property="og:locale:alternate" content="mk_MK" />
+    <meta property="og:locale:alternate" content="en_US" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Potvrdio · Operativna COD Verifikacija za WooCommerce" />
+    <meta name="twitter:description" content="Zaustavite troškove povrata paketa pouzećem. 2-way Viber verifikacija sa 1-click izmenom adrese." />
+
+    <!-- Favicon & Theme -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#070A13" />
+
+    <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Schema.org JSON-LD 1: SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Potvrdio WooCommerce COD Verification Plugin",
+      "operatingSystem": "WordPress 5.0+, WooCommerce 7.0+",
+      "applicationCategory": "BusinessApplication",
+      "description": "Automated Cash on Delivery (COD) address verification and shipping label release engine for WooCommerce stores in Serbia, North Macedonia and the Western Balkans.",
+      "url": "https://potvrdio.online",
+      "softwareVersion": "2.1.0",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.016",
+        "priceCurrency": "EUR",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "0.016",
+          "priceCurrency": "EUR",
+          "unitCode": "C62",
+          "valueAddedTaxIncluded": "false"
+        }
+      }
+    }
+    </script>
+
+    <!-- Schema.org JSON-LD 2: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Potvrdio.online",
+      "url": "https://potvrdio.online",
+      "logo": "https://potvrdio.online/favicon.svg",
+      "sameAs": [
+        "https://github.com/potvrdioapp/potvrdio"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "kontakt@potvrdio.online",
+        "contactType": "customer service",
+        "availableLanguage": ["Serbian", "Macedonian", "English"]
+      }
+    }
+    </script>
+
+    <!-- Schema.org JSON-LD 3: FAQPage for AI Generative Search Engines & Rich Snippets -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Kako Potvrdio sprečava troškove nepreuzetih paketa pri plaćanju pouzećem?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Potvrdio presreće WooCommerce porudžbine napravljene pouzećem (COD), stavlja ih na status On-Hold i šalje kupcu automatsku Viber poruku sa zahtevom za verifikaciju adrese. Paket se štampa i šalje kurirskoj službi tek nakon potvrde kupca."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Da li je Viber verifikacija adrese zakonski usklađena sa ZZPL RS i EU GDPR?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Da, Potvrdio funkcioniše isključivo na osnovu Člana 12 Zakona o zaštiti podataka o ličnosti RS (Službeni glasnik 87/2018) i Člana 6(1)(b) EU GDPR. Verifikacija je ugovorna obaveza za isporuku robe. Svi podaci se automatski brišu 30 dni nakon dostave."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Šta se dešava ako kupac nema Viber ili ignoriše poruku?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Ako kupac nema instaliran Viber ili ne odgovori u roku od 4 minuta, Potvrdio automatski aktivira SMS fallback sa linkom za izmenu i potvrdu adrese."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Da li je Potvrdio kompatibilan sa High-Performance Order Storage (HPOS)?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Da, Potvrdio eklentija je u potpunosti testirana i podržava WooCommerce High-Performance Order Storage (HPOS) u verzijama WooCommerce 7.0 do 9.x."
+          }
+        }
+      ]
+    }
+    </script>
   </head>
   <body class="bg-[#070A13] text-[#CBD5E1] font-['Inter',sans-serif] antialiased selection:bg-teal-500 selection:text-white">
     <div id="root"></div>

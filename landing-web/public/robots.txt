@@ -1,0 +1,31 @@
+# Robots.txt for Potvrdio.online - WooCommerce COD Verification Engine
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /edit-address
+
+# Explicitly allow AI Search Engines & LLM Crawlers (GEO / Generative Engine Optimization)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Sitemap & LLM Documentation
+Sitemap: https://potvrdio.online/sitemap.xml
+# LLMs Text File: https://potvrdio.online/llms.txt
