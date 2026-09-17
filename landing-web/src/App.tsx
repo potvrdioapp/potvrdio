@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink, Menu
+  X, Lock, ExternalLink, Menu, Scale
 } from 'lucide-react';
 
 /* Web Audio API Micro Sound Effects */
@@ -149,9 +149,9 @@ export default function App() {
         price_note: "Obračun se vrši u dinarima po srednjem kursu NBS na dan izdavanja e-fakture. Bez automatskih skidanja sa kartice bez vašeg odobrenja.",
         pro_tag: "Za radnje sa > 300 porudžbina",
         btn_act_pro: "Aktiviraj Pro Reserve",
-        leg_tag: "05 / Pravni okvir",
-        leg_title: "Usklađenost sa Zakonom o zaštiti podataka o ličnosti (ZZPL)",
-        leg_p: "Slanje komercijalnih poruka bez osnova podleže prekršajnim sankcijama. Potvrdio funkcioniše isključivo na osnovu Člana 12 ZZPL (izvršenje ugovora o kupoprodaji).",
+        leg_tag: "05 / Pravni okvir & Usklađenost",
+        leg_title: "Usklađenost sa Zakonom o zaštiti podataka o ličnosti (ZZPL RS & EU GDPR)",
+        leg_p: "Slanje verifikacionih poruka funkcioniše isključivo na osnovu Člana 12 Zakona o zaštiti podataka o ličnosti RS (Službeni glasnik 87/2018), Člana 10 ZZLP Severne Makedonije i Člana 6(1)(b) EU GDPR. Obrada je zakonski neophodna za izvršenje ugovora o kupoprodaji na daljinu.",
         dev_tag: "Tehnička integracija",
         dev_title: "Kako izgleda kod u WooCommerce eklentiji?",
         dl_title: "Zaustavite troškove povrata već u sledećoj turi slanja",
@@ -192,10 +192,22 @@ export default function App() {
         calc_rate_avg: "13% (Prosek Srbije)",
         calc_rate_high: "25% (Kritičan gubitak)",
         calc_freight_note: "Trošak duple poštarine (slanje + povrat):",
-        leg_item1_title: "1. Izvršenje ugovora (Član 12 ZZPL)",
-        leg_item1_desc: "Kupac je sam uneo broj na checkout stranici. Verifikacija adrese je neophodan korak za isporuku robe.",
-        leg_item2_title: "2. Automatsko brisanje (Retention 30 dana)",
-        leg_item2_desc: "Brojevi telefona i tokeni se automatski brišu i anonimizuju iz sistema 30 dana nakon isporuke pošiljke.",
+        leg_item1_title: "1. Izvršenje Ugovora o Kupoprodaji (ZZPL Član 12.1.2)",
+        leg_item1_desc: "Kupac samostalno unosi broj telefona na checkout stranici. Verifikacija adrese pre predaje kuriru predstavlja ugovornu obavezu dostave robe. Dodatna saglasnost za marketing nije potrebna jer poruke nisu reklamne.",
+        leg_item2_title: "2. Automatska Anonimizacija & Data Retention (30 Dana)",
+        leg_item2_desc: "Brojevi telefona i jednokratni verifikacioni tokeni se automatski anonimizuju i trajno brišu sa procesnih servera 30 dana nakon uručenja. Nema profilisanja niti deljenja trećim licima.",
+        leg_item3_title: "3. Enkripcija & Jednokratni Passwordless Tokeni",
+        leg_item3_desc: "Korekcija adrese se vrši preko jedinstvenog HMAC-SHA256 tokena preko TLS 1.3 enkripcije. Potvrdio nema pristup privatnim Viber porukama kupca niti platnim karticama.",
+        leg_proof_title: "Zvanični Pravni Registri i Zakonski Dokazi",
+        leg_ref_pis: "Pravno-informacioni sistem RS",
+        leg_ref_pis_sub: "Sl. glasnik RS 87/2018 (Član 12 - Zakonitost obrade)",
+        leg_ref_poverenik: "Poverenik za informacije RS",
+        leg_ref_poverenik_sub: "Organ nadzora za zaštitu podataka (poverenik.rs)",
+        leg_ref_gdpr: "EU GDPR EUR-Lex Portal",
+        leg_ref_gdpr_sub: "Uredba (EU) 2016/679 - Član 6.1.b (Contract Law)",
+        leg_ref_azlp: "AZLP Severna Makedonija",
+        leg_ref_azlp_sub: "Agencija za zaštitu ličnih podataka (azlp.mk)",
+        modal_legal_notice: "🔒 Kriptografski HMAC Token · Usklađeno sa Čl. 12 ZZPL RS & GDPR Art. 6",
         dev_code_comment: "// 1. Presretanje porudžbine u functions.php ili pluginu",
         dev_status_note: "Potvrdio: Čeka Viber potvrdu kupca",
         dev_hpos_note: "Testirano na WooCommerce 7.0 do 9.x sa High-Performance Order Storage (HPOS) uključenim.",
@@ -306,9 +318,9 @@ export default function App() {
         price_note: "Фактурирање во денари/евра. Без автоматско одземање од картичка.",
         pro_tag: "За продавници со > 300 нарачки",
         btn_act_pro: "Активирај Pro Reserve",
-        leg_tag: "05 / Правна рамка",
-        leg_title: "Усогласеност со законите за заштита на лични податоци (GDPR / ZZPL)",
-        leg_p: "Испраќањето пораки функционира исклучиво врз основа на исполнување на купопродажниот договор.",
+        leg_tag: "05 / Правна Рамка & Усогласеност",
+        leg_title: "Усогласеност со Законот за заштита на личните податоци (ZZLP MK & EU GDPR)",
+        leg_p: "Испраќањето верификациски пораки функционира исклучиво врз основа на Член 10 од Законот за заштита на личните податоци на С. Македонија (АЗЛП), Член 12 од ZZPL RS и Член 6(1)(b) од EU GDPR. Обработката е законски неопходна за исполнување на купопродажниот договор.",
         dev_tag: "Техничка интеграција",
         dev_title: "Како изгледа кодот во WooCommerce?",
         dl_title: "Запрете ги трошоците за враќање уште при следната достава",
@@ -349,10 +361,22 @@ export default function App() {
         calc_rate_avg: "13% (Просек во регионот)",
         calc_rate_high: "25% (Критична загуба)",
         calc_freight_note: "Трошок за двојна поштарина (достава + враќање):",
-        leg_item1_title: "1. Исполнување на договор (Член 12 ZZPL)",
-        leg_item1_desc: "Купувачот сам го внесе бројот на checkout. Верификацијата на адреса е неопходен чекор за достава.",
-        leg_item2_title: "2. Автоматско бришење (Retention 30 дена)",
-        leg_item2_desc: "Телефонските броеви и токени автоматски се бришат и анонимизираат 30 дена по доставата.",
+        leg_item1_title: "1. Исполнување на Купопродажен Договор (ZZLP Член 10.1.б)",
+        leg_item1_desc: "Купувачот сам го внесува телефонскиот број при checkout. Верификацијата на адресата пред предажба на курир е договорна обврска за достава. Дополнителен маркетинг opt-in не е потребен.",
+        leg_item2_title: "2. Автоматска Анонимизација & Retention (30 Дена)",
+        leg_item2_desc: "Телефонските броеви и токени автоматски се анонимизираат и трајно се бришат од серверите 30 дена по доставата. Без профилирање или споделување со трети лица.",
+        leg_item3_title: "3. Енкрипција & Еднократни Passwordless Токени",
+        leg_item3_desc: "Корекцијата на адреса се врши преку единствен HMAC-SHA256 токен со TLS 1.3 енкрипција. Potvrdio нема пристап до приватни Viber пораки ниту картички.",
+        leg_proof_title: "Официјални Правни Регистри и Законски Докази",
+        leg_ref_pis: "Правно-информационен систем на Србија",
+        leg_ref_pis_sub: "Сл. гласник RS 87/2018 (Член 12 - Законитост)",
+        leg_ref_poverenik: "Повереник за информации на Србија",
+        leg_ref_poverenik_sub: "Надзорен орган за заштита на податоци (poverenik.rs)",
+        leg_ref_gdpr: "ЕУ GDPR EUR-Lex Портал",
+        leg_ref_gdpr_sub: "Уредба (ЕУ) 2016/679 - Член 6.1.б (Договор)",
+        leg_ref_azlp: "АЗЛП Северна Македонија",
+        leg_ref_azlp_sub: "Агенција за заштита на личните податоци (azlp.mk)",
+        modal_legal_notice: "🔒 Криптографски HMAC Токен · Усогласено со Чл. 10 ZZLP MK & GDPR Art. 6",
         dev_code_comment: "// 1. Интерцепција во functions.php или приклучок",
         dev_status_note: "Potvrdio: Се чека Viber потврда",
         dev_hpos_note: "Тестирано на WooCommerce 7.0 до 9.x со вклучен High-Performance Order Storage (HPOS).",
@@ -463,9 +487,9 @@ export default function App() {
         price_note: "Invoiced in local RSD or EUR via official central bank rate. Zero automated credit card charges without consent.",
         pro_tag: "For stores with > 300 monthly orders",
         btn_act_pro: "Activate Pro Reserve",
-        leg_tag: "05 / Legal Framework",
-        leg_title: "Compliant with Serbian ZZPL Art. 12 & EU GDPR",
-        leg_p: "Sending arbitrary marketing messages carries severe penalties. Potvrdio processes data strictly under Article 12 (sales contract execution).",
+        leg_tag: "05 / Legal Framework & Compliance",
+        leg_title: "Compliant with Serbian ZZPL Art. 12, MK ZZLP & EU GDPR",
+        leg_p: "Customer address verification messages operate strictly under Article 12 of the Serbian Personal Data Protection Law (ZZPL), Article 10 of North Macedonia's ZZLP, and Article 6(1)(b) of the EU GDPR. Processing is legally grounded in remote sales contract execution.",
         dev_tag: "Technical Integration",
         dev_title: "How clean is the WooCommerce code?",
         dl_title: "Halt return courier costs before tomorrow's dispatch",
@@ -507,9 +531,21 @@ export default function App() {
         calc_rate_high: "25% (Critical Loss)",
         calc_freight_note: "Double courier freight cost (shipping + return):",
         leg_item1_title: "1. Sales Contract Execution (Art. 12 / GDPR Art. 6)",
-        leg_item1_desc: "Customer willingly submitted their phone number at checkout. Address verification is a required step for physical order fulfillment.",
-        leg_item2_title: "2. Automatic Erasure (30-Day Data Retention)",
-        leg_item2_desc: "Phone numbers and tokens are automatically anonymized and purged from all gateway servers 30 days post-delivery.",
+        leg_item1_desc: "The buyer submits their phone number during checkout. Verifying delivery address accuracy prior to dispatch fulfills the merchant's contractual fulfillment obligation. Additional marketing consent is not required.",
+        leg_item2_title: "2. Automatic Data Anonymization & Retention (30 Days)",
+        leg_item2_desc: "Phone numbers and single-use verification tokens are automatically anonymized and permanently purged from gateway servers 30 days post-delivery. Zero cross-store profiling or data sharing.",
+        leg_item3_title: "3. Cryptographic Token & TLS 1.3 Security",
+        leg_item3_desc: "Address edits use single-use HMAC-SHA256 tokens over TLS 1.3. Potvrdio has zero access to private Viber chat messages or financial payment cards.",
+        leg_proof_title: "Official Legal Registries & Evidence Links",
+        leg_ref_pis: "Serbian Legal Information System",
+        leg_ref_pis_sub: "Official Gazette RS 87/2018 (Art. 12 Lawfulness)",
+        leg_ref_poverenik: "RS Data Protection Commissioner",
+        leg_ref_poverenik_sub: "Data Inspectorate Authority (poverenik.rs)",
+        leg_ref_gdpr: "EU GDPR EUR-Lex Official Portal",
+        leg_ref_gdpr_sub: "Regulation (EU) 2016/679 - Art. 6.1.b (Contract Law)",
+        leg_ref_azlp: "AZLP North Macedonia",
+        leg_ref_azlp_sub: "Personal Data Protection Agency (azlp.mk)",
+        modal_legal_notice: "🔒 Cryptographic HMAC Token · Compliant with Art. 12 ZZPL & EU GDPR Art. 6",
         dev_code_comment: "// 1. Intercept order inside functions.php or custom plugin",
         dev_status_note: "Potvrdio: Awaiting buyer Viber confirmation",
         dev_hpos_note: "Battle-tested on WooCommerce 7.0 through 9.x with High-Performance Order Storage (HPOS) enabled.",
@@ -648,7 +684,10 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-4">
-            <span className="text-slate-400 hidden md:inline">{t('top_protocol')}</span>
+            <a href="#integracija" className="text-slate-400 hover:text-[#14B8A6] transition-colors hidden md:inline-flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span>{t('top_protocol')}</span>
+            </a>
             <span className="text-white/10 hidden md:inline">|</span>
             <span className="text-amber-400 font-medium">{t('top_avg_penalty')}</span>
           </div>
@@ -1438,16 +1477,33 @@ export default function App() {
             <p className="text-xs text-slate-400 leading-relaxed">{t('leg_p')}</p>
 
             <div className="space-y-3 font-mono text-xs pt-2">
-              <div className="p-3.5 rounded glass-panel">
-                <div className="text-white font-bold mb-1">{t('leg_item1_title')}</div>
+              <div className="p-3.5 rounded glass-panel border border-white/10">
+                <div className="text-white font-bold mb-1 flex items-center justify-between">
+                  <span>{t('leg_item1_title')}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans">Pravni Osnov</span>
+                </div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
                   {t('leg_item1_desc')}
                 </div>
               </div>
-              <div className="p-3.5 rounded glass-panel">
-                <div className="text-white font-bold mb-1">{t('leg_item2_title')}</div>
+
+              <div className="p-3.5 rounded glass-panel border border-white/10">
+                <div className="text-white font-bold mb-1 flex items-center justify-between">
+                  <span>{t('leg_item2_title')}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 font-sans">Retention 30D</span>
+                </div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
                   {t('leg_item2_desc')}
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded glass-panel border border-white/10">
+                <div className="text-white font-bold mb-1 flex items-center justify-between">
+                  <span>{t('leg_item3_title')}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-sans">TLS 1.3 HMAC</span>
+                </div>
+                <div className="text-slate-400 text-[11px] leading-relaxed">
+                  {t('leg_item3_desc')}
                 </div>
               </div>
             </div>
@@ -1472,6 +1528,98 @@ export default function App() {
               <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{t('dev_hpos_note')}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Official Legal Evidence & Regulatory Links Grid */}
+        <div className="mt-10 pt-8 border-t border-white/10">
+          <div className="flex items-center gap-2 mb-4">
+            <Scale className="w-4 h-4 text-[#14B8A6]" />
+            <h3 className="text-xs sm:text-sm font-bold text-white uppercase font-mono tracking-wider">
+              {t('leg_proof_title')}
+            </h3>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* Link 1: Pravno-informacioni sistem RS */}
+            <a 
+              href="https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2018/87/1/reg" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+            >
+              <div>
+                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                  <span className="line-clamp-1">{t('leg_ref_pis')}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_pis_sub')}</p>
+              </div>
+              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                <span>Sl. Glasnik RS 87/2018</span>
+              </div>
+            </a>
+
+            {/* Link 2: Poverenik RS */}
+            <a 
+              href="https://www.poverenik.rs" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+            >
+              <div>
+                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                  <span className="line-clamp-1">{t('leg_ref_poverenik')}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_poverenik_sub')}</p>
+              </div>
+              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 shrink-0" />
+                <span>poverenik.rs</span>
+              </div>
+            </a>
+
+            {/* Link 3: EUR-Lex EU GDPR */}
+            <a 
+              href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+            >
+              <div>
+                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                  <span className="line-clamp-1">{t('leg_ref_gdpr')}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_gdpr_sub')}</p>
+              </div>
+              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                <span>CELEX 32016R0679</span>
+              </div>
+            </a>
+
+            {/* Link 4: AZLP MK */}
+            <a 
+              href="https://azlp.mk" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+            >
+              <div>
+                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                  <span className="line-clamp-1">{t('leg_ref_azlp')}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_azlp_sub')}</p>
+              </div>
+              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+                <ShieldCheck className="w-3 h-3 shrink-0" />
+                <span>azlp.mk</span>
+              </div>
+            </a>
           </div>
         </div>
       </section>
@@ -1602,6 +1750,11 @@ export default function App() {
                 <Check className="w-4 h-4" />
                 <span>{t('modal_btn_save')}</span>
               </button>
+
+              <div className="pt-2 text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1.5 text-center leading-normal">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>{t('modal_legal_notice')}</span>
+              </div>
             </div>
 
           </div>
