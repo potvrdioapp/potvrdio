@@ -1561,9 +1561,9 @@ export default function App() {
               </div>
             </a>
 
-            {/* Link 2: Poverenik RS */}
+            {/* Link 2: Poverenik RS (Dynamic language URL) */}
             <a 
-              href="https://www.poverenik.rs" 
+              href={lang === 'en' ? 'https://www.poverenik.rs/en/' : 'https://www.poverenik.rs/sr-lat/'} 
               target="_blank" 
               rel="noopener noreferrer"
               className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
@@ -1581,9 +1581,9 @@ export default function App() {
               </div>
             </a>
 
-            {/* Link 3: EUR-Lex EU GDPR */}
+            {/* Link 3: EUR-Lex EU GDPR (Dynamic language URL) */}
             <a 
-              href="https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679" 
+              href={lang === 'sr' ? 'https://eur-lex.europa.eu/legal-content/HR/TXT/?uri=CELEX:32016R0679' : 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679'} 
               target="_blank" 
               rel="noopener noreferrer"
               className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
@@ -1601,9 +1601,9 @@ export default function App() {
               </div>
             </a>
 
-            {/* Link 4: AZLP MK */}
+            {/* Link 4: AZLP MK (Dynamic language URL) */}
             <a 
-              href="https://azlp.mk" 
+              href={lang === 'en' ? 'https://azlp.mk/en' : 'https://azlp.mk'} 
               target="_blank" 
               rel="noopener noreferrer"
               className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
