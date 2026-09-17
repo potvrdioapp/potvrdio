@@ -256,6 +256,43 @@ app.post('/api/v1/billing/webhook', (req: Request, res: Response) => {
   res.json({ status: 'success', message: 'Credits updated successfully' });
 });
 
+/**
+ * 6. Infobip DLR (Delivery Report) Webhook Receiver
+ * Endpoint: POST /api/v1/messaging/webhook/infobip
+ */
+app.post('/api/v1/messaging/webhook/infobip', (req: Request, res: Response) => {
+  const gatewayManager = viberService.getGatewayManager();
+  const result = gatewayManager.handleInfobipDlr(req.body);
+  res.json({ success: true, matched: result.matched });
+});
+
+/**
+ * 7. BulkGate DLR (Delivery Report) Webhook Receiver
+ * Endpoint: POST /api/v1/messaging/webhook/bulkgate
+ */
+app.post('/api/v1/messaging/webhook/bulkgate', (req: Request, res: Response) => {
+  const gatewayManager = viberService.getGatewayManager();
+  const result = gatewayManager.handleBulkGateDlr(req.body);
+  res.json({ success: true, matched: result.matched });
+});
+
+/**
+ * 8. Message Delivery Status Query
+ * Endpoint: GET /api/v1/messaging/status/:id
+ */
+app.get('/api/v1/messaging/status/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const gatewayManager = viberService.getGatewayManager();
+  const record = gatewayManager.getRecord(id);
+
+  if (!record) {
+    return res.status(404).json({ error: 'Message not found' });
+  }
+
+  res.json(record);
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Potvrdio Central API Server listening on port ${PORT}`);
 });
+

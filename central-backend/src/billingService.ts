@@ -29,6 +29,13 @@ export class BillingService {
         messageCreditsRemaining: 1875,
         planType: 'PAYG',
       });
+      BillingService.instance.merchants.set('pk_test_balkan_demo_123', {
+        apiKey: 'pk_test_balkan_demo_123',
+        storeName: 'Mock WooCommerce Demo Store',
+        creditBalance: 50.00,
+        messageCreditsRemaining: 2000,
+        planType: 'PAYG',
+      });
     }
     return BillingService.instance;
   }
