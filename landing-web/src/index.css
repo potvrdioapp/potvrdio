@@ -10,13 +10,6 @@
       radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
   }
 
-  .light .saas-bg {
-    background-color: #F8FAFC;
-    background-image: 
-      radial-gradient(circle at 50% 0%, rgba(13, 148, 136, 0.07) 0%, transparent 65%),
-      radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.04) 0%, transparent 55%);
-  }
-
   .glass-panel {
     background: rgba(17, 24, 39, 0.75);
     backdrop-filter: blur(16px);
@@ -25,17 +18,9 @@
     box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
   }
 
-  .light .glass-panel {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
-  }
-
   .btn-brand-cta {
     background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
-    color: #FFFFFF;
+    color: #FFFFFF !important;
     font-weight: 600;
     transition: all 0.2s ease;
     touch-action: manipulation;
@@ -51,11 +36,11 @@
   }
 
   .thermal-label {
-    background-color: #FFFFFF;
-    color: #0F172A;
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
     font-family: 'JetBrains Mono', monospace;
-    border: 1px solid #CBD5E1;
-    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12) !important;
   }
 
   /* Touch Scrolling Smoothness */
@@ -74,6 +59,170 @@ body {
   overflow-x: hidden;
 }
 
+/* =========================================================================
+   LIGHT THEME OVERRIDES (Activates when html does not have .dark)
+   ========================================================================= */
+html:not(.dark) body {
+  background-color: #F8FAFC !important;
+  color: #1E293B !important;
+}
+
+html:not(.dark) .saas-bg {
+  background-color: #F8FAFC !important;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(13, 148, 136, 0.09) 0%, transparent 65%),
+    radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 55%) !important;
+}
+
+html:not(.dark) .glass-panel {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05) !important;
+  color: #1E293B !important;
+}
+
+/* Text overrides in Light Mode */
+html:not(.dark) h1,
+html:not(.dark) h2,
+html:not(.dark) h3,
+html:not(.dark) h4,
+html:not(.dark) h5,
+html:not(.dark) .text-white {
+  color: #0F172A !important;
+}
+
+html:not(.dark) .text-slate-200 {
+  color: #1E293B !important;
+}
+
+html:not(.dark) .text-slate-300 {
+  color: #334155 !important;
+}
+
+html:not(.dark) .text-slate-400 {
+  color: #64748B !important;
+}
+
+html:not(.dark) .text-slate-500 {
+  color: #64748B !important;
+}
+
+/* Background overrides for dark containers in Light Mode */
+html:not(.dark) .bg-\[\#0B0F19\] {
+  background-color: #F8FAFC !important;
+}
+
+html:not(.dark) .bg-\[\#0B0F19\]\/90 {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+html:not(.dark) .bg-\[\#111827\] {
+  background-color: #FFFFFF !important;
+}
+
+html:not(.dark) .bg-\[\#0D121F\] {
+  background-color: #F1F5F9 !important;
+}
+
+html:not(.dark) .bg-\[\#070A13\] {
+  background-color: #FFFFFF !important;
+}
+
+html:not(.dark) .bg-\[\#070A13\]\/40 {
+  background-color: #F8FAFC !important;
+}
+
+html:not(.dark) .bg-\[\#070A13\]\/98 {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+html:not(.dark) .bg-\[\#131C2E\] {
+  background-color: #F1F5F9 !important;
+}
+
+html:not(.dark) .bg-slate-900 {
+  background-color: #F1F5F9 !important;
+}
+
+html:not(.dark) .bg-slate-900\/80,
+html:not(.dark) .bg-slate-900\/90 {
+  background-color: #F8FAFC !important;
+}
+
+/* Border overrides */
+html:not(.dark) .border-white\/10 {
+  border-color: #E2E8F0 !important;
+}
+
+html:not(.dark) .border-white\/5 {
+  border-color: #F1F5F9 !important;
+}
+
+html:not(.dark) .border-slate-800 {
+  border-color: #E2E8F0 !important;
+}
+
+html:not(.dark) .border-slate-700,
+html:not(.dark) .border-slate-700\/60,
+html:not(.dark) .border-slate-700\/80 {
+  border-color: #CBD5E1 !important;
+}
+
+/* Protected elements that maintain dedicated styling */
+html:not(.dark) .btn-brand-cta,
+html:not(.dark) .btn-brand-cta * {
+  color: #FFFFFF !important;
+}
+
+html:not(.dark) .bg-emerald-600,
+html:not(.dark) .bg-emerald-600 * {
+  color: #FFFFFF !important;
+}
+
+html:not(.dark) .bg-teal-600,
+html:not(.dark) .bg-teal-600 * {
+  color: #FFFFFF !important;
+}
+
+html:not(.dark) button.bg-\[\#14B8A6\] {
+  color: #000000 !important;
+}
+
+/* Dedicated Event Terminal styling */
+html:not(.dark) .wp-terminal-screen,
+html:not(.dark) .wp-terminal-screen * {
+  background-color: #0F172A !important;
+  color: #38BDF8 !important;
+}
+
+html:not(.dark) .wp-terminal-screen .text-emerald-400 {
+  color: #34D399 !important;
+}
+html:not(.dark) .wp-terminal-screen .text-amber-400 {
+  color: #FBBF24 !important;
+}
+html:not(.dark) .wp-terminal-screen .text-white {
+  color: #F8FAFC !important;
+}
+html:not(.dark) .wp-terminal-screen .text-neutral-300,
+html:not(.dark) .wp-terminal-screen .text-neutral-400 {
+  color: #94A3B8 !important;
+}
+
+/* Light Mode Scrollbars */
+html:not(.dark)::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+html:not(.dark)::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
+html:not(.dark)::-webkit-scrollbar-thumb:hover {
+  background: #14B8A6;
+}
+
+/* Dark Mode Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -89,7 +238,7 @@ body {
   background: rgba(20, 184, 166, 0.4);
 }
 
-/* Touch-optimized Range Slider */
+/* Range Slider */
 input[type=range]::-webkit-slider-thumb {
   background: #14B8A6;
   height: 22px;
@@ -114,4 +263,3 @@ input[type=range]::-moz-range-thumb {
   border: none;
   box-shadow: 0 0 12px rgba(20, 184, 166, 0.6);
 }
-

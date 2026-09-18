@@ -1190,7 +1190,7 @@ export default function App() {
                 <span className="text-[10px] sm:text-[11px] text-slate-400">HMAC-SHA256 SIGNED</span>
               </div>
 
-              <div className="mt-3 bg-[#070A13] p-3 sm:p-3.5 rounded border border-white/10 space-y-1.5 h-56 sm:h-64 overflow-y-auto touch-scroll text-[10px] sm:text-[11px]">
+              <div className="mt-3 bg-[#070A13] wp-terminal-screen p-3 sm:p-3.5 rounded border border-white/10 space-y-1.5 h-56 sm:h-64 overflow-y-auto touch-scroll text-[10px] sm:text-[11px]">
                 <div className="text-neutral-400">[13:42:01] WC Order Created: {currentScenConfig.orderId} {t('term_log_cod')}.</div>
                 <div className="text-amber-400">[13:42:01] Potvrdio Hook: Order status switched to ON-HOLD. Label printing suspended.</div>
                 

@@ -1,8 +1,22 @@
 <!DOCTYPE html>
-<html lang="sr" class="dark">
+<html lang="sr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('potvrdio_theme');
+          if (saved === 'light') {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+          } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          }
+        } catch(e) {}
+      })();
+    </script>
     <title>Potvrdio · Operativna COD Verifikacija za WooCommerce</title>
     <meta name="description" content="Eliminišite troškove nepreuzetih paketa pri plaćanju pouzećem. Verifikujte COD porudžbine i ponudite instant izmenu adrese na potvrdio.online putem Viber-a i SMS-a." />
     <meta name="keywords" content="WooCommerce COD, plaćanje pouzećem, verifikacija adrese, Viber bot WooCommerce, Post Express adresnica, zaštita od povrata paketa, Srbija e-commerce, Makedonija COD, ZZPL Član 12, GDPR compliance" />
@@ -143,7 +157,7 @@
     </script>
     <!-- /Yandex.Metrika counter -->
   </head>
-  <body class="bg-[#0B0F19] text-[#CBD5E1] font-['Inter',sans-serif] antialiased selection:bg-teal-500 selection:text-white">
+  <body class="font-['Inter',sans-serif] antialiased selection:bg-teal-500 selection:text-white">
     <noscript><div><img src="https://mc.yandex.ru/watch/112751737" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
