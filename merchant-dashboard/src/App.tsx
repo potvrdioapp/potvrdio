@@ -2,24 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
-  Copy, Check, ExternalLink, ChevronRight, Monitor, ArrowRight, HelpCircle, Info,
-  Store, Globe
+  Copy, Check, ChevronRight, Monitor, Store, Globe
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
+import { translations, Language } from './i18n';
 
 type Theme = 'dark' | 'light';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'overview' | 'credits' | 'settings'>('overview');
   const [credits, setCredits] = useState(1875);
-  const [balance, setBalance] = useState(45.00);
+  const [, setBalance] = useState(45.00);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [activeGuideTab, setActiveGuideTab] = useState<'plugin_settings' | 'wc_rest_api'>('plugin_settings');
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
-  const [selectedLang, setSelectedLang] = useState<'sr' | 'mk' | 'en'>('sr');
 
-  const currentLangCode = selectedLang === 'sr' ? 'sr-RS' : selectedLang === 'mk' ? 'mk-MK' : 'en-US';
+  const [selectedLang, setSelectedLang] = useState<Language>(() => {
+    const saved = localStorage.getItem('potvrdio_lang') as Language | null;
+    return saved && ['sr', 'mk', 'en'].includes(saved) ? saved : 'sr';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('potvrdio_lang', selectedLang);
+  }, [selectedLang]);
+
+  const t = translations[selectedLang];
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -62,21 +70,13 @@ export default function App() {
       setCredits(prev => prev + count);
       setBalance(prev => prev + cost);
       setPurchasing(null);
-      alert(`[PADDLE / LEMON SQUEEZY] Uspešno ste dopunili ${count} kredita za €${cost}!`);
+      alert(t.successTopupAlert(count, cost));
     }, 1000);
   };
 
-  const logs = [
-    { id: '#7482', customer: 'Nikola Petrović', phone: '+381 64 123 ****', status: 'APPROVED', channel: 'Viber', city: 'Beograd', amount: '4.850 RSD', time: 'Pre 4 min' },
-    { id: '#7481', customer: 'Milica Jovanović', phone: '+381 63 987 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Novi Sad', amount: '8.200 RSD', time: 'Pre 18 min' },
-    { id: '#7480', customer: 'Stefan Ilić', phone: '+381 61 456 ****', status: 'APPROVED', channel: 'Viber', city: 'Niš', amount: '3.100 RSD', time: 'Pre 42 min' },
-    { id: '#7479', customer: 'Jelena Stojanović', phone: '+387 65 321 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Banja Luka', amount: '6.400 RSD', time: 'Pre 1h 12m' },
-    { id: '#7478', customer: 'Marko Đorđević', phone: '+381 62 888 ****', status: 'APPROVED', channel: 'Viber', city: 'Kragujevac', amount: '5.900 RSD', time: 'Pre 2h 05m' },
-  ];
-
   return (
     <div className="min-h-screen bg-canvas text-theme-secondary font-sans transition-colors duration-200 flex">
-      {/* Sidebar Navigation - w-72 for generous breathability and strict left alignment */}
+      {/* Sidebar Navigation: w-72 with strict left-alignment and zero wrapping */}
       <aside className="w-72 bg-surface border-r border-theme min-h-screen p-5 flex flex-col justify-between hidden md:flex transition-colors shrink-0 sticky top-0 h-screen">
         <div className="space-y-6">
           <div className="px-2 text-left">
@@ -92,7 +92,7 @@ export default function App() {
               }`}
             >
               <BarChart2 className="w-4 h-4 shrink-0 text-left" />
-              <span className="truncate text-left">Pregled & Analitika</span>
+              <span className="truncate text-left">{t.navOverview}</span>
             </button>
 
             <button
@@ -102,7 +102,7 @@ export default function App() {
               }`}
             >
               <Zap className="w-4 h-4 shrink-0 text-left" />
-              <span className="truncate text-left">Krediti & Dopuna</span>
+              <span className="truncate text-left">{t.navCredits}</span>
               <span className="ml-auto bg-teal-500/15 text-teal-600 dark:text-teal-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-500/30 shrink-0">
                 {credits}
               </span>
@@ -115,20 +115,20 @@ export default function App() {
               }`}
             >
               <Settings className="w-4 h-4 shrink-0 text-left" />
-              <span className="truncate text-left">WooCommerce API Key</span>
+              <span className="truncate text-left">{t.navSettings}</span>
             </button>
           </nav>
         </div>
 
         <div className="glass-panel rounded-2xl p-4 border border-theme space-y-3 text-left">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-theme-muted">MoR Model Plaćanja</span>
+            <span className="text-theme-muted">{t.morTitle}</span>
             <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> Paddle Active
             </span>
           </div>
           <div className="text-xs text-theme-secondary font-medium text-left">
-            100% legalna MoR infrastruktura bez poreza i administrativnih tereta.
+            {t.morDesc}
           </div>
         </div>
       </aside>
@@ -146,23 +146,23 @@ export default function App() {
               <div className="text-left">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-lg md:text-xl font-bold text-theme-primary tracking-tight">
-                    Balkan Style Shop
+                    {t.storeName}
                   </h1>
                   {/* Language Code Badge */}
                   <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold bg-surface-subtle text-theme-primary border border-theme px-2 py-0.5 rounded-md shadow-xs" title="Jezik i tržište prodavnice">
                     <Globe className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" />
-                    {currentLangCode}
+                    {t.langCode}
                   </span>
                   {/* WooCommerce Connected Status */}
                   <span className="inline-flex items-center gap-1.5 text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    WooCommerce Connected
+                    {t.connected}
                   </span>
                 </div>
                 <p className="text-xs text-theme-muted mt-0.5 flex flex-wrap items-center gap-2 text-left">
-                  <span className="font-mono text-teal-600 dark:text-teal-400 font-medium">balkanshop.rs</span>
+                  <span className="font-mono text-teal-600 dark:text-teal-400 font-medium">{t.storeDomain}</span>
                   <span>·</span>
-                  <span>Sprečite COD troškove i povećajte dostavu paketa na 98%+</span>
+                  <span>{t.storeSubtitle}</span>
                 </p>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function App() {
                       ? 'bg-teal-600 text-white shadow-xs'
                       : 'text-theme-muted hover:text-theme-primary'
                   }`}
-                  title="Severna Makedonija (mk-MK)"
+                  title="Северна Македонија (mk-MK)"
                 >
                   MK
                 </button>
@@ -210,7 +210,7 @@ export default function App() {
               <button
                 onClick={toggleTheme}
                 className="p-2.5 rounded-xl bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary hover:border-theme-emphasis transition-all cursor-pointer flex items-center justify-center shadow-xs"
-                title={theme === 'dark' ? 'Prebaci na Svetlu Temu' : 'Prebaci na Tamnu Temu'}
+                title={theme === 'dark' ? t.themeLightTitle : t.themeDarkTitle}
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? (
@@ -224,8 +224,8 @@ export default function App() {
               <div className="bg-surface-subtle border border-theme px-3.5 py-2 rounded-xl flex items-center gap-2.5 shadow-xs">
                 <Zap className="w-4 h-4 text-teal-600 dark:text-teal-400 animate-pulse shrink-0" />
                 <div className="text-left">
-                  <div className="text-[10px] text-theme-muted uppercase tracking-wider font-semibold leading-none">Bazen Kredita</div>
-                  <div className="text-sm font-bold text-theme-primary leading-tight">{credits} <span className="text-theme-muted text-xs font-normal">Preostalo</span></div>
+                  <div className="text-[10px] text-theme-muted uppercase tracking-wider font-semibold leading-none">{t.creditPool}</div>
+                  <div className="text-sm font-bold text-theme-primary leading-tight">{credits} <span className="text-theme-muted text-xs font-normal">{t.remaining}</span></div>
                 </div>
               </div>
 
@@ -235,7 +235,7 @@ export default function App() {
                 className="btn-brand-cta text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <CreditCard className="w-4 h-4" />
-                <span>Dopuni Kredite</span>
+                <span>{t.topUpCredits}</span>
               </button>
             </div>
           </div>
@@ -250,38 +250,38 @@ export default function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
-                    <span>Potvrđene COD Porudžbine</span>
+                    <span>{t.statConfirmedTitle}</span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-theme-primary">412 <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">+18% ovog meseca</span></div>
-                  <div className="text-[11px] text-theme-muted">Uspešno verifikovano putem Viber-a</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">412 <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">{t.statConfirmedBadge}</span></div>
+                  <div className="text-[11px] text-theme-muted">{t.statConfirmedSub}</div>
                 </div>
 
                 <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
-                    <span>Stopa Uspešne Dostave</span>
+                    <span>{t.statDeliveryTitle}</span>
                     <TrendingUp className="w-4 h-4 text-teal-500" />
                   </div>
                   <div className="text-2xl font-extrabold text-theme-primary">96.4%</div>
-                  <div className="text-[11px] text-theme-muted">Pre Potvrdio: 74% (Kargo povrati spali na 3.6%)</div>
+                  <div className="text-[11px] text-theme-muted">{t.statDeliverySub}</div>
                 </div>
 
                 <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
-                    <span>Ušteđeni Kargo Troškovi</span>
+                    <span>{t.statSavedTitle}</span>
                     <Layers className="w-4 h-4 text-indigo-500" />
                   </div>
                   <div className="text-2xl font-extrabold text-theme-primary">€1,240</div>
-                  <div className="text-[11px] text-theme-muted">Sprečene povratne poštarine (Post Express)</div>
+                  <div className="text-[11px] text-theme-muted">{t.statSavedSub}</div>
                 </div>
 
                 <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
-                    <span>Viber Otvaranje (Open Rate)</span>
+                    <span>{t.statViberTitle}</span>
                     <MessageSquare className="w-4 h-4 text-pink-500" />
                   </div>
                   <div className="text-2xl font-extrabold text-theme-primary">93.8%</div>
-                  <div className="text-[11px] text-theme-muted">Prosečno vreme potvrde: 2.4 minuta</div>
+                  <div className="text-[11px] text-theme-muted">{t.statViberSub}</div>
                 </div>
               </div>
 
@@ -289,11 +289,11 @@ export default function App() {
               <div className="glass-panel rounded-2xl p-6 border border-theme space-y-4 shadow-card">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-theme-primary">Poslednje Verifikacije Pošiljki</h3>
-                    <p className="text-xs text-theme-muted">Real-time praćenje Viber poruka i potvrdio.online izmena</p>
+                    <h3 className="text-lg font-bold text-theme-primary">{t.tableTitle}</h3>
+                    <p className="text-xs text-theme-muted">{t.tableSubtitle}</p>
                   </div>
                   <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full">
-                    Aktivno Praćenje
+                    {t.tableBadge}
                   </span>
                 </div>
 
@@ -301,16 +301,16 @@ export default function App() {
                   <table className="w-full text-left text-xs text-theme-secondary">
                     <thead className="bg-surface-subtle text-theme-muted uppercase tracking-wider text-[10px] border-b border-theme">
                       <tr>
-                        <th className="py-3 px-4 rounded-l-xl">Porudžbina</th>
-                        <th className="py-3 px-4">Kupac & Telefon</th>
-                        <th className="py-3 px-4">Grad / Mesto</th>
-                        <th className="py-3 px-4">Iznos</th>
-                        <th className="py-3 px-4">Status & Kanal</th>
-                        <th className="py-3 px-4 rounded-r-xl">Vreme</th>
+                        <th className="py-3 px-4 rounded-l-xl">{t.colOrder}</th>
+                        <th className="py-3 px-4">{t.colCustomer}</th>
+                        <th className="py-3 px-4">{t.colCity}</th>
+                        <th className="py-3 px-4">{t.colAmount}</th>
+                        <th className="py-3 px-4">{t.colStatus}</th>
+                        <th className="py-3 px-4 rounded-r-xl">{t.colTime}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme">
-                      {logs.map((log, index) => (
+                      {t.logs.map((log, index) => (
                         <tr key={index} className="hover:bg-surface-subtle/50 transition-colors">
                           <td className="py-3.5 px-4 font-bold text-theme-primary font-mono">{log.id}</td>
                           <td className="py-3.5 px-4">
@@ -322,17 +322,17 @@ export default function App() {
                           <td className="py-3.5 px-4">
                             {log.status === 'APPROVED' && (
                               <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                <CheckCircle2 className="w-3 h-3" /> Potvrđeno ({log.channel})
+                                <CheckCircle2 className="w-3 h-3" /> {t.statusApproved} ({log.channel})
                               </span>
                             )}
                             {log.status === 'EDITED_ADDRESS' && (
                               <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                <Sparkles className="w-3 h-3" /> Izmenjena Adresa
+                                <Sparkles className="w-3 h-3" /> {t.statusAddressEdited}
                               </span>
                             )}
                             {log.status === 'SMS_FALLBACK' && (
                               <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                <AlertTriangle className="w-3 h-3" /> SMS Fallback
+                                <AlertTriangle className="w-3 h-3" /> {t.statusSmsFallback}
                               </span>
                             )}
                           </td>
@@ -350,79 +350,79 @@ export default function App() {
           {activeTab === 'credits' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-theme-primary">Zajednički Bazen Viber Kredita</h2>
-                <p className="text-xs text-theme-muted mt-1">Bez mesečne provizije, dopunite samo onoliko kredita koliko vam je potrebno za COD verifikaciju.</p>
+                <h2 className="text-xl font-bold text-theme-primary">{t.creditsHeading}</h2>
+                <p className="text-xs text-theme-muted mt-1">{t.creditsSubheading}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Starter Package */}
                 <div className="glass-panel rounded-2xl p-6 border border-theme flex flex-col justify-between hover:border-teal-500/40 transition-all shadow-card">
                   <div className="space-y-3">
-                    <div className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Starter Paket</div>
+                    <div className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t.starterTitle}</div>
                     <div className="text-3xl font-black text-theme-primary">€15</div>
-                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">600 Viber Kredita</div>
-                    <p className="text-xs text-theme-muted leading-relaxed">€0.025 / poruci. Idealno za manje prodavnice (do 50 porudžbina/mesec).</p>
+                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">{t.starterCredits}</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">{t.starterDesc}</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('starter', 15, 600)}
                     disabled={purchasing === 'starter'}
                     className="btn-select-wave w-full mt-6 bg-surface hover:bg-surface-subtle border border-theme text-theme-primary font-bold py-2.5 px-4 rounded-xl text-xs transition-all cursor-pointer shadow-sm"
                   >
-                    {purchasing === 'starter' ? 'Učitavanje...' : 'Kupi sa Paddle MoR'}
+                    {purchasing === 'starter' ? t.loadingText : t.starterBtn}
                   </button>
                 </div>
 
                 {/* Growth Package */}
                 <div className="glass-panel rounded-2xl p-6 border-2 border-teal-500/60 bg-teal-500/5 flex flex-col justify-between relative shadow-xl shadow-teal-500/10">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal-600 text-white text-[10px] font-extrabold uppercase px-3 py-0.5 rounded-full shadow-sm">
-                    NAJPOPULARNIJE
+                    {t.growthBadge}
                   </div>
                   <div className="space-y-3 pt-2">
-                    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300 uppercase tracking-wider">Growth Paket</div>
+                    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300 uppercase tracking-wider">{t.growthTitle}</div>
                     <div className="text-3xl font-black text-theme-primary">€45</div>
-                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">1,875 Viber Kredita</div>
-                    <p className="text-xs text-theme-muted leading-relaxed">€0.024 / poruci. Za srednje e-trgovce u Srbiji i regionu.</p>
+                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">{t.growthCredits}</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">{t.growthDesc}</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('growth', 45, 1875)}
                     disabled={purchasing === 'growth'}
                     className="btn-brand-cta w-full mt-6 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-lg cursor-pointer"
                   >
-                    {purchasing === 'growth' ? 'Učitavanje...' : 'Kupi sa Lemon Squeezy'}
+                    {purchasing === 'growth' ? t.loadingText : t.growthBtn}
                   </button>
                 </div>
 
                 {/* Pro Package */}
                 <div className="glass-panel rounded-2xl p-6 border border-theme flex flex-col justify-between hover:border-teal-500/40 transition-all shadow-card">
                   <div className="space-y-3">
-                    <div className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Pro Paket</div>
+                    <div className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t.proTitle}</div>
                     <div className="text-3xl font-black text-theme-primary">€120</div>
-                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">6,000 Viber Kredita</div>
-                    <p className="text-xs text-theme-muted leading-relaxed">€0.020 / poruci. Najniža cena poruke za visoki obim pošiljki.</p>
+                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">{t.proCredits}</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">{t.proDesc}</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('pro', 120, 6000)}
                     disabled={purchasing === 'pro'}
                     className="btn-select-wave w-full mt-6 bg-surface hover:bg-surface-subtle border border-theme text-theme-primary font-bold py-2.5 px-4 rounded-xl text-xs transition-all cursor-pointer shadow-sm"
                   >
-                    {purchasing === 'pro' ? 'Učitavanje...' : 'Kupi sa Paddle MoR'}
+                    {purchasing === 'pro' ? t.loadingText : t.proBtn}
                   </button>
                 </div>
 
                 {/* Pro Reserve Subscription */}
                 <div className="glass-panel rounded-2xl p-6 border border-emerald-500/30 bg-emerald-500/5 flex flex-col justify-between relative shadow-card">
                   <div className="space-y-3">
-                    <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Pro Reserve (MRR)</div>
-                    <div className="text-3xl font-black text-theme-primary">€29 <span className="text-xs text-theme-muted font-normal">/mesec</span></div>
-                    <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">1,800 Kredita / Mesec</div>
-                    <p className="text-xs text-theme-muted leading-relaxed">Automatska mesečna rezervacija garancije sa popustom na poruke.</p>
+                    <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">{t.reserveTitle}</div>
+                    <div className="text-3xl font-black text-theme-primary">€29 <span className="text-xs text-theme-muted font-normal">{t.reservePerMonth}</span></div>
+                    <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{t.reserveCredits}</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">{t.reserveDesc}</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('reserve', 29, 1800)}
                     disabled={purchasing === 'reserve'}
                     className="btn-brand-cta w-full mt-6 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all shadow-lg cursor-pointer"
                   >
-                    {purchasing === 'reserve' ? 'Učitavanje...' : 'Aktiviraj Pretplatu'}
+                    {purchasing === 'reserve' ? t.loadingText : t.reserveBtn}
                   </button>
                 </div>
               </div>
@@ -436,10 +436,10 @@ export default function App() {
               <div>
                 <h2 className="text-xl font-bold text-theme-primary flex items-center gap-2">
                   <Key className="w-5 h-5 text-teal-600 dark:text-teal-400" />
-                  WooCommerce API Ključevi & Povezivanje Prodavnice
+                  {t.settingsHeading}
                 </h2>
                 <p className="text-xs text-theme-muted mt-1">
-                  Uputstvo korak-po-korak: Pogledajte tačno na kojoj stranici u WordPress admin panelu se unose ovi ključevi.
+                  {t.settingsSubheading}
                 </p>
               </div>
 
@@ -449,11 +449,11 @@ export default function App() {
                 <div className="lg:col-span-2 glass-panel rounded-2xl p-6 border border-theme space-y-5 shadow-card">
                   <div className="flex items-center justify-between pb-3 border-b border-theme">
                     <div>
-                      <h3 className="text-sm font-bold text-theme-primary">Vaši Kredencijali za Povezivanje</h3>
-                      <p className="text-[11px] text-theme-muted">Kliknite na dugme za brzo kopiranje svakog parametra</p>
+                      <h3 className="text-sm font-bold text-theme-primary">{t.credentialsTitle}</h3>
+                      <p className="text-[11px] text-theme-muted">{t.credentialsSub}</p>
                     </div>
                     <span className="text-[10px] bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30 px-2.5 py-1 rounded-full font-bold">
-                      SHA-256 Sigurno
+                      {t.shaSecurity}
                     </span>
                   </div>
 
@@ -463,11 +463,11 @@ export default function App() {
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-xs font-semibold text-theme-secondary flex items-center gap-1.5">
                           <span className="w-4 h-4 rounded-full bg-surface-subtle text-teal-600 dark:text-teal-400 text-[10px] font-bold flex items-center justify-center border border-theme">1</span>
-                          Central Backend API Endpoint
+                          {t.labelEndpoint}
                         </label>
                         {copiedField === 'endpoint' && (
                           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 animate-in fade-in">
-                            <Check className="w-3 h-3" /> Kopirano!
+                            <Check className="w-3 h-3" /> {t.copiedBtn}
                           </span>
                         )}
                       </div>
@@ -483,7 +483,7 @@ export default function App() {
                           className="absolute right-2 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 text-teal-600 dark:text-teal-400 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer border border-teal-500/20"
                         >
                           <Copy className="w-3 h-3" />
-                          <span>Kopiraj</span>
+                          <span>{t.copyBtn}</span>
                         </button>
                       </div>
                     </div>
@@ -493,11 +493,11 @@ export default function App() {
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-xs font-semibold text-theme-secondary flex items-center gap-1.5">
                           <span className="w-4 h-4 rounded-full bg-surface-subtle text-teal-600 dark:text-teal-400 text-[10px] font-bold flex items-center justify-center border border-theme">2</span>
-                          API Key (ID Prodavnice / Store ID)
+                          {t.labelApiKey}
                         </label>
                         {copiedField === 'key' && (
                           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 animate-in fade-in">
-                            <Check className="w-3 h-3" /> Kopirano!
+                            <Check className="w-3 h-3" /> {t.copiedBtn}
                           </span>
                         )}
                       </div>
@@ -513,7 +513,7 @@ export default function App() {
                           className="absolute right-2 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 text-teal-600 dark:text-teal-400 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer border border-teal-500/20"
                         >
                           <Copy className="w-3 h-3" />
-                          <span>Kopiraj</span>
+                          <span>{t.copyBtn}</span>
                         </button>
                       </div>
                     </div>
@@ -523,11 +523,11 @@ export default function App() {
                       <div className="flex items-center justify-between mb-1.5">
                         <label className="text-xs font-semibold text-theme-secondary flex items-center gap-1.5">
                           <span className="w-4 h-4 rounded-full bg-surface-subtle text-teal-600 dark:text-teal-400 text-[10px] font-bold flex items-center justify-center border border-theme">3</span>
-                          API Secret (HMAC Tajni Ključ)
+                          {t.labelApiSecret}
                         </label>
                         {copiedField === 'secret' && (
                           <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1 animate-in fade-in">
-                            <Check className="w-3 h-3" /> Kopirano!
+                            <Check className="w-3 h-3" /> {t.copiedBtn}
                           </span>
                         )}
                       </div>
@@ -543,7 +543,7 @@ export default function App() {
                           className="absolute right-2 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 text-teal-600 dark:text-teal-400 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer border border-teal-500/20"
                         >
                           <Copy className="w-3 h-3" />
-                          <span>Kopiraj</span>
+                          <span>{t.copyBtn}</span>
                         </button>
                       </div>
                     </div>
@@ -554,30 +554,30 @@ export default function App() {
                 <div className="glass-panel rounded-2xl p-6 border border-theme flex flex-col justify-between space-y-4 shadow-card">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-theme-muted font-semibold uppercase tracking-wider">Status Veze</span>
+                      <span className="text-xs text-theme-muted font-semibold uppercase tracking-wider">{t.connStatusTitle}</span>
                       <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Aktivno
+                        {t.connStatusActive}
                       </span>
                     </div>
 
                     <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2 text-xs">
                       <div className="flex items-center justify-between text-theme-muted">
-                        <span>Prodavnica:</span>
-                        <span className="text-theme-primary font-semibold">balkanshop.rs</span>
+                        <span>{t.connStoreLabel}</span>
+                        <span className="text-theme-primary font-semibold">{t.storeDomain}</span>
                       </div>
                       <div className="flex items-center justify-between text-theme-muted">
-                        <span>WooCommerce:</span>
+                        <span>{t.connWooLabel}</span>
                         <span className="text-teal-600 dark:text-teal-400 font-semibold font-mono">v9.2.1 (HPOS)</span>
                       </div>
                       <div className="flex items-center justify-between text-theme-muted">
-                        <span>Webhook Ping:</span>
+                        <span>{t.connPingLabel}</span>
                         <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">24ms (OK)</span>
                       </div>
                     </div>
 
                     <p className="text-[11px] text-theme-muted leading-relaxed">
-                      Nakon unosa ključeva u WordPress, kliknite ispod da testirate dvosmernu komunikaciju.
+                      {t.connTestPrompt}
                     </p>
                   </div>
 
@@ -590,17 +590,17 @@ export default function App() {
                       {testStatus === 'testing' ? (
                         <>
                           <RefreshCw className="w-4 h-4 animate-spin text-teal-600 dark:text-teal-400" />
-                          <span>Provera veze...</span>
+                          <span>{t.connTestingBtn}</span>
                         </>
                       ) : testStatus === 'success' ? (
                         <>
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                          <span className="text-emerald-600 dark:text-emerald-400">200 OK · Veza je Ispravna!</span>
+                          <span className="text-emerald-600 dark:text-emerald-400">{t.connSuccessBtn}</span>
                         </>
                       ) : (
                         <>
                           <RefreshCw className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                          <span>Testiraj WooCommerce Povezivanje</span>
+                          <span>{t.connDefaultBtn}</span>
                         </>
                       )}
                     </button>
@@ -615,8 +615,8 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <Monitor className="w-5 h-5 text-teal-600 dark:text-teal-400" />
                     <div>
-                      <h3 className="text-sm font-bold text-theme-primary">Vizuelni Prikaz: Gde se unosi u WordPress-u?</h3>
-                      <p className="text-[11px] text-theme-muted">Pratite označeni meni sa leve strane vaše administratorske table</p>
+                      <h3 className="text-sm font-bold text-theme-primary">{t.guideTitle}</h3>
+                      <p className="text-[11px] text-theme-muted">{t.guideSubtitle}</p>
                     </div>
                   </div>
 
@@ -630,7 +630,7 @@ export default function App() {
                           : 'text-theme-muted hover:text-theme-primary'
                       }`}
                     >
-                      Metod 1: Potvrdio Eklentija (Preporučeno)
+                      {t.method1Tab}
                     </button>
                     <button
                       onClick={() => setActiveGuideTab('wc_rest_api')}
@@ -640,7 +640,7 @@ export default function App() {
                           : 'text-theme-muted hover:text-theme-primary'
                       }`}
                     >
-                      Metod 2: WooCommerce REST API
+                      {t.method2Tab}
                     </button>
                   </div>
                 </div>
@@ -650,10 +650,10 @@ export default function App() {
                   <div className="p-5 sm:p-6 space-y-6">
                     {/* Breadcrumbs Banner */}
                     <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-700 dark:text-teal-300 flex flex-wrap items-center gap-2">
-                      <span className="font-bold uppercase text-[10px] tracking-wider bg-teal-500/20 px-2 py-0.5 rounded">Putanja u meniju:</span>
+                      <span className="font-bold uppercase text-[10px] tracking-wider bg-teal-500/20 px-2 py-0.5 rounded">Putanja / Мену / Path:</span>
                       <span className="font-semibold text-theme-primary">WordPress Admin</span>
                       <ChevronRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-                      <span className="font-semibold text-theme-primary">Podešavanja (Settings)</span>
+                      <span className="font-semibold text-theme-primary">Settings</span>
                       <ChevronRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                       <span className="font-bold text-teal-700 dark:text-teal-300 bg-teal-500/20 px-2 py-0.5 rounded">Potvrdio Viber COD</span>
                     </div>
@@ -665,13 +665,13 @@ export default function App() {
                         <div className="flex items-center gap-3">
                           <span className="font-bold text-white flex items-center gap-1">
                             <span className="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-white">W</span>
-                            Balkan Style Shop
+                            {t.storeName}
                           </span>
                           <span className="text-slate-500 hidden sm:inline">|</span>
-                          <span className="text-slate-400 hidden sm:inline">Komentari (0)</span>
-                          <span className="text-slate-400 hidden sm:inline">+ Novo</span>
+                          <span className="text-slate-400 hidden sm:inline">Comments (0)</span>
+                          <span className="text-slate-400 hidden sm:inline">+ New</span>
                         </div>
-                        <span className="text-slate-400 text-[10px]">Pozdrav, admin</span>
+                        <span className="text-slate-400 text-[10px]">admin</span>
                       </div>
 
                       {/* WP Split Layout: Sidebar + Main Content */}
@@ -679,36 +679,36 @@ export default function App() {
                         {/* WP Sidebar Mockup */}
                         <div className="w-full md:w-56 bg-[#1D2327] text-slate-300 p-2 text-xs border-r border-slate-800 shrink-0 space-y-0.5">
                           <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <BarChart2 className="w-3.5 h-3.5" /> Kontrolna tabla (Dashboard)
+                            <BarChart2 className="w-3.5 h-3.5" /> Dashboard
                           </div>
                           <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <Layers className="w-3.5 h-3.5" /> Objave (Posts)
+                            <Layers className="w-3.5 h-3.5" /> Posts
                           </div>
                           <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
                             <Zap className="w-3.5 h-3.5" /> WooCommerce
                           </div>
                           <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <CreditCard className="w-3.5 h-3.5" /> Proizvodi (Products)
+                            <CreditCard className="w-3.5 h-3.5" /> Products
                           </div>
                           <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <Key className="w-3.5 h-3.5" /> Dodaci (Plugins)
+                            <Key className="w-3.5 h-3.5" /> Plugins
                           </div>
                           
                           {/* HIGHLIGHTED SETTINGS MENU */}
                           <div className="bg-[#2271B1] text-white rounded-t font-semibold px-3 py-2 flex items-center gap-2 shadow-sm">
-                            <Settings className="w-3.5 h-3.5" /> Podešavanja (Settings)
+                            <Settings className="w-3.5 h-3.5" /> Settings
                           </div>
                           <div className="bg-[#2C3338] rounded-b py-1 pl-6 pr-2 space-y-1 text-[11px]">
-                            <div className="py-1 text-slate-400">Opšta (General)</div>
-                            <div className="py-1 text-slate-400">Pisanje (Writing)</div>
-                            <div className="py-1 text-slate-400">Čitanje (Reading)</div>
+                            <div className="py-1 text-slate-400">General</div>
+                            <div className="py-1 text-slate-400">Writing</div>
+                            <div className="py-1 text-slate-400">Reading</div>
                             
                             {/* ACTIVE HIGHLIGHTED PLUGIN SUBMENU */}
                             <div className="py-1.5 px-2 rounded bg-teal-500 text-black font-extrabold flex items-center justify-between shadow-md animate-pulse">
                               <span className="flex items-center gap-1.5">
                                 <ShieldCheck className="w-3.5 h-3.5" /> Potvrdio Viber COD
                               </span>
-                              <span className="text-[9px] bg-black text-white px-1.5 py-0.2 rounded font-bold">KLIKNI</span>
+                              <span className="text-[9px] bg-black text-white px-1.5 py-0.2 rounded font-bold">CLICK</span>
                             </div>
                           </div>
                         </div>
@@ -717,13 +717,13 @@ export default function App() {
                         <div className="flex-1 bg-[#F0F0F1] text-slate-800 p-5 sm:p-7 space-y-4">
                           <div className="border-b border-slate-300 pb-3">
                             <h4 className="text-base font-bold text-[#1D2327]">Potvrdio - Viber COD & Cart Recovery Settings</h4>
-                            <p className="text-[11px] text-slate-600 mt-0.5">WooCommerce motor za sprečavanje povrata paketa i verifikaciju adrese.</p>
+                            <p className="text-[11px] text-slate-600 mt-0.5">{t.storeSubtitle}</p>
                           </div>
 
                           <div className="space-y-4 bg-white p-5 rounded-lg border border-slate-300 shadow-sm max-w-xl">
                             <div>
                               <label className="block text-xs font-bold text-[#1D2327] mb-1">
-                                Central Backend API Endpoint
+                                {t.labelEndpoint}
                               </label>
                               <div className="flex items-center gap-2">
                                 <input
@@ -733,14 +733,14 @@ export default function App() {
                                   className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
                                 />
                                 <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
-                                  ✓ Nalepiti ovde
+                                  {t.pasteHereBadge}
                                 </span>
                               </div>
                             </div>
 
                             <div>
                               <label className="block text-xs font-bold text-[#1D2327] mb-1">
-                                API Key
+                                {t.labelApiKey}
                               </label>
                               <div className="flex items-center gap-2">
                                 <input
@@ -750,14 +750,14 @@ export default function App() {
                                   className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
                                 />
                                 <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
-                                  ✓ Nalepiti ovde
+                                  {t.pasteHereBadge}
                                 </span>
                               </div>
                             </div>
 
                             <div>
                               <label className="block text-xs font-bold text-[#1D2327] mb-1">
-                                API Secret
+                                {t.labelApiSecret}
                               </label>
                               <div className="flex items-center gap-2">
                                 <input
@@ -767,15 +767,15 @@ export default function App() {
                                   className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
                                 />
                                 <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
-                                  ✓ Nalepiti ovde
+                                  {t.pasteHereBadge}
                                 </span>
                               </div>
                             </div>
 
                             <div className="pt-2">
                               <div className="inline-flex items-center gap-2 bg-[#2271B1] text-white px-4 py-2 rounded font-bold text-xs shadow hover:bg-[#135E96] transition cursor-pointer">
-                                <span>Sačuvaj izmene (Save Changes)</span>
-                                <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">Poslednji korak</span>
+                                <span>{t.saveChangesBtn}</span>
+                                <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">{t.finalStepBadge}</span>
                               </div>
                             </div>
                           </div>
@@ -787,25 +787,25 @@ export default function App() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
                       <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
                         <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">1</div>
-                        <h5 className="font-bold text-xs text-theme-primary">Otvorite Podešavanja</h5>
+                        <h5 className="font-bold text-xs text-theme-primary">{t.step1Title}</h5>
                         <p className="text-[11px] text-theme-secondary leading-relaxed">
-                          Ulogujte se u WordPress admin panel (<code className="text-teal-600 dark:text-teal-300 font-mono">/wp-admin</code>) i kliknite na <strong>Podešavanja</strong> ➔ <strong>Potvrdio Viber COD</strong>.
+                          {t.step1Desc}
                         </p>
                       </div>
 
                       <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
                         <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">2</div>
-                        <h5 className="font-bold text-xs text-theme-primary">Nalepite Ključeve</h5>
+                        <h5 className="font-bold text-xs text-theme-primary">{t.step2Title}</h5>
                         <p className="text-[11px] text-theme-secondary leading-relaxed">
-                          Kopirajte 3 polja sa vrha ovog ekrana i nalepite ih u odgovarajuća polja unutar WordPress forme.
+                          {t.step2Desc}
                         </p>
                       </div>
 
                       <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
                         <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">3</div>
-                        <h5 className="font-bold text-xs text-theme-primary">Sačuvajte i Gotovo!</h5>
+                        <h5 className="font-bold text-xs text-theme-primary">{t.step3Title}</h5>
                         <p className="text-[11px] text-theme-secondary leading-relaxed">
-                          Kliknite na plavo dugme <strong>Sačuvaj izmene</strong>. Vaša prodavnica je odmah zaštićena od lažnih COD porudžbina.
+                          {t.step3Desc}
                         </p>
                       </div>
                     </div>
@@ -817,12 +817,12 @@ export default function App() {
                   <div className="p-5 sm:p-6 space-y-6">
                     {/* Breadcrumbs Banner */}
                     <div className="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-700 dark:text-indigo-300 flex flex-wrap items-center gap-2">
-                      <span className="font-bold uppercase text-[10px] tracking-wider bg-indigo-500/20 px-2 py-0.5 rounded">Putanja u meniju:</span>
+                      <span className="font-bold uppercase text-[10px] tracking-wider bg-indigo-500/20 px-2 py-0.5 rounded">Putanja / Мену / Path:</span>
                       <span className="font-semibold text-theme-primary">WooCommerce</span>
                       <ChevronRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span className="font-semibold text-theme-primary">Podešavanja (Settings)</span>
+                      <span className="font-semibold text-theme-primary">Settings</span>
                       <ChevronRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span className="font-semibold text-theme-primary">Napredno (Advanced)</span>
+                      <span className="font-semibold text-theme-primary">Advanced</span>
                       <ChevronRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
                       <span className="font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded">REST API</span>
                     </div>
@@ -830,12 +830,12 @@ export default function App() {
                     {/* Visual WooCommerce Tabs Mockup */}
                     <div className="rounded-xl border border-slate-700/80 light:border-slate-300 overflow-hidden bg-[#F0F0F1] text-slate-800 p-5 space-y-4 shadow-lg font-sans">
                       <div className="flex flex-wrap items-center gap-1 border-b border-slate-300 pb-2 text-xs font-semibold text-slate-600">
-                        <span className="px-3 py-1.5 text-slate-500">Opšta</span>
-                        <span className="px-3 py-1.5 text-slate-500">Proizvodi</span>
-                        <span className="px-3 py-1.5 text-slate-500">Dostava</span>
-                        <span className="px-3 py-1.5 text-slate-500">Plaćanja</span>
-                        <span className="px-3 py-1.5 text-slate-500">Nalozi i privatnost</span>
-                        <span className="px-3 py-1.5 bg-[#2271B1] text-white rounded font-bold shadow-sm">Napredno (Advanced)</span>
+                        <span className="px-3 py-1.5 text-slate-500">General</span>
+                        <span className="px-3 py-1.5 text-slate-500">Products</span>
+                        <span className="px-3 py-1.5 text-slate-500">Shipping</span>
+                        <span className="px-3 py-1.5 text-slate-500">Payments</span>
+                        <span className="px-3 py-1.5 text-slate-500">Accounts</span>
+                        <span className="px-3 py-1.5 bg-[#2271B1] text-white rounded font-bold shadow-sm">Advanced</span>
                       </div>
 
                       {/* Subtabs Mockup */}
@@ -844,15 +844,15 @@ export default function App() {
                         <span className="text-slate-400">|</span>
                         <span className="text-slate-500">Webhooks</span>
                         <span className="text-slate-400">|</span>
-                        <span className="text-slate-500">Nasleđeni API</span>
+                        <span className="text-slate-500">Legacy API</span>
                       </div>
 
                       {/* Key Generation Form Mockup */}
                       <div className="bg-white p-5 rounded-lg border border-slate-300 space-y-3 max-w-xl shadow-sm text-xs">
-                        <h5 className="font-bold text-sm text-[#1D2327]">Detalji o ključu (Key Details)</h5>
+                        <h5 className="font-bold text-sm text-[#1D2327]">Key Details</h5>
                         
                         <div>
-                          <label className="block font-bold text-slate-700 mb-1">Opis (Description):</label>
+                          <label className="block font-bold text-slate-700 mb-1">Description:</label>
                           <input
                             type="text"
                             readOnly
@@ -862,16 +862,16 @@ export default function App() {
                         </div>
 
                         <div>
-                          <label className="block font-bold text-slate-700 mb-1">Dozvole (Permissions):</label>
+                          <label className="block font-bold text-slate-700 mb-1">Permissions:</label>
                           <div className="w-full bg-[#F6F7F7] border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-bold text-emerald-700 flex items-center justify-between">
-                            <span>Čitanje / Pisanje (Read / Write)</span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Obavezno</span>
+                            <span>Read / Write</span>
+                            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Required</span>
                           </div>
                         </div>
 
                         <div className="pt-2">
                           <span className="inline-block bg-[#2271B1] text-white px-4 py-1.5 rounded font-bold text-xs">
-                            Generiši API ključ (Generate API Key)
+                            Generate API Key
                           </span>
                         </div>
                       </div>
