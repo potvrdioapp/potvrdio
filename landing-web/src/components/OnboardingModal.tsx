@@ -119,17 +119,17 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-[#111827] border border-slate-700/60 rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#111827] light:bg-white border border-slate-700/60 light:border-slate-200/80 rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 light:text-slate-700 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#0B0F19] px-4 sm:px-5 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0 font-sans">
+        <div className="bg-[#0B0F19] light:bg-slate-50 px-4 sm:px-5 py-3.5 border-b border-slate-800 light:border-slate-200 flex items-center justify-between shrink-0 font-sans">
           <div className="flex items-center gap-2 text-[#14B8A6]">
-            <Rocket className="w-4.5 h-4.5 text-teal-400 shrink-0" />
-            <span className="text-xs font-bold text-white tracking-wide uppercase">{t.badge}</span>
+            <Rocket className="w-4.5 h-4.5 text-teal-400 light:text-teal-600 shrink-0" />
+            <span className="text-xs font-bold text-white light:text-slate-900 tracking-wide uppercase">{t.badge}</span>
           </div>
           <button 
             onClick={handleResetAndClose}
-            className="text-slate-400 hover:text-white transition p-1 cursor-pointer shrink-0"
+            className="text-slate-400 hover:text-white light:hover:text-slate-900 transition p-1 cursor-pointer shrink-0"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />

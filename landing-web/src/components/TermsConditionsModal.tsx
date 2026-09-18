@@ -116,20 +116,20 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-[#111827] border border-slate-700/60 rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#111827] light:bg-white border border-slate-700/60 light:border-slate-200/80 rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 light:text-slate-700 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#0B0F19] px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0 font-sans">
+        <div className="bg-[#0B0F19] light:bg-slate-50 px-4 sm:px-6 py-3.5 border-b border-slate-800 light:border-slate-200 flex items-center justify-between shrink-0 font-sans">
           <div className="flex items-center gap-2 text-[#14B8A6]">
-            <FileText className="w-5 h-5 text-teal-400 shrink-0" />
+            <FileText className="w-5 h-5 text-teal-400 light:text-teal-600 shrink-0" />
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">{t.title}</h2>
-              <p className="text-[10px] text-slate-400 font-sans">{t.updated}</p>
+              <h2 className="text-sm sm:text-base font-bold text-white light:text-slate-900 tracking-tight">{t.title}</h2>
+              <p className="text-[10px] text-slate-400 light:text-slate-500 font-sans">{t.updated}</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition p-1.5 rounded-lg hover:bg-white/5 cursor-pointer shrink-0"
+            className="text-slate-400 hover:text-white light:hover:text-slate-900 transition p-1.5 rounded-lg hover:bg-white/5 light:hover:bg-slate-200/50 cursor-pointer shrink-0"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />

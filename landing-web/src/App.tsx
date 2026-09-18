@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket
+  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket, Sun, Moon
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
@@ -61,9 +61,33 @@ function playScannerBeep() {
 }
 
 type Lang = 'sr' | 'mk' | 'en';
+type Theme = 'dark' | 'light';
 
 export default function App() {
   const [lang, setLang] = useState<Lang>('sr');
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem('potvrdio_theme') as Theme | null;
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('potvrdio_theme', theme);
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    } else {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    playClickSound();
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   const [currentScenario, setCurrentScenario] = useState<number>(1);
   const [simState, setSimState] = useState<'initial' | 'confirmed' | 'edited'>('initial');
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
@@ -719,70 +743,85 @@ export default function App() {
   const currentScenConfig = scenarios[currentScenario as keyof typeof scenarios];
 
   return (
-    <div className="min-h-[100dvh] flex flex-col saas-bg bg-[#0B0F19] text-[#CBD5E1] font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white">
+    <div className="min-h-[100dvh] flex flex-col saas-bg bg-[#0B0F19] light:bg-[#F8FAFC] text-slate-300 light:text-slate-700 font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white transition-colors duration-200">
       
       {/* Top Network & Legal Bar */}
-      <aside className="border-b border-white/10 bg-[#0B0F19]/90 px-3 sm:px-4 py-1.5 text-xs">
+      <aside className="border-b border-white/10 light:border-slate-200/80 bg-[#0B0F19]/90 light:bg-white/80 px-3 sm:px-4 py-1.5 text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-sans">
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="inline-flex items-center gap-1.5 text-emerald-400">
+            <span className="inline-flex items-center gap-1.5 text-emerald-400 light:text-emerald-600">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              <span className="font-medium text-white">{t('top_gateway')}</span>
+              <span className="font-medium text-white light:text-slate-900">{t('top_gateway')}</span>
             </span>
-            <span className="text-white/10">|</span>
-            <span className="hidden sm:inline text-slate-400">{t('top_networks')}</span>
+            <span className="text-white/10 light:text-slate-300">|</span>
+            <span className="hidden sm:inline text-slate-400 light:text-slate-600">{t('top_networks')}</span>
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-4">
-            <a href="#integracija" className="text-slate-400 hover:text-[#14B8A6] transition-colors hidden md:inline-flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <a href="#integracija" className="text-slate-400 light:text-slate-600 hover:text-[#14B8A6] transition-colors hidden md:inline-flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 light:text-emerald-600 shrink-0" />
               <span>{t('top_protocol')}</span>
             </a>
-            <span className="text-white/10 hidden md:inline">|</span>
-            <span className="text-amber-400 font-medium">{t('top_avg_penalty')}</span>
+            <span className="text-white/10 light:text-slate-300 hidden md:inline">|</span>
+            <span className="text-amber-400 light:text-amber-600 font-medium">{t('top_avg_penalty')}</span>
           </div>
         </div>
       </aside>
 
       {/* Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B0F19]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-white/10 light:border-slate-200/80 bg-[#0B0F19]/90 light:bg-white/90 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
-            <PotvrdioLogo variant="horizontal" mode="dark" />
-            <div className="hidden sm:block pl-2 border-l border-white/10 text-[10px] font-sans text-slate-400">
+            <PotvrdioLogo variant="horizontal" mode={theme} />
+            <div className="hidden sm:block pl-2 border-l border-white/10 light:border-slate-200 text-[10px] font-sans text-slate-400 light:text-slate-500">
               {t('nav_sub')}
             </div>
           </a>
 
           {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs text-slate-400 font-medium">
-            <a href="#lab" className="hover:text-white transition-colors">{t('nav_lab')}</a>
-            <a href="#manifest" className="hover:text-white transition-colors">{t('nav_manifest')}</a>
-            <a href="#kalkulator" className="hover:text-white transition-colors">{t('nav_calc')}</a>
-            <a href="#cenovnik" className="hover:text-white transition-colors">{t('nav_pricing')}</a>
-            <a href="#integracija" className="hover:text-white transition-colors">{t('nav_dev')}</a>
+          <nav className="hidden md:flex items-center gap-6 text-xs text-slate-400 light:text-slate-600 font-medium">
+            <a href="#lab" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_lab')}</a>
+            <a href="#manifest" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_manifest')}</a>
+            <a href="#kalkulator" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_calc')}</a>
+            <a href="#cenovnik" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_pricing')}</a>
+            <a href="#integracija" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_dev')}</a>
           </nav>
 
           {/* Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex items-center bg-[#131C2E] border border-white/10 rounded-lg p-0.5 text-xs font-sans">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-[#131C2E] light:bg-slate-100 border border-white/10 light:border-slate-200 text-slate-300 light:text-slate-700 hover:text-white light:hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center min-h-[34px] min-w-[34px]"
+              title={theme === 'dark' ? 'Prebaci na Svetlu Temu' : 'Prebaci na Tamnu Temu'}
+              aria-label="Toggle light/dark theme"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-indigo-600" />
+              )}
+            </button>
+
+            {/* Language Switcher */}
+            <div className="flex items-center bg-[#131C2E] light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-lg p-0.5 text-xs font-sans">
               <button 
                 onClick={() => { playClickSound(); setLang('sr'); }} 
-                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900'}`}
               >
                 SR
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('mk'); }} 
-                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'mk' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'mk' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900'}`}
               >
                 MK
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('en'); }} 
-                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'en' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'en' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900'}`}
               >
                 EN
               </button>

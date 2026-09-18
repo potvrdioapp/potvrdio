@@ -1,15 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
-  MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers
+  MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
+
+type Theme = 'dark' | 'light';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'overview' | 'credits' | 'settings'>('overview');
   const [credits, setCredits] = useState(1875);
   const [balance, setBalance] = useState(45.00);
   const [purchasing, setPurchasing] = useState<string | null>(null);
+
+  const [theme, setTheme] = useState<Theme>(() => {
+    const saved = localStorage.getItem('potvrdio_theme') as Theme | null;
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('potvrdio_theme', theme);
+    const root = document.documentElement;
+    if (theme === 'light') {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    } else {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   const handleBuyCredit = (planId: string, cost: number, count: number) => {
     setPurchasing(planId);
@@ -30,21 +54,21 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] text-slate-100 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#0B0F19] light:bg-[#F8FAFC] text-slate-100 light:text-slate-800 font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
       {/* Sidebar Navigation */}
       <div className="flex">
-        <aside className="w-64 bg-[#111827] border-r border-slate-800/80 min-h-screen p-5 flex flex-col justify-between hidden md:flex">
+        <aside className="w-64 bg-[#111827] light:bg-white border-r border-slate-800/80 light:border-slate-200 min-h-screen p-5 flex flex-col justify-between hidden md:flex transition-colors">
           <div className="space-y-6">
             <div className="px-2">
-              <PotvrdioLogo variant="horizontal" mode="dark" />
-              <span className="block text-[10px] text-slate-400 font-medium tracking-wide mt-1 pl-10.5">MERCHANT DASHBOARD</span>
+              <PotvrdioLogo variant="horizontal" mode={theme} />
+              <span className="block text-[10px] text-slate-400 light:text-slate-500 font-medium tracking-wide mt-1 pl-10.5">MERCHANT DASHBOARD</span>
             </div>
 
             <nav className="space-y-1.5 pt-4">
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  activeTab === 'overview' ? 'bg-teal-500/10 text-teal-300 border border-teal-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                  activeTab === 'overview' ? 'bg-teal-500/10 text-teal-300 light:text-teal-700 border border-teal-500/30' : 'text-slate-400 light:text-slate-600 hover:bg-slate-800/50 light:hover:bg-slate-100 hover:text-slate-200 light:hover:text-slate-900'
                 }`}
               >
                 <BarChart2 className="w-4 h-4" />
@@ -54,12 +78,12 @@ export default function App() {
               <button
                 onClick={() => setActiveTab('credits')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  activeTab === 'credits' ? 'bg-teal-500/10 text-teal-300 border border-teal-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                  activeTab === 'credits' ? 'bg-teal-500/10 text-teal-300 light:text-teal-700 border border-teal-500/30' : 'text-slate-400 light:text-slate-600 hover:bg-slate-800/50 light:hover:bg-slate-100 hover:text-slate-200 light:hover:text-slate-900'
                 }`}
               >
                 <Zap className="w-4 h-4" />
                 <span>Krediti & Dopuna</span>
-                <span className="ml-auto bg-teal-500/20 text-teal-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-500/30">
+                <span className="ml-auto bg-teal-500/20 text-teal-300 light:text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-500/30">
                   {credits}
                 </span>
               </button>
@@ -67,7 +91,7 @@ export default function App() {
               <button
                 onClick={() => setActiveTab('settings')}
                 className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  activeTab === 'settings' ? 'bg-teal-500/10 text-teal-300 border border-teal-500/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                  activeTab === 'settings' ? 'bg-teal-500/10 text-teal-300 light:text-teal-700 border border-teal-500/30' : 'text-slate-400 light:text-slate-600 hover:bg-slate-800/50 light:hover:bg-slate-100 hover:text-slate-200 light:hover:text-slate-900'
                 }`}
               >
                 <Settings className="w-4 h-4" />
@@ -78,12 +102,12 @@ export default function App() {
 
           <div className="glass-card rounded-2xl p-4 border border-teal-500/20 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">MoR Model Plaćanja</span>
-              <span className="text-emerald-400 font-bold flex items-center gap-1">
+              <span className="text-slate-400 light:text-slate-500">MoR Model Plaćanja</span>
+              <span className="text-emerald-400 light:text-emerald-600 font-bold flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Paddle Active
               </span>
             </div>
-            <div className="text-xs text-slate-300 font-medium">
+            <div className="text-xs text-slate-300 light:text-slate-600 font-medium">
               100% legalna MoR infrastruktura bez poreza i administrativnih tereta.
             </div>
           </div>
@@ -92,21 +116,35 @@ export default function App() {
         {/* Main Content Area */}
         <main className="flex-1 p-6 md:p-8 space-y-8 max-w-7xl">
           {/* Top Bar Header */}
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0d121f] p-5 rounded-2xl border border-slate-800">
+          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#0d121f] light:bg-white p-5 rounded-2xl border border-slate-800 light:border-slate-200 shadow-sm transition-colors">
             <div>
-              <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-white light:text-slate-900 flex items-center gap-2">
                 Balkan Style Shop (Srbija)
-                <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold">WooCommerce Connected</span>
+                <span className="text-xs bg-emerald-500/10 text-emerald-400 light:text-emerald-600 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold">WooCommerce Connected</span>
               </h1>
-              <p className="text-xs text-slate-400 mt-1">Sprečite COD ištetu i povećajte dostavu paketa na 98%+</p>
+              <p className="text-xs text-slate-400 light:text-slate-500 mt-1">Sprečite COD ištetu i povećajte dostavu paketa na 98%+</p>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="bg-slate-900 border border-slate-700/80 px-4 py-2 rounded-xl flex items-center gap-3">
-                <Zap className="w-4 h-4 text-teal-400 animate-pulse" />
+              {/* Theme Toggle Button */}
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-xl bg-slate-900 light:bg-slate-100 border border-slate-700/80 light:border-slate-200 text-slate-300 light:text-slate-700 hover:text-white light:hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center"
+                title={theme === 'dark' ? 'Prebaci na Svetlu Temu' : 'Prebaci na Tamnu Temu'}
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-indigo-600" />
+                )}
+              </button>
+
+              <div className="bg-slate-900 light:bg-slate-50 border border-slate-700/80 light:border-slate-200 px-4 py-2 rounded-xl flex items-center gap-3">
+                <Zap className="w-4 h-4 text-teal-400 light:text-teal-600 animate-pulse" />
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Bazen Kredita</div>
-                  <div className="text-sm font-bold text-white">{credits} <span className="text-slate-400 text-xs">Preostalo</span></div>
+                  <div className="text-[10px] text-slate-400 light:text-slate-500 uppercase tracking-wider font-semibold">Bazen Kredita</div>
+                  <div className="text-sm font-bold text-white light:text-slate-900">{credits} <span className="text-slate-400 light:text-slate-500 text-xs">Preostalo</span></div>
                 </div>
               </div>
 
