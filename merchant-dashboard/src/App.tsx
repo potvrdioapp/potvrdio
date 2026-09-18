@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
-  Copy, Check, ExternalLink, ChevronRight, Monitor, ArrowRight, HelpCircle, Info
+  Copy, Check, ExternalLink, ChevronRight, Monitor, ArrowRight, HelpCircle, Info,
+  Store, Globe
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 
@@ -16,6 +17,9 @@ export default function App() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [activeGuideTab, setActiveGuideTab] = useState<'plugin_settings' | 'wc_rest_api'>('plugin_settings');
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
+  const [selectedLang, setSelectedLang] = useState<'sr' | 'mk' | 'en'>('sr');
+
+  const currentLangCode = selectedLang === 'sr' ? 'sr-RS' : selectedLang === 'mk' ? 'mk-MK' : 'en-US';
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -71,82 +75,141 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-canvas text-theme-secondary font-sans transition-colors duration-200">
-      {/* Sidebar Navigation */}
-      <div className="flex">
-        <aside className="w-64 bg-surface border-r border-theme min-h-screen p-5 flex flex-col justify-between hidden md:flex transition-colors shrink-0">
-          <div className="space-y-6">
-            <div className="px-2">
-              <PotvrdioLogo variant="horizontal" mode={theme} />
-              <span className="block text-[10px] text-theme-muted font-medium tracking-wide mt-1 pl-10.5">MERCHANT DASHBOARD</span>
-            </div>
-
-            <nav className="space-y-1.5 pt-4">
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === 'overview' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
-                }`}
-              >
-                <BarChart2 className="w-4 h-4" />
-                <span>Pregled & Analitika</span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('credits')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === 'credits' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
-                }`}
-              >
-                <Zap className="w-4 h-4" />
-                <span>Krediti & Dopuna</span>
-                <span className="ml-auto bg-teal-500/15 text-teal-600 dark:text-teal-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-500/30">
-                  {credits}
-                </span>
-              </button>
-
-              <button
-                onClick={() => setActiveTab('settings')}
-                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
-                  activeTab === 'settings' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
-                }`}
-              >
-                <Settings className="w-4 h-4" />
-                <span>WooCommerce API Key</span>
-              </button>
-            </nav>
+    <div className="min-h-screen bg-canvas text-theme-secondary font-sans transition-colors duration-200 flex">
+      {/* Sidebar Navigation - w-72 for generous breathability and strict left alignment */}
+      <aside className="w-72 bg-surface border-r border-theme min-h-screen p-5 flex flex-col justify-between hidden md:flex transition-colors shrink-0 sticky top-0 h-screen">
+        <div className="space-y-6">
+          <div className="px-2 text-left">
+            <PotvrdioLogo variant="horizontal" mode={theme} />
+            <span className="block text-[10px] text-theme-muted font-medium tracking-wide mt-1 pl-10.5 text-left">MERCHANT DASHBOARD</span>
           </div>
 
-          <div className="glass-panel rounded-2xl p-4 border border-theme space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-theme-muted">MoR Model Plaćanja</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> Paddle Active
+          <nav className="space-y-1.5 pt-4">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`w-full flex items-center justify-start text-left gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'overview' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30 shadow-xs' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
+              }`}
+            >
+              <BarChart2 className="w-4 h-4 shrink-0 text-left" />
+              <span className="truncate text-left">Pregled & Analitika</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('credits')}
+              className={`w-full flex items-center justify-start text-left gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'credits' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30 shadow-xs' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
+              }`}
+            >
+              <Zap className="w-4 h-4 shrink-0 text-left" />
+              <span className="truncate text-left">Krediti & Dopuna</span>
+              <span className="ml-auto bg-teal-500/15 text-teal-600 dark:text-teal-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-500/30 shrink-0">
+                {credits}
               </span>
-            </div>
-            <div className="text-xs text-theme-secondary font-medium">
-              100% legalna MoR infrastruktura bez poreza i administrativnih tereta.
-            </div>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`w-full flex items-center justify-start text-left gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === 'settings' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30 shadow-xs' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
+              }`}
+            >
+              <Settings className="w-4 h-4 shrink-0 text-left" />
+              <span className="truncate text-left">WooCommerce API Key</span>
+            </button>
+          </nav>
+        </div>
+
+        <div className="glass-panel rounded-2xl p-4 border border-theme space-y-3 text-left">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-theme-muted">MoR Model Plaćanja</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" /> Paddle Active
+            </span>
           </div>
-        </aside>
+          <div className="text-xs text-theme-secondary font-medium text-left">
+            100% legalna MoR infrastruktura bez poreza i administrativnih tereta.
+          </div>
+        </div>
+      </aside>
 
-        {/* Main Content Area */}
-        <main className="flex-1 p-6 md:p-8 space-y-8 max-w-7xl">
-          {/* Top Bar Header */}
-          <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface p-5 rounded-2xl border border-theme shadow-card transition-colors">
-            <div>
-              <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
-                Balkan Style Shop (Srbija)
-                <span className="text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold">WooCommerce Connected</span>
-              </h1>
-              <p className="text-xs text-theme-muted mt-1">Sprečite COD troškove i povećajte dostavu paketa na 98%+</p>
+      {/* Main Workspace Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* STORE BANNER HEADER (Positioned as full-width top dashboard header with language code) */}
+        <header className="sticky top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-theme px-6 md:px-8 py-4 transition-colors">
+          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            {/* Store Information Banner */}
+            <div className="flex items-center gap-3.5 text-left">
+              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shrink-0 shadow-xs">
+                <Store className="w-5 h-5" />
+              </div>
+              <div className="text-left">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-lg md:text-xl font-bold text-theme-primary tracking-tight">
+                    Balkan Style Shop
+                  </h1>
+                  {/* Language Code Badge */}
+                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold bg-surface-subtle text-theme-primary border border-theme px-2 py-0.5 rounded-md shadow-xs" title="Jezik i tržište prodavnice">
+                    <Globe className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" />
+                    {currentLangCode}
+                  </span>
+                  {/* WooCommerce Connected Status */}
+                  <span className="inline-flex items-center gap-1.5 text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    WooCommerce Connected
+                  </span>
+                </div>
+                <p className="text-xs text-theme-muted mt-0.5 flex flex-wrap items-center gap-2 text-left">
+                  <span className="font-mono text-teal-600 dark:text-teal-400 font-medium">balkanshop.rs</span>
+                  <span>·</span>
+                  <span>Sprečite COD troškove i povećajte dostavu paketa na 98%+</span>
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            {/* Action Controls: Language Switcher, Theme Switcher, Credit Pool, Main CTA */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Language Code Switcher */}
+              <div className="flex items-center bg-surface-subtle border border-theme rounded-xl p-1 text-xs font-semibold shadow-xs">
+                <button
+                  onClick={() => setSelectedLang('sr')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    selectedLang === 'sr'
+                      ? 'bg-teal-600 text-white shadow-xs'
+                      : 'text-theme-muted hover:text-theme-primary'
+                  }`}
+                  title="Srbija (sr-RS)"
+                >
+                  SR
+                </button>
+                <button
+                  onClick={() => setSelectedLang('mk')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    selectedLang === 'mk'
+                      ? 'bg-teal-600 text-white shadow-xs'
+                      : 'text-theme-muted hover:text-theme-primary'
+                  }`}
+                  title="Severna Makedonija (mk-MK)"
+                >
+                  MK
+                </button>
+                <button
+                  onClick={() => setSelectedLang('en')}
+                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                    selectedLang === 'en'
+                      ? 'bg-teal-600 text-white shadow-xs'
+                      : 'text-theme-muted hover:text-theme-primary'
+                  }`}
+                  title="International (en-US)"
+                >
+                  EN
+                </button>
+              </div>
+
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="p-2.5 rounded-xl bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary hover:border-theme-emphasis transition-all cursor-pointer flex items-center justify-center"
+                className="p-2.5 rounded-xl bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary hover:border-theme-emphasis transition-all cursor-pointer flex items-center justify-center shadow-xs"
                 title={theme === 'dark' ? 'Prebaci na Svetlu Temu' : 'Prebaci na Tamnu Temu'}
                 aria-label="Toggle theme"
               >
@@ -157,24 +220,29 @@ export default function App() {
                 )}
               </button>
 
-              <div className="bg-surface-subtle border border-theme px-4 py-2 rounded-xl flex items-center gap-3">
-                <Zap className="w-4 h-4 text-teal-600 dark:text-teal-400 animate-pulse" />
-                <div>
-                  <div className="text-[10px] text-theme-muted uppercase tracking-wider font-semibold">Bazen Kredita</div>
-                  <div className="text-sm font-bold text-theme-primary">{credits} <span className="text-theme-muted text-xs">Preostalo</span></div>
+              {/* Credit Pool Display */}
+              <div className="bg-surface-subtle border border-theme px-3.5 py-2 rounded-xl flex items-center gap-2.5 shadow-xs">
+                <Zap className="w-4 h-4 text-teal-600 dark:text-teal-400 animate-pulse shrink-0" />
+                <div className="text-left">
+                  <div className="text-[10px] text-theme-muted uppercase tracking-wider font-semibold leading-none">Bazen Kredita</div>
+                  <div className="text-sm font-bold text-theme-primary leading-tight">{credits} <span className="text-theme-muted text-xs font-normal">Preostalo</span></div>
                 </div>
               </div>
 
+              {/* Primary Top-up CTA */}
               <button 
                 onClick={() => setActiveTab('credits')}
-                className="btn-brand-cta text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                className="btn-brand-cta text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <CreditCard className="w-4 h-4" />
                 <span>Dopuni Kredite</span>
               </button>
             </div>
-          </header>
+          </div>
+        </header>
 
+        {/* Main Content Body */}
+        <main className="flex-1 p-6 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
             <div className="space-y-8">
