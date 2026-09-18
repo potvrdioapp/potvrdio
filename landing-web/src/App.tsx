@@ -47,14 +47,14 @@ function playScannerBeep() {
     const ctx = getAudioContext();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(1850, ctx.currentTime);
-    gain.gain.setValueAtTime(0.08, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(750, ctx.currentTime);
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.005, ctx.currentTime + 0.05);
     osc.connect(gain);
     gain.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.08);
+    osc.stop(ctx.currentTime + 0.05);
   } catch (e) {
     // Ignore audio context errors
   }
@@ -252,7 +252,17 @@ export default function App() {
         man_good_addr1: "Bulevar Despota Stefana br. 114",
         man_good_city: "11000 BEOGRAD",
         calc_freight_val: "780 RSD (~6.65 €)",
-        modal_badge: "Passwordless Token Verifikacija"
+        modal_badge: "Passwordless Token Verifikacija",
+        nav_btn_register: "Registracija (25 Kredita)",
+        hero_btn_activate: "Aktiviraj 25 Besplatnih Verifikacija",
+        scen2_ignored_notice: "Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.",
+        calc_orders_unit: "narudžbina",
+        modal_alert_tip: "⚡ Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.",
+        faq_tag: "06 / Često Postavljana Pitanja",
+        faq_title: "Sve što treba da znate o Potvrdio COD verifikaciji",
+        faq_sub: "Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.",
+        floor_word: "Sprat",
+        apt_word: "Stan"
       },
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
@@ -293,7 +303,7 @@ export default function App() {
         viber_order_received: "Ја примивме твојата нарачка",
         viber_shipping_address: "АДРЕСА ЗА ДОСТАВА:",
         viber_confirm_prompt: "Те молиме потврди ја точноста пред да го предадеме пакетот на курир:",
-        scen1_warning: "⚠️ Упозорение: Недостасува број на стан и кат (Ризик од неиспорака)",
+        scen1_warning: "⚠️ Предупредување: Недостасува број на стан и кат (Ризик од неиспорака)",
         scen2_warning: "⏱️ Пораката е игнорирана. Нема одговор 24ч. Пакетот е задржан!",
         viber_btn_yes: "ДА, АДРЕСАТА Е ТОЧНА",
         viber_btn_edit: "ИЗМЕНИ ЈА АДРЕСАТА",
@@ -337,7 +347,7 @@ export default function App() {
         dev_title: "Како изгледа кодот во WooCommerce?",
         dl_title: "Запрете ги трошоците за враќање уште при следната достава",
         dl_desc: "Преземете го бесплатниот ZIP, активирајте го во WordPress и добијте 25 бесплатни кредити.",
-        btn_dl_full: "Preuzmi Potvrdio WordPress Plugin (.zip)",
+        btn_dl_full: "Преземи Potvrdio WordPress Plugin (.zip)",
         btn_view_demo: "Погледај го демато во живо",
         modal_title: "Ажурирање на адреса за достава",
         modal_subtitle: "Дополнете ги податоците за курирот побрзо да го најде вашиот влез",
@@ -425,7 +435,17 @@ export default function App() {
         man_good_addr1: "Бул. Деспот Стефан бр. 114",
         man_good_city: "1000 СКОПЈЕ",
         calc_freight_val: "390 MKD (~6.35 €)",
-        modal_badge: "Passwordless Token Верификација"
+        modal_badge: "Passwordless Token Верификација",
+        nav_btn_register: "Регистрација (25 Кредити)",
+        hero_btn_activate: "Активирај 25 Бесплатни Верификации",
+        scen2_ignored_notice: "Купувачот не одговори 24ч. Нарачката е откажана пред пакување.",
+        calc_orders_unit: "нарачки",
+        modal_alert_tip: "⚡ Пополнете кат и стан за курирот без застој да го најде вашиот влез.",
+        faq_tag: "06 / Често Поставувани Прашања",
+        faq_title: "Сè што треба да знаете за Potvrdio COD верификацијата",
+        faq_sub: "Одговори на клучните технички и правни прашања.",
+        floor_word: "Кат",
+        apt_word: "Стан"
       },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
@@ -598,7 +618,17 @@ export default function App() {
         man_good_addr1: "114 Despot Stefan Blvd",
         man_good_city: "11000 BELGRADE",
         calc_freight_val: "~€6.65 (780 RSD)",
-        modal_badge: "Passwordless Token Verification"
+        modal_badge: "Passwordless Token Verification",
+        nav_btn_register: "Register Store (25 Free)",
+        hero_btn_activate: "Activate 25 Free Credits",
+        scen2_ignored_notice: "Customer ignored for 24h. Order cancelled before packing.",
+        calc_orders_unit: "orders",
+        modal_alert_tip: "⚡ Fill floor and apartment so the courier can find your entrance without delay.",
+        faq_tag: "06 / Frequently Asked Questions",
+        faq_title: "Everything you need to know about Potvrdio COD verification",
+        faq_sub: "Answers to key technical, legal, and operational questions.",
+        floor_word: "Floor",
+        apt_word: "Apt"
       }
     };
 
@@ -689,11 +719,11 @@ export default function App() {
   const currentScenConfig = scenarios[currentScenario as keyof typeof scenarios];
 
   return (
-    <div className="min-h-[100dvh] flex flex-col blueprint-grid bg-[#070A13] text-[#CBD5E1] font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white">
+    <div className="min-h-[100dvh] flex flex-col saas-bg bg-[#0B0F19] text-[#CBD5E1] font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white">
       
       {/* Top Network & Legal Bar */}
-      <aside className="border-b border-white/10 bg-[#070A13]/90 px-3 sm:px-4 py-1.5 text-xs">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-mono">
+      <aside className="border-b border-white/10 bg-[#0B0F19]/90 px-3 sm:px-4 py-1.5 text-xs">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-sans">
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="inline-flex items-center gap-1.5 text-emerald-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
@@ -715,13 +745,13 @@ export default function App() {
       </aside>
 
       {/* Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#070A13]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B0F19]/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
             <PotvrdioLogo variant="horizontal" mode="dark" />
-            <div className="hidden sm:block pl-2 border-l border-white/10 text-[10px] font-mono text-slate-400">
+            <div className="hidden sm:block pl-2 border-l border-white/10 text-[10px] font-sans text-slate-400">
               {t('nav_sub')}
             </div>
           </a>
@@ -737,7 +767,7 @@ export default function App() {
 
           {/* Controls */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="flex items-center bg-[#0D121F] border border-white/10 rounded p-0.5 text-xs font-mono">
+            <div className="flex items-center bg-[#131C2E] border border-white/10 rounded-lg p-0.5 text-xs font-sans">
               <button 
                 onClick={() => { playClickSound(); setLang('sr'); }} 
                 className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 hover:text-white'}`}
@@ -840,17 +870,17 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="border-b border-white/10 bg-gradient-to-b from-[#0D121F] to-[#070A13] pt-10 sm:pt-14 pb-12 sm:pb-16">
+      <section className="border-b border-white/10 bg-gradient-to-b from-[#111827] to-[#0B0F19] pt-10 sm:pt-14 pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
             
             {/* Left Column */}
             <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-5">
-              <div className="inline-flex items-center gap-2 border border-white/10 bg-[#0D121F] px-2.5 sm:px-3 py-1 rounded text-[11px] sm:text-xs font-mono text-slate-400 w-fit max-w-full flex-wrap">
+              <div className="inline-flex items-center gap-2 border border-slate-700/60 bg-slate-800/60 px-3 py-1 rounded-full text-xs text-slate-300 w-fit max-w-full flex-wrap">
                 <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse shrink-0"></span>
-                <span className="text-white font-medium">{t('hero_tag')}</span>
-                <span className="text-white/10">/</span>
-                <span className="text-emerald-400 font-mono">{t('hero_no_sub')}</span>
+                <span className="text-white font-semibold">{t('hero_tag')}</span>
+                <span className="text-white/20">•</span>
+                <span className="text-emerald-400 font-medium">{t('hero_no_sub')}</span>
               </div>
 
               <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-white leading-[1.2]">
@@ -865,14 +895,14 @@ export default function App() {
                 <a 
                   href="#lab" 
                   onClick={playClickSound}
-                  className="btn-brand-cta text-white font-bold text-xs px-5 py-3.5 sm:py-3 rounded transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
+                  className="btn-brand-cta text-white font-bold text-xs px-5 py-3.5 sm:py-3 rounded-lg transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                 >
                   <span>{t('hero_cta_primary')}</span>
                   <ArrowDown className="w-3.5 h-3.5" />
                 </a>
                 <button 
                   onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
-                  className="px-5 py-3.5 sm:py-3 bg-[#0D121F] hover:bg-white/10 text-white border border-[#14B8A6]/40 hover:border-[#14B8A6] text-xs rounded font-bold transition inline-flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+                  className="px-5 py-3.5 sm:py-3 bg-[#131C2E] hover:bg-slate-800 text-white border border-[#14B8A6]/40 hover:border-[#14B8A6] text-xs rounded-lg font-bold transition inline-flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
                 >
                   <Rocket className="w-4 h-4 text-teal-300 shrink-0" />
                   <span>{lang === 'sr' ? 'Aktiviraj 25 Besplatnih Verifikacija' : lang === 'mk' ? 'Активирај 25 Бесплатни Верификации' : 'Activate 25 Free Credits'}</span>
@@ -880,37 +910,37 @@ export default function App() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-white/10 mt-2 sm:mt-3 font-mono">
-                <div className="glass-panel p-2.5 sm:p-3 rounded">
-                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1">{t('stat_open_rate')}</div>
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-white/10 mt-2 sm:mt-3 font-sans">
+                <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
+                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_open_rate')}</div>
                   <div className="text-base sm:text-2xl font-bold text-white tracking-tight">89.6%</div>
-                  <div className="text-[9px] sm:text-[10px] text-emerald-400 mt-0.5 truncate">{t('stat_open_sub')}</div>
+                  <div className="text-[9px] sm:text-[10px] text-emerald-400 mt-0.5 truncate font-medium">{t('stat_open_sub')}</div>
                 </div>
-                <div className="glass-panel p-2.5 sm:p-3 rounded">
-                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1">{t('stat_hold_cost')}</div>
+                <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
+                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_hold_cost')}</div>
                   <div className="text-base sm:text-2xl font-bold text-amber-400 tracking-tight">{t('stat_hold_val')}</div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate">{t('stat_hold_sub')}</div>
+                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate font-medium">{t('stat_hold_sub')}</div>
                 </div>
-                <div className="glass-panel p-2.5 sm:p-3 rounded">
-                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1">{t('stat_recovery')}</div>
+                <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
+                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_recovery')}</div>
                   <div className="text-base sm:text-2xl font-bold text-emerald-400 tracking-tight">-83%</div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate">{t('stat_recovery_sub')}</div>
+                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate font-medium">{t('stat_recovery_sub')}</div>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Live Status Dashboard */}
-            <div className="lg:col-span-5 glass-panel rounded-lg p-4 sm:p-5 shadow-2xl relative">
+            <div className="lg:col-span-5 glass-panel rounded-xl p-4 sm:p-5 shadow-2xl relative border border-slate-800">
               <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded bg-[#14B8A6]"></span>
-                  <span className="text-xs font-mono font-bold text-white uppercase">WP-Admin · WooCommerce Hook</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#14B8A6]"></span>
+                  <span className="text-xs font-semibold text-white tracking-wide">WooCommerce Integration</span>
                 </div>
-                <div className="text-[10px] font-mono text-slate-400">HPOS Compatible</div>
+                <div className="text-[10px] font-mono text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">HPOS Ready</div>
               </div>
 
               {/* Order Card */}
-              <div className="bg-[#070A13] p-3 sm:p-3.5 rounded border border-white/10 mb-4 font-mono text-xs space-y-2">
+              <div className="bg-[#0B0F19] p-3 sm:p-3.5 rounded-lg border border-slate-800 mb-4 text-xs space-y-2">
                 <div className="flex justify-between items-center text-[11px] text-slate-400 border-b border-white/10 pb-2">
                   <span>{t('order_word')} #RS-8492</span>
                   <span>17. Sep 2026, 09:14</span>
@@ -962,10 +992,10 @@ export default function App() {
       <section id="lab" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div>
-            <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('lab_tag')}</div>
+            <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('lab_tag')}</div>
             <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('lab_title')}</h2>
           </div>
-          <div className="text-xs text-slate-400 font-mono">
+          <div className="text-xs text-slate-400 font-sans">
             {t('lab_subtitle')}
           </div>
         </div>
@@ -974,11 +1004,11 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 sm:mb-8">
           <button 
             onClick={() => handleScenarioChange(1)} 
-            className={`text-left p-3.5 sm:p-4 rounded glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-white/10 hover:border-white/20'}`}
           >
-            <div className="flex items-center justify-between mb-1 font-mono">
-              <span className={`font-bold ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario A</span>
-              <span className="text-[10px] text-emerald-400">{t('scen_common_tag')}</span>
+            <div className="flex items-center justify-between mb-1.5 font-sans">
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-slate-400'}`}>Scenario A</span>
+              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_common_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen1_title')}</div>
             <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen1_desc')}</div>
@@ -986,11 +1016,11 @@ export default function App() {
 
           <button 
             onClick={() => handleScenarioChange(2)} 
-            className={`text-left p-3.5 sm:p-4 rounded glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-white/10 hover:border-white/20'}`}
           >
-            <div className="flex items-center justify-between mb-1 font-mono">
-              <span className={`font-bold ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario B</span>
-              <span className="text-[10px] text-red-400">{t('scen_saved_tag')}</span>
+            <div className="flex items-center justify-between mb-1.5 font-sans">
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-slate-400'}`}>Scenario B</span>
+              <span className="text-[10px] font-semibold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">{t('scen_saved_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen2_title')}</div>
             <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen2_desc')}</div>
@@ -998,11 +1028,11 @@ export default function App() {
 
           <button 
             onClick={() => handleScenarioChange(3)} 
-            className={`text-left p-3.5 sm:p-4 rounded glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6]' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-white/10 hover:border-white/20'}`}
           >
-            <div className="flex items-center justify-between mb-1 font-mono">
-              <span className={`font-bold ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-white'}`}>Scenario C</span>
-              <span className="text-[10px] text-emerald-400">{t('scen_fast_tag')}</span>
+            <div className="flex items-center justify-between mb-1.5 font-sans">
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-slate-400'}`}>Scenario C</span>
+              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_fast_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen3_title')}</div>
             <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen3_desc')}</div>
@@ -1203,15 +1233,15 @@ export default function App() {
       {/* SECTION 02: Physical Manifest Label Inspector */}
       <section id="manifest" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
         <div className="max-w-3xl mb-8 sm:mb-12">
-          <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('man_tag')}</div>
+          <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('man_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('man_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">{t('man_p')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
           {/* Unverified Bad Label */}
-          <div className="glass-panel border-red-500/30 p-4 sm:p-6 rounded-lg relative overflow-hidden">
-            <div className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20">
+          <div className="glass-panel border-red-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden">
+            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-red-500/10 text-red-400 px-2.5 py-0.5 rounded-full border border-red-500/20">
               {t('man_badge_bad')}
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
@@ -1219,7 +1249,7 @@ export default function App() {
               <span>{t('man_bad_title')}</span>
             </h3>
 
-            <div className="thermal-label p-3.5 sm:p-4 rounded text-xs space-y-3 select-none overflow-x-auto">
+            <div className="thermal-label p-3.5 sm:p-4 rounded-lg text-xs space-y-3 select-none overflow-x-auto">
               <div className="flex justify-between border-b border-slate-300 pb-2">
                 <span className="font-bold">{t('man_label_header_bad')}</span>
                 <span className="text-[11px]">PE-9948201-RS</span>
@@ -1241,14 +1271,14 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-red-400 font-mono leading-relaxed">
+            <div className="mt-4 text-xs text-red-400 font-sans leading-relaxed">
               {t('man_bad_footer')}
             </div>
           </div>
 
           {/* Verified Good Label */}
-          <div className="glass-panel border-emerald-500/30 p-4 sm:p-6 rounded-lg relative overflow-hidden">
-            <div className="absolute top-3 right-3 text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">
+          <div className="glass-panel border-emerald-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden">
+            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
               {t('man_badge_good')}
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
@@ -1256,7 +1286,7 @@ export default function App() {
               <span>{t('man_good_title')}</span>
             </h3>
 
-            <div className="thermal-label p-3.5 sm:p-4 rounded text-xs space-y-3 select-none overflow-x-auto">
+            <div className="thermal-label p-3.5 sm:p-4 rounded-lg text-xs space-y-3 select-none overflow-x-auto">
               <div className="flex justify-between border-b border-slate-300 pb-2">
                 <span className="font-bold">{t('man_label_header_good')}</span>
                 <span className="text-[11px] font-bold text-emerald-800">POTVRDIO #7489</span>
@@ -1278,7 +1308,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-emerald-400 font-mono leading-relaxed">
+            <div className="mt-4 text-xs text-emerald-400 font-sans leading-relaxed">
               {t('man_good_footer')}
             </div>
           </div>
@@ -1288,17 +1318,17 @@ export default function App() {
       {/* SECTION 03: Return Freight Loss ROI Calculator */}
       <section id="kalkulator" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
         <div className="max-w-3xl mb-8 sm:mb-12">
-          <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('calc_tag')}</div>
+          <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('calc_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('calc_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">{t('calc_desc')}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center glass-panel p-4 sm:p-8 rounded-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center glass-panel p-4 sm:p-8 rounded-xl">
           <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             <div>
-              <div className="flex justify-between items-center text-xs font-mono mb-2">
-                <span className="text-white font-medium">{t('calc_label_orders')}</span>
-                <span className="text-[#14B8A6] font-bold text-sm bg-[#070A13] px-2.5 py-1 rounded border border-white/10">
+              <div className="flex justify-between items-center text-xs font-sans mb-2">
+                <span className="text-white font-semibold">{t('calc_label_orders')}</span>
+                <span className="text-[#14B8A6] font-bold text-sm bg-[#0B0F19] px-3 py-1 rounded-md border border-slate-800">
                   {ordersCount} {lang === 'sr' ? 'narudžbina' : 'orders'}
                 </span>
               </div>
@@ -1309,9 +1339,9 @@ export default function App() {
                 step="50" 
                 value={ordersCount} 
                 onChange={(e) => setOrdersCount(Number(e.target.value))}
-                className="w-full h-3 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
+                className="w-full h-3 bg-[#0B0F19] rounded-lg appearance-none cursor-pointer border border-slate-800"
               />
-              <div className="flex justify-between text-[10px] sm:text-[11px] font-mono text-slate-400 mt-1.5 flex-wrap gap-1">
+              <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-slate-400 mt-1.5 flex-wrap gap-1">
                 <span>50 ({lang === 'sr' ? 'Mala radnja' : lang === 'mk' ? 'Мала продавница' : 'Small Store'})</span>
                 <span>750 ({lang === 'sr' ? 'Rastući brend' : lang === 'mk' ? 'Растечки бренд' : 'Growing Brand'})</span>
                 <span>2.500+ ({lang === 'sr' ? 'Veliki shop' : lang === 'mk' ? 'Голема продавница' : 'Enterprise Store'})</span>
@@ -1319,9 +1349,9 @@ export default function App() {
             </div>
 
             <div>
-              <div className="flex justify-between items-center text-xs font-mono mb-2">
-                <span className="text-white font-medium">{t('calc_label_rate')}</span>
-                <span className="text-red-400 font-bold text-sm bg-[#070A13] px-2.5 py-1 rounded border border-white/10">
+              <div className="flex justify-between items-center text-xs font-sans mb-2">
+                <span className="text-white font-semibold">{t('calc_label_rate')}</span>
+                <span className="text-red-400 font-bold text-sm bg-[#0B0F19] px-3 py-1 rounded-md border border-slate-800">
                   {failureRate}%
                 </span>
               </div>
@@ -1332,42 +1362,42 @@ export default function App() {
                 step="1" 
                 value={failureRate} 
                 onChange={(e) => setFailureRate(Number(e.target.value))}
-                className="w-full h-3 bg-[#070A13] rounded appearance-none cursor-pointer border border-white/10"
+                className="w-full h-3 bg-[#0B0F19] rounded-lg appearance-none cursor-pointer border border-slate-800"
               />
-              <div className="flex justify-between text-[10px] sm:text-[11px] font-mono text-slate-400 mt-1.5 flex-wrap gap-1">
+              <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-slate-400 mt-1.5 flex-wrap gap-1">
                 <span>{t('calc_rate_ideal')}</span>
                 <span>{t('calc_rate_avg')}</span>
                 <span>{t('calc_rate_high')}</span>
               </div>
             </div>
 
-            <div className="p-3 bg-[#070A13] rounded border border-white/10 text-xs font-mono flex flex-wrap justify-between items-center gap-2 text-slate-400">
+            <div className="p-3 bg-[#0B0F19] rounded-lg border border-slate-800 text-xs font-sans flex flex-wrap justify-between items-center gap-2 text-slate-400">
               <span>{t('calc_freight_note')}</span>
               <span className="text-white font-bold">{t('calc_freight_val')}</span>
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-[#0D121F] border border-white/10 p-5 sm:p-6 rounded-lg text-center space-y-5">
+          <div className="lg:col-span-5 bg-[#131C2E] border border-slate-800 p-5 sm:p-6 rounded-xl text-center space-y-5">
             <div>
-              <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 {t('calc_loss_head')}
               </div>
-              <div className="text-2xl sm:text-3xl font-mono font-bold text-red-400 mt-1 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-sans font-bold text-red-400 mt-1 tracking-tight">
                 {annualLossRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
-              <div className="text-xs text-slate-400 font-mono mt-0.5">
+              <div className="text-xs text-slate-400 font-sans mt-0.5">
                 (~{annualLossEur.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} € {lang === 'sr' ? '/ godišnje' : lang === 'mk' ? '/ годишно' : '/ year'})
               </div>
             </div>
 
             <div className="pt-5 border-t border-white/10">
-              <div className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider">
+              <div className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
                 {t('calc_saved_head')}
               </div>
-              <div className="text-xl sm:text-2xl font-mono font-bold text-emerald-400 mt-1">
+              <div className="text-xl sm:text-2xl font-sans font-bold text-emerald-400 mt-1">
                 {annualSavedRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
-              <div className="text-[11px] text-slate-400 font-mono mt-1">
+              <div className="text-[11px] text-slate-400 font-sans mt-1">
                 {t('calc_roi_note')}
               </div>
             </div>
@@ -1378,37 +1408,37 @@ export default function App() {
       {/* SECTION 04: Credit Pool PAYG Pricing */}
       <section id="cenovnik" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
         <div className="mb-8 sm:mb-12">
-          <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('price_tag')}</div>
+          <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('price_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('price_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl">{t('price_desc')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-          <div className="lg:col-span-8 glass-panel rounded-lg overflow-hidden">
-            <div className="px-4 sm:px-5 py-3 border-b border-white/10 bg-[#0D121F] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-mono">
+          <div className="lg:col-span-8 glass-panel rounded-xl overflow-hidden border border-slate-800">
+            <div className="px-4 sm:px-5 py-3.5 border-b border-white/10 bg-[#131C2E] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-sans">
               <span className="font-bold text-white">{t('price_prepaid_header')}</span>
               <span className="text-slate-400 text-[11px]">{t('price_invoice_sub')}</span>
             </div>
 
             <div className="overflow-x-auto touch-scroll">
-              <table className="w-full text-left text-xs font-mono min-w-[500px]">
-                <thead className="bg-[#070A13] text-slate-400 border-b border-white/10 text-[11px]">
+              <table className="w-full text-left text-xs font-sans min-w-[500px]">
+                <thead className="bg-[#0B0F19] text-slate-400 border-b border-white/10 text-[11px]">
                   <tr>
-                    <th className="p-3.5 sm:p-4 font-normal">{t('th_tier')}</th>
-                    <th className="p-3.5 sm:p-4 font-normal">{t('th_deposit')}</th>
-                    <th className="p-3.5 sm:p-4 font-normal">{t('th_viber_rate')}</th>
-                    <th className="p-3.5 sm:p-4 font-normal">{t('th_sms_rate')}</th>
-                    <th className="p-3.5 sm:p-4 font-normal text-right">{t('price_btn_select')}</th>
+                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_tier')}</th>
+                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_deposit')}</th>
+                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_viber_rate')}</th>
+                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_sms_rate')}</th>
+                    <th className="p-3.5 sm:p-4 font-semibold text-right">{t('price_btn_select')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/10 text-slate-300">
-                  <tr className="hover:bg-[#0D121F]/50 transition">
+                  <tr className="hover:bg-[#131C2E]/50 transition">
                     <td className="p-3.5 sm:p-4 font-bold text-white">Starter Pool</td>
                     <td className="p-3.5 sm:p-4 font-bold text-white">15 €</td>
                     <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.026 €</td>
                     <td className="p-3.5 sm:p-4 text-slate-400">0.048 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer min-h-[32px]">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-[#131C2E] hover:bg-slate-700 border border-white/10 text-white text-[11px] font-semibold transition cursor-pointer min-h-[32px]">
                         {t('price_btn_select')}
                       </button>
                     </td>
@@ -1416,24 +1446,24 @@ export default function App() {
                   <tr className="bg-[#14B8A6]/5 hover:bg-[#14B8A6]/10 transition">
                     <td className="p-3.5 sm:p-4 font-bold text-white flex items-center gap-2">
                       Growth Pool
-                      <span className="text-[9px] bg-[#14B8A6]/20 text-[#14B8A6] px-1.5 py-0.5 rounded border border-[#14B8A6]/30">{t('price_badge_popular')}</span>
+                      <span className="text-[9px] font-semibold bg-[#14B8A6]/20 text-[#14B8A6] px-2 py-0.5 rounded-full border border-[#14B8A6]/30">{t('price_badge_popular')}</span>
                     </td>
                     <td className="p-3.5 sm:p-4 font-bold text-white">45 €</td>
                     <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.024 €</td>
                     <td className="p-3.5 sm:p-4 text-slate-400">0.042 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded bg-[#14B8A6] hover:bg-[#0F766E] text-black font-bold text-[11px] transition cursor-pointer min-h-[32px]">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-[#14B8A6] hover:bg-[#0F766E] text-black font-bold text-[11px] transition cursor-pointer min-h-[32px]">
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
-                  <tr className="hover:bg-[#0D121F]/50 transition">
+                  <tr className="hover:bg-[#131C2E]/50 transition">
                     <td className="p-3.5 sm:p-4 font-bold text-white">Scale Volume</td>
                     <td className="p-3.5 sm:p-4 font-bold text-white">120 €</td>
                     <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.020 €</td>
                     <td className="p-3.5 sm:p-4 text-slate-400">0.038 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded bg-[#0D121F] hover:bg-white/10 border border-white/10 text-white text-[11px] transition cursor-pointer min-h-[32px]">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-[#131C2E] hover:bg-slate-700 border border-white/10 text-white text-[11px] font-semibold transition cursor-pointer min-h-[32px]">
                         {t('price_btn_select')}
                       </button>
                     </td>
@@ -1442,18 +1472,18 @@ export default function App() {
               </table>
             </div>
 
-            <div className="p-3.5 sm:p-4 bg-[#070A13] border-t border-white/10 text-[11px] text-slate-400 font-mono flex items-start gap-1.5">
+            <div className="p-3.5 sm:p-4 bg-[#0B0F19] border-t border-white/10 text-[11px] text-slate-400 font-sans flex items-start gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
               <span>{t('price_note')}</span>
             </div>
           </div>
 
           {/* Pro Reserve */}
-          <div className="lg:col-span-4 glass-panel rounded-lg p-5 sm:p-6 font-mono text-xs">
-            <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-bold">{t('pro_tag')}</div>
+          <div className="lg:col-span-4 glass-panel rounded-xl p-5 sm:p-6 font-sans text-xs border border-slate-800">
+            <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-semibold">{t('pro_tag')}</div>
             <h3 className="text-base font-bold text-white font-sans">{t('price_pro_title')}</h3>
             <div className="mt-3 flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-white font-mono">29 €</span>
+              <span className="text-3xl font-bold text-white font-sans">29 €</span>
               <span className="text-slate-400 text-xs">{t('price_per_month')}</span>
             </div>
             <p className="text-slate-400 text-[11px] mt-2 leading-relaxed">
@@ -1489,35 +1519,35 @@ export default function App() {
       <section id="integracija" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
           <div className="lg:col-span-6 space-y-4">
-            <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
+            <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
             <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('leg_title')}</h2>
             <p className="text-xs text-slate-400 leading-relaxed">{t('leg_p')}</p>
 
-            <div className="space-y-3 font-mono text-xs pt-2">
-              <div className="p-3.5 rounded glass-panel border border-white/10">
+            <div className="space-y-3 font-sans text-xs pt-2">
+              <div className="p-3.5 rounded-xl glass-panel border border-white/10">
                 <div className="text-white font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item1_title')}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans">Pravni Osnov</span>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans">Pravni Osnov</span>
                 </div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
                   {t('leg_item1_desc')}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded glass-panel border border-white/10">
+              <div className="p-3.5 rounded-xl glass-panel border border-white/10">
                 <div className="text-white font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item2_title')}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 font-sans">Retention 30D</span>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20 font-sans">Retention 30D</span>
                 </div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
                   {t('leg_item2_desc')}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded glass-panel border border-white/10">
+              <div className="p-3.5 rounded-xl glass-panel border border-white/10">
                 <div className="text-white font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item3_title')}</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 font-sans">TLS 1.3 HMAC</span>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-sans">TLS 1.3 HMAC</span>
                 </div>
                 <div className="text-slate-400 text-[11px] leading-relaxed">
                   {t('leg_item3_desc')}
@@ -1527,11 +1557,11 @@ export default function App() {
           </div>
 
           <div className="lg:col-span-6 space-y-4">
-            <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider mb-1">{t('dev_tag')}</div>
+            <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('dev_tag')}</div>
             <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('dev_title')}</h2>
             
-            <div className="bg-[#070A13] border border-white/10 rounded-lg p-3.5 sm:p-4 font-mono text-xs text-slate-300 overflow-x-auto touch-scroll">
-              <div className="text-slate-400 text-[11px] mb-2">{t('dev_code_comment')}</div>
+            <div className="bg-[#0B0F19] border border-slate-800 rounded-xl p-3.5 sm:p-4 font-mono text-xs text-slate-300 overflow-x-auto touch-scroll">
+              <div className="text-slate-400 text-[11px] mb-2 font-sans">{t('dev_code_comment')}</div>
               <div className="text-[#14B8A6]">add_action('woocommerce_checkout_order_processed', function($order_id) &#123;</div>
               <div className="pl-4 text-slate-400">$order = wc_get_order($order_id);</div>
               <div className="pl-4 text-slate-400">if ($order-&gt;get_payment_method() === 'cod') &#123;</div>
@@ -1541,7 +1571,7 @@ export default function App() {
               <div className="text-[#14B8A6]">&#125;);</div>
             </div>
 
-            <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+            <div className="text-[11px] font-sans text-slate-400 flex items-center gap-1.5">
               <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{t('dev_hpos_note')}</span>
             </div>
@@ -1552,7 +1582,7 @@ export default function App() {
         <div className="mt-10 pt-8 border-t border-white/10">
           <div className="flex items-center gap-2 mb-4">
             <Scale className="w-4 h-4 text-[#14B8A6]" />
-            <h3 className="text-xs sm:text-sm font-bold text-white uppercase font-mono tracking-wider">
+            <h3 className="text-xs sm:text-sm font-bold text-white uppercase font-sans tracking-wider">
               {t('leg_proof_title')}
             </h3>
           </div>
@@ -1563,76 +1593,76 @@ export default function App() {
               href="https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2018/87/1/reg" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
                 <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_pis')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_pis_sub')}</p>
+                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_pis_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
                 <span>Sl. Glasnik RS 87/2018</span>
               </div>
             </a>
 
-            {/* Link 2: Poverenik RS (Dynamic language URL) */}
+            {/* Link 2: Poverenik RS */}
             <a 
               href={lang === 'en' ? 'https://www.poverenik.rs/en/' : 'https://www.poverenik.rs/sr-lat/'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
                 <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_poverenik')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_poverenik_sub')}</p>
+                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_poverenik_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <ShieldCheck className="w-3 h-3 shrink-0" />
                 <span>poverenik.rs</span>
               </div>
             </a>
 
-            {/* Link 3: EUR-Lex EU GDPR (Dynamic language URL) */}
+            {/* Link 3: EUR-Lex EU GDPR */}
             <a 
               href={lang === 'sr' ? 'https://eur-lex.europa.eu/legal-content/HR/TXT/?uri=CELEX:32016R0679' : 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
                 <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_gdpr')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_gdpr_sub')}</p>
+                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_gdpr_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
                 <span>CELEX 32016R0679</span>
               </div>
             </a>
 
-            {/* Link 4: AZLP MK (Dynamic language URL) */}
+            {/* Link 4: AZLP MK */}
             <a 
               href={lang === 'en' ? 'https://azlp.mk/en' : 'https://azlp.mk'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
                 <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_azlp')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-mono">{t('leg_ref_azlp_sub')}</p>
+                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_azlp_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-mono flex items-center gap-1">
+              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <ShieldCheck className="w-3 h-3 shrink-0" />
                 <span>azlp.mk</span>
               </div>
@@ -1641,10 +1671,10 @@ export default function App() {
         </div>
 
         {/* Full Legal Documents Action Row */}
-        <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4 font-mono text-xs">
+        <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4 font-sans text-xs">
           <button 
             onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-            className="px-4 py-2.5 rounded glass-panel border border-[#14B8A6]/40 hover:border-[#14B8A6] text-white hover:text-teal-300 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+            className="px-4 py-2.5 rounded-lg glass-panel border border-[#14B8A6]/40 hover:border-[#14B8A6] text-white hover:text-teal-300 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px]"
           >
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{t('leg_action_privacy')}</span>

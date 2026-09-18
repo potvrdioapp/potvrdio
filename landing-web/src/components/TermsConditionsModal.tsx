@@ -41,7 +41,8 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
       sec6_p: "Potvrdio ne snosi odgovornost za eventualna kašnjenja ili neisporuku paketa uzrokovanu greškama kurirskih službi (Post Express, Bex, D Express, Cargo), niti za odluku krajnjeg kupca da odbije preuzimanje paketa na vratima uprkos prethodno izvršenoj Viber verifikaciji.",
 
       sec7_title: "7. Merodavno pravo i sudska nadležnost",
-      sec7_p: "Na ove Uslove primenjuje se pravo Republike Srbije. Eventualni sporovi rešavaće se mirnim putem, a u suprotnom nadležan je stvarno odgovarajući sud u Novom Sadu / Beogradu."
+      sec7_p: "Na ove Uslove primenjuje se pravo Republike Srbije. Eventualni sporovi rešavaće se mirnim putem, a u suprotnom nadležan je stvarno odgovarajući sud u Novom Sadu / Beogradu.",
+      btn_close: "Zatvori"
     },
     mk: {
       title: "Услови за Користење на SaaS Платформата",
@@ -73,7 +74,8 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
       sec6_p: "Potvrdio не сноси одговорност за доцнења на курирските служби ниту за одлуката на купувачот да го одбие пакетот на врата и покрај потврдата.",
 
       sec7_title: "7. Мердоавно право",
-      sec7_p: "За сите спорови меродавно е правото на Република Србија / Северна Македонија."
+      sec7_p: "За сите спорови меродавно е правото на Република Србија / Северна Македонија.",
+      btn_close: "Затвори"
     },
     en: {
       title: "SaaS Platform Terms & Conditions",
@@ -105,7 +107,8 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
       sec6_p: "Potvrdio shall not be liable for delivery delays caused by external courier networks (Post Express, Bex, D Express, Cargo) or buyer doorstep refusal post-verification.",
 
       sec7_title: "7. Governing Law & Jurisdiction",
-      sec7_p: "These Terms shall be governed by the laws of the Republic of Serbia. Disputes shall be resolved amicably, or submitted to the competent court in Novi Sad / Belgrade."
+      sec7_p: "These Terms shall be governed by the laws of the Republic of Serbia. Disputes shall be resolved amicably, or submitted to the competent court in Novi Sad / Belgrade.",
+      btn_close: "Close"
     }
   };
 
@@ -113,15 +116,15 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-[#0D121F] border border-[#14B8A6]/40 rounded-xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#111827] border border-slate-700/60 rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#070A13] px-4 sm:px-6 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0">
+        <div className="bg-[#0B0F19] px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0 font-sans">
           <div className="flex items-center gap-2 text-[#14B8A6]">
             <FileText className="w-5 h-5 text-teal-400 shrink-0" />
             <div>
               <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">{t.title}</h2>
-              <p className="text-[10px] text-slate-400 font-mono">{t.updated}</p>
+              <p className="text-[10px] text-slate-400 font-sans">{t.updated}</p>
             </div>
           </div>
           <button 
@@ -135,13 +138,13 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
 
         {/* Scrollable Body */}
         <div className="p-5 sm:p-7 space-y-5 overflow-y-auto touch-scroll leading-relaxed">
-          <div className="p-3.5 bg-teal-500/10 border border-teal-500/30 rounded-lg text-teal-300 text-[11px] font-mono flex items-start gap-2.5">
+          <div className="p-3.5 bg-teal-500/10 border border-teal-500/30 rounded-xl text-teal-300 text-[11px] font-sans flex items-start gap-2.5">
             <Scale className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
             <span>{t.subtitle}</span>
           </div>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec1_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec1_p1}</p>
@@ -149,14 +152,14 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec2_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec2_p}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec3_title}
             </h3>
             <ul className="space-y-1.5 text-[11px] text-slate-300">
@@ -170,7 +173,7 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec4_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec4_p1}</p>
@@ -178,21 +181,21 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec5_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec5_p}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec6_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec6_p}</p>
           </section>
 
           <section className="space-y-2 border-t border-white/10 pt-4">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec7_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec7_p}</p>
@@ -200,13 +203,13 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
         </div>
 
         {/* Footer */}
-        <div className="bg-[#070A13] px-5 py-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono shrink-0">
+        <div className="bg-[#0B0F19] px-5 py-3 border-t border-slate-800 flex items-center justify-between text-[11px] font-sans shrink-0">
           <span className="text-slate-400">Potvrdio Merchant Terms Protection</span>
           <button 
             onClick={onClose}
-            className="px-4 py-1.5 rounded bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer"
+            className="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer"
           >
-            Zatvori
+            {t.btn_close}
           </button>
         </div>
 

@@ -85,7 +85,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
       success_step1: "1. Преземете го и активирајте го WordPress приклучокот (.zip)",
       success_step2: "2. Вашиот API клуч е испратен на вашата е-пошта:",
       success_step3: "3. Поддршката за инсталација ви стои на располагање 24/7.",
-      btn_dl_zip: "Preuzmi WordPress Plugin (.zip)",
+      btn_dl_zip: "Преземи WordPress Plugin (.zip)",
       btn_close: "Заврши Регистрација"
     },
     en: {
@@ -119,13 +119,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-[#0D121F] border border-[#14B8A6]/50 rounded-xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#111827] border border-slate-700/60 rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#070A13] px-4 sm:px-5 py-3 border-b border-white/10 flex items-center justify-between shrink-0 font-mono">
+        <div className="bg-[#0B0F19] px-4 sm:px-5 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0 font-sans">
           <div className="flex items-center gap-2 text-[#14B8A6]">
             <Rocket className="w-4.5 h-4.5 text-teal-400 shrink-0" />
-            <span className="text-xs font-bold text-white tracking-tight uppercase">{t.badge}</span>
+            <span className="text-xs font-bold text-white tracking-wide uppercase">{t.badge}</span>
           </div>
           <button 
             onClick={handleResetAndClose}
@@ -145,7 +145,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 <p className="text-[11px] text-slate-400 mt-0.5">{t.subtitle}</p>
               </div>
 
-              <div className="space-y-3 font-mono">
+              <div className="space-y-3 font-sans">
                 {/* Store URL */}
                 <div>
                   <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
@@ -266,7 +266,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 )}
               </button>
 
-              <div className="text-[10px] text-slate-400 font-mono text-center flex items-center justify-center gap-1">
+              <div className="text-[10px] text-slate-400 font-sans text-center flex items-center justify-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span>{t.note_legal}</span>
               </div>
@@ -279,13 +279,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
 
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-white font-sans">{t.success_title}</h3>
-                <p className="text-xs text-emerald-300 mt-1 font-mono">{t.success_sub}</p>
+                <p className="text-xs text-emerald-300 mt-1 font-sans">{t.success_sub}</p>
               </div>
 
-              <div className="p-4 bg-[#070A13] border border-white/10 rounded-lg text-left text-xs font-mono space-y-2 text-slate-300">
+              <div className="p-4 bg-[#0B0F19] border border-slate-800 rounded-xl text-left text-xs font-sans space-y-2 text-slate-300">
                 <p className="text-slate-200 font-bold">{t.success_step1}</p>
                 <p className="text-slate-400">
-                  {t.success_step2} <span className="text-[#14B8A6] underline">{email || 'petar@mojaradnja.rs'}</span>
+                  {t.success_step2} <span className="text-[#14B8A6] underline font-medium">{email || 'petar@mojaradnja.rs'}</span>
                 </p>
                 <p className="text-slate-400">{t.success_step3}</p>
               </div>
@@ -301,7 +301,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
 
                 <button 
                   onClick={handleResetAndClose}
-                  className="w-full bg-white/5 hover:bg-white/10 text-slate-300 font-mono py-2 rounded text-xs transition cursor-pointer"
+                  className="w-full bg-white/5 hover:bg-white/10 text-slate-300 font-sans font-medium py-2.5 rounded-lg text-xs transition cursor-pointer"
                 >
                   {t.btn_close}
                 </button>

@@ -38,7 +38,8 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
       sec5_p2: "Podaci se ne prodaju niti dele sa trećim licima. Jedini eksterni obrađivači su zvanični Viber Business API provajderi i telekom operateri isključivo u svrhu isporuke verifikacione poruke.",
 
       sec6_title: "6. Prava lica na koje se podaci odnose",
-      sec6_p: "Kupac u svakom trenutku ima pravo na uvid u svoje podatke, ispravku neaccurate adrese, brisanje pre isteka roka od 30 dana i podnošenje prigovora Nadzornom organu (Poverenik za informacije od javnog značaja i zaštitu podataka o ličnosti RS). Za zahteve pisati na: privacy@potvrdio.online."
+      sec6_p: "Kupac u svakom trenutku ima pravo na uvid u svoje podatke, ispravku neaccurate adrese, brisanje pre isteka roka od 30 dana i podnošenje prigovora Nadzornom organu (Poverenik za informacije od javnog značaja i zaštitu podataka o ličnosti RS). Za zahteve pisati na: privacy@potvrdio.online.",
+      btn_close: "Zatvori"
     },
     mk: {
       title: "Политика за Приватност и Заштита на Податоци",
@@ -67,7 +68,8 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
       sec5_p2: "Податоците не се продаваат ниту споделуваат. Единствени обработувачи се овластените Viber Business API провајдери за достава на пораката.",
 
       sec6_title: "6. Права на купувачите",
-      sec6_p: "Купувачот има право на увид, корекција и бришење на податоците. За сите барања обратете се на: privacy@potvrdio.online."
+      sec6_p: "Купувачот има право на увид, корекција и бришење на податоците. За сите барања обратете се на: privacy@potvrdio.online.",
+      btn_close: "Затвори"
     },
     en: {
       title: "Privacy & Data Protection Policy",
@@ -96,7 +98,8 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
       sec5_p2: "Data is never sold or shared with advertising networks. The only third-party processors are authorized Viber Business API aggregators and SMS gateways strictly for message delivery.",
 
       sec6_title: "6. Data Subject Rights & Contact",
-      sec6_p: "Buyers reserve the right to access, rectify, or request early erasure of their data prior to the 30-day purge, or lodge a complaint with the National Data Protection Commissioner. For inquiries: privacy@potvrdio.online."
+      sec6_p: "Buyers reserve the right to access, rectify, or request early erasure of their data prior to the 30-day purge, or lodge a complaint with the National Data Protection Commissioner. For inquiries: privacy@potvrdio.online.",
+      btn_close: "Close"
     }
   };
 
@@ -104,15 +107,15 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-[#0D121F] border border-[#14B8A6]/40 rounded-xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-[#111827] border border-slate-700/60 rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#070A13] px-4 sm:px-6 py-3.5 border-b border-white/10 flex items-center justify-between shrink-0">
+        <div className="bg-[#0B0F19] px-4 sm:px-6 py-3.5 border-b border-slate-800 flex items-center justify-between shrink-0 font-sans">
           <div className="flex items-center gap-2 text-[#14B8A6]">
             <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0" />
             <div>
               <h2 className="text-sm sm:text-base font-bold text-white tracking-tight">{t.title}</h2>
-              <p className="text-[10px] text-slate-400 font-mono">{t.updated}</p>
+              <p className="text-[10px] text-slate-400 font-sans">{t.updated}</p>
             </div>
           </div>
           <button 
@@ -126,13 +129,13 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
 
         {/* Scrollable Body */}
         <div className="p-5 sm:p-7 space-y-5 overflow-y-auto touch-scroll leading-relaxed">
-          <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-300 text-[11px] font-mono flex items-start gap-2.5">
+          <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-300 text-[11px] font-sans flex items-start gap-2.5">
             <Lock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <span>{t.subtitle}</span>
           </div>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec1_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec1_p1}</p>
@@ -140,7 +143,7 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec2_title}
             </h3>
             <ul className="space-y-1.5 text-[11px] text-slate-300">
@@ -154,21 +157,21 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec3_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec3_p}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec4_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec4_p}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec5_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec5_p1}</p>
@@ -176,7 +179,7 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
           </section>
 
           <section className="space-y-2 border-t border-white/10 pt-4">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
               {t.sec6_title}
             </h3>
             <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec6_p}</p>
@@ -184,13 +187,13 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({ isOpen, 
         </div>
 
         {/* Footer */}
-        <div className="bg-[#070A13] px-5 py-3 border-t border-white/10 flex items-center justify-between text-[11px] font-mono shrink-0">
+        <div className="bg-[#0B0F19] px-5 py-3 border-t border-slate-800 flex items-center justify-between text-[11px] font-sans shrink-0">
           <span className="text-slate-400">Potvrdio Legal & Compliance Guard</span>
           <button 
             onClick={onClose}
-            className="px-4 py-1.5 rounded bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer"
+            className="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer"
           >
-            Zatvori
+            {t.btn_close}
           </button>
         </div>
 

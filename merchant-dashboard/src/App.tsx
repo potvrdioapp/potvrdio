@@ -30,10 +30,10 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#070a12] text-slate-100 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-[#0B0F19] text-slate-100 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Sidebar Navigation */}
       <div className="flex">
-        <aside className="w-64 bg-[#0d121f] border-r border-slate-800/80 min-h-screen p-5 flex flex-col justify-between hidden md:flex">
+        <aside className="w-64 bg-[#111827] border-r border-slate-800/80 min-h-screen p-5 flex flex-col justify-between hidden md:flex">
           <div className="space-y-6">
             <div className="px-2">
               <PotvrdioLogo variant="horizontal" mode="dark" />
@@ -78,13 +78,13 @@ export default function App() {
 
           <div className="glass-card rounded-2xl p-4 border border-teal-500/20 space-y-3">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">MoR Ödeme Modu</span>
+              <span className="text-slate-400">MoR Model Plaćanja</span>
               <span className="text-emerald-400 font-bold flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" /> Paddle Active
               </span>
             </div>
             <div className="text-xs text-slate-300 font-medium">
-              Sırbistan vergi ve fatura yükü olmadan %100 legal MoR altyapısı.
+              100% legalna MoR infrastruktura bez poreza i administrativnih tereta.
             </div>
           </div>
         </aside>
@@ -105,7 +105,7 @@ export default function App() {
               <div className="bg-slate-900 border border-slate-700/80 px-4 py-2 rounded-xl flex items-center gap-3">
                 <Zap className="w-4 h-4 text-teal-400 animate-pulse" />
                 <div>
-                  <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Kredit Havuzu</div>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Bazen Kredita</div>
                   <div className="text-sm font-bold text-white">{credits} <span className="text-slate-400 text-xs">Preostalo</span></div>
                 </div>
               </div>
@@ -130,13 +130,13 @@ export default function App() {
                     <span>Potvrđene COD Porudžbine</span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   </div>
-                  <div className="text-2xl font-extrabold text-white">412 <span className="text-xs text-emerald-400 font-semibold">+18% ovg meseca</span></div>
+                  <div className="text-2xl font-extrabold text-white">412 <span className="text-xs text-emerald-400 font-semibold">+18% ovog meseca</span></div>
                   <div className="text-[11px] text-slate-400">Uspešno verifikovano putem Viber-a</div>
                 </div>
 
                 <div className="glass-card rounded-2xl p-5 border border-slate-800 space-y-2">
                   <div className="flex items-center justify-between text-slate-400 text-xs">
-                    <span>Stopa Uspesne Dostave</span>
+                    <span>Stopa Uspešne Dostave</span>
                     <TrendingUp className="w-4 h-4 text-teal-400" />
                   </div>
                   <div className="text-2xl font-extrabold text-white">96.4%</div>
@@ -202,7 +202,6 @@ export default function App() {
                                 <CheckCircle2 className="w-3 h-3" /> Potvrđeno ({log.channel})
                               </span>
                             )}
-                            {/* Info Status EDITED_ADDRESS uses Blue (#3B82F6) per v1.1.0 Design System */}
                             {log.status === 'EDITED_ADDRESS' && (
                               <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
                                 <Sparkles className="w-3 h-3" /> Izmenjena Adresa
@@ -228,7 +227,7 @@ export default function App() {
           {activeTab === 'credits' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-white">Ortak Viber Mesaj Kredi Havuzu</h2>
+                <h2 className="text-xl font-bold text-white">Zajednički Bazen Viber Kredita</h2>
                 <p className="text-xs text-slate-400 mt-1">Bez mesečne provizije, dopunite samo onoliko kredita koliko vam je potrebno za COD verifikaciju.</p>
               </div>
 
@@ -253,13 +252,13 @@ export default function App() {
                 {/* Growth Package */}
                 <div className="glass-card rounded-2xl p-6 border-2 border-teal-500/60 bg-teal-950/20 flex flex-col justify-between relative shadow-xl shadow-teal-500/10">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal-600 text-white text-[10px] font-extrabold uppercase px-3 py-0.5 rounded-full">
-                    NAJPOPULARNIJE (%63 MARŽA)
+                    NAJPOPULARNIJE
                   </div>
                   <div className="space-y-3 pt-2">
                     <div className="text-xs font-semibold text-teal-300 uppercase tracking-wider">Growth Paket</div>
                     <div className="text-3xl font-black text-white">€45</div>
                     <div className="text-sm font-bold text-teal-400">1,875 Viber Kredita</div>
-                    <p className="text-xs text-slate-300 leading-relaxed">€0.024 / poruci. Za srednje e-trgovce u Srbiji i regionu.</p>
+                    <p className="text-xs text-slate-300 leading-relaxed">€0.024 / poruci. Za srednje e-trgovce u Srbij i regionu.</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('growth', 45, 1875)}
@@ -313,9 +312,9 @@ export default function App() {
               <div>
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
                   <Key className="w-5 h-5 text-teal-400" />
-                  WooCommerce Eklentisi API Ključevi
+                  WooCommerce Plugin API Ključevi
                 </h2>
-                <p className="text-xs text-slate-400 mt-1">Unesite ove ključeve u WordPress admin panelu eklentisi (Potvrdio Viber COD Settings).</p>
+                <p className="text-xs text-slate-400 mt-1">Unesite ove ključeve u WordPress admin panelu dodatka (Potvrdio Viber COD Settings).</p>
               </div>
 
               <div className="space-y-4">
@@ -330,7 +329,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">API Key (Mağaza Kimliği)</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">API Key (ID Prodavnice)</label>
                   <input
                     type="text"
                     readOnly
@@ -340,7 +339,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">API Secret (HMAC Imza Anahtarı)</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">API Secret (HMAC Potpis Key)</label>
                   <input
                     type="password"
                     readOnly
