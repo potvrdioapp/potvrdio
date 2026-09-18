@@ -7,9 +7,10 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" href="/favicon-192.png" />
+    <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
         (function(m,e,t,r,i,k,a){
@@ -24,19 +25,20 @@
     <!-- Zero-flash theme initialization -->
     <script>
       (function() {
-        var savedTheme = localStorage.getItem('potvrdio_theme');
-        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
-        if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
-          document.documentElement.classList.add('light');
-          document.documentElement.classList.remove('dark');
-        } else {
-          document.documentElement.classList.add('dark');
-          document.documentElement.classList.remove('light');
-        }
+        try {
+          var saved = localStorage.getItem('potvrdio_theme');
+          if (saved === 'light') {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light');
+          } else {
+            document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light');
+          }
+        } catch(e) {}
       })();
     </script>
   </head>
-  <body class="bg-canvas text-theme-secondary font-['Plus_Jakarta_Sans',sans-serif] antialiased">
+  <body class="bg-canvas text-theme-secondary font-sans antialiased">
     <noscript><div><img src="https://mc.yandex.ru/watch/112751737" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

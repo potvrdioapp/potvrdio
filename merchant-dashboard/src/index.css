@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* =========================================================================
-   SEMANTIC CSS TOKEN ARCHITECTURE (MERCHANT DASHBOARD)
+   SEMANTIC CSS TOKEN ARCHITECTURE (DUAL THEME SYSTEM)
    ========================================================================= */
 :root {
   /* Canvas & Base Layout */
@@ -14,16 +14,26 @@
   --bg-sidebar: #FFFFFF;
 
   /* Borders & Dividers */
-  --border-default: #E2E8F0;     /* Slate-200 */
-  --border-subtle: #F1F5F9;      /* Slate-100 */
+  --border-default: #E2E8F0;     /* Slate-200 standard border */
+  --border-subtle: #F1F5F9;      /* Slate-100 subtle divider */
+  --border-emphasis: #CBD5E1;    /* Slate-300 strong border */
 
   /* Typography */
-  --text-primary: #0F172A;       /* Slate-900 */
-  --text-secondary: #334155;     /* Slate-700 */
-  --text-muted: #64748B;         /* Slate-500 */
+  --text-primary: #0F172A;       /* Deep slate-900 for headings & bold numbers */
+  --text-secondary: #334155;     /* Slate-700 for body copy & paragraphs */
+  --text-muted: #64748B;         /* Slate-500 for secondary descriptions */
+  --text-subtle: #94A3B8;        /* Slate-400 for meta labels */
+
+  /* Brand Accents */
+  --color-brand-primary: #0D9488;/* Teal-600 */
+  --color-brand-accent: #059669; /* Emerald-600 */
+  --badge-emerald-bg: #ECFDF5;
+  --badge-emerald-text: #065F46;
+  --badge-emerald-border: #A7F3D0;
 
   /* Shadows */
   --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  --shadow-elevated: 0 20px 40px -15px rgba(15, 23, 42, 0.08);
 
   /* Scrollbar */
   --scrollbar-track: #F1F5F9;
@@ -35,20 +45,30 @@
   --bg-canvas: #0B0F19;          /* Deep obsidian / midnight navy */
   --bg-surface: #111827;         /* Slate-900 surface */
   --bg-surface-subtle: #0D121F;  /* Dark subtle container / input background */
-  --bg-header: rgba(13, 18, 31, 0.95);
+  --bg-header: rgba(11, 15, 25, 0.95);
   --bg-sidebar: #111827;
 
   /* Borders & Dividers */
   --border-default: rgba(255, 255, 255, 0.10);
   --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-emphasis: rgba(255, 255, 255, 0.20);
 
   /* Typography */
-  --text-primary: #F8FAFC;       /* Slate-50 */
-  --text-secondary: #CBD5E1;     /* Slate-300 */
-  --text-muted: #94A3B8;         /* Slate-400 */
+  --text-primary: #F8FAFC;       /* Slate-50 luminous headings */
+  --text-secondary: #CBD5E1;     /* Slate-300 crisp body copy */
+  --text-muted: #94A3B8;         /* Slate-400 readable descriptions */
+  --text-subtle: #64748B;        /* Slate-500 muted labels */
+
+  /* Brand Accents */
+  --color-brand-primary: #14B8A6;/* Teal-500 */
+  --color-brand-accent: #10B981; /* Emerald-500 */
+  --badge-emerald-bg: rgba(16, 185, 129, 0.15);
+  --badge-emerald-text: #34D399;
+  --badge-emerald-border: rgba(16, 185, 129, 0.30);
 
   /* Shadows */
   --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.45);
+  --shadow-elevated: 0 20px 40px -15px rgba(0, 0, 0, 0.65);
 
   /* Scrollbar */
   --scrollbar-track: #0B0F19;
@@ -56,6 +76,7 @@
 }
 
 @layer utilities {
+  /* Semantic Layout Utilities */
   .bg-canvas {
     background-color: var(--bg-canvas);
   }
@@ -72,6 +93,14 @@
     border-color: var(--border-default);
   }
 
+  .border-theme-subtle {
+    border-color: var(--border-subtle);
+  }
+
+  .border-theme-emphasis {
+    border-color: var(--border-emphasis);
+  }
+
   .text-theme-primary {
     color: var(--text-primary);
   }
@@ -84,6 +113,20 @@
     color: var(--text-muted);
   }
 
+  .text-theme-subtle {
+    color: var(--text-subtle);
+  }
+
+  /* SaaS Background Pattern */
+  .saas-bg {
+    background-color: var(--bg-canvas);
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(20, 184, 166, 0.07) 0%, transparent 60%),
+      radial-gradient(circle at 85% 30%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+  }
+
+  /* Universal Glass Panel Component */
+  .glass-panel,
   .glass-card {
     background-color: var(--bg-surface);
     backdrop-filter: blur(16px);
@@ -91,7 +134,99 @@
     border: 1px solid var(--border-default);
     box-shadow: var(--shadow-card);
     color: var(--text-secondary);
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Chromatic Color Wave & Shimmer Sweep Animations for Main CTAs */
+  @keyframes color-wave {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes shimmer-sweep {
+    0% {
+      transform: translateX(-130%) skewX(-20deg);
+    }
+    100% {
+      transform: translateX(260%) skewX(-20deg);
+    }
+  }
+
+  /* Call-To-Action Button with Dynamic Color Wave on Hover */
+  .btn-brand-cta {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(115deg, #0D9488 0%, #14B8A6 25%, #059669 50%, #06B6D4 75%, #0D9488 100%);
+    background-size: 250% 100%;
+    background-position: 0% 50%;
+    color: #FFFFFF !important;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    touch-action: manipulation;
+  }
+
+  .btn-brand-cta::after,
+  .btn-select-wave::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: translateX(-130%) skewX(-20deg);
+    pointer-events: none;
+  }
+  
+  .btn-brand-cta:hover {
+    animation: color-wave 2.2s ease infinite;
+    transform: translateY(-1.5px);
+    box-shadow: 0 10px 25px -4px rgba(20, 184, 166, 0.45);
+  }
+
+  .btn-brand-cta:hover::after,
+  .btn-select-wave:hover::after {
+    animation: shimmer-sweep 1.5s infinite ease-in-out;
+  }
+
+  .btn-brand-cta:active,
+  .btn-select-wave:active {
+    transform: translateY(0);
+  }
+
+  /* Color wave for action / select buttons */
+  .btn-select-wave {
+    position: relative;
+    overflow: hidden;
+    background-size: 250% 100%;
+    background-position: 0% 50%;
+    transition: all 0.25s ease;
+  }
+
+  .btn-select-wave:hover {
+    background: linear-gradient(115deg, #0D9488 0%, #14B8A6 25%, #059669 50%, #06B6D4 75%, #0D9488 100%);
+    background-size: 250% 100%;
+    animation: color-wave 2.2s ease infinite;
+    color: #FFFFFF !important;
+    border-color: transparent !important;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -3px rgba(20, 184, 166, 0.4);
+  }
+
+  /* Thermal Courier Label */
+  .thermal-label {
+    background-color: #FFFFFF !important;
+    color: #0F172A !important;
+    font-family: 'JetBrains Mono', monospace;
+    border: 1px solid #CBD5E1 !important;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12) !important;
   }
 }
 
@@ -106,6 +241,7 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

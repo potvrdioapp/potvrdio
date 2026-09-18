@@ -54,7 +54,7 @@ export const PotvrdioLogo: React.FC<PotvrdioLogoProps> = ({
       </div>
       <div className="flex items-baseline">
         <span className={`font-extrabold text-lg tracking-tight ${isDark ? 'text-white' : 'text-[#361F6F]'}`}>
-          Potvrdio
+          potvrdio
         </span>
         {showSuffix && (
           <span className="font-semibold text-sm text-[#22AF75]">
