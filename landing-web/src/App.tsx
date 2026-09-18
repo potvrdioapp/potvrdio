@@ -917,8 +917,8 @@ export default function App() {
             <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-5">
               <div className="inline-flex items-center gap-2 border border-theme bg-surface-subtle px-3 py-1 rounded-full text-xs text-theme-secondary w-fit max-w-full flex-wrap shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse shrink-0"></span>
-                <span className="text-white font-semibold">{t('hero_tag')}</span>
-                <span className="text-white/20">•</span>
+                <span className="text-theme-primary font-semibold">{t('hero_tag')}</span>
+                <span className="text-theme-muted/40">•</span>
                 <span className="text-emerald-400 font-medium">{t('hero_no_sub')}</span>
               </div>
 
@@ -951,19 +951,19 @@ export default function App() {
               {/* Stats */}
               <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-theme mt-2 sm:mt-3 font-sans">
                 <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
-                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_open_rate')}</div>
-                  <div className="text-base sm:text-2xl font-bold text-white tracking-tight">89.6%</div>
+                  <div className="text-[10px] sm:text-xs text-theme-muted mb-0.5 sm:mb-1 font-medium">{t('stat_open_rate')}</div>
+                  <div className="text-base sm:text-2xl font-bold text-theme-primary tracking-tight">89.6%</div>
                   <div className="text-[9px] sm:text-[10px] text-emerald-400 mt-0.5 truncate font-medium">{t('stat_open_sub')}</div>
                 </div>
                 <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
-                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_hold_cost')}</div>
+                  <div className="text-[10px] sm:text-xs text-theme-muted mb-0.5 sm:mb-1 font-medium">{t('stat_hold_cost')}</div>
                   <div className="text-base sm:text-2xl font-bold text-amber-400 tracking-tight">{t('stat_hold_val')}</div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate font-medium">{t('stat_hold_sub')}</div>
+                  <div className="text-[9px] sm:text-[10px] text-theme-muted mt-0.5 truncate font-medium">{t('stat_hold_sub')}</div>
                 </div>
                 <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
-                  <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_recovery')}</div>
+                  <div className="text-[10px] sm:text-xs text-theme-muted mb-0.5 sm:mb-1 font-medium">{t('stat_recovery')}</div>
                   <div className="text-base sm:text-2xl font-bold text-emerald-400 tracking-tight">-83%</div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 truncate font-medium">{t('stat_recovery_sub')}</div>
+                  <div className="text-[9px] sm:text-[10px] text-theme-muted mt-0.5 truncate font-medium">{t('stat_recovery_sub')}</div>
                 </div>
               </div>
             </div>
@@ -994,7 +994,7 @@ export default function App() {
                 </div>
                 <div className="flex items-center justify-between pt-2 text-[11px]">
                   <span className="text-slate-400">{t('dash_courier')}</span>
-                  <span className="text-white font-medium">{t('dash_courier_val')}</span>
+                  <span className="text-theme-primary font-medium">{t('dash_courier_val')}</span>
                 </div>
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-slate-400">{t('dash_risk_label')}</span>
@@ -1049,7 +1049,7 @@ export default function App() {
               <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario A</span>
               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_common_tag')}</span>
             </div>
-            <div className="font-bold text-white text-sm mb-1">{t('scen1_title')}</div>
+            <div className="font-bold text-theme-primary text-sm mb-1">{t('scen1_title')}</div>
             <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen1_desc')}</div>
           </button>
 
@@ -1061,7 +1061,7 @@ export default function App() {
               <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario B</span>
               <span className="text-[10px] font-semibold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">{t('scen_saved_tag')}</span>
             </div>
-            <div className="font-bold text-white text-sm mb-1">{t('scen2_title')}</div>
+            <div className="font-bold text-theme-primary text-sm mb-1">{t('scen2_title')}</div>
             <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen2_desc')}</div>
           </button>
 
@@ -1073,7 +1073,7 @@ export default function App() {
               <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario C</span>
               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_fast_tag')}</span>
             </div>
-            <div className="font-bold text-white text-sm mb-1">{t('scen3_title')}</div>
+            <div className="font-bold text-theme-primary text-sm mb-1">{t('scen3_title')}</div>
             <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen3_desc')}</div>
           </button>
         </div>
@@ -1185,7 +1185,7 @@ export default function App() {
               <div className="flex items-center justify-between pb-2 border-b border-white/10 text-slate-400">
                 <span className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-                  <span className="text-white font-bold">{t('term_title')}</span>
+                  <span className="text-theme-primary font-bold">{t('term_title')}</span>
                 </span>
                 <span className="text-[10px] sm:text-[11px] text-slate-400">HMAC-SHA256 SIGNED</span>
               </div>
@@ -1273,7 +1273,7 @@ export default function App() {
       <section id="manifest" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('man_tag')}</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('man_title')}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('man_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">{t('man_p')}</p>
         </div>
 
@@ -1283,8 +1283,8 @@ export default function App() {
             <div className="absolute top-3 right-3 text-[10px] font-semibold bg-red-500/10 text-red-500 px-2.5 py-0.5 rounded-full border border-red-500/20">
               {t('man_badge_bad')}
             </div>
-            <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <XCircle className="w-4 h-4 text-red-400 shrink-0" />
+            <h3 className="text-xs sm:text-sm font-bold text-theme-primary mb-4 flex items-center gap-2">
+              <XCircle className="w-4 h-4 text-red-500 shrink-0" />
               <span>{t('man_bad_title')}</span>
             </h3>
 
@@ -1320,8 +1320,8 @@ export default function App() {
             <div className="absolute top-3 right-3 text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
               {t('man_badge_good')}
             </div>
-            <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <h3 className="text-xs sm:text-sm font-bold text-theme-primary mb-4 flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>{t('man_good_title')}</span>
             </h3>
 
@@ -1358,7 +1358,7 @@ export default function App() {
       <section id="kalkulator" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('calc_tag')}</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('calc_title')}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('calc_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2">{t('calc_desc')}</p>
         </div>
 
@@ -1366,7 +1366,7 @@ export default function App() {
           <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             <div>
               <div className="flex justify-between items-center text-xs font-sans mb-2">
-                <span className="text-white font-semibold">{t('calc_label_orders')}</span>
+                <span className="text-theme-primary font-semibold">{t('calc_label_orders')}</span>
                 <span className="text-[#14B8A6] font-bold text-sm bg-[#0B0F19] px-3 py-1 rounded-md border border-slate-800">
                   {ordersCount} {lang === 'sr' ? 'narudžbina' : 'orders'}
                 </span>
@@ -1389,7 +1389,7 @@ export default function App() {
 
             <div>
               <div className="flex justify-between items-center text-xs font-sans mb-2">
-                <span className="text-white font-semibold">{t('calc_label_rate')}</span>
+                <span className="text-theme-primary font-semibold">{t('calc_label_rate')}</span>
                 <span className="text-red-400 font-bold text-sm bg-[#0B0F19] px-3 py-1 rounded-md border border-slate-800">
                   {failureRate}%
                 </span>
@@ -1412,7 +1412,7 @@ export default function App() {
 
             <div className="p-3 bg-[#0B0F19] rounded-lg border border-slate-800 text-xs font-sans flex flex-wrap justify-between items-center gap-2 text-slate-400">
               <span>{t('calc_freight_note')}</span>
-              <span className="text-white font-bold">{t('calc_freight_val')}</span>
+              <span className="text-theme-primary font-bold">{t('calc_freight_val')}</span>
             </div>
           </div>
 
@@ -1448,14 +1448,14 @@ export default function App() {
       <section id="cenovnik" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('price_tag')}</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('price_title')}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('price_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl">{t('price_desc')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
           <div className="lg:col-span-8 glass-panel rounded-xl overflow-hidden border border-theme">
             <div className="px-4 sm:px-5 py-3.5 border-b border-white/10 bg-[#131C2E] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-sans">
-              <span className="font-bold text-white">{t('price_prepaid_header')}</span>
+              <span className="font-bold text-theme-primary">{t('price_prepaid_header')}</span>
               <span className="text-slate-400 text-[11px]">{t('price_invoice_sub')}</span>
             </div>
 
@@ -1522,7 +1522,7 @@ export default function App() {
             <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-semibold">{t('pro_tag')}</div>
             <h3 className="text-base font-bold text-theme-primary font-sans">{t('price_pro_title')}</h3>
             <div className="mt-3 flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-white font-sans">29 €</span>
+              <span className="text-3xl font-bold text-theme-primary font-sans">29 €</span>
               <span className="text-slate-400 text-xs">{t('price_per_month')}</span>
             </div>
             <p className="text-slate-400 text-[11px] mt-2 leading-relaxed">
@@ -1559,7 +1559,7 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
           <div className="lg:col-span-6 space-y-4">
             <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('leg_title')}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('leg_title')}</h2>
             <p className="text-xs text-slate-400 leading-relaxed">{t('leg_p')}</p>
 
             <div className="space-y-3 font-sans text-xs pt-2">
@@ -1845,7 +1845,7 @@ export default function App() {
           <div className="w-12 h-12 rounded bg-[#14B8A6]/10 border border-[#14B8A6]/30 text-[#14B8A6] flex items-center justify-center mx-auto mb-4">
             <Download className="w-6 h-6" />
           </div>
-          <h2 className="text-xl sm:text-3xl font-bold text-white tracking-tight">{t('dl_title')}</h2>
+          <h2 className="text-xl sm:text-3xl font-bold text-theme-primary tracking-tight">{t('dl_title')}</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-3 max-w-md mx-auto">{t('dl_desc')}</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
@@ -1923,7 +1923,7 @@ export default function App() {
                 <div className="text-[10px] text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
                   {t('modal_badge')}
                 </div>
-                <h3 className="text-base font-bold text-white font-sans">{t('modal_title')}</h3>
+                <h3 className="text-base font-bold text-theme-primary font-sans">{t('modal_title')}</h3>
                 <p className="text-[11px] text-slate-400 mt-1">{t('modal_subtitle')}</p>
               </div>
 

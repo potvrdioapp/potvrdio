@@ -21,9 +21,22 @@
 
         ym(112751737, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
     </script>
-    <!-- /Yandex.Metrika counter -->
+    <!-- Zero-flash theme initialization -->
+    <script>
+      (function() {
+        var savedTheme = localStorage.getItem('potvrdio_theme');
+        var prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+        if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+          document.documentElement.classList.add('light');
+          document.documentElement.classList.remove('dark');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        }
+      })();
+    </script>
   </head>
-  <body class="bg-[#0b0f17] text-slate-100 font-['Plus_Jakarta_Sans',sans-serif] antialiased">
+  <body class="bg-canvas text-theme-secondary font-['Plus_Jakarta_Sans',sans-serif] antialiased">
     <noscript><div><img src="https://mc.yandex.ru/watch/112751737" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

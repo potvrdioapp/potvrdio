@@ -71,7 +71,7 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] light:bg-[#F8FAFC] text-slate-100 light:text-slate-800 font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
+    <div className="min-h-screen bg-canvas text-theme-secondary font-['Plus_Jakarta_Sans',sans-serif] transition-colors duration-200">
       {/* Sidebar Navigation */}
       <div className="flex">
         <aside className="w-64 bg-[#111827] light:bg-white border-r border-slate-800/80 light:border-slate-200 min-h-screen p-5 flex flex-col justify-between hidden md:flex transition-colors">
@@ -180,58 +180,58 @@ export default function App() {
             <div className="space-y-8">
               {/* Stats Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="glass-card rounded-2xl p-5 border border-slate-800 space-y-2">
-                  <div className="flex items-center justify-between text-slate-400 text-xs">
+                <div className="glass-card rounded-2xl p-5 border border-theme space-y-2">
+                  <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>Potvrđene COD Porudžbine</span>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-white">412 <span className="text-xs text-emerald-400 font-semibold">+18% ovog meseca</span></div>
-                  <div className="text-[11px] text-slate-400">Uspešno verifikovano putem Viber-a</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">412 <span className="text-xs text-emerald-500 font-semibold">+18% ovog meseca</span></div>
+                  <div className="text-[11px] text-theme-muted">Uspešno verifikovano putem Viber-a</div>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 border border-slate-800 space-y-2">
-                  <div className="flex items-center justify-between text-slate-400 text-xs">
+                <div className="glass-card rounded-2xl p-5 border border-theme space-y-2">
+                  <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>Stopa Uspešne Dostave</span>
-                    <TrendingUp className="w-4 h-4 text-teal-400" />
+                    <TrendingUp className="w-4 h-4 text-teal-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-white">96.4%</div>
-                  <div className="text-[11px] text-slate-400">Pre Potvrdio: 74% (Kargo povrati spali na 3.6%)</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">96.4%</div>
+                  <div className="text-[11px] text-theme-muted">Pre Potvrdio: 74% (Kargo povrati spali na 3.6%)</div>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 border border-slate-800 space-y-2">
-                  <div className="flex items-center justify-between text-slate-400 text-xs">
+                <div className="glass-card rounded-2xl p-5 border border-theme space-y-2">
+                  <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>Ušteđeni Kargo Troškovi</span>
-                    <Layers className="w-4 h-4 text-indigo-400" />
+                    <Layers className="w-4 h-4 text-indigo-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-white">€1,240</div>
-                  <div className="text-[11px] text-slate-400">Sprečene povratne poštarine (Post Express)</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">€1,240</div>
+                  <div className="text-[11px] text-theme-muted">Sprečene povratne poštarine (Post Express)</div>
                 </div>
 
-                <div className="glass-card rounded-2xl p-5 border border-slate-800 space-y-2">
-                  <div className="flex items-center justify-between text-slate-400 text-xs">
+                <div className="glass-card rounded-2xl p-5 border border-theme space-y-2">
+                  <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>Viber Otvaranje (Open Rate)</span>
-                    <MessageSquare className="w-4 h-4 text-pink-400" />
+                    <MessageSquare className="w-4 h-4 text-pink-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-white">93.8%</div>
-                  <div className="text-[11px] text-slate-400">Prosečno vreme potvrde: 2.4 minuta</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">93.8%</div>
+                  <div className="text-[11px] text-theme-muted">Prosečno vreme potvrde: 2.4 minuta</div>
                 </div>
               </div>
 
               {/* Logs Table Section */}
-              <div className="glass-card rounded-2xl p-6 border border-slate-800 space-y-4">
+              <div className="glass-card rounded-2xl p-6 border border-theme space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-white">Poslednje Verifikacije Pošiljki</h3>
-                    <p className="text-xs text-slate-400">Real-time praćenje Viber poruka i potvrdio.online izmena</p>
+                    <h3 className="text-lg font-bold text-theme-primary">Poslednje Verifikacije Pošiljki</h3>
+                    <p className="text-xs text-theme-muted">Real-time praćenje Viber poruka i potvrdio.online izmena</p>
                   </div>
-                  <button className="text-xs text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1">
-                    <RefreshCw className="w-3.5 h-3.5" /> Osveži Logove
-                  </button>
+                  <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full">
+                    Aktivno Praćenje
+                  </span>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs text-slate-300">
-                    <thead className="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <table className="w-full text-left text-xs text-theme-secondary">
+                    <thead className="bg-surface-subtle text-theme-muted uppercase tracking-wider text-[10px] border-b border-theme">
                       <tr>
                         <th className="py-3 px-4 rounded-l-xl">Porudžbina</th>
                         <th className="py-3 px-4">Kupac & Telefon</th>
@@ -241,34 +241,34 @@ export default function App() {
                         <th className="py-3 px-4 rounded-r-xl">Vreme</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/60">
+                    <tbody className="divide-y divide-theme">
                       {logs.map((log, index) => (
-                        <tr key={index} className="hover:bg-slate-800/30 transition-colors">
-                          <td className="py-3.5 px-4 font-bold text-white">{log.id}</td>
+                        <tr key={index} className="hover:bg-surface-subtle/50 transition-colors">
+                          <td className="py-3.5 px-4 font-bold text-theme-primary">{log.id}</td>
                           <td className="py-3.5 px-4">
-                            <div className="font-medium text-slate-200">{log.customer}</div>
-                            <div className="text-[10px] text-slate-400">{log.phone}</div>
+                            <div className="font-bold text-theme-primary">{log.customer}</div>
+                            <div className="text-[10px] text-theme-muted">{log.phone}</div>
                           </td>
-                          <td className="py-3.5 px-4">{log.city}</td>
-                          <td className="py-3.5 px-4 font-semibold text-teal-300">{log.amount}</td>
+                          <td className="py-3.5 px-4 text-theme-secondary">{log.city}</td>
+                          <td className="py-3.5 px-4 font-bold text-teal-600 dark:text-teal-400">{log.amount}</td>
                           <td className="py-3.5 px-4">
                             {log.status === 'APPROVED' && (
-                              <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
+                              <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
                                 <CheckCircle2 className="w-3 h-3" /> Potvrđeno ({log.channel})
                               </span>
                             )}
                             {log.status === 'EDITED_ADDRESS' && (
-                              <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
+                              <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
                                 <Sparkles className="w-3 h-3" /> Izmenjena Adresa
                               </span>
                             )}
                             {log.status === 'SMS_FALLBACK' && (
-                              <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
+                              <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
                                 <AlertTriangle className="w-3 h-3" /> SMS Fallback
                               </span>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 text-slate-400">{log.time}</td>
+                          <td className="py-3.5 px-4 text-theme-muted">{log.time}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -282,38 +282,38 @@ export default function App() {
           {activeTab === 'credits' && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-bold text-white">Zajednički Bazen Viber Kredita</h2>
-                <p className="text-xs text-slate-400 mt-1">Bez mesečne provizije, dopunite samo onoliko kredita koliko vam je potrebno za COD verifikaciju.</p>
+                <h2 className="text-xl font-bold text-theme-primary">Zajednički Bazen Viber Kredita</h2>
+                <p className="text-xs text-theme-muted mt-1">Bez mesečne provizije, dopunite samo onoliko kredita koliko vam je potrebno za COD verifikaciju.</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Starter Package */}
-                <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-all">
+                <div className="glass-card rounded-2xl p-6 border border-theme flex flex-col justify-between hover:border-[#14B8A6]/40 transition-all">
                   <div className="space-y-3">
-                    <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Starter Paket</div>
-                    <div className="text-3xl font-black text-white">€15</div>
-                    <div className="text-sm font-bold text-teal-400">600 Viber Kredita</div>
-                    <p className="text-xs text-slate-400 leading-relaxed">€0.025 / poruci. Idealno za manje prodavnice (do 50 porudžbina/mesec).</p>
+                    <div className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Starter Paket</div>
+                    <div className="text-3xl font-black text-theme-primary">€15</div>
+                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">600 Viber Kredita</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">€0.025 / poruci. Idealno za manje prodavnice (do 50 porudžbina/mesec).</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('starter', 15, 600)}
                     disabled={purchasing === 'starter'}
-                    className="w-full mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
+                    className="w-full mt-6 bg-surface hover:bg-surface-subtle border border-theme text-theme-primary font-bold py-2.5 px-4 rounded-xl text-xs transition-all cursor-pointer shadow-sm"
                   >
                     {purchasing === 'starter' ? 'Učitavanje...' : 'Kupi sa Paddle MoR'}
                   </button>
                 </div>
 
                 {/* Growth Package */}
-                <div className="glass-card rounded-2xl p-6 border-2 border-teal-500/60 bg-teal-950/20 flex flex-col justify-between relative shadow-xl shadow-teal-500/10">
+                <div className="glass-card rounded-2xl p-6 border-2 border-teal-500/60 bg-teal-500/5 flex flex-col justify-between relative shadow-xl shadow-teal-500/10">
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-teal-600 text-white text-[10px] font-extrabold uppercase px-3 py-0.5 rounded-full">
                     NAJPOPULARNIJE
                   </div>
                   <div className="space-y-3 pt-2">
-                    <div className="text-xs font-semibold text-teal-300 uppercase tracking-wider">Growth Paket</div>
-                    <div className="text-3xl font-black text-white">€45</div>
-                    <div className="text-sm font-bold text-teal-400">1,875 Viber Kredita</div>
-                    <p className="text-xs text-slate-300 leading-relaxed">€0.024 / poruci. Za srednje e-trgovce u Srbij i regionu.</p>
+                    <div className="text-xs font-semibold text-teal-600 dark:text-teal-300 uppercase tracking-wider">Growth Paket</div>
+                    <div className="text-3xl font-black text-theme-primary">€45</div>
+                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">1,875 Viber Kredita</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">€0.024 / poruci. Za srednje e-trgovce u Srbiji i regionu.</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('growth', 45, 1875)}
@@ -325,29 +325,29 @@ export default function App() {
                 </div>
 
                 {/* Pro Package */}
-                <div className="glass-card rounded-2xl p-6 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-all">
+                <div className="glass-card rounded-2xl p-6 border border-theme flex flex-col justify-between hover:border-[#14B8A6]/40 transition-all">
                   <div className="space-y-3">
-                    <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pro Paket</div>
-                    <div className="text-3xl font-black text-white">€120</div>
-                    <div className="text-sm font-bold text-teal-400">6,000 Viber Kredita</div>
-                    <p className="text-xs text-slate-400 leading-relaxed">€0.020 / poruci. Najniža cena poruke za visoki obim pošiljki.</p>
+                    <div className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Pro Paket</div>
+                    <div className="text-3xl font-black text-theme-primary">€120</div>
+                    <div className="text-sm font-bold text-teal-600 dark:text-teal-400">6,000 Viber Kredita</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">€0.020 / poruci. Najniža cena poruke za visoki obim pošiljki.</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('pro', 120, 6000)}
                     disabled={purchasing === 'pro'}
-                    className="w-full mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
+                    className="w-full mt-6 bg-surface hover:bg-surface-subtle border border-theme text-theme-primary font-bold py-2.5 px-4 rounded-xl text-xs transition-all cursor-pointer shadow-sm"
                   >
                     {purchasing === 'pro' ? 'Učitavanje...' : 'Kupi sa Paddle MoR'}
                   </button>
                 </div>
 
                 {/* Pro Reserve Subscription */}
-                <div className="glass-card rounded-2xl p-6 border border-emerald-500/30 bg-emerald-950/10 flex flex-col justify-between relative">
+                <div className="glass-card rounded-2xl p-6 border border-emerald-500/30 bg-emerald-500/5 flex flex-col justify-between relative">
                   <div className="space-y-3">
-                    <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Pro Reserve (MRR)</div>
-                    <div className="text-3xl font-black text-white">€29 <span className="text-xs text-slate-400 font-normal">/mesec</span></div>
-                    <div className="text-sm font-bold text-emerald-400">1,800 Kredita / Mesec</div>
-                    <p className="text-xs text-slate-400 leading-relaxed">Automatska mesečna rezervacija garancije sa popustom na poruke.</p>
+                    <div className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Pro Reserve (MRR)</div>
+                    <div className="text-3xl font-black text-theme-primary">€29 <span className="text-xs text-theme-muted font-normal">/mesec</span></div>
+                    <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400">1,800 Kredita / Mesec</div>
+                    <p className="text-xs text-theme-muted leading-relaxed">Automatska mesečna rezervacija garancije sa popustom na poruke.</p>
                   </div>
                   <button
                     onClick={() => handleBuyCredit('reserve', 29, 1800)}
