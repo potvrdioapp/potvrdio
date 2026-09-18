@@ -743,50 +743,50 @@ export default function App() {
   const currentScenConfig = scenarios[currentScenario as keyof typeof scenarios];
 
   return (
-    <div className="min-h-[100dvh] flex flex-col saas-bg bg-[#0B0F19] light:bg-[#F8FAFC] text-slate-300 light:text-slate-700 font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white transition-colors duration-200">
+    <div className="min-h-[100dvh] flex flex-col saas-bg text-theme-secondary font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white transition-colors duration-200">
       
       {/* Top Network & Legal Bar */}
-      <aside className="border-b border-white/10 light:border-slate-200/80 bg-[#0B0F19]/90 light:bg-white/80 px-3 sm:px-4 py-1.5 text-xs transition-colors">
+      <aside className="border-b border-theme bg-surface/90 px-3 sm:px-4 py-1.5 text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-sans">
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="inline-flex items-center gap-1.5 text-emerald-400 light:text-emerald-600">
+            <span className="inline-flex items-center gap-1.5 text-emerald-500">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              <span className="font-medium text-white light:text-slate-900">{t('top_gateway')}</span>
+              <span className="font-medium text-theme-primary">{t('top_gateway')}</span>
             </span>
-            <span className="text-white/10 light:text-slate-300">|</span>
-            <span className="hidden sm:inline text-slate-400 light:text-slate-600">{t('top_networks')}</span>
+            <span className="text-theme-muted/30">|</span>
+            <span className="hidden sm:inline text-theme-muted">{t('top_networks')}</span>
           </div>
 
           <div className="flex items-center gap-2.5 sm:gap-4">
-            <a href="#integracija" className="text-slate-400 light:text-slate-600 hover:text-[#14B8A6] transition-colors hidden md:inline-flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 light:text-emerald-600 shrink-0" />
+            <a href="#integracija" className="text-theme-muted hover:text-[#14B8A6] transition-colors hidden md:inline-flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
               <span>{t('top_protocol')}</span>
             </a>
-            <span className="text-white/10 light:text-slate-300 hidden md:inline">|</span>
-            <span className="text-amber-400 light:text-amber-600 font-medium">{t('top_avg_penalty')}</span>
+            <span className="text-theme-muted/30 hidden md:inline">|</span>
+            <span className="text-amber-500 font-medium">{t('top_avg_penalty')}</span>
           </div>
         </div>
       </aside>
 
       {/* Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-white/10 light:border-slate-200/80 bg-[#0B0F19]/90 light:bg-white/90 backdrop-blur-md transition-colors">
+      <header className="sticky top-0 z-40 border-b border-theme bg-surface/90 backdrop-blur-md transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
           <a href="#" className="flex items-center gap-3 group">
             <PotvrdioLogo variant="horizontal" mode={theme} />
-            <div className="hidden sm:block pl-2 border-l border-white/10 light:border-slate-200 text-[10px] font-sans text-slate-400 light:text-slate-500">
+            <div className="hidden sm:block pl-2 border-l border-theme text-[10px] font-sans text-theme-muted">
               {t('nav_sub')}
             </div>
           </a>
 
           {/* Nav Links */}
-          <nav className="hidden md:flex items-center gap-6 text-xs text-slate-400 light:text-slate-600 font-medium">
-            <a href="#lab" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_lab')}</a>
-            <a href="#manifest" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_manifest')}</a>
-            <a href="#kalkulator" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_calc')}</a>
-            <a href="#cenovnik" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_pricing')}</a>
-            <a href="#integracija" className="hover:text-white light:hover:text-slate-900 transition-colors">{t('nav_dev')}</a>
+          <nav className="hidden md:flex items-center gap-6 text-xs text-theme-muted font-medium">
+            <a href="#lab" className="hover:text-theme-primary transition-colors">{t('nav_lab')}</a>
+            <a href="#manifest" className="hover:text-theme-primary transition-colors">{t('nav_manifest')}</a>
+            <a href="#kalkulator" className="hover:text-theme-primary transition-colors">{t('nav_calc')}</a>
+            <a href="#cenovnik" className="hover:text-theme-primary transition-colors">{t('nav_pricing')}</a>
+            <a href="#integracija" className="hover:text-theme-primary transition-colors">{t('nav_dev')}</a>
           </nav>
 
           {/* Controls */}
@@ -794,7 +794,7 @@ export default function App() {
             {/* Theme Toggle Button */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-[#131C2E] light:bg-slate-100 border border-white/10 light:border-slate-200 text-slate-300 light:text-slate-700 hover:text-white light:hover:text-slate-900 transition-all cursor-pointer flex items-center justify-center min-h-[34px] min-w-[34px]"
+              className="p-2 rounded-lg bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary transition-all cursor-pointer flex items-center justify-center min-h-[34px] min-w-[34px]"
               title={theme === 'dark' ? 'Prebaci na Svetlu Temu' : 'Prebaci na Tamnu Temu'}
               aria-label="Toggle light/dark theme"
             >
@@ -806,22 +806,22 @@ export default function App() {
             </button>
 
             {/* Language Switcher */}
-            <div className="flex items-center bg-[#131C2E] light:bg-slate-100 border border-white/10 light:border-slate-200 rounded-lg p-0.5 text-xs font-sans">
+            <div className="flex items-center bg-surface-subtle border border-theme rounded-lg p-0.5 text-xs font-sans">
               <button 
                 onClick={() => { playClickSound(); setLang('sr'); }} 
-                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'sr' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'sr' ? 'bg-[#14B8A6] text-white' : 'text-theme-muted hover:text-theme-primary'}`}
               >
                 SR
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('mk'); }} 
-                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'mk' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'mk' ? 'bg-[#14B8A6] text-white' : 'text-theme-muted hover:text-theme-primary'}`}
               >
                 MK
               </button>
               <button 
                 onClick={() => { playClickSound(); setLang('en'); }} 
-                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'en' ? 'bg-[#14B8A6] text-black' : 'text-slate-400 light:text-slate-600 hover:text-white light:hover:text-slate-900'}`}
+                className={`px-1.5 sm:px-2 py-0.5 rounded font-bold transition-all text-[11px] sm:text-xs ${lang === 'en' ? 'bg-[#14B8A6] text-white' : 'text-theme-muted hover:text-theme-primary'}`}
               >
                 EN
               </button>
@@ -838,10 +838,10 @@ export default function App() {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => { playClickSound(); setMobileMenuOpen(!mobileMenuOpen); }}
-              className="md:hidden p-2 rounded-lg bg-[#0D121F] border border-white/10 text-slate-300 hover:text-white transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
+              className="md:hidden p-2 rounded-lg bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary transition-colors cursor-pointer min-h-[38px] min-w-[38px] flex items-center justify-center"
               aria-label="Toggle navigation menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 text-[#14B8A6]" /> : <Menu className="w-5 h-5 text-white" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-[#14B8A6]" /> : <Menu className="w-5 h-5 text-theme-primary" />}
             </button>
           </div>
 
@@ -849,49 +849,49 @@ export default function App() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-white/10 bg-[#070A13]/98 backdrop-blur-xl px-4 py-4 space-y-3 font-mono text-xs animate-in slide-in-from-top-2 duration-200">
-            <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">
+          <div className="md:hidden border-b border-theme bg-surface/98 backdrop-blur-xl px-4 py-4 space-y-3 font-mono text-xs animate-in slide-in-from-top-2 duration-200">
+            <div className="text-[10px] text-theme-muted uppercase font-bold tracking-wider mb-1">
               {lang === 'sr' ? 'Navigacija' : lang === 'mk' ? 'Навигација' : 'Navigation'}
             </div>
             <a 
               href="#lab" 
               onClick={() => setMobileMenuOpen(false)} 
-              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+              className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
               <span>01. {t('nav_lab')}</span>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
               href="#manifest" 
               onClick={() => setMobileMenuOpen(false)} 
-              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+              className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
               <span>02. {t('nav_manifest')}</span>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
               href="#kalkulator" 
               onClick={() => setMobileMenuOpen(false)} 
-              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+              className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
               <span>03. {t('nav_calc')}</span>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
               href="#cenovnik" 
               onClick={() => setMobileMenuOpen(false)} 
-              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+              className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
               <span>04. {t('nav_pricing')}</span>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
               href="#integracija" 
               onClick={() => setMobileMenuOpen(false)} 
-              className="py-2.5 text-slate-200 hover:text-[#14B8A6] transition-colors border-b border-white/5 flex items-center justify-between"
+              className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
               <span>05. {t('nav_dev')}</span>
-              <ChevronRight className="w-4 h-4 text-slate-500" />
+              <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
 
             <div className="pt-2">
@@ -909,24 +909,24 @@ export default function App() {
       </header>
 
       {/* Hero Section */}
-      <section className="border-b border-white/10 bg-gradient-to-b from-[#111827] to-[#0B0F19] pt-10 sm:pt-14 pb-12 sm:pb-16">
+      <section className="border-b border-theme bg-canvas pt-10 sm:pt-14 pb-12 sm:pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-5">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
             
             {/* Left Column */}
             <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-5">
-              <div className="inline-flex items-center gap-2 border border-slate-700/60 bg-slate-800/60 px-3 py-1 rounded-full text-xs text-slate-300 w-fit max-w-full flex-wrap">
+              <div className="inline-flex items-center gap-2 border border-theme bg-surface-subtle px-3 py-1 rounded-full text-xs text-theme-secondary w-fit max-w-full flex-wrap shadow-sm">
                 <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse shrink-0"></span>
                 <span className="text-white font-semibold">{t('hero_tag')}</span>
                 <span className="text-white/20">•</span>
                 <span className="text-emerald-400 font-medium">{t('hero_no_sub')}</span>
               </div>
 
-              <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-white leading-[1.2]">
+              <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight text-theme-primary leading-[1.2]">
                 {t('hero_title')}
               </h1>
 
-              <p className="text-xs sm:text-sm leading-relaxed text-slate-400 max-w-2xl">
+              <p className="text-xs sm:text-sm leading-relaxed text-theme-muted max-w-2xl">
                 {t('hero_p')}
               </p>
 
@@ -941,7 +941,7 @@ export default function App() {
                 </a>
                 <button 
                   onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
-                  className="px-5 py-3.5 sm:py-3 bg-[#131C2E] hover:bg-slate-800 text-white border border-[#14B8A6]/40 hover:border-[#14B8A6] text-xs rounded-lg font-bold transition inline-flex items-center justify-center gap-2 cursor-pointer min-h-[44px]"
+                  className="px-5 py-3.5 sm:py-3 bg-surface-subtle hover:bg-surface text-theme-primary border border-[#14B8A6]/40 hover:border-[#14B8A6] text-xs rounded-lg font-bold transition inline-flex items-center justify-center gap-2 cursor-pointer min-h-[44px] shadow-sm"
                 >
                   <Rocket className="w-4 h-4 text-teal-300 shrink-0" />
                   <span>{lang === 'sr' ? 'Aktiviraj 25 Besplatnih Verifikacija' : lang === 'mk' ? 'Активирај 25 Бесплатни Верификации' : 'Activate 25 Free Credits'}</span>
@@ -949,7 +949,7 @@ export default function App() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-white/10 mt-2 sm:mt-3 font-sans">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-theme mt-2 sm:mt-3 font-sans">
                 <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
                   <div className="text-[10px] sm:text-xs text-slate-400 mb-0.5 sm:mb-1 font-medium">{t('stat_open_rate')}</div>
                   <div className="text-base sm:text-2xl font-bold text-white tracking-tight">89.6%</div>
@@ -969,26 +969,26 @@ export default function App() {
             </div>
 
             {/* Right Column: Live Status Dashboard */}
-            <div className="lg:col-span-5 glass-panel rounded-xl p-4 sm:p-5 shadow-2xl relative border border-slate-800">
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+            <div className="lg:col-span-5 glass-panel rounded-xl p-4 sm:p-5 shadow-2xl relative border-theme">
+              <div className="flex items-center justify-between border-b border-theme pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#14B8A6]"></span>
-                  <span className="text-xs font-semibold text-white tracking-wide">WooCommerce Integration</span>
+                  <span className="text-xs font-semibold text-theme-primary tracking-wide">WooCommerce Integration</span>
                 </div>
-                <div className="text-[10px] font-mono text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20">HPOS Ready</div>
+                <div className="text-[10px] font-mono text-teal-500 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20 font-semibold">HPOS Ready</div>
               </div>
 
               {/* Order Card */}
-              <div className="bg-[#0B0F19] p-3 sm:p-3.5 rounded-lg border border-slate-800 mb-4 text-xs space-y-2">
-                <div className="flex justify-between items-center text-[11px] text-slate-400 border-b border-white/10 pb-2">
+              <div className="bg-surface-subtle p-3 sm:p-3.5 rounded-lg border border-theme mb-4 text-xs space-y-2">
+                <div className="flex justify-between items-center text-[11px] text-theme-muted border-b border-theme pb-2">
                   <span>{t('order_word')} #RS-8492</span>
                   <span>17. Sep 2026, 09:14</span>
                 </div>
-                <div className="flex justify-between items-center text-white pt-1">
+                <div className="flex justify-between items-center text-theme-primary pt-1">
                   <span className="font-bold font-sans text-sm">{t('dash_customer_name')}</span>
                   <span className="text-[#14B8A6] font-bold">{t('dash_order_amount')}</span>
                 </div>
-                <div className="text-[11px] text-slate-400 flex items-start gap-1.5">
+                <div className="text-[11px] text-theme-muted flex items-start gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
                   <span>{t('dash_address')}</span>
                 </div>
@@ -1003,7 +1003,7 @@ export default function App() {
               </div>
 
               {/* Logistics State */}
-              <div className="p-3 bg-[#0D121F] rounded border border-white/10 font-mono text-[11px] space-y-2 mb-4">
+              <div className="p-3 bg-surface rounded border border-theme font-mono text-[11px] space-y-2 mb-4">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">{t('dash_order_status_label')}</span>
                   <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
@@ -1017,7 +1017,7 @@ export default function App() {
               </div>
 
               {/* Note */}
-              <div className="text-[11px] text-slate-400 font-mono leading-relaxed border-t border-white/10 pt-3 flex items-start gap-1.5">
+              <div className="text-[11px] text-theme-muted font-mono leading-relaxed border-t border-theme pt-3 flex items-start gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
                 <span>{t('hero_box_note')}</span>
               </div>
@@ -1028,11 +1028,11 @@ export default function App() {
       </section>
 
       {/* SECTION 01: Interactive Lab Simulator */}
-      <section id="lab" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+      <section id="lab" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div>
             <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('lab_tag')}</div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('lab_title')}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('lab_title')}</h2>
           </div>
           <div className="text-xs text-slate-400 font-sans">
             {t('lab_subtitle')}
@@ -1043,38 +1043,38 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 sm:mb-8">
           <button 
             onClick={() => handleScenarioChange(1)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-theme hover:border-[#14B8A6]/40'}`}
           >
             <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-slate-400'}`}>Scenario A</span>
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario A</span>
               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_common_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen1_title')}</div>
-            <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen1_desc')}</div>
+            <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen1_desc')}</div>
           </button>
 
           <button 
             onClick={() => handleScenarioChange(2)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-theme hover:border-[#14B8A6]/40'}`}
           >
             <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-slate-400'}`}>Scenario B</span>
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario B</span>
               <span className="text-[10px] font-semibold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">{t('scen_saved_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen2_title')}</div>
-            <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen2_desc')}</div>
+            <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen2_desc')}</div>
           </button>
 
           <button 
             onClick={() => handleScenarioChange(3)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-white/10 hover:border-white/20'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-theme hover:border-[#14B8A6]/40'}`}
           >
             <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-slate-400'}`}>Scenario C</span>
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario C</span>
               <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_fast_tag')}</span>
             </div>
             <div className="font-bold text-white text-sm mb-1">{t('scen3_title')}</div>
-            <div className="text-slate-400 text-[11px] leading-relaxed">{t('scen3_desc')}</div>
+            <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen3_desc')}</div>
           </button>
         </div>
 
@@ -1258,7 +1258,7 @@ export default function App() {
               </div>
               <button 
                 onClick={handleResetSim} 
-                className="w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded bg-[#070A13] hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px]"
+                className="w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded bg-surface hover:bg-surface-subtle border border-theme text-theme-muted hover:text-theme-primary text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px] shadow-sm"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>{t('btn_restart_sim')}</span>
@@ -1270,7 +1270,7 @@ export default function App() {
       </section>
 
       {/* SECTION 02: Physical Manifest Label Inspector */}
-      <section id="manifest" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+      <section id="manifest" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('man_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('man_title')}</h2>
@@ -1280,7 +1280,7 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
           {/* Unverified Bad Label */}
           <div className="glass-panel border-red-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden">
-            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-red-500/10 text-red-400 px-2.5 py-0.5 rounded-full border border-red-500/20">
+            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-red-500/10 text-red-500 px-2.5 py-0.5 rounded-full border border-red-500/20">
               {t('man_badge_bad')}
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
@@ -1310,14 +1310,14 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-red-400 font-sans leading-relaxed">
+            <div className="mt-4 text-xs text-red-500 font-sans leading-relaxed">
               {t('man_bad_footer')}
             </div>
           </div>
 
           {/* Verified Good Label */}
           <div className="glass-panel border-emerald-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden">
-            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
               {t('man_badge_good')}
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-white mb-4 flex items-center gap-2">
@@ -1347,7 +1347,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-emerald-400 font-sans leading-relaxed">
+            <div className="mt-4 text-xs text-emerald-500 font-sans leading-relaxed">
               {t('man_good_footer')}
             </div>
           </div>
@@ -1355,7 +1355,7 @@ export default function App() {
       </section>
 
       {/* SECTION 03: Return Freight Loss ROI Calculator */}
-      <section id="kalkulator" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+      <section id="kalkulator" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('calc_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('calc_title')}</h2>
@@ -1378,9 +1378,9 @@ export default function App() {
                 step="50" 
                 value={ordersCount} 
                 onChange={(e) => setOrdersCount(Number(e.target.value))}
-                className="w-full h-3 bg-[#0B0F19] rounded-lg appearance-none cursor-pointer border border-slate-800"
+                className="w-full h-3 bg-surface-subtle rounded-lg appearance-none cursor-pointer border border-theme"
               />
-              <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-slate-400 mt-1.5 flex-wrap gap-1">
+              <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-theme-muted mt-1.5 flex-wrap gap-1">
                 <span>50 ({lang === 'sr' ? 'Mala radnja' : lang === 'mk' ? 'Мала продавница' : 'Small Store'})</span>
                 <span>750 ({lang === 'sr' ? 'Rastući brend' : lang === 'mk' ? 'Растечки бренд' : 'Growing Brand'})</span>
                 <span>2.500+ ({lang === 'sr' ? 'Veliki shop' : lang === 'mk' ? 'Голема продавница' : 'Enterprise Store'})</span>
@@ -1401,7 +1401,7 @@ export default function App() {
                 step="1" 
                 value={failureRate} 
                 onChange={(e) => setFailureRate(Number(e.target.value))}
-                className="w-full h-3 bg-[#0B0F19] rounded-lg appearance-none cursor-pointer border border-slate-800"
+                className="w-full h-3 bg-surface-subtle rounded-lg appearance-none cursor-pointer border border-theme"
               />
               <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-slate-400 mt-1.5 flex-wrap gap-1">
                 <span>{t('calc_rate_ideal')}</span>
@@ -1416,7 +1416,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-[#131C2E] border border-slate-800 p-5 sm:p-6 rounded-xl text-center space-y-5">
+          <div className="lg:col-span-5 bg-surface-subtle border border-theme p-5 sm:p-6 rounded-xl text-center space-y-5">
             <div>
               <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
                 {t('calc_loss_head')}
@@ -1445,7 +1445,7 @@ export default function App() {
       </section>
 
       {/* SECTION 04: Credit Pool PAYG Pricing */}
-      <section id="cenovnik" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+      <section id="cenovnik" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('price_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('price_title')}</h2>
@@ -1453,7 +1453,7 @@ export default function App() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-          <div className="lg:col-span-8 glass-panel rounded-xl overflow-hidden border border-slate-800">
+          <div className="lg:col-span-8 glass-panel rounded-xl overflow-hidden border border-theme">
             <div className="px-4 sm:px-5 py-3.5 border-b border-white/10 bg-[#131C2E] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-sans">
               <span className="font-bold text-white">{t('price_prepaid_header')}</span>
               <span className="text-slate-400 text-[11px]">{t('price_invoice_sub')}</span>
@@ -1461,7 +1461,7 @@ export default function App() {
 
             <div className="overflow-x-auto touch-scroll">
               <table className="w-full text-left text-xs font-sans min-w-[500px]">
-                <thead className="bg-[#0B0F19] text-slate-400 border-b border-white/10 text-[11px]">
+                <thead className="bg-surface-subtle text-theme-muted border-b border-theme text-[11px]">
                   <tr>
                     <th className="p-3.5 sm:p-4 font-semibold">{t('th_tier')}</th>
                     <th className="p-3.5 sm:p-4 font-semibold">{t('th_deposit')}</th>
@@ -1470,24 +1470,24 @@ export default function App() {
                     <th className="p-3.5 sm:p-4 font-semibold text-right">{t('price_btn_select')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10 text-slate-300">
-                  <tr className="hover:bg-[#131C2E]/50 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-white">Starter Pool</td>
-                    <td className="p-3.5 sm:p-4 font-bold text-white">15 €</td>
+                <tbody className="divide-y divide-theme text-theme-secondary">
+                  <tr className="hover:bg-surface-subtle/50 transition">
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Starter Pool</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">15 €</td>
                     <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.026 €</td>
                     <td className="p-3.5 sm:p-4 text-slate-400">0.048 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-[#131C2E] hover:bg-slate-700 border border-white/10 text-white text-[11px] font-semibold transition cursor-pointer min-h-[32px]">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm">
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
                   <tr className="bg-[#14B8A6]/5 hover:bg-[#14B8A6]/10 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-white flex items-center gap-2">
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary flex items-center gap-2">
                       Growth Pool
                       <span className="text-[9px] font-semibold bg-[#14B8A6]/20 text-[#14B8A6] px-2 py-0.5 rounded-full border border-[#14B8A6]/30">{t('price_badge_popular')}</span>
                     </td>
-                    <td className="p-3.5 sm:p-4 font-bold text-white">45 €</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">45 €</td>
                     <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.024 €</td>
                     <td className="p-3.5 sm:p-4 text-slate-400">0.042 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
@@ -1496,13 +1496,13 @@ export default function App() {
                       </button>
                     </td>
                   </tr>
-                  <tr className="hover:bg-[#131C2E]/50 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-white">Scale Volume</td>
-                    <td className="p-3.5 sm:p-4 font-bold text-white">120 €</td>
+                  <tr className="hover:bg-surface-subtle/50 transition">
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Scale Volume</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">120 €</td>
                     <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.020 €</td>
                     <td className="p-3.5 sm:p-4 text-slate-400">0.038 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-[#131C2E] hover:bg-slate-700 border border-white/10 text-white text-[11px] font-semibold transition cursor-pointer min-h-[32px]">
+                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm">
                         {t('price_btn_select')}
                       </button>
                     </td>
@@ -1511,16 +1511,16 @@ export default function App() {
               </table>
             </div>
 
-            <div className="p-3.5 sm:p-4 bg-[#0B0F19] border-t border-white/10 text-[11px] text-slate-400 font-sans flex items-start gap-1.5">
+            <div className="p-3.5 sm:p-4 bg-surface-subtle border-t border-theme text-[11px] text-theme-muted font-sans flex items-start gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
               <span>{t('price_note')}</span>
             </div>
           </div>
 
           {/* Pro Reserve */}
-          <div className="lg:col-span-4 glass-panel rounded-xl p-5 sm:p-6 font-sans text-xs border border-slate-800">
+          <div className="lg:col-span-4 glass-panel rounded-xl p-5 sm:p-6 font-sans text-xs border border-theme">
             <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-semibold">{t('pro_tag')}</div>
-            <h3 className="text-base font-bold text-white font-sans">{t('price_pro_title')}</h3>
+            <h3 className="text-base font-bold text-theme-primary font-sans">{t('price_pro_title')}</h3>
             <div className="mt-3 flex items-baseline gap-1">
               <span className="text-3xl font-bold text-white font-sans">29 €</span>
               <span className="text-slate-400 text-xs">{t('price_per_month')}</span>
@@ -1529,7 +1529,7 @@ export default function App() {
               {t('price_pro_desc')}
             </p>
 
-            <ul className="space-y-2.5 my-5 text-slate-300 text-[11px]">
+            <ul className="space-y-2.5 my-5 text-theme-secondary text-[11px]">
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span>{t('price_pro_feat1')}</span>
@@ -1555,7 +1555,7 @@ export default function App() {
       </section>
 
       {/* SECTION 05: Legal Framework & Code Integration */}
-      <section id="integracija" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+      <section id="integracija" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
           <div className="lg:col-span-6 space-y-4">
             <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
@@ -1563,32 +1563,32 @@ export default function App() {
             <p className="text-xs text-slate-400 leading-relaxed">{t('leg_p')}</p>
 
             <div className="space-y-3 font-sans text-xs pt-2">
-              <div className="p-3.5 rounded-xl glass-panel border border-white/10">
-                <div className="text-white font-bold mb-1 flex items-center justify-between">
+              <div className="p-3.5 rounded-xl glass-panel border border-theme">
+                <div className="text-theme-primary font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item1_title')}</span>
                   <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans">Pravni Osnov</span>
                 </div>
-                <div className="text-slate-400 text-[11px] leading-relaxed">
+                <div className="text-theme-muted text-[11px] leading-relaxed">
                   {t('leg_item1_desc')}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl glass-panel border border-white/10">
-                <div className="text-white font-bold mb-1 flex items-center justify-between">
+              <div className="p-3.5 rounded-xl glass-panel border border-theme">
+                <div className="text-theme-primary font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item2_title')}</span>
                   <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20 font-sans">Retention 30D</span>
                 </div>
-                <div className="text-slate-400 text-[11px] leading-relaxed">
+                <div className="text-theme-muted text-[11px] leading-relaxed">
                   {t('leg_item2_desc')}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl glass-panel border border-white/10">
-                <div className="text-white font-bold mb-1 flex items-center justify-between">
+              <div className="p-3.5 rounded-xl glass-panel border border-theme">
+                <div className="text-theme-primary font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item3_title')}</span>
                   <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-sans">TLS 1.3 HMAC</span>
                 </div>
-                <div className="text-slate-400 text-[11px] leading-relaxed">
+                <div className="text-theme-muted text-[11px] leading-relaxed">
                   {t('leg_item3_desc')}
                 </div>
               </div>
@@ -1597,7 +1597,7 @@ export default function App() {
 
           <div className="lg:col-span-6 space-y-4">
             <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('dev_tag')}</div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">{t('dev_title')}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('dev_title')}</h2>
             
             <div className="bg-[#0B0F19] border border-slate-800 rounded-xl p-3.5 sm:p-4 font-mono text-xs text-slate-300 overflow-x-auto touch-scroll">
               <div className="text-slate-400 text-[11px] mb-2 font-sans">{t('dev_code_comment')}</div>
@@ -1610,7 +1610,7 @@ export default function App() {
               <div className="text-[#14B8A6]">&#125;);</div>
             </div>
 
-            <div className="text-[11px] font-sans text-slate-400 flex items-center gap-1.5">
+            <div className="text-[11px] font-sans text-theme-muted flex items-center gap-1.5">
               <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>{t('dev_hpos_note')}</span>
             </div>
@@ -1618,10 +1618,10 @@ export default function App() {
         </div>
 
         {/* Official Legal Evidence & Regulatory Links Grid */}
-        <div className="mt-10 pt-8 border-t border-white/10">
+        <div className="mt-10 pt-8 border-t border-theme">
           <div className="flex items-center gap-2 mb-4">
             <Scale className="w-4 h-4 text-[#14B8A6]" />
-            <h3 className="text-xs sm:text-sm font-bold text-white uppercase font-sans tracking-wider">
+            <h3 className="text-xs sm:text-sm font-bold text-theme-primary uppercase font-sans tracking-wider">
               {t('leg_proof_title')}
             </h3>
           </div>
@@ -1632,14 +1632,14 @@ export default function App() {
               href="https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2018/87/1/reg" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
-                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_pis')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_pis_sub')}</p>
+                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_pis_sub')}</p>
               </div>
               <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
@@ -1652,14 +1652,14 @@ export default function App() {
               href={lang === 'en' ? 'https://www.poverenik.rs/en/' : 'https://www.poverenik.rs/sr-lat/'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
-                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_poverenik')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_poverenik_sub')}</p>
+                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_poverenik_sub')}</p>
               </div>
               <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <ShieldCheck className="w-3 h-3 shrink-0" />
@@ -1672,14 +1672,14 @@ export default function App() {
               href={lang === 'sr' ? 'https://eur-lex.europa.eu/legal-content/HR/TXT/?uri=CELEX:32016R0679' : 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
-                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_gdpr')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_gdpr_sub')}</p>
+                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_gdpr_sub')}</p>
               </div>
               <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
@@ -1692,14 +1692,14 @@ export default function App() {
               href={lang === 'en' ? 'https://azlp.mk/en' : 'https://azlp.mk'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-white/10 hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
             >
               <div>
-                <div className="flex items-center justify-between text-slate-200 font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_azlp')}</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-sans">{t('leg_ref_azlp_sub')}</p>
+                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_azlp_sub')}</p>
               </div>
               <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
                 <ShieldCheck className="w-3 h-3 shrink-0" />
@@ -1713,7 +1713,7 @@ export default function App() {
         <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4 font-sans text-xs">
           <button 
             onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-            className="px-4 py-2.5 rounded-lg glass-panel border border-[#14B8A6]/40 hover:border-[#14B8A6] text-white hover:text-teal-300 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+            className="px-4 py-2.5 rounded-lg glass-panel border border-[#14B8A6]/40 hover:border-[#14B8A6] text-theme-primary hover:text-teal-500 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px]"
           >
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>{t('leg_action_privacy')}</span>
@@ -1721,7 +1721,7 @@ export default function App() {
 
           <button 
             onClick={() => { playClickSound(); setShowTermsModal(true); }} 
-            className="px-4 py-2.5 rounded glass-panel border border-white/10 hover:border-white/30 text-slate-300 hover:text-white transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+            className="px-4 py-2.5 rounded-lg glass-panel border border-theme hover:border-[#14B8A6]/50 text-theme-secondary hover:text-theme-primary transition flex items-center gap-2 cursor-pointer min-h-[42px]"
           >
             <FileText className="w-4 h-4 text-teal-400 shrink-0" />
             <span>{t('leg_action_terms')}</span>
@@ -1730,16 +1730,16 @@ export default function App() {
       </section>
 
       {/* SECTION 05.5: Frequently Asked Questions (FAQ & AI GEO Indexing) */}
-      <section id="faq" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-white/10">
+      <section id="faq" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="max-w-3xl mx-auto">
           <div className="text-center space-y-2 mb-10">
             <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider">
               {lang === 'sr' ? '06 / Često Postavljana Pitanja' : lang === 'mk' ? '06 / Често Поставувани Прашања' : '06 / Frequently Asked Questions'}
             </div>
-            <h2 className="text-xl sm:text-3xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-3xl font-bold text-theme-primary tracking-tight">
               {lang === 'sr' ? 'Sve što treba da znate o Potvrdio COD verifikaciji' : lang === 'mk' ? 'Сè што треба да знаете за Potvrdio COD верификацијата' : 'Everything you need to know about Potvrdio COD verification'}
             </h2>
-            <p className="text-xs text-slate-400 max-w-lg mx-auto leading-relaxed">
+            <p className="text-xs text-theme-muted max-w-lg mx-auto leading-relaxed">
               {lang === 'sr' ? 'Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.' : lang === 'mk' ? 'Одговори на клучните технички и правни прашања.' : 'Answers to key technical, legal, and operational questions.'}
             </p>
           </div>
@@ -1811,14 +1811,14 @@ export default function App() {
               return (
                 <div 
                   key={idx} 
-                  className="rounded-lg glass-panel border border-white/10 overflow-hidden transition-all duration-150"
+                  className="rounded-lg glass-panel border border-theme overflow-hidden transition-all duration-150"
                 >
                   <button
                     onClick={() => {
                       playClickSound();
                       setOpenFaqIndex(isOpen ? null : idx);
                     }}
-                    className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-3 text-white font-bold text-xs sm:text-sm cursor-pointer hover:bg-white/5 transition"
+                    className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-3 text-theme-primary font-bold text-xs sm:text-sm cursor-pointer hover:bg-surface-subtle/50 transition"
                   >
                     <span className="flex items-center gap-2.5">
                       <HelpCircle className="w-4 h-4 text-[#14B8A6] shrink-0" />
@@ -1828,7 +1828,7 @@ export default function App() {
                   </button>
 
                   {isOpen && (
-                    <div className="px-4 sm:px-5 pb-4 pt-1 text-slate-300 text-xs leading-relaxed border-t border-white/5 bg-[#070A13]/40 font-mono">
+                    <div className="px-4 sm:px-5 pb-4 pt-1 text-theme-secondary text-xs leading-relaxed border-t border-theme-subtle bg-surface-subtle/40 font-mono">
                       {faq.a[lang]}
                     </div>
                   )}
@@ -1857,7 +1857,7 @@ export default function App() {
             </button>
             <a 
               href="#lab" 
-              className="w-full sm:w-auto px-5 py-3.5 sm:py-3 bg-[#0D121F] hover:bg-white/10 text-white border border-white/10 text-xs rounded font-mono transition inline-flex items-center justify-center min-h-[44px]"
+              className="w-full sm:w-auto px-5 py-3.5 sm:py-3 bg-surface-subtle hover:bg-surface text-theme-primary border border-theme text-xs rounded font-mono transition inline-flex items-center justify-center min-h-[44px] shadow-sm"
             >
               {t('btn_view_demo')}
             </a>
@@ -1866,10 +1866,10 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/10 bg-[#070A13] py-8 text-xs text-slate-400 font-mono mt-auto">
+      <footer className="border-t border-theme bg-surface py-8 text-xs text-theme-muted font-mono mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-center md:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-3">
-            <PotvrdioLogo variant="horizontal" mode="dark" />
+            <PotvrdioLogo variant="horizontal" mode={theme} />
             <span className="text-white/20 hidden sm:inline">•</span>
             <span>{t('footer_sub')}</span>
           </div>
@@ -1901,10 +1901,10 @@ export default function App() {
       {/* Address Edit Token Modal */}
       {showAddressModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-[#0D121F] border border-[#14B8A6]/50 rounded-xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-surface border border-[#14B8A6]/50 rounded-xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150">
             
             {/* Browser Header / URL bar */}
-            <div className="bg-[#070A13] px-3.5 sm:px-4 py-2.5 border-b border-white/10 flex items-center justify-between text-[11px] text-slate-400 shrink-0">
+            <div className="bg-surface-subtle px-3.5 sm:px-4 py-2.5 border-b border-theme flex items-center justify-between text-[11px] text-theme-muted shrink-0">
               <div className="flex items-center gap-2 text-[#14B8A6] font-mono truncate mr-2">
                 <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
                 <span className="text-slate-200 truncate">potvrdio.online/edit-address?token=vbr_9842</span>
@@ -1947,21 +1947,21 @@ export default function App() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-200 font-bold mb-1">{t('modal_floor')}</label>
+                    <label className="block text-[11px] text-theme-primary font-bold mb-1">{t('modal_floor')}</label>
                     <input 
                       type="text" 
                       value={floorInput}
                       onChange={(e) => setFloorInput(e.target.value)}
-                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-[#14B8A6] rounded px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] text-slate-200 font-bold mb-1">{t('modal_apt')}</label>
+                    <label className="block text-[11px] text-theme-primary font-bold mb-1">{t('modal_apt')}</label>
                     <input 
                       type="text" 
                       value={aptInput}
                       onChange={(e) => setAptInput(e.target.value)}
-                      className="w-full bg-[#070A13] border border-[#14B8A6] rounded px-3 py-2 text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-[#14B8A6] rounded px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
                     />
                   </div>
                 </div>
