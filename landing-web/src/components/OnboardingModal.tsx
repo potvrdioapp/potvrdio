@@ -118,18 +118,18 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
   const t = content[lang];
 
   return (
-    <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
-      <div className="bg-[#111827] light:bg-white border border-slate-700/60 light:border-slate-200/80 rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 light:text-slate-700 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4">
+      <div className="bg-surface border border-theme rounded-2xl max-w-lg w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-theme-secondary animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#0B0F19] light:bg-slate-50 px-4 sm:px-5 py-3.5 border-b border-slate-800 light:border-slate-200 flex items-center justify-between shrink-0 font-sans">
-          <div className="flex items-center gap-2 text-[#14B8A6]">
-            <Rocket className="w-4.5 h-4.5 text-teal-400 light:text-teal-600 shrink-0" />
-            <span className="text-xs font-bold text-white light:text-slate-900 tracking-wide uppercase">{t.badge}</span>
+        <div className="bg-surface-subtle px-4 sm:px-5 py-3.5 border-b border-theme flex items-center justify-between shrink-0 font-sans">
+          <div className="flex items-center gap-2 text-teal-600 dark:text-[#14B8A6]">
+            <Rocket className="w-4.5 h-4.5 text-teal-600 dark:text-teal-400 shrink-0" />
+            <span className="text-xs font-bold text-theme-primary tracking-wide uppercase">{t.badge}</span>
           </div>
           <button 
             onClick={handleResetAndClose}
-            className="text-slate-400 hover:text-white light:hover:text-slate-900 transition p-1 cursor-pointer shrink-0"
+            className="text-theme-muted hover:text-theme-primary transition p-1 cursor-pointer shrink-0"
             aria-label="Close modal"
           >
             <X className="w-4 h-4" />
@@ -141,15 +141,15 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
           {step === 'form' ? (
             <form onSubmit={handleSubmit} className="space-y-3.5">
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">{t.title}</h3>
-                <p className="text-[11px] text-slate-400 mt-0.5">{t.subtitle}</p>
+                <h3 className="text-base sm:text-lg font-bold text-theme-primary tracking-tight">{t.title}</h3>
+                <p className="text-[11px] text-theme-muted mt-0.5">{t.subtitle}</p>
               </div>
 
               <div className="space-y-3 font-sans">
                 {/* Store URL */}
                 <div>
-                  <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-[#14B8A6]" />
+                  <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
                     <span>{t.label_store} *</span>
                   </label>
                   <input 
@@ -158,15 +158,15 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                     placeholder={t.placeholder_store}
                     value={storeUrl}
                     onChange={(e) => setStoreUrl(e.target.value)}
-                    className="w-full bg-[#070A13] border border-white/15 focus:border-[#14B8A6] rounded px-3 py-2 text-white font-sans text-xs focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                    className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
                   />
                 </div>
 
                 {/* Grid 2 cols */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
-                      <Building className="w-3.5 h-3.5 text-[#14B8A6]" />
+                    <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
+                      <Building className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
                       <span>{t.label_name} *</span>
                     </label>
                     <input 
@@ -175,13 +175,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                       placeholder={t.placeholder_name}
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full bg-[#070A13] border border-white/15 focus:border-[#14B8A6] rounded px-3 py-2 text-white font-sans text-xs focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 text-[#14B8A6]" />
+                    <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
+                      <Mail className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
                       <span>{t.label_email} *</span>
                     </label>
                     <input 
@@ -190,7 +190,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                       placeholder={t.placeholder_email}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-[#070A13] border border-white/15 focus:border-[#14B8A6] rounded px-3 py-2 text-white font-sans text-xs focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
                     />
                   </div>
                 </div>
@@ -198,8 +198,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 {/* Phone & Volume */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-[#14B8A6]" />
+                    <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
                       <span>{t.label_phone} *</span>
                     </label>
                     <input 
@@ -208,19 +208,19 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                       placeholder={t.placeholder_phone}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#070A13] border border-white/15 focus:border-[#14B8A6] rounded px-3 py-2 text-white font-sans text-xs focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
-                      <Package className="w-3.5 h-3.5 text-[#14B8A6]" />
+                    <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
+                      <Package className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
                       <span>{t.label_volume}</span>
                     </label>
                     <select 
                       value={orderVolume}
                       onChange={(e) => setOrderVolume(e.target.value)}
-                      className="w-full bg-[#070A13] border border-white/15 focus:border-[#14B8A6] rounded px-3 py-2 text-white font-sans text-xs focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px] cursor-pointer"
+                      className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px] cursor-pointer"
                     >
                       <option value="<100">&lt; 100 porudžbina / mesec</option>
                       <option value="100-300">100 - 300 porudžbina / mesec</option>
@@ -232,14 +232,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
 
                 {/* Courier Selection */}
                 <div>
-                  <label className="block text-[11px] text-slate-300 font-bold mb-1 flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-[#14B8A6]" />
+                  <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
                     <span>{t.label_courier}</span>
                   </label>
                   <select 
                     value={courier}
                     onChange={(e) => setCourier(e.target.value)}
-                    className="w-full bg-[#070A13] border border-white/15 focus:border-[#14B8A6] rounded px-3 py-2 text-white font-sans text-xs focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px] cursor-pointer"
+                    className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px] cursor-pointer"
                   >
                     <option value="post-express">Post Express (Pošta Srbije)</option>
                     <option value="bex">Bex Express</option>
@@ -266,28 +266,28 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 )}
               </button>
 
-              <div className="text-[10px] text-slate-400 font-sans text-center flex items-center justify-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <div className="text-[10px] text-theme-muted font-sans text-center flex items-center justify-center gap-1 pt-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{t.note_legal}</span>
               </div>
             </form>
           ) : (
             <div className="space-y-4 text-center py-2 animate-in fade-in duration-200">
-              <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-md">
                 <CheckCircle2 className="w-8 h-8" />
               </div>
 
               <div>
-                <h3 className="text-base sm:text-lg font-bold text-white font-sans">{t.success_title}</h3>
-                <p className="text-xs text-emerald-300 mt-1 font-sans">{t.success_sub}</p>
+                <h3 className="text-base sm:text-lg font-bold text-theme-primary font-sans">{t.success_title}</h3>
+                <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1 font-sans">{t.success_sub}</p>
               </div>
 
-              <div className="p-4 bg-[#0B0F19] border border-slate-800 rounded-xl text-left text-xs font-sans space-y-2 text-slate-300">
-                <p className="text-slate-200 font-bold">{t.success_step1}</p>
-                <p className="text-slate-400">
-                  {t.success_step2} <span className="text-[#14B8A6] underline font-medium">{email || 'petar@mojaradnja.rs'}</span>
+              <div className="p-4 bg-surface-subtle border border-theme rounded-xl text-left text-xs font-sans space-y-2 text-theme-secondary">
+                <p className="text-theme-primary font-bold">{t.success_step1}</p>
+                <p className="text-theme-muted">
+                  {t.success_step2} <span className="text-teal-600 dark:text-[#14B8A6] underline font-medium">{email || 'petar@mojaradnja.rs'}</span>
                 </p>
-                <p className="text-slate-400">{t.success_step3}</p>
+                <p className="text-theme-muted">{t.success_step3}</p>
               </div>
 
               <div className="space-y-2 pt-2">
@@ -301,7 +301,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
 
                 <button 
                   onClick={handleResetAndClose}
-                  className="w-full bg-white/5 hover:bg-white/10 text-slate-300 font-sans font-medium py-2.5 rounded-lg text-xs transition cursor-pointer"
+                  className="w-full bg-surface hover:bg-surface-subtle text-theme-secondary border border-theme font-sans font-medium py-2.5 rounded-lg text-xs transition cursor-pointer"
                 >
                   {t.btn_close}
                 </button>

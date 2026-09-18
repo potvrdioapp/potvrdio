@@ -10,7 +10,7 @@
 - **HPOS Ready**: Tested and fully compatible with WooCommerce 7.0+ High-Performance Order Storage (HPOS).
 
 ## Legal Compliance & Data Protection
-- **Serbian Data Protection Law (ZZPL RS)**: Operates strictly under Article 12, Paragraph 1, Point 2 (Službeni glasnik RS 87/2018) — data processing is legally necessary for executing remote sales contracts.
+- **Serbian Data Protection Law (ZZPL RS)**: Operates strictly under Article 12, Paragraph 1, Point 2 (Službeni glasnik RS 87/2018) - data processing is legally necessary for executing remote sales contracts.
 - **EU General Data Protection Regulation (EU GDPR)**: Compliant with Article 6(1)(b) GDPR (contractual performance necessity).
 - **North Macedonia Personal Data Protection Law (ZZLP MK)**: Compliant with Article 10(1)(b) ZZLP.
 - **Automatic 30-Day Purge**: Customer phone numbers, addresses, and session tokens are automatically anonymized and purged 30 days post-delivery. Zero marketing spam or cross-store profiling.

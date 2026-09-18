@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket, Sun, Moon
+  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket, Sun, Moon,
+  Package, Key, Send, Clock, Sparkles
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
@@ -90,6 +91,7 @@ export default function App() {
 
   const [currentScenario, setCurrentScenario] = useState<number>(1);
   const [simState, setSimState] = useState<'initial' | 'confirmed' | 'edited'>('initial');
+  const [wrongClickNotice, setWrongClickNotice] = useState<boolean>(false);
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
@@ -108,16 +110,18 @@ export default function App() {
       sr: {
         top_networks: "Post Express, D Express, Bex, City Express",
         nav_sub: "Lojistička COD Zaštita · WP v2.1",
-        nav_lab: "Simulacija na terenu",
-        nav_manifest: "Inspekcija adresnice",
-        nav_calc: "Matrica gubitka",
-        nav_pricing: "Bazen kredita",
-        nav_dev: "API & HPOS",
+        nav_how: "Kako radi",
+        nav_calc: "Kalkulator",
+        nav_pricing: "Cenovnik",
+        nav_integration: "Integracija",
+        nav_lab: "Kako radi",
+        nav_manifest: "Tačnost adresnice",
+        nav_dev: "Integracija",
         btn_dl: "Preuzmi ZIP",
         hero_tag: "WooCommerce Plaćanje Pouzećem (COD)",
-        hero_title: "Kupac poruči pouzećem, ne preuzme paket. Vi plaćate i slanje i povratak.",
-        hero_p: "U Srbiji i regionu preko 65% e-commerce narudžbina ide pouzećem. Svaka peta vraćena pošiljka (Post Express, D Express, Bex) košta vas između 720 i 890 RSD čistog gubitka. Potvrdio automatski zadržava porudžbinu na statusu On-Hold, šalje dvosmernu Viber verifikaciju i dozvoljava štampanje adresnice isključivo nakon potvrde kupca.",
-        hero_cta_primary: "Testiraj Interaktivnu Verifikaciju",
+        hero_title: "Kupac ne preuzme paket, vi plaćate duplu poštarinu. Zaustavite to pre slanja.",
+        hero_p: "Potvrdio automatski verifikuje kupca i adresu preko Vibera pre pakovanja. Lažne i nepotpune porudžbine se zaustavljaju na vreme - bez ručnih poziva i sa 80% manje povrata.",
+        hero_cta_primary: "Pogledaj kako radi",
         hero_free_credits: "besplatnih verifikacija uključeno uz plugin",
         stat_open_rate: "Odziv poruke",
         stat_open_sub: "Viber unutar 4 min.",
@@ -126,9 +130,9 @@ export default function App() {
         stat_recovery: "Pad povrata",
         stat_recovery_sub: "Sa 14.8% na 2.5%",
         hero_box_note: "Paket se fizički ne preuzima iz skladišta dok kupac ne klikne potvrdu na Viberu. Time se rizik praznog hoda kurira svodi na nulu.",
-        lab_tag: "01 / Interaktivni laboratorijum",
-        lab_title: "Isprobajte 3 realna scenarija iz balkanske prakse",
-        lab_subtitle: "Kliknite na scenario da vidite ponašanje Viber bota i WooCommerce baze:",
+        lab_tag: "01 / KAKO RADI",
+        lab_title: "Automatska Viber verifikacija u realnom vremenu",
+        lab_subtitle: "Isprobajte 3 realna scenarija iz balkanske prakse:",
         scen1_title: "Nepotpuna adresa (Novi Sad)",
         scen1_desc: "Kupac je zaboravio broj stana i sprat. Koriguje podatke jednim klikom preko token linka.",
         scen2_title: "Kupac se predomislio (Niš)",
@@ -148,6 +152,11 @@ export default function App() {
         scen2_warning: "⏱️ Poruka ignorisana. Nema odgovora 24h. Paket zadržan u skladištu!",
         viber_btn_yes: "DA, ADRESA JE TAČNA",
         viber_btn_edit: "IZMENI ADRESU",
+        scen1_btn_badge: "👉 Kliknite ovde: Dopunite sprat i stan",
+        scen3_btn_badge: "⚡ Kliknite ovde: Potvrdite u 1 klik",
+        scen1_wrong_click_hint: "Adresa je nepotpuna (nedostaje stan). Kliknite na „IZMENI ADRESU” ispod da vidite automatsku dopunu!",
+        scen_btn_not_recommended: "Nije preporučeno (fali stan)",
+        scen_btn_force_confirm: "Ipak potvrdi bez stana",
         viber_success_confirmed: "Potvrđeno bez izmena! Paket je spreman za štampu adresnice.",
         viber_success_edited: "Adresa dopunjena! Dodat sprat i stan. WooCommerce ažuriran.",
         status_saved: "SAČUVANO: Paket nije poslat, 820 RSD u džepu",
@@ -156,14 +165,14 @@ export default function App() {
         term_title: "Real-Time WP Event Terminal",
         term_risk_status: "Status Magacina",
         btn_restart_sim: "Restartuj test",
-        man_tag: "02 / Fizička Adresnica",
+        man_tag: "01.1 / TAČNOST ADRESNICE",
         man_title: "Zašto kuriri vraćaju pakete? Anatomija neispravne adresnice",
         man_p: "Kurir ima prosečno 45 sekundi po adresi. Ako nema sprat, stan ili ako je unet stari broj telefona, kurir stavlja oznaku 'Izvešten - Nije preuzet'. Kada se to desi, trošak povratnog prevoza pada na teret internet prodavnice.",
         man_bad_title: "Standardni WooCommerce Unos (Visok rizik povrata)",
         man_bad_footer: "Rezultat: Kurir ne može da nađe ulaz. Pošiljka stoji u pošti 5 dana, vraća se prodavcu. Gubitak: 780 RSD.",
         man_good_title: "Čista Adresnica nakon Viber Potvrde",
         man_good_footer: "Rezultat: Kurir pronalazi interfon u prvom pokušaju. Kupac očekuje paket i priprema tačan iznos otkupnine.",
-        calc_tag: "03 / Matematika gubitka",
+        calc_tag: "02 / KALKULATOR UŠTEDE",
         calc_title: "Izračunajte godišnje curenje profita na kurirskim službama",
         calc_desc: "Kalkulacija uračunava zvanične cene kurirskih službi u regionu za pakete do 2kg sa otkupninom.",
         calc_label_orders: "Broj narudžbina pouzećem mesečno:",
@@ -171,21 +180,29 @@ export default function App() {
         calc_loss_head: "Godišnji direktan gubitak na poštarinama",
         calc_saved_head: "Neto sačuvano uz Potvrdio:",
         calc_roi_note: "Nakon odbitka cene utrošenih Viber kredita (ROI > 14x)",
-        price_tag: "04 / Bazen Kredita (PAYG)",
-        price_title: "Bez ugovora sa agregatorima. Plaćate samo poslate poruke.",
-        price_desc: "Direktan Viber Business API zahteva fiksne mesečne zakupe od 150€+ i složene ugovore. Potvrdio objedinjuje stotine trgovaca u jedinstveni bazen sa najnižom jediničnom cenom.",
+        price_tag: "03 / CENOVNIK KREDITA (BEZ PRETPLATE)",
+        price_title: "Plaćate samo poslate poruke. Bez ikakve obavezne pretplate.",
+        price_desc: "Zaboravite skupe fiksne zakupe od 150€+ kod agregatora. Dopunjavate kredite po potrebi, plaćate samo uspešno isporučene verifikacije, a kupljeni krediti nikada ne ističu.",
         th_tier: "Paket",
         th_deposit: "Iznos uplate",
         th_viber_rate: "Viber cena",
         th_sms_rate: "SMS Fallback",
         price_note: "Obračun se vrši u dinarima po srednjem kursu NBS na dan izdavanja e-fakture. Bez automatskih skidanja sa kartice bez vašeg odobrenja.",
-        pro_tag: "Za radnje sa > 300 porudžbina",
-        btn_act_pro: "Aktiviraj Pro Reserve",
-        leg_tag: "05 / Pravni okvir & Usklađenost",
-        leg_title: "Usklađenost sa Zakonom o zaštiti podataka o ličnosti (ZZPL RS & EU GDPR)",
+        pro_tag: "Opciono: Za veće radnje (> 500 porudžbina)",
+        btn_act_pro: "Izaberi Pro Opciju",
+        leg_tag: "04.1 / PRAVNA USKLAĐENOST & PRIVATNOST",
+        leg_title: "Pravno Bezbedno i Usklađeno sa Zakonom",
         leg_p: "Slanje verifikacionih poruka funkcioniše isključivo na osnovu Člana 12 Zakona o zaštiti podataka o ličnosti RS (Službeni glasnik 87/2018), Člana 10 ZZLP Severne Makedonije i Člana 6(1)(b) EU GDPR. Obrada je zakonski neophodna za izvršenje ugovora o kupoprodaji na daljinu.",
-        dev_tag: "Tehnička integracija",
-        dev_title: "Kako izgleda kod u WooCommerce eklentiji?",
+        leg_bottom_note: "100% u skladu sa zvaničnim smernicama Poverenika za informacije od javnog značaja i ZZPL RS.",
+        dev_tag: "04.2 / BRZA INSTALACIJA",
+        dev_title: "Instalacija za 2 minuta - bez pisanja koda",
+        dev_p: "Zvanični WordPress dodatak se instalira u nekoliko klikova, bez menjanja tema ili uređivanja functions.php koda. Potpuno kompatibilan sa WooCommerce HPOS sistemom i svim checkout funnel-ima.",
+        dev_step1_title: "1. Preuzmite WordPress dodatak",
+        dev_step1_desc: "Instalirajte besplatni Potvrdio plugin u vašem WordPress adminu (Plugins → Add New → Upload .zip).",
+        dev_step2_title: "2. Povežite vaš API ključ",
+        dev_step2_desc: "Nakon besplatne registracije, unesite licencni ključ sa kontrolne table u podešavanja eklentije.",
+        dev_step3_title: "3. Automatizovana zaštita je aktivna",
+        dev_step3_desc: "Potvrdio automatski zaustavlja rizične COD porudžbine na On-Hold statusu i traži potvrdu kupca pre slanja.",
         dl_title: "Zaustavite troškove povrata već u sledećoj turi slanja",
         dl_desc: "Preuzmite besplatan ZIP, aktivirajte ga u WordPress adminu i odmah dobijate 25 besplatnih verifikacionih sesija.",
         btn_dl_full: "Preuzmi Potvrdio WordPress Plugin (.zip)",
@@ -198,9 +215,9 @@ export default function App() {
         modal_intercom: "Interfon / Napomena za kurira",
         modal_btn_save: "Sačuvaj i Potvrdi Adresu",
         man_badge_bad: "BEZ POTVRDIO ALATA",
-        man_badge_good: "POTVRDIO VALIDIRANO",
-        man_label_header_bad: "STANDARDNA ADRESNICA",
-        man_label_header_good: "VERIFIKOVANA ADRESNICA",
+        man_badge_good: "POTVRDIO VERIFIKACIJA",
+        man_label_header_bad: "POST EXPRESS - STANDARD",
+        man_label_header_good: "POST EXPRESS - VERIFIED",
         man_recipient_bad: "PRIMALAC:",
         man_recipient_good: "PRIMALAC (KUPAC POTVRDIO NA VIBERU):",
         man_bad_warning: "NEMA BROJ ZGRADE, NEMA STAN",
@@ -210,13 +227,13 @@ export default function App() {
         man_cod: "OTKUPNINA: 3.200 RSD",
         man_bad_return: "POVRAT: +410 RSD",
         man_good_delivery: "ISPORUKA: 98.4%",
-        price_prepaid_header: "Prepaid Dopuna (Krediti nikada ne ističu)",
+        price_prepaid_header: "Prepaid Dopuna Kredita (Krediti nikada ne ističu)",
         price_invoice_sub: "Faktura za pravna lica (RSD / EUR)",
         price_badge_popular: "NAJČEŠĆE",
         price_btn_select: "Izaberi",
-        price_pro_title: "Pro Reserve Pretplata",
+        price_pro_title: "Pro Reserve Paket",
         price_per_month: "/ mesečno",
-        price_pro_desc: "Uključuje 1.800 verifikacija (~0.016 € po poruci). Prioritetna Viber linija sa direktnim prolazom bez čekanja.",
+        price_pro_desc: "Za radnje sa preko 500 porudžbina mesečno kojima je potreban namenski prioritetni prolaz i tehnička podrška. (Standardni sistem je 0€ pretplata).",
         price_pro_feat1: "1.800 uključenih kredita / mesec",
         price_pro_feat2: "Automatski oporavak napuštenih korpi",
         price_pro_feat3: "HPOS i WP-CLI tehnička podrška",
@@ -246,10 +263,10 @@ export default function App() {
         leg_action_terms: "Uslovi Korišćenja SaaS Platforme",
         dev_code_comment: "// 1. Presretanje porudžbine u functions.php ili pluginu",
         dev_status_note: "Potvrdio: Čeka Viber potvrdu kupca",
-        dev_hpos_note: "Testirano na WooCommerce 7.0 do 9.x sa High-Performance Order Storage (HPOS) uključenim.",
-        footer_sub: "— Regionalna infrastruktura za WooCommerce pouzeće",
+        dev_hpos_note: "100% kompatibilno sa WooCommerce 7.0 do 9.x sa uključenim HPOS-om.",
+        footer_sub: "Regionalna infrastruktura za WooCommerce pouzeće",
         footer_location: "Novi Sad / Beograd",
-        top_gateway: "Viber Gateway RS: AKTIVAN",
+        top_gateway: "Zvanični Viber & SMS poslovni kanal",
         top_protocol: "Protokol: ZZPL (RS) Član 12 & GDPR",
         top_avg_penalty: "Avg. Dupla Poštarina: 780 RSD",
         hero_no_sub: "0€ Pretplata",
@@ -278,11 +295,11 @@ export default function App() {
         calc_freight_val: "780 RSD (~6.65 €)",
         modal_badge: "Passwordless Token Verifikacija",
         nav_btn_register: "Registracija (25 Kredita)",
-        hero_btn_activate: "Aktiviraj 25 Besplatnih Verifikacija",
+        hero_btn_activate: "Aktiviraj 25 besplatnih verifikacija",
         scen2_ignored_notice: "Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.",
         calc_orders_unit: "narudžbina",
         modal_alert_tip: "⚡ Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.",
-        faq_tag: "06 / Često Postavljana Pitanja",
+        faq_tag: "05 / Često Postavljana Pitanja",
         faq_title: "Sve što treba da znate o Potvrdio COD verifikaciji",
         faq_sub: "Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.",
         floor_word: "Sprat",
@@ -291,16 +308,18 @@ export default function App() {
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
         nav_sub: "Логистичка COD Заштита · WP v2.1",
-        nav_lab: "Симулација на терен",
-        nav_manifest: "Инспекција на адреса",
-        nav_calc: "Матрица на загуби",
-        nav_pricing: "Кредитен базен",
-        nav_dev: "API & HPOS",
+        nav_how: "Како работи",
+        nav_calc: "Калкулатор",
+        nav_pricing: "Ценовник",
+        nav_integration: "Интеграција",
+        nav_lab: "Како работи",
+        nav_manifest: "Точност на адреса",
+        nav_dev: "Интеграција",
         btn_dl: "Преземи ZIP",
         hero_tag: "WooCommerce Заштита на плаќање при преземање (COD)",
-        hero_title: "Купувачот нарачува со плаќање при преземање, не го презема пакетот. Вие плаќате и достава и враќање.",
-        hero_p: "Во регионот над 65% од e-commerce нарачките се со плаќање при преземање. Секоја петта вратена пратка ве чини меѓу 720 и 890 RSD чиста загуба. Potvrdio автоматски ја задржува нарачката во статус On-Hold, испраќа двонасочна Viber верификација и дозволува печатење на адресарот исклучиво по потврда на купувачот.",
-        hero_cta_primary: "Тестирај интерактивна верификација",
+        hero_title: "Купувачот не го подигнува пакетот, вие плаќате двојна поштарина. Спречете го тоа пред испраќање.",
+        hero_p: "Potvrdio автоматски го верификува купувачот и адресата преку Viber пред пакување. Лажните и некомплетни нарачки се запираат навреме - без телефонски повици и со 80% помалку вратени пратки.",
+        hero_cta_primary: "Погледни како работи",
         hero_free_credits: "бесплатни верификации вклучени со приклучокот",
         stat_open_rate: "Одзив на порака",
         stat_open_sub: "Viber во рок од 4 мин.",
@@ -309,8 +328,8 @@ export default function App() {
         stat_recovery: "Пад на вратени пратки",
         stat_recovery_sub: "Од 14.8% на 2.5%",
         hero_box_note: "Пакетот физички не се подигнува од магацин додека купувачот не кликне потврда на Viber. Со тоа ризикот се сведува на нула.",
-        lab_tag: "01 / Интерактивна лабораторија",
-        lab_title: "Испробајте 3 реални сценарија од балканската пракса",
+        lab_tag: "01 / КАКО РАБОТИ",
+        lab_title: "Автоматска Viber верификација во реално време",
         lab_subtitle: "Кликнете на сценарио за да го видите однесувањето на Viber ботот и WooCommerce базата:",
         scen1_title: "Нецелосна адреса (Скопје)",
         scen1_desc: "Купувачот заборавил број на стан и кат. Ги корегира податоците со еден клик преку токен линк.",
@@ -331,6 +350,11 @@ export default function App() {
         scen2_warning: "⏱️ Пораката е игнорирана. Нема одговор 24ч. Пакетот е задржан!",
         viber_btn_yes: "ДА, АДРЕСАТА Е ТОЧНА",
         viber_btn_edit: "ИЗМЕНИ ЈА АДРЕСАТА",
+        scen1_btn_badge: "👉 Кликнете тука: Дополнете кат и стан",
+        scen3_btn_badge: "⚡ Кликнете тука: Потврдете со 1 клик",
+        scen1_wrong_click_hint: "Адресата е нецелосна (недостасува стан). Кликнете на „ИЗМЕНИ ЈА АДРЕСАТА“ подолу за автоматска исправка!",
+        scen_btn_not_recommended: "Не се препорачува (недостасува стан)",
+        scen_btn_force_confirm: "Сепак потврди без стан",
         viber_success_confirmed: "Потврдено без измени! Пакетот е подготвен за достава.",
         viber_success_edited: "Адресата е дополнета! Додаден кат и стан. WooCommerce е ажуриран.",
         status_saved: "ЗАШТЕДЕНО: Пакетот не е испратен, 820 RSD во џеб",
@@ -339,14 +363,14 @@ export default function App() {
         term_title: "Real-Time WP Event Terminal",
         term_risk_status: "Статус на магацин",
         btn_restart_sim: "Рестартирај тест",
-        man_tag: "02 / Физички адресар",
+        man_tag: "01.1 / ТОЧНОСТ НА АДРЕСАТА",
         man_title: "Зошто куририте враќаат пакети? Анатомија на неисправна адреса",
         man_p: "Курирот има просечно 45 секунди по адреса. Ако нема кат или стан, го означува како 'Неиспорачано'. Трошокот паѓа на продавачот.",
         man_bad_title: "Стандарден WooCommerce Внос (Висок ризик)",
         man_bad_footer: "Резултат: Курирот не може да ја најде зградата. Пакетот се враќа на продавачот. Загуба: 780 RSD.",
         man_good_title: "Чист адресар по Viber потврда",
         man_good_footer: "Резултат: Курирот го наоѓа интерфонот од прв обид. Купувачот го очекува пакетот.",
-        calc_tag: "03 / Математика на загуба",
+        calc_tag: "02 / КАЛКУЛАТОР ЗА ЗАШТЕДА",
         calc_title: "Преметајте ги годишните загуби на курирски услуги",
         calc_desc: "Калкулацијата ги зема предвид официјалните ценовници на курирските служби во регионот.",
         calc_label_orders: "Месечен број на COD нарачки:",
@@ -354,21 +378,29 @@ export default function App() {
         calc_loss_head: "Годишна директна загуба од поштарина",
         calc_saved_head: "Нето заштедено со Potvrdio:",
         calc_roi_note: "По одземање на трошокот за Viber кредити (ROI > 14x)",
-        price_tag: "04 / Кредитен базен (PAYG)",
-        price_title: "Без договори. Плаќате само за испратени пораки.",
-        price_desc: "Директен Viber Business API бара фиксни месечни закупнини од 150€+. Potvrdio ве обединува за најниска цена.",
+        price_tag: "03 / ЦЕНОВНИК ЗА КРЕДИТИ (БЕЗ ПРЕТПЛАТА)",
+        price_title: "Плаќате само за испратени пораки. Без задолжителна претплата.",
+        price_desc: "Заборавете ги скапите фиксни закупнини од 150€+. Дополнувате кредити по потреба, плаќате само испратени пораки, а купените кредити никогаш не истекуваат.",
         th_tier: "Пакет",
         th_deposit: "Износ за уплата",
         th_viber_rate: "Viber цена",
         th_sms_rate: "SMS Fallback",
         price_note: "Фактурирање во денари/евра. Без автоматско одземање од картичка.",
-        pro_tag: "За продавници со > 300 нарачки",
-        btn_act_pro: "Активирај Pro Reserve",
-        leg_tag: "05 / Правна Рамка & Усогласеност",
-        leg_title: "Усогласеност со Законот за заштита на личните податоци (ZZLP MK & EU GDPR)",
+        pro_tag: "Опционо: За поголеми продавници (> 500 нарачки)",
+        btn_act_pro: "Избери Pro Опција",
+        leg_tag: "04.1 / ПРАВНА СООДВЕТНОСТ И ПРИВАТНОСТ",
+        leg_title: "Правно Безбедно и Усогласено со Законот",
         leg_p: "Испраќањето верификациски пораки функционира исклучиво врз основа на Член 10 од Законот за заштита на личните податоци на С. Македонија (АЗЛП), Член 12 од ZZPL RS и Член 6(1)(b) од EU GDPR. Обработката е законски неопходна за исполнување на купопродажниот договор.",
-        dev_tag: "Техничка интеграција",
-        dev_title: "Како изгледа кодот во WooCommerce?",
+        leg_bottom_note: "100% во согласност со насоките на Агенцијата за заштита на личните податоци (АЗЛП).",
+        dev_tag: "04.2 / БРЗА ИНСТАЛАЦИЈА",
+        dev_title: "Инсталација за 2 минути - без програмирање",
+        dev_p: "Официјалниот WordPress додаток се инсталира со неколку клика, без менување на кодот на темата или уредување на functions.php. Целосно компатибилен со WooCommerce HPOS и прилагодени checkout текови.",
+        dev_step1_title: "1. Преземете го бесплатниот WordPress додаток",
+        dev_step1_desc: "Инсталирајте го Potvrdio со еден клик преку вашиот WordPress админ панел (Plugins → Add New → Upload .zip).",
+        dev_step2_title: "2. Поврзете го вашиот API клуч",
+        dev_step2_desc: "По бесплатната регистрација, внесете го лиценчниот клуч од контролниот панел во поставките.",
+        dev_step3_title: "3. Автоматизираната заштита е активна",
+        dev_step3_desc: "Potvrdio автоматски ги задржува ризичните COD нарачки и бара потврда од купувачот пред испраќање.",
         dl_title: "Запрете ги трошоците за враќање уште при следната достава",
         dl_desc: "Преземете го бесплатниот ZIP, активирајте го во WordPress и добијте 25 бесплатни кредити.",
         btn_dl_full: "Преземи Potvrdio WordPress Plugin (.zip)",
@@ -393,13 +425,13 @@ export default function App() {
         man_cod: "ОТКУПНИНА: 3.200 RSD",
         man_bad_return: "ВРАЌАЊЕ: +410 RSD",
         man_good_delivery: "ИСПРАТИ: 98.4%",
-        price_prepaid_header: "Prepaid Дополнување (Кредитите никогаш не истекуваат)",
+        price_prepaid_header: "Prepaid Дополнување на Кредити (Кредитите никогаш не истекуваат)",
         price_invoice_sub: "Фактура за правни лица (RSD / EUR)",
         price_badge_popular: "НАЈЧЕСТО",
         price_btn_select: "Избери",
-        price_pro_title: "Pro Reserve Претплата",
+        price_pro_title: "Pro Reserve Пакет",
         price_per_month: "/ месечно",
-        price_pro_desc: "Вклучува 1.800 верификации (~0.016 € по порака). Приоритетна Viber линија со директен премин.",
+        price_pro_desc: "За продавници со над 500 нарачки месечно со приоритетен деловен премин и техничка поддршка. (Стандардниот систем е 0€ претплата).",
         price_pro_feat1: "1.800 вклучени кредити / месец",
         price_pro_feat2: "Автоматско враќање на напуштени кошнички",
         price_pro_feat3: "HPOS и WP-CLI техничка поддршка",
@@ -429,10 +461,10 @@ export default function App() {
         leg_action_terms: "Услови за Користење на Платформата",
         dev_code_comment: "// 1. Интерцепција во functions.php или приклучок",
         dev_status_note: "Potvrdio: Се чека Viber потврда",
-        dev_hpos_note: "Тестирано на WooCommerce 7.0 до 9.x со вклучен High-Performance Order Storage (HPOS).",
-        footer_sub: "— Регионална инфраструктура за WooCommerce плаќање при преземање",
+        dev_hpos_note: "100% компатибилно со WooCommerce 7.0 до 9.x со вклучен HPOS.",
+        footer_sub: "Регионална инфраструктура за WooCommerce плаќање при преземање",
         footer_location: "Скопје / Битола / Белград",
-        top_gateway: "Viber Gateway: АКТИВЕН",
+        top_gateway: "Официјален Viber & SMS деловен канал",
         top_protocol: "Протокол: Закон за лични податоци & GDPR",
         top_avg_penalty: "Просечна двојна поштарина: 390 MKD",
         hero_no_sub: "0€ Претплата",
@@ -461,11 +493,11 @@ export default function App() {
         calc_freight_val: "390 MKD (~6.35 €)",
         modal_badge: "Passwordless Token Верификација",
         nav_btn_register: "Регистрација (25 Кредити)",
-        hero_btn_activate: "Активирај 25 Бесплатни Верификации",
+        hero_btn_activate: "Активирај 25 бесплатни верификации",
         scen2_ignored_notice: "Купувачот не одговори 24ч. Нарачката е откажана пред пакување.",
         calc_orders_unit: "нарачки",
         modal_alert_tip: "⚡ Пополнете кат и стан за курирот без застој да го најде вашиот влез.",
-        faq_tag: "06 / Често Поставувани Прашања",
+        faq_tag: "05 / Често Поставувани Прашања",
         faq_title: "Сè што треба да знаете за Potvrdio COD верификацијата",
         faq_sub: "Одговори на клучните технички и правни прашања.",
         floor_word: "Кат",
@@ -474,16 +506,18 @@ export default function App() {
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
         nav_sub: "COD Protection Engine · WP v2.1",
-        nav_lab: "Field Simulator",
-        nav_manifest: "Label Inspector",
-        nav_calc: "Courier Loss Matrix",
-        nav_pricing: "Credit Pool",
-        nav_dev: "API & HPOS",
+        nav_how: "How it works",
+        nav_calc: "Calculator",
+        nav_pricing: "Pricing",
+        nav_integration: "Integration",
+        nav_lab: "How it works",
+        nav_manifest: "Address Accuracy",
+        nav_dev: "Integration",
         btn_dl: "Download ZIP",
         hero_tag: "WooCommerce Cash on Delivery (COD) Shield",
-        hero_title: "Buyers order COD, reject at door. You pay shipping both ways.",
-        hero_p: "In the Balkans, over 65% of e-commerce orders are Cash on Delivery. Every uncollected parcel (Post Express, D Express) costs between 720 and 890 RSD (~€7) in deadweight shipping penalties. Potvrdio intercepts orders on On-Hold status, executes 2-way Viber verification, and blocks shipping manifests until confirmed.",
-        hero_cta_primary: "Test Interactive Simulator",
+        hero_title: "Customer abandons COD parcel, you pay double shipping. Stop it before dispatch.",
+        hero_p: "Potvrdio automatically verifies buyer intent and shipping address via Viber before packing. Fake and incomplete orders are stopped in time - zero phone calls, 80% fewer returns.",
+        hero_cta_primary: "See how it works",
         hero_free_credits: "free verification credits included with plugin",
         stat_open_rate: "Open Rate",
         stat_open_sub: "Viber within 4 min.",
@@ -492,8 +526,8 @@ export default function App() {
         stat_recovery: "Return Reduction",
         stat_recovery_sub: "From 14.8% down to 2.5%",
         hero_box_note: "Parcels never leave warehouse shelves until the buyer confirms on Viber. Courier return exposure drops to near zero.",
-        lab_tag: "01 / Interactive Lab",
-        lab_title: "Test 3 real operational scenarios from the field",
+        lab_tag: "01 / HOW IT WORKS",
+        lab_title: "Automated real-time Viber verification",
         lab_subtitle: "Click a scenario to observe Viber bot and WooCommerce database hooks:",
         scen1_title: "Incomplete Address (Novi Sad)",
         scen1_desc: "Customer missed apartment & floor numbers. Fixes details with a single tap passwordless link.",
@@ -514,6 +548,11 @@ export default function App() {
         scen2_warning: "⏱️ Customer ignored message. 24h expired. Parcel safely held in warehouse!",
         viber_btn_yes: "YES, ADDRESS IS ACCURATE",
         viber_btn_edit: "EDIT ADDRESS",
+        scen1_btn_badge: "👉 Click here: Add missing floor & apt",
+        scen3_btn_badge: "⚡ Click here: 1-tap instant confirm",
+        scen1_wrong_click_hint: "Address is incomplete (missing apartment). Click \"EDIT ADDRESS\" below to test automated address completion!",
+        scen_btn_not_recommended: "Not recommended (missing apt)",
+        scen_btn_force_confirm: "Confirm anyway without apartment",
         viber_success_confirmed: "Confirmed without edits! Parcel ready for shipping label printing.",
         viber_success_edited: "Address updated! Floor and apartment added. WooCommerce updated.",
         status_saved: "SAVED: Parcel not dispatched, ~€7 saved in pocket",
@@ -522,14 +561,14 @@ export default function App() {
         term_title: "Real-Time WP Event Terminal",
         term_risk_status: "Warehouse Decision",
         btn_restart_sim: "Reset test",
-        man_tag: "02 / Physical Manifest",
+        man_tag: "01.1 / ADDRESS ACCURACY",
         man_title: "Why couriers fail deliveries: Anatomy of a faulty label",
         man_p: "Couriers spend an average of 45 seconds per drop. If the intercom or floor is missing, they tag the parcel as 'Customer Not Found'. That return fee lands directly on your P&L.",
         man_bad_title: "Standard Blind WooCommerce Entry (High Risk)",
         man_bad_footer: "Outcome: Courier cannot locate apartment. Stored in depot 5 days, returned. Loss: 780 RSD.",
         man_good_title: "Clean Verified Label via Potvrdio",
         man_good_footer: "Outcome: Courier rings intercom on first attempt. Customer expects delivery with exact cash.",
-        calc_tag: "03 / Loss Mathematics",
+        calc_tag: "02 / SAVINGS CALCULATOR",
         calc_title: "Calculate annual profit hemorrhage on courier returns",
         calc_desc: "Calculations based on standard regional courier tariffs with return penalties for parcels under 2kg.",
         calc_label_orders: "Monthly Cash on Delivery Orders:",
@@ -537,21 +576,29 @@ export default function App() {
         calc_loss_head: "Annual Direct Shipping Loss",
         calc_saved_head: "Net Saved with Potvrdio:",
         calc_roi_note: "After deducting Viber verification credit costs (ROI > 14x)",
-        price_tag: "04 / Credit Pool (PAYG)",
-        price_title: "No aggregator contract. Pay strictly per verified message.",
-        price_desc: "Direct Viber Business accounts demand €150+/mo minimum retainers and bureaucratic contracts. Potvrdio aggregates regional volume for wholesale unit pricing.",
+        price_tag: "03 / CREDIT PRICING (NO SUBSCRIPTION)",
+        price_title: "Pay strictly per verified message. Zero mandatory subscriptions.",
+        price_desc: "Forget expensive €150+/mo telecom retainers and rigid contracts. Top up message credits as needed, pay only for delivered verifications, and credits never expire.",
         th_tier: "Tier",
         th_deposit: "Deposit Amount",
         th_viber_rate: "Viber Rate",
         th_sms_rate: "SMS Fallback",
         price_note: "Invoiced in local RSD or EUR via official central bank rate. Zero automated credit card charges without consent.",
-        pro_tag: "For stores with > 300 monthly orders",
-        btn_act_pro: "Activate Pro Reserve",
-        leg_tag: "05 / Legal Framework & Compliance",
-        leg_title: "Compliant with Serbian ZZPL Art. 12, MK ZZLP & EU GDPR",
+        pro_tag: "Optional for high-volume stores (> 500 orders)",
+        btn_act_pro: "Select Pro Option",
+        leg_tag: "04.1 / LEGAL COMPLIANCE & PRIVACY",
+        leg_title: "Legally Grounded & Privacy-First",
         leg_p: "Customer address verification messages operate strictly under Article 12 of the Serbian Personal Data Protection Law (ZZPL), Article 10 of North Macedonia's ZZLP, and Article 6(1)(b) of the EU GDPR. Processing is legally grounded in remote sales contract execution.",
-        dev_tag: "Technical Integration",
-        dev_title: "How clean is the WooCommerce code?",
+        leg_bottom_note: "100% compliant with official Serbian Commissioner guidelines, MK AZLP & EU GDPR.",
+        dev_tag: "04.2 / EFFORTLESS SETUP",
+        dev_title: "2-Minute Setup - Zero Code Required",
+        dev_p: "Install the official WordPress plugin in clicks without editing theme files or touching functions.php code. Fully compatible with High-Performance Order Storage (HPOS) and custom checkout funnels out of the box.",
+        dev_step1_title: "1. Download the WordPress Plugin",
+        dev_step1_desc: "Install Potvrdio with a single click inside your WordPress admin (Plugins → Add New → Upload .zip).",
+        dev_step2_title: "2. Connect Your License Key",
+        dev_step2_desc: "Paste your unique API key into WooCommerce settings directly from your Potvrdio dashboard.",
+        dev_step3_title: "3. Automated Protection is Live",
+        dev_step3_desc: "Potvrdio automatically intercepts COD orders, holds unverified packages, and verifies buyer addresses on Viber.",
         dl_title: "Halt return courier costs before tomorrow's dispatch",
         dl_desc: "Download the free ZIP plugin, activate inside WordPress admin, and get 25 free credits instantly.",
         btn_dl_full: "Download Potvrdio WordPress Plugin (.zip)",
@@ -576,13 +623,13 @@ export default function App() {
         man_cod: "COD: 3,200 RSD (~€27)",
         man_bad_return: "RETURN PENALTY: +410 RSD",
         man_good_delivery: "DELIVERY SUCCESS: 98.4%",
-        price_prepaid_header: "Prepaid Credits (Credits never expire)",
+        price_prepaid_header: "Prepaid Message Credits (Credits never expire)",
         price_invoice_sub: "Invoices for Companies (RSD / EUR)",
         price_badge_popular: "MOST POPULAR",
         price_btn_select: "Select",
-        price_pro_title: "Pro Reserve Plan",
+        price_pro_title: "Pro Reserve Package",
         price_per_month: "/ month",
-        price_pro_desc: "Includes 1,800 verifications (~€0.016 / message). Priority Viber gateway with zero waiting queue.",
+        price_pro_desc: "For stores with > 500 monthly orders requiring a dedicated priority pipeline and live support. (Standard usage is €0 subscription).",
         price_pro_feat1: "1,800 included credits / month",
         price_pro_feat2: "Automated abandoned cart recovery",
         price_pro_feat3: "HPOS & WP-CLI technical support",
@@ -612,10 +659,10 @@ export default function App() {
         leg_action_terms: "SaaS Platform Terms & Conditions",
         dev_code_comment: "// 1. Intercept order inside functions.php or custom plugin",
         dev_status_note: "Potvrdio: Awaiting buyer Viber confirmation",
-        dev_hpos_note: "Battle-tested on WooCommerce 7.0 through 9.x with High-Performance Order Storage (HPOS) enabled.",
-        footer_sub: "— Regional Infrastructure for WooCommerce Cash on Delivery (COD)",
+        dev_hpos_note: "100% compatible with WooCommerce 7.0 through 9.x with HPOS enabled.",
+        footer_sub: "Regional Infrastructure for WooCommerce Cash on Delivery (COD)",
         footer_location: "Belgrade / Novi Sad / Skopje",
-        top_gateway: "Viber Gateway: ACTIVE",
+        top_gateway: "Official Viber & SMS Business Service",
         top_protocol: "Protocol: Data Protection & GDPR Compliant",
         top_avg_penalty: "Avg. Double Return Penalty: ~€7 (780 RSD)",
         hero_no_sub: "€0 Subscription",
@@ -644,11 +691,11 @@ export default function App() {
         calc_freight_val: "~€6.65 (780 RSD)",
         modal_badge: "Passwordless Token Verification",
         nav_btn_register: "Register Store (25 Free)",
-        hero_btn_activate: "Activate 25 Free Credits",
+        hero_btn_activate: "Activate 25 free credits",
         scen2_ignored_notice: "Customer ignored for 24h. Order cancelled before packing.",
         calc_orders_unit: "orders",
         modal_alert_tip: "⚡ Fill floor and apartment so the courier can find your entrance without delay.",
-        faq_tag: "06 / Frequently Asked Questions",
+        faq_tag: "05 / Frequently Asked Questions",
         faq_title: "Everything you need to know about Potvrdio COD verification",
         faq_sub: "Answers to key technical, legal, and operational questions.",
         floor_word: "Floor",
@@ -709,14 +756,21 @@ export default function App() {
     playClickSound();
     setCurrentScenario(scenNum);
     setSimState('initial');
+    setWrongClickNotice(false);
     setShowAddressModal(false);
   };
 
-  const handleSimAction = (action: 'confirm' | 'edit') => {
+  const handleSimAction = (action: 'confirm' | 'edit', forceConfirm: boolean = false) => {
     playScannerBeep();
     if (action === 'edit') {
+      setWrongClickNotice(false);
       setShowAddressModal(true);
     } else {
+      if (currentScenario === 1 && !forceConfirm) {
+        setWrongClickNotice(true);
+        return;
+      }
+      setWrongClickNotice(false);
       setSimState('confirmed');
     }
   };
@@ -724,6 +778,7 @@ export default function App() {
   const handleResetSim = () => {
     playClickSound();
     setSimState('initial');
+    setWrongClickNotice(false);
     setShowAddressModal(false);
   };
 
@@ -773,20 +828,16 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="#" className="flex items-center group">
             <PotvrdioLogo variant="horizontal" mode={theme} />
-            <div className="hidden sm:block pl-2 border-l border-theme text-[10px] font-sans text-theme-muted">
-              {t('nav_sub')}
-            </div>
           </a>
 
           {/* Nav Links */}
           <nav className="hidden md:flex items-center gap-6 text-xs text-theme-muted font-medium">
-            <a href="#lab" className="hover:text-theme-primary transition-colors">{t('nav_lab')}</a>
-            <a href="#manifest" className="hover:text-theme-primary transition-colors">{t('nav_manifest')}</a>
+            <a href="#kako-radi" className="hover:text-theme-primary transition-colors">{t('nav_how')}</a>
             <a href="#kalkulator" className="hover:text-theme-primary transition-colors">{t('nav_calc')}</a>
             <a href="#cenovnik" className="hover:text-theme-primary transition-colors">{t('nav_pricing')}</a>
-            <a href="#integracija" className="hover:text-theme-primary transition-colors">{t('nav_dev')}</a>
+            <a href="#integracija" className="hover:text-theme-primary transition-colors">{t('nav_integration')}</a>
           </nav>
 
           {/* Controls */}
@@ -832,7 +883,7 @@ export default function App() {
               className="hidden sm:inline-flex btn-brand-cta text-white font-bold text-xs px-3 sm:px-3.5 py-2 rounded transition-all items-center gap-1.5 shadow-sm min-h-[36px] cursor-pointer"
             >
               <Rocket className="w-3.5 h-3.5 text-teal-300 shrink-0" />
-              <span>{lang === 'sr' ? 'Registracija (25 Kredita)' : lang === 'mk' ? 'Регистрација (25 Кредити)' : 'Register Store (25 Free)'}</span>
+              <span>{t('nav_btn_register')}</span>
             </button>
 
             {/* Mobile Hamburger Button */}
@@ -854,19 +905,11 @@ export default function App() {
               {lang === 'sr' ? 'Navigacija' : lang === 'mk' ? 'Навигација' : 'Navigation'}
             </div>
             <a 
-              href="#lab" 
+              href="#kako-radi" 
               onClick={() => setMobileMenuOpen(false)} 
               className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
-              <span>01. {t('nav_lab')}</span>
-              <ChevronRight className="w-4 h-4 text-theme-muted" />
-            </a>
-            <a 
-              href="#manifest" 
-              onClick={() => setMobileMenuOpen(false)} 
-              className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
-            >
-              <span>02. {t('nav_manifest')}</span>
+              <span>01. {t('nav_how')}</span>
               <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
@@ -874,7 +917,7 @@ export default function App() {
               onClick={() => setMobileMenuOpen(false)} 
               className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
-              <span>03. {t('nav_calc')}</span>
+              <span>02. {t('nav_calc')}</span>
               <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
@@ -882,7 +925,7 @@ export default function App() {
               onClick={() => setMobileMenuOpen(false)} 
               className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
-              <span>04. {t('nav_pricing')}</span>
+              <span>03. {t('nav_pricing')}</span>
               <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
             <a 
@@ -890,7 +933,7 @@ export default function App() {
               onClick={() => setMobileMenuOpen(false)} 
               className="py-2.5 text-theme-secondary hover:text-[#14B8A6] transition-colors border-b border-theme-subtle flex items-center justify-between"
             >
-              <span>05. {t('nav_dev')}</span>
+              <span>04. {t('nav_integration')}</span>
               <ChevronRight className="w-4 h-4 text-theme-muted" />
             </a>
 
@@ -932,7 +975,7 @@ export default function App() {
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
                 <a 
-                  href="#lab" 
+                  href="#kako-radi" 
                   onClick={playClickSound}
                   className="btn-brand-cta text-white font-bold text-xs px-5 py-3.5 sm:py-3 rounded-lg transition-all inline-flex items-center justify-center gap-2 min-h-[44px]"
                 >
@@ -944,7 +987,7 @@ export default function App() {
                   className="px-5 py-3.5 sm:py-3 bg-surface-subtle hover:bg-surface text-theme-primary border border-[#14B8A6]/40 hover:border-[#14B8A6] text-xs rounded-lg font-bold transition inline-flex items-center justify-center gap-2 cursor-pointer min-h-[44px] shadow-sm"
                 >
                   <Rocket className="w-4 h-4 text-teal-300 shrink-0" />
-                  <span>{lang === 'sr' ? 'Aktiviraj 25 Besplatnih Verifikacija' : lang === 'mk' ? 'Активирај 25 Бесплатни Верификации' : 'Activate 25 Free Credits'}</span>
+                  <span>{t('hero_btn_activate')}</span>
                 </button>
               </div>
 
@@ -1028,13 +1071,14 @@ export default function App() {
       </section>
 
       {/* SECTION 01: Interactive Lab Simulator */}
-      <section id="lab" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
+      <section id="kako-radi" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme relative">
+        <span id="lab" className="sr-only" />
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
           <div>
             <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('lab_tag')}</div>
             <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('lab_title')}</h2>
           </div>
-          <div className="text-xs text-slate-400 font-sans">
+          <div className="text-xs text-theme-muted font-sans">
             {t('lab_subtitle')}
           </div>
         </div>
@@ -1043,11 +1087,11 @@ export default function App() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 sm:mb-8">
           <button 
             onClick={() => handleScenarioChange(1)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-theme hover:border-[#14B8A6]/40'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30 bg-teal-50/40 dark:bg-[#14B8A6]/5' : 'border border-theme hover:border-[#14B8A6]/40'}`}
           >
             <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario A</span>
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_common_tag')}</span>
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario A</span>
+              <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">{t('scen_common_tag')}</span>
             </div>
             <div className="font-bold text-theme-primary text-sm mb-1">{t('scen1_title')}</div>
             <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen1_desc')}</div>
@@ -1055,11 +1099,11 @@ export default function App() {
 
           <button 
             onClick={() => handleScenarioChange(2)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-theme hover:border-[#14B8A6]/40'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30 bg-teal-50/40 dark:bg-[#14B8A6]/5' : 'border border-theme hover:border-[#14B8A6]/40'}`}
           >
             <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario B</span>
-              <span className="text-[10px] font-semibold text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">{t('scen_saved_tag')}</span>
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario B</span>
+              <span className="text-[10px] font-semibold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-2 py-0.5 rounded-full border border-red-200 dark:border-red-500/20">{t('scen_saved_tag')}</span>
             </div>
             <div className="font-bold text-theme-primary text-sm mb-1">{t('scen2_title')}</div>
             <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen2_desc')}</div>
@@ -1067,11 +1111,11 @@ export default function App() {
 
           <button 
             onClick={() => handleScenarioChange(3)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30' : 'border border-theme hover:border-[#14B8A6]/40'}`}
+            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30 bg-teal-50/40 dark:bg-[#14B8A6]/5' : 'border border-theme hover:border-[#14B8A6]/40'}`}
           >
             <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario C</span>
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">{t('scen_fast_tag')}</span>
+              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario C</span>
+              <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">{t('scen_fast_tag')}</span>
             </div>
             <div className="font-bold text-theme-primary text-sm mb-1">{t('scen3_title')}</div>
             <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen3_desc')}</div>
@@ -1082,183 +1126,330 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start glass-panel p-4 sm:p-6 rounded-lg">
           
           {/* Viber Phone Mockup Left */}
-          <div className="lg:col-span-5 bg-[#1E1838] border border-[#46377B] rounded-xl p-3.5 sm:p-4 shadow-xl">
-            <div className="flex items-center justify-between border-b border-[#46377B] pb-3 mb-4">
+          <div className="lg:col-span-5 bg-[#F8F9FE] dark:bg-[#1E1838] border border-[#E2DEF6] dark:border-[#46377B] rounded-xl p-3.5 sm:p-4 shadow-lg transition-colors">
+            <div className="flex items-center justify-between border-b border-[#E2DEF6] dark:border-[#46377B] pb-3 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#7360F2] flex items-center justify-center text-white font-bold text-xs shrink-0">
+                <div className="w-8 h-8 rounded-full bg-[#7360F2] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">
                   VB
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-white flex items-center gap-1.5 flex-wrap">
+                  <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap">
                     <span>Potvrdio · {t('viber_verified_title')}</span>
-                    <span className="text-[9px] bg-emerald-500/20 text-emerald-300 px-1 py-0.5 rounded font-mono">{t('viber_verified_badge')}</span>
+                    <span className="text-[9px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 py-0.5 rounded font-mono font-medium">{t('viber_verified_badge')}</span>
                   </div>
-                  <div className="text-[10px] font-mono text-[#A798CE]">Viber Business Gateway #782</div>
+                  <div className="text-[10px] font-mono text-slate-500 dark:text-[#A798CE]">Viber Business Gateway #782</div>
                 </div>
               </div>
-              <span className="text-[10px] font-mono text-[#8B79B2] shrink-0">13:42</span>
+              <span className="text-[10px] font-mono text-slate-400 dark:text-[#8B79B2] shrink-0">13:42</span>
             </div>
 
-            <div className="space-y-3 text-xs leading-relaxed text-[#E6DDFA]">
+            <div className="space-y-3 text-xs leading-relaxed text-slate-800 dark:text-[#E6DDFA]">
               {/* Scenario 1 Warning Banner */}
               {currentScenario === 1 && simState === 'initial' && (
-                <div className="p-2.5 rounded bg-amber-500/20 border border-amber-400/40 text-amber-200 text-[11px] font-mono flex items-start gap-2 shadow-sm animate-pulse">
-                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-400/40 text-amber-800 dark:text-amber-200 text-[11px] font-mono flex items-start gap-2 shadow-sm animate-pulse">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                   <span>{t('scen1_warning')}</span>
                 </div>
               )}
 
               {/* Scenario 2 Warning Banner */}
               {currentScenario === 2 && (
-                <div className="p-2.5 rounded bg-red-500/20 border border-red-400/40 text-red-200 text-[11px] font-mono flex items-start gap-2 shadow-sm">
-                  <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-400/40 text-red-800 dark:text-red-200 text-[11px] font-mono flex items-start gap-2 shadow-sm">
+                  <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
                   <span>{t('scen2_warning')}</span>
                 </div>
               )}
 
-              <div className="bg-[#29204A] p-3 sm:p-3.5 rounded-lg border border-[#46377B]">
-                <p className="mb-2">
+              <div className="bg-white dark:bg-[#29204A] p-3 sm:p-3.5 rounded-lg border border-[#E2DEF6] dark:border-[#46377B] shadow-sm">
+                <p className="mb-2 text-slate-800 dark:text-[#E6DDFA]">
                   {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount[lang]}).
                 </p>
-                <div className="p-2.5 rounded bg-[#1E1838] border border-[#46377B] font-mono text-[11px] text-[#C4B5FD] mb-3">
-                  <span className="text-slate-400 block text-[10px]">{t('viber_shipping_address')}</span>
-                  <span className="text-white font-medium">
+                <div className="p-2.5 rounded bg-[#F1EFFB] dark:bg-[#1E1838] border border-[#DDD8F4] dark:border-[#46377B] font-mono text-[11px] text-slate-900 dark:text-[#C4B5FD] mb-3">
+                  <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('viber_shipping_address')}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
                     {simState === 'edited' ? (
                       <span>
                         {currentScenConfig.address[lang]}
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold text-[10px] border border-blue-400/40 animate-pulse">
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300 font-bold text-[10px] border border-blue-200 dark:border-blue-400/40 animate-pulse">
                           + {lang === 'sr' ? `Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `Кат ${floorInput}, Стан ${aptInput}` : `Floor ${floorInput}, Apt ${aptInput}`}
                         </span>
                       </span>
                     ) : currentScenConfig.address[lang]}
                   </span>
                 </div>
-                <p className="text-[11px] text-[#DDD6FE]">
+                <p className="text-[11px] text-slate-600 dark:text-[#DDD6FE]">
                   {t('viber_confirm_prompt')}
                 </p>
               </div>
 
               {currentScenario === 2 ? (
-                <div className="p-3 rounded bg-red-500/10 border border-red-500/30 text-red-300 text-xs font-mono text-center flex flex-col items-center gap-1">
+                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-300 text-xs font-mono text-center flex flex-col items-center gap-1">
                   <div className="flex items-center gap-1.5 font-bold">
-                    <XCircle className="w-4 h-4 text-red-400 shrink-0" />
+                    <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                     <span>{t('status_saved')}</span>
                   </div>
-                  <p className="text-[10px] text-slate-300 font-sans">
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300 font-sans">
                     {lang === 'sr' ? 'Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.' : lang === 'mk' ? 'Купувачот не одговори 24ч. Нарачката е откажана пред пакување.' : 'Customer ignored for 24h. Order cancelled before packing.'}
                   </p>
                 </div>
               ) : simState === 'initial' ? (
-                <div className="space-y-2 pt-1">
-                  <button 
-                    onClick={() => handleSimAction('confirm')} 
-                    className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-md cursor-pointer min-h-[44px]"
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>{t('viber_btn_yes')}</span>
-                  </button>
-                  <button 
-                    onClick={() => handleSimAction('edit')} 
-                    className="w-full bg-[#191A2B] hover:bg-[#252840] text-slate-200 py-2.5 rounded text-xs transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer min-h-[42px]"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#14B8A6]" />
-                    <span>{t('viber_btn_edit')}</span>
-                  </button>
+                <div className="space-y-3 pt-1">
+                  {currentScenario === 1 ? (
+                    <>
+                      {/* Secondary / De-emphasized button (Confirm) with soft guidance */}
+                      <div className="space-y-1.5">
+                        <button 
+                          onClick={() => handleSimAction('confirm')} 
+                          className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 font-medium py-2 rounded text-xs transition opacity-50 hover:opacity-80 flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px] border border-dashed border-slate-300 dark:border-white/10"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                          <span>{t('viber_btn_yes')}</span>
+                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-normal">({t('scen_btn_not_recommended')})</span>
+                        </button>
+
+                        {/* Wrong Click Notice Banner */}
+                        {wrongClickNotice && (
+                          <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-500/20 border border-amber-300 dark:border-amber-400/40 text-amber-900 dark:text-amber-200 text-[11px] font-sans flex flex-col gap-1.5 shadow-sm animate-pulse">
+                            <div className="flex items-start gap-1.5 font-medium">
+                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                              <span>{t('scen1_wrong_click_hint')}</span>
+                            </div>
+                            <button
+                              onClick={() => handleSimAction('confirm', true)}
+                              className="self-end text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white underline cursor-pointer"
+                            >
+                              {t('scen_btn_force_confirm')} →
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Primary / Spotlight Hero Button (Edit Address) */}
+                      <div className="relative pt-1">
+                        <div className="flex items-center justify-center mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#7360F2] text-white shadow-md shadow-[#7360F2]/30 animate-bounce">
+                            <span>{t('scen1_btn_badge')}</span>
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => handleSimAction('edit')} 
+                          className="w-full bg-[#7360F2] hover:bg-[#6250E0] text-white font-bold py-3.5 rounded-xl text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-[#7360F2]/30 ring-2 ring-[#7360F2] ring-offset-2 ring-offset-[#F8F9FE] dark:ring-offset-[#1E1838] cursor-pointer min-h-[46px]"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-white" />
+                          <span className="tracking-wide text-xs font-extrabold">{t('viber_btn_edit')}</span>
+                        </button>
+                      </div>
+                    </>
+                  ) : currentScenario === 3 ? (
+                    <>
+                      {/* Primary / Spotlight Hero Button (Confirm in 1 click) */}
+                      <div className="relative pt-1">
+                        <div className="flex items-center justify-center mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-600 text-white shadow-md shadow-emerald-600/30 animate-bounce">
+                            <span>{t('scen3_btn_badge')}</span>
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => handleSimAction('confirm')} 
+                          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 ring-2 ring-emerald-500 ring-offset-2 ring-offset-[#F8F9FE] dark:ring-offset-[#1E1838] cursor-pointer min-h-[46px]"
+                        >
+                          <Check className="w-4 h-4 text-white" />
+                          <span className="tracking-wide text-xs font-extrabold">{t('viber_btn_yes')}</span>
+                        </button>
+                      </div>
+
+                      {/* Secondary / De-emphasized button (Edit) */}
+                      <button 
+                        onClick={() => handleSimAction('edit')} 
+                        className="w-full bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 dark:text-slate-500 font-medium py-2 rounded text-xs transition opacity-50 hover:opacity-80 flex items-center justify-center gap-1.5 border border-slate-200 dark:border-white/10 cursor-pointer min-h-[36px]"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{t('viber_btn_edit')}</span>
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        onClick={() => handleSimAction('confirm')} 
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-md cursor-pointer min-h-[44px]"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>{t('viber_btn_yes')}</span>
+                      </button>
+                      <button 
+                        onClick={() => handleSimAction('edit')} 
+                        className="w-full bg-white hover:bg-slate-50 dark:bg-[#191A2B] dark:hover:bg-[#252840] text-slate-700 dark:text-slate-200 font-semibold py-2.5 rounded text-xs transition border border-slate-300 dark:border-white/10 flex items-center justify-center gap-2 cursor-pointer min-h-[42px] shadow-sm"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
+                        <span>{t('viber_btn_edit')}</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               ) : simState === 'edited' ? (
-                <div className="p-3 rounded bg-blue-500/10 border border-blue-500/30 text-blue-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
-                  <Check className="w-4 h-4 text-blue-400 shrink-0" />
+                <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-blue-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
+                  <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
                   <span>{t('viber_success_edited')}</span>
                 </div>
               ) : (
-                <div className="p-3 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{t('viber_success_confirmed')}</span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* WP Event Terminal Right */}
-          <div className="lg:col-span-7 flex flex-col justify-between h-full space-y-4 font-mono text-xs">
+          {/* Live WooCommerce Order Flow Right */}
+          <div className="lg:col-span-7 flex flex-col justify-between h-full space-y-4 font-sans text-xs">
             <div>
-              <div className="flex items-center justify-between pb-2 border-b border-white/10 text-slate-400">
+              <div className="flex items-center justify-between pb-2 border-b border-theme text-theme-muted">
                 <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-                  <span className="text-theme-primary font-bold">{t('term_title')}</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                  <span className="text-theme-primary font-bold text-xs">
+                    {lang === 'sr' ? 'Živi tok obrade u WooCommerce-u' : lang === 'mk' ? 'Тек на обработка во WooCommerce' : 'Live WooCommerce & Warehouse Flow'}
+                  </span>
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-slate-400">HMAC-SHA256 SIGNED</span>
+                <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">
+                  {lang === 'sr' ? 'AUTOMATIZOVANO' : lang === 'mk' ? 'АВТОМАТИЗИРАНО' : 'AUTOMATED'}
+                </span>
               </div>
 
-              <div className="mt-3 bg-[#070A13] wp-terminal-screen p-3 sm:p-3.5 rounded border border-white/10 space-y-1.5 h-56 sm:h-64 overflow-y-auto touch-scroll text-[10px] sm:text-[11px]">
-                <div className="text-neutral-400">[13:42:01] WC Order Created: {currentScenConfig.orderId} {t('term_log_cod')}.</div>
-                <div className="text-amber-400">[13:42:01] Potvrdio Hook: Order status switched to ON-HOLD. Label printing suspended.</div>
-                
+              {/* Order Life Cycle Cards */}
+              <div className="mt-3 space-y-2.5">
+                {/* Step 1: Order Created */}
+                <div className="p-3 rounded-lg glass-panel border border-theme flex items-start gap-3 shadow-sm">
+                  <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <Package className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-theme-primary text-xs">
+                        {lang === 'sr' ? `1. Porudžbina ${currentScenConfig.orderId} kreirana` : lang === 'mk' ? `1. Нарачка ${currentScenConfig.orderId} креирана` : `1. Order ${currentScenConfig.orderId} Created`}
+                      </span>
+                      <span className="text-[10px] text-amber-500 font-semibold bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-500/20 shrink-0">
+                        {lang === 'sr' ? 'Na čekanju (On-Hold)' : lang === 'mk' ? 'На чекање (On-Hold)' : 'On-Hold'}
+                      </span>
+                    </div>
+                    <p className="text-theme-muted text-[11px] mt-0.5 leading-relaxed">
+                      {lang === 'sr' ? 'Plaćanje pouzećem (COD). Potvrdio automatski zaustavlja štampanje adresnice dok kupac ne potvrdi.' : lang === 'mk' ? 'Плаќање при преземање (COD). Пакетот останува во магацин додека купувачот не потврди.' : 'Cash on Delivery order. Shipping label printing is automatically held until buyer verifies.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 2: Viber Dispatched */}
+                <div className="p-3 rounded-lg glass-panel border border-theme flex items-start gap-3 shadow-sm">
+                  <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20 flex items-center justify-center shrink-0 mt-0.5">
+                    <Send className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-bold text-theme-primary text-xs">
+                        {lang === 'sr' ? '2. Viber verifikacija poslata kupcu' : lang === 'mk' ? '2. Viber верификација испратена' : '2. Viber Verification Dispatched'}
+                      </span>
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">
+                        13:42:02
+                      </span>
+                    </div>
+                    <p className="text-theme-muted text-[11px] mt-0.5 leading-relaxed">
+                      {lang === 'sr' ? `Kupac ${currentScenConfig.customer} prima interaktivnu Viber poruku sa tačnom adresom i iznosom (${currentScenConfig.orderAmount[lang]}).` : lang === 'mk' ? `Купувачот ${currentScenConfig.customer} добива интерактивна Viber порака со адреса и износ (${currentScenConfig.orderAmount[lang]}).` : `Customer ${currentScenConfig.customer} receives interactive verification with full address and COD total (${currentScenConfig.orderAmount[lang]}).`}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3: Dynamic Outcome per Scenario & State */}
                 {currentScenario === 1 && (
-                  <>
-                    <div className="text-neutral-300">[13:42:02] Viber Gateway: Transaction #VB-9201 dispatched (+381642918472). Status: DELIVERED.</div>
-                    {simState === 'confirmed' && (
-                      <>
-                        <div className="text-emerald-400 font-bold">[13:42:08] Viber Action: [DIRECT_CONFIRM] Customer approved address as-is without edits.</div>
-                        <div className="text-slate-200">[13:42:09] WooCommerce Hook: Order status changed -&gt; PROCESSING. Dispatch label ready.</div>
-                      </>
-                    )}
-                    {simState === 'edited' && (
-                      <>
-                        <div className="text-blue-400 font-bold">[13:42:12] Token Link Opened: Customer filled missing floor &amp; apartment form.</div>
-                        <div className="text-blue-300">[13:42:15] WooCommerce Metadata: Overwritten with '+ {lang === 'sr' ? `Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `Кат ${floorInput}, Стан ${aptInput}` : `Floor ${floorInput}, Apt ${aptInput}`}'.</div>
-                        <div className="text-emerald-300 font-semibold">[13:42:16] Order unblocked -&gt; PROCESSING. Clean manifest label generated.</div>
-                      </>
-                    )}
-                  </>
+                  <div className={`p-3 rounded-lg border transition-all shadow-sm flex items-start gap-3 ${simState === 'edited' ? 'bg-blue-50/50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' : simState === 'confirmed' ? 'bg-emerald-50/50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30' : 'bg-amber-50/50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30'}`}>
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 border ${simState === 'edited' ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 border-blue-300' : simState === 'confirmed' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 border-emerald-300' : 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 border-amber-300'}`}>
+                      {simState !== 'initial' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-theme-primary text-xs">
+                          {simState === 'edited'
+                            ? (lang === 'sr' ? '3. Adresa dopunjena u WooCommerce-u!' : lang === 'mk' ? '3. Адресата е дополнета во WooCommerce!' : '3. Address Updated in WooCommerce!')
+                            : simState === 'confirmed'
+                            ? (lang === 'sr' ? '3. Kupac potvrdio tačnost' : lang === 'mk' ? '3. Купувачот потврди точност' : '3. Buyer Confirmed Details')
+                            : (lang === 'sr' ? '3. Čeka se dopuna: Nedostaje stan i sprat' : lang === 'mk' ? '3. Се чека дополнување: Недостасува кат и стан' : '3. Action Required: Missing Apartment & Floor')}
+                        </span>
+                        {simState !== 'initial' && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-100 dark:bg-emerald-500/20 px-2 py-0.5 rounded shrink-0">
+                            {lang === 'sr' ? 'U obradi (Processing)' : lang === 'mk' ? 'Во обработка' : 'Processing'}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-theme-muted text-[11px] mt-0.5 leading-relaxed">
+                        {simState === 'edited'
+                          ? (lang === 'sr' ? `Kupac uneo: Sprat ${floorInput}, Stan ${aptInput}. WooCommerce baza ažurirana bez ijednog telefonskog poziva - adresnica je sada 100% tačna!` : lang === 'mk' ? `Внесен кат ${floorInput}, стан ${aptInput}. WooCommerce е ажуриран без телефонски повик!` : `Customer submitted Floor ${floorInput}, Apt ${aptInput}. Database updated automatically without any phone calls!`)
+                          : simState === 'confirmed'
+                          ? (lang === 'sr' ? 'Kupac potvrdio bez izmena. Paket je deblokiran za štampu adresnice i predaju kuriru.' : lang === 'mk' ? 'Потврдено без измени. Пакетот е подготвен за достава.' : 'Confirmed without edits. Manifest label unlocked for courier dispatch.')
+                          : (lang === 'sr' ? 'Sistem sprečava slanje paketa na slepo. Kurir ne bi mogao da nađe ulaz bez broja stana.' : lang === 'mk' ? 'Системот спречува испраќање пратка без кат и стан.' : 'System prevents blind dispatch. Courier cannot deliver without apartment number.')}
+                      </p>
+                    </div>
+                  </div>
                 )}
 
                 {currentScenario === 2 && (
-                  <>
-                    <div className="text-amber-400">[13:42:02] Viber sent. No read receipt within 20 minutes.</div>
-                    <div className="text-amber-500">[13:42:22] {t('term_sms_log')}</div>
-                    <div className="text-red-400">[14:02:00] 24h Expired: No customer action. Order safely CANCELLED.</div>
-                    <div className="text-emerald-400">{t('term_saved_log')}</div>
-                  </>
+                  <div className="p-3 rounded-lg bg-red-50/60 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 flex items-start gap-3 shadow-sm">
+                    <div className="w-7 h-7 rounded-lg bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                      <XCircle className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-red-700 dark:text-red-400 text-xs">
+                          {lang === 'sr' ? '3. Kupac se predomislio (Nema odgovora 24h)' : lang === 'mk' ? '3. Купувачот се премислил (Нема одговор 24ч)' : '3. Customer Changed Mind (No response 24h)'}
+                        </span>
+                        <span className="text-[10px] text-red-700 dark:text-red-400 font-semibold bg-red-100 dark:bg-red-500/20 px-2 py-0.5 rounded border border-red-200 shrink-0">
+                          {lang === 'sr' ? 'Otkazano pre slanja' : lang === 'mk' ? 'Откажано навреме' : 'Cancelled in Time'}
+                        </span>
+                      </div>
+                      <p className="text-theme-muted text-[11px] mt-0.5 leading-relaxed">
+                        {lang === 'sr' ? 'Poslat SMS podsetnik, kupac ignoriše. Paket ostaje na polici u magacinu - sačuvano 820 RSD duple poštarine (slanje + povrat)!' : lang === 'mk' ? 'Испратен SMS потсетник, нема одговор. Пакетот останува во магацин - заштедени 820 RSD за поштарина!' : 'SMS fallback sent, no reply. Parcel never leaves warehouse shelf - ~€7 in double shipping return fees saved!'}
+                      </p>
+                    </div>
+                  </div>
                 )}
 
                 {currentScenario === 3 && (
-                  <>
-                    <div className="text-neutral-300">[13:42:02] Viber sent. Customer active.</div>
-                    {simState === 'confirmed' && (
-                      <>
-                        <div className="text-emerald-400 font-bold">[13:42:08] Viber Action: [CONFIRM_TAP_EVENT] received.</div>
-                        <div className="text-slate-200">[13:42:09] Webhook: POST /wc-api/potvrdio_verify (200 OK).</div>
-                        <div className="text-emerald-300 font-semibold">[13:42:09] WooCommerce order status changed to PROCESSING.</div>
-                        <div className="text-white">[13:42:10] Barcode generated: PE-7892014-RS.</div>
-                      </>
-                    )}
-                  </>
-                )}
-
-                {simState === 'initial' && currentScenario !== 2 && (
-                  <div className="text-slate-400">{t('term_waiting_log')}</div>
+                  <div className="p-3 rounded-lg bg-emerald-50/60 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 flex items-start gap-3 shadow-sm">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-emerald-700 dark:text-emerald-400 text-xs">
+                          {lang === 'sr' ? '3. Potvrđeno u jednom dodiru (za 8 sekundi)' : lang === 'mk' ? '3. Потврдено со еден допир (за 8 секунди)' : '3. 1-Tap Instant Confirmation (< 8 sec)'}
+                        </span>
+                        <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold bg-emerald-100 dark:bg-emerald-500/20 px-2 py-0.5 rounded shrink-0">
+                          {lang === 'sr' ? 'Spremno za kurira' : lang === 'mk' ? 'Подготвено за курир' : 'Ready for Dispatch'}
+                        </span>
+                      </div>
+                      <p className="text-theme-muted text-[11px] mt-0.5 leading-relaxed">
+                        {lang === 'sr' ? 'Kupac je kliknuo potvrdu na telefonu. Webhook automatski generiše Post Express adresnicu i priprema nalog za pakovanje.' : lang === 'mk' ? 'Купувачот потврди на телефон. Webhook автоматски генерира адресар за курир.' : 'Buyer confirmed on Viber. Webhook generates courier shipping manifest and alerts packing station.'}
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Warehouse Decision Footer */}
-            <div className="p-3 sm:p-3.5 bg-[#0D121F] rounded border border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="p-3 sm:p-3.5 bg-surface-subtle rounded-lg border border-theme flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <div>
-                <div className="text-slate-400 text-[10px] uppercase font-bold">{t('term_risk_status')}</div>
+                <div className="text-theme-muted text-[10px] uppercase font-bold">{t('term_risk_status')}</div>
                 <div className="font-bold text-xs mt-0.5">
                   {currentScenario === 2 ? (
-                    <span className="text-emerald-400">{t('status_saved')}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">{t('status_saved')}</span>
                   ) : simState !== 'initial' ? (
-                    <span className="text-emerald-400">{t('status_approved')}</span>
+                    <span className="text-emerald-600 dark:text-emerald-400">{t('status_approved')}</span>
                   ) : (
-                    <span className="text-amber-400">{t('status_waiting')}</span>
+                    <span className="text-amber-600 dark:text-amber-400">{t('status_waiting')}</span>
                   )}
                 </div>
               </div>
               <button 
                 onClick={handleResetSim} 
-                className="w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded bg-surface hover:bg-surface-subtle border border-theme text-theme-muted hover:text-theme-primary text-[11px] transition flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px] shadow-sm"
+                className="w-full sm:w-auto px-3 py-2 sm:py-1.5 rounded bg-surface hover:bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary text-[11px] font-medium transition flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px] shadow-sm"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>{t('btn_restart_sim')}</span>
@@ -1274,17 +1465,17 @@ export default function App() {
         <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('man_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('man_title')}</h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2 leading-relaxed">{t('man_p')}</p>
+          <p className="text-xs sm:text-sm text-theme-muted mt-2 leading-relaxed">{t('man_p')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-start">
           {/* Unverified Bad Label */}
-          <div className="glass-panel border-red-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden">
-            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-red-500/10 text-red-500 px-2.5 py-0.5 rounded-full border border-red-500/20">
+          <div className="glass-panel border-red-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden shadow-sm">
+            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 px-2.5 py-0.5 rounded-full border border-red-200 dark:border-red-500/20">
               {t('man_badge_bad')}
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-theme-primary mb-4 flex items-center gap-2">
-              <XCircle className="w-4 h-4 text-red-500 shrink-0" />
+              <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
               <span>{t('man_bad_title')}</span>
             </h3>
 
@@ -1310,18 +1501,18 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-red-500 font-sans leading-relaxed">
+            <div className="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-xs text-red-700 dark:text-red-400 font-sans leading-relaxed">
               {t('man_bad_footer')}
             </div>
           </div>
 
           {/* Verified Good Label */}
-          <div className="glass-panel border-emerald-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden">
-            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+          <div className="glass-panel border-emerald-500/30 p-4 sm:p-6 rounded-xl relative overflow-hidden shadow-sm">
+            <div className="absolute top-3 right-3 text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">
               {t('man_badge_good')}
             </div>
             <h3 className="text-xs sm:text-sm font-bold text-theme-primary mb-4 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{t('man_good_title')}</span>
             </h3>
 
@@ -1347,7 +1538,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="mt-4 text-xs text-emerald-500 font-sans leading-relaxed">
+            <div className="mt-4 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-400 font-sans leading-relaxed">
               {t('man_good_footer')}
             </div>
           </div>
@@ -1359,15 +1550,15 @@ export default function App() {
         <div className="max-w-3xl mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('calc_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('calc_title')}</h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2">{t('calc_desc')}</p>
+          <p className="text-xs sm:text-sm text-theme-muted mt-2">{t('calc_desc')}</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center glass-panel p-4 sm:p-8 rounded-xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center glass-panel p-4 sm:p-8 rounded-xl shadow-sm">
           <div className="lg:col-span-7 space-y-6 sm:space-y-7">
             <div>
               <div className="flex justify-between items-center text-xs font-sans mb-2">
                 <span className="text-theme-primary font-semibold">{t('calc_label_orders')}</span>
-                <span className="text-[#14B8A6] font-bold text-sm bg-[#0B0F19] px-3 py-1 rounded-md border border-slate-800">
+                <span className="text-teal-700 dark:text-[#14B8A6] font-bold text-sm bg-teal-50 dark:bg-teal-950/60 px-3 py-1 rounded-md border border-teal-200 dark:border-teal-800">
                   {ordersCount} {lang === 'sr' ? 'narudžbina' : 'orders'}
                 </span>
               </div>
@@ -1378,7 +1569,7 @@ export default function App() {
                 step="50" 
                 value={ordersCount} 
                 onChange={(e) => setOrdersCount(Number(e.target.value))}
-                className="w-full h-3 bg-surface-subtle rounded-lg appearance-none cursor-pointer border border-theme"
+                className="w-full h-3 bg-surface-subtle rounded-lg appearance-none cursor-pointer border border-theme accent-teal-600 dark:accent-teal-500"
               />
               <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-theme-muted mt-1.5 flex-wrap gap-1">
                 <span>50 ({lang === 'sr' ? 'Mala radnja' : lang === 'mk' ? 'Мала продавница' : 'Small Store'})</span>
@@ -1390,7 +1581,7 @@ export default function App() {
             <div>
               <div className="flex justify-between items-center text-xs font-sans mb-2">
                 <span className="text-theme-primary font-semibold">{t('calc_label_rate')}</span>
-                <span className="text-red-400 font-bold text-sm bg-[#0B0F19] px-3 py-1 rounded-md border border-slate-800">
+                <span className="text-red-700 dark:text-red-400 font-bold text-sm bg-red-50 dark:bg-red-950/60 px-3 py-1 rounded-md border border-red-200 dark:border-red-800">
                   {failureRate}%
                 </span>
               </div>
@@ -1401,42 +1592,42 @@ export default function App() {
                 step="1" 
                 value={failureRate} 
                 onChange={(e) => setFailureRate(Number(e.target.value))}
-                className="w-full h-3 bg-surface-subtle rounded-lg appearance-none cursor-pointer border border-theme"
+                className="w-full h-3 bg-surface-subtle rounded-lg appearance-none cursor-pointer border border-theme accent-teal-600 dark:accent-teal-500"
               />
-              <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-slate-400 mt-1.5 flex-wrap gap-1">
+              <div className="flex justify-between text-[10px] sm:text-[11px] font-sans text-theme-muted mt-1.5 flex-wrap gap-1">
                 <span>{t('calc_rate_ideal')}</span>
                 <span>{t('calc_rate_avg')}</span>
                 <span>{t('calc_rate_high')}</span>
               </div>
             </div>
 
-            <div className="p-3 bg-[#0B0F19] rounded-lg border border-slate-800 text-xs font-sans flex flex-wrap justify-between items-center gap-2 text-slate-400">
+            <div className="p-3 bg-surface-subtle rounded-lg border border-theme text-xs font-sans flex flex-wrap justify-between items-center gap-2 text-theme-muted">
               <span>{t('calc_freight_note')}</span>
               <span className="text-theme-primary font-bold">{t('calc_freight_val')}</span>
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-surface-subtle border border-theme p-5 sm:p-6 rounded-xl text-center space-y-5">
+          <div className="lg:col-span-5 bg-surface-subtle border border-theme p-5 sm:p-6 rounded-xl text-center space-y-5 shadow-sm">
             <div>
-              <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+              <div className="text-[11px] font-semibold text-theme-muted uppercase tracking-wider">
                 {t('calc_loss_head')}
               </div>
-              <div className="text-2xl sm:text-3xl font-sans font-bold text-red-400 mt-1 tracking-tight">
+              <div className="text-2xl sm:text-3xl font-sans font-bold text-red-600 dark:text-red-400 mt-1 tracking-tight">
                 {annualLossRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
-              <div className="text-xs text-slate-400 font-sans mt-0.5">
+              <div className="text-xs text-theme-muted font-sans mt-0.5">
                 (~{annualLossEur.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} € {lang === 'sr' ? '/ godišnje' : lang === 'mk' ? '/ годишно' : '/ year'})
               </div>
             </div>
 
-            <div className="pt-5 border-t border-white/10">
-              <div className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">
+            <div className="pt-5 border-t border-theme">
+              <div className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
                 {t('calc_saved_head')}
               </div>
-              <div className="text-xl sm:text-2xl font-sans font-bold text-emerald-400 mt-1">
+              <div className="text-xl sm:text-2xl font-sans font-bold text-emerald-600 dark:text-emerald-400 mt-1">
                 {annualSavedRsd.toLocaleString(lang === 'sr' ? 'sr-RS' : 'en-US')} RSD
               </div>
-              <div className="text-[11px] text-slate-400 font-sans mt-1">
+              <div className="text-[11px] text-theme-muted font-sans mt-1">
                 {t('calc_roi_note')}
               </div>
             </div>
@@ -1449,14 +1640,14 @@ export default function App() {
         <div className="mb-8 sm:mb-12">
           <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('price_tag')}</div>
           <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('price_title')}</h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl">{t('price_desc')}</p>
+          <p className="text-xs sm:text-sm text-theme-muted mt-2 max-w-2xl">{t('price_desc')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
-          <div className="lg:col-span-8 glass-panel rounded-xl overflow-hidden border border-theme">
-            <div className="px-4 sm:px-5 py-3.5 border-b border-white/10 bg-[#131C2E] flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-sans">
+          <div className="lg:col-span-8 glass-panel rounded-xl overflow-hidden border border-theme shadow-sm">
+            <div className="px-4 sm:px-5 py-3.5 border-b border-theme bg-surface-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs font-sans">
               <span className="font-bold text-theme-primary">{t('price_prepaid_header')}</span>
-              <span className="text-slate-400 text-[11px]">{t('price_invoice_sub')}</span>
+              <span className="text-theme-muted text-[11px]">{t('price_invoice_sub')}</span>
             </div>
 
             <div className="overflow-x-auto touch-scroll">
@@ -1472,37 +1663,46 @@ export default function App() {
                 </thead>
                 <tbody className="divide-y divide-theme text-theme-secondary">
                   <tr className="hover:bg-surface-subtle/50 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Starter Pool</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Starter Paket</td>
                     <td className="p-3.5 sm:p-4 font-bold text-theme-primary">15 €</td>
-                    <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.026 €</td>
-                    <td className="p-3.5 sm:p-4 text-slate-400">0.048 €</td>
+                    <td className="p-3.5 sm:p-4 text-emerald-600 dark:text-emerald-400 font-bold">0.026 €</td>
+                    <td className="p-3.5 sm:p-4 text-theme-muted">0.048 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm">
+                      <button 
+                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
+                        className="btn-select-wave px-3.5 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm"
+                      >
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
-                  <tr className="bg-[#14B8A6]/5 hover:bg-[#14B8A6]/10 transition">
+                  <tr className="bg-teal-50/50 dark:bg-[#14B8A6]/5 hover:bg-teal-50/80 dark:hover:bg-[#14B8A6]/10 transition">
                     <td className="p-3.5 sm:p-4 font-bold text-theme-primary flex items-center gap-2">
-                      Growth Pool
-                      <span className="text-[9px] font-semibold bg-[#14B8A6]/20 text-[#14B8A6] px-2 py-0.5 rounded-full border border-[#14B8A6]/30">{t('price_badge_popular')}</span>
+                      Growth Paket
+                      <span className="text-[9px] font-semibold bg-teal-100 dark:bg-[#14B8A6]/20 text-teal-800 dark:text-[#14B8A6] px-2 py-0.5 rounded-full border border-teal-200 dark:border-[#14B8A6]/30">{t('price_badge_popular')}</span>
                     </td>
                     <td className="p-3.5 sm:p-4 font-bold text-theme-primary">45 €</td>
-                    <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.024 €</td>
-                    <td className="p-3.5 sm:p-4 text-slate-400">0.042 €</td>
+                    <td className="p-3.5 sm:p-4 text-emerald-600 dark:text-emerald-400 font-bold">0.024 €</td>
+                    <td className="p-3.5 sm:p-4 text-theme-muted">0.042 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-[#14B8A6] hover:bg-[#0F766E] text-black font-bold text-[11px] transition cursor-pointer min-h-[32px]">
+                      <button 
+                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
+                        className="btn-brand-cta px-3.5 py-1.5 rounded-lg text-white font-bold text-[11px] transition cursor-pointer min-h-[32px] shadow-sm"
+                      >
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
                   <tr className="hover:bg-surface-subtle/50 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Scale Volume</td>
+                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Scale Paket</td>
                     <td className="p-3.5 sm:p-4 font-bold text-theme-primary">120 €</td>
-                    <td className="p-3.5 sm:p-4 text-emerald-400 font-bold">0.020 €</td>
-                    <td className="p-3.5 sm:p-4 text-slate-400">0.038 €</td>
+                    <td className="p-3.5 sm:p-4 text-emerald-600 dark:text-emerald-400 font-bold">0.020 €</td>
+                    <td className="p-3.5 sm:p-4 text-theme-muted">0.038 €</td>
                     <td className="p-3.5 sm:p-4 text-right">
-                      <button onClick={playClickSound} className="px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm">
+                      <button 
+                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
+                        className="btn-select-wave px-3.5 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm"
+                      >
                         {t('price_btn_select')}
                       </button>
                     </td>
@@ -1518,28 +1718,28 @@ export default function App() {
           </div>
 
           {/* Pro Reserve */}
-          <div className="lg:col-span-4 glass-panel rounded-xl p-5 sm:p-6 font-sans text-xs border border-theme">
-            <div className="text-[10px] text-[#14B8A6] uppercase tracking-wider mb-2 font-semibold">{t('pro_tag')}</div>
+          <div className="lg:col-span-4 glass-panel rounded-xl p-5 sm:p-6 font-sans text-xs border border-theme shadow-sm">
+            <div className="text-[10px] text-teal-600 dark:text-[#14B8A6] uppercase tracking-wider mb-2 font-semibold">{t('pro_tag')}</div>
             <h3 className="text-base font-bold text-theme-primary font-sans">{t('price_pro_title')}</h3>
             <div className="mt-3 flex items-baseline gap-1">
               <span className="text-3xl font-bold text-theme-primary font-sans">29 €</span>
-              <span className="text-slate-400 text-xs">{t('price_per_month')}</span>
+              <span className="text-theme-muted text-xs">{t('price_per_month')}</span>
             </div>
-            <p className="text-slate-400 text-[11px] mt-2 leading-relaxed">
+            <p className="text-theme-muted text-[11px] mt-2 leading-relaxed">
               {t('price_pro_desc')}
             </p>
 
             <ul className="space-y-2.5 my-5 text-theme-secondary text-[11px]">
               <li className="flex items-center gap-2">
-                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{t('price_pro_feat1')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{t('price_pro_feat2')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{t('price_pro_feat3')}</span>
               </li>
             </ul>
@@ -1558,60 +1758,94 @@ export default function App() {
       <section id="integracija" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 border-b border-theme">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
           <div className="lg:col-span-6 space-y-4">
-            <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
-            <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('leg_title')}</h2>
-            <p className="text-xs text-slate-400 leading-relaxed">{t('leg_p')}</p>
+            <div className="space-y-1 lg:min-h-[140px] flex flex-col justify-start">
+              <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('leg_tag')}</div>
+              <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('leg_title')}</h2>
+              <p className="text-xs text-theme-muted leading-relaxed pt-1">{t('leg_p')}</p>
+            </div>
 
             <div className="space-y-3 font-sans text-xs pt-2">
-              <div className="p-3.5 rounded-xl glass-panel border border-theme">
+              <div className="p-3.5 rounded-xl glass-panel border border-theme shadow-sm">
                 <div className="text-theme-primary font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item1_title')}</span>
-                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans">Pravni Osnov</span>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20 font-sans">Pravni Osnov</span>
                 </div>
                 <div className="text-theme-muted text-[11px] leading-relaxed">
                   {t('leg_item1_desc')}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl glass-panel border border-theme">
+              <div className="p-3.5 rounded-xl glass-panel border border-theme shadow-sm">
                 <div className="text-theme-primary font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item2_title')}</span>
-                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-teal-500/10 text-teal-400 border border-teal-500/20 font-sans">Retention 30D</span>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-teal-50 dark:bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-500/20 font-sans">Retention 30D</span>
                 </div>
                 <div className="text-theme-muted text-[11px] leading-relaxed">
                   {t('leg_item2_desc')}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl glass-panel border border-theme">
+              <div className="p-3.5 rounded-xl glass-panel border border-theme shadow-sm">
                 <div className="text-theme-primary font-bold mb-1 flex items-center justify-between">
                   <span>{t('leg_item3_title')}</span>
-                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-sans">TLS 1.3 HMAC</span>
+                  <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20 font-sans">TLS 1.3 HMAC</span>
                 </div>
                 <div className="text-theme-muted text-[11px] leading-relaxed">
                   {t('leg_item3_desc')}
                 </div>
               </div>
             </div>
+
+            <div className="p-3 rounded-lg bg-surface-subtle border border-theme text-[11px] font-sans text-theme-muted flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>{t('leg_bottom_note')}</span>
+            </div>
           </div>
 
           <div className="lg:col-span-6 space-y-4">
-            <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('dev_tag')}</div>
-            <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('dev_title')}</h2>
+            <div className="space-y-1 lg:min-h-[140px] flex flex-col justify-start">
+              <div className="text-xs font-semibold text-[#14B8A6] uppercase tracking-wider mb-1">{t('dev_tag')}</div>
+              <h2 className="text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">{t('dev_title')}</h2>
+              <p className="text-xs text-theme-muted leading-relaxed pt-1">{t('dev_p')}</p>
+            </div>
             
-            <div className="bg-[#0B0F19] border border-slate-800 rounded-xl p-3.5 sm:p-4 font-mono text-xs text-slate-300 overflow-x-auto touch-scroll">
-              <div className="text-slate-400 text-[11px] mb-2 font-sans">{t('dev_code_comment')}</div>
-              <div className="text-[#14B8A6]">add_action('woocommerce_checkout_order_processed', function($order_id) &#123;</div>
-              <div className="pl-4 text-slate-400">$order = wc_get_order($order_id);</div>
-              <div className="pl-4 text-slate-400">if ($order-&gt;get_payment_method() === 'cod') &#123;</div>
-              <div className="pl-8 text-emerald-400">$order-&gt;update_status('on-hold', '{t('dev_status_note')}');</div>
-              <div className="pl-8 text-slate-300">Potvrdio_Client::dispatch_viber_session($order);</div>
-              <div className="pl-4 text-slate-400">&#125;</div>
-              <div className="text-[#14B8A6]">&#125;);</div>
+            <div className="space-y-3 font-sans text-xs pt-2">
+              {/* Step 1 */}
+              <div className="p-3.5 rounded-xl glass-panel border border-theme shadow-sm flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-[#14B8A6]/10 text-teal-600 dark:text-[#14B8A6] border border-teal-200 dark:border-[#14B8A6]/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Download className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-theme-primary font-bold mb-0.5">{t('dev_step1_title')}</div>
+                  <div className="text-theme-muted text-[11px] leading-relaxed">{t('dev_step1_desc')}</div>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="p-3.5 rounded-xl glass-panel border border-theme shadow-sm flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Key className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-theme-primary font-bold mb-0.5">{t('dev_step2_title')}</div>
+                  <div className="text-theme-muted text-[11px] leading-relaxed">{t('dev_step2_desc')}</div>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="p-3.5 rounded-xl glass-panel border border-theme shadow-sm flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <div className="text-theme-primary font-bold mb-0.5">{t('dev_step3_title')}</div>
+                  <div className="text-theme-muted text-[11px] leading-relaxed">{t('dev_step3_desc')}</div>
+                </div>
+              </div>
             </div>
 
-            <div className="text-[11px] font-sans text-theme-muted flex items-center gap-1.5">
-              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div className="p-3 rounded-lg bg-surface-subtle border border-theme text-[11px] font-sans text-theme-muted flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{t('dev_hpos_note')}</span>
             </div>
           </div>
@@ -1620,7 +1854,7 @@ export default function App() {
         {/* Official Legal Evidence & Regulatory Links Grid */}
         <div className="mt-10 pt-8 border-t border-theme">
           <div className="flex items-center gap-2 mb-4">
-            <Scale className="w-4 h-4 text-[#14B8A6]" />
+            <Scale className="w-4 h-4 text-teal-600 dark:text-[#14B8A6]" />
             <h3 className="text-xs sm:text-sm font-bold text-theme-primary uppercase font-sans tracking-wider">
               {t('leg_proof_title')}
             </h3>
@@ -1632,16 +1866,16 @@ export default function App() {
               href="https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2018/87/1/reg" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
             >
               <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_pis')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
                 <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_pis_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
                 <span>Sl. Glasnik RS 87/2018</span>
               </div>
@@ -1652,16 +1886,16 @@ export default function App() {
               href={lang === 'en' ? 'https://www.poverenik.rs/en/' : 'https://www.poverenik.rs/sr-lat/'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
             >
               <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_poverenik')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
                 <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_poverenik_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
                 <ShieldCheck className="w-3 h-3 shrink-0" />
                 <span>poverenik.rs</span>
               </div>
@@ -1672,16 +1906,16 @@ export default function App() {
               href={lang === 'sr' ? 'https://eur-lex.europa.eu/legal-content/HR/TXT/?uri=CELEX:32016R0679' : 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
             >
               <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_gdpr')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
                 <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_gdpr_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
                 <CheckCircle2 className="w-3 h-3 shrink-0" />
                 <span>CELEX 32016R0679</span>
               </div>
@@ -1692,16 +1926,16 @@ export default function App() {
               href={lang === 'en' ? 'https://azlp.mk/en' : 'https://azlp.mk'} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-[#14B8A6]/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px]"
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
             >
               <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-[#14B8A6] transition">
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
                   <span className="line-clamp-1">{t('leg_ref_azlp')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
                 </div>
                 <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_azlp_sub')}</p>
               </div>
-              <div className="mt-3 text-[10px] text-emerald-400 font-sans flex items-center gap-1 font-medium">
+              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
                 <ShieldCheck className="w-3 h-3 shrink-0" />
                 <span>azlp.mk</span>
               </div>
@@ -1713,17 +1947,17 @@ export default function App() {
         <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4 font-sans text-xs">
           <button 
             onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-            className="px-4 py-2.5 rounded-lg glass-panel border border-[#14B8A6]/40 hover:border-[#14B8A6] text-theme-primary hover:text-teal-500 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+            className="px-4 py-2.5 rounded-lg glass-panel border border-teal-500/40 hover:border-teal-500 text-theme-primary hover:text-teal-600 dark:hover:text-teal-400 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px] shadow-sm"
           >
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{t('leg_action_privacy')}</span>
           </button>
 
           <button 
             onClick={() => { playClickSound(); setShowTermsModal(true); }} 
-            className="px-4 py-2.5 rounded-lg glass-panel border border-theme hover:border-[#14B8A6]/50 text-theme-secondary hover:text-theme-primary transition flex items-center gap-2 cursor-pointer min-h-[42px]"
+            className="px-4 py-2.5 rounded-lg glass-panel border border-theme hover:border-teal-500/50 text-theme-secondary hover:text-theme-primary transition flex items-center gap-2 cursor-pointer min-h-[42px] shadow-sm"
           >
-            <FileText className="w-4 h-4 text-teal-400 shrink-0" />
+            <FileText className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
             <span>{t('leg_action_terms')}</span>
           </button>
         </div>
@@ -1734,13 +1968,13 @@ export default function App() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center space-y-2 mb-10">
             <div className="text-xs font-mono text-[#14B8A6] uppercase tracking-wider">
-              {lang === 'sr' ? '06 / Često Postavljana Pitanja' : lang === 'mk' ? '06 / Често Поставувани Прашања' : '06 / Frequently Asked Questions'}
+              {t('faq_tag')}
             </div>
             <h2 className="text-xl sm:text-3xl font-bold text-theme-primary tracking-tight">
-              {lang === 'sr' ? 'Sve što treba da znate o Potvrdio COD verifikaciji' : lang === 'mk' ? 'Сè што треба да знаете за Potvrdio COD верификацијата' : 'Everything you need to know about Potvrdio COD verification'}
+              {t('faq_title')}
             </h2>
             <p className="text-xs text-theme-muted max-w-lg mx-auto leading-relaxed">
-              {lang === 'sr' ? 'Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.' : lang === 'mk' ? 'Одговори на клучните технички и правни прашања.' : 'Answers to key technical, legal, and operational questions.'}
+              {t('faq_sub')}
             </p>
           </div>
 
@@ -1821,14 +2055,14 @@ export default function App() {
                     className="w-full px-4 sm:px-5 py-3.5 sm:py-4 text-left flex items-center justify-between gap-3 text-theme-primary font-bold text-xs sm:text-sm cursor-pointer hover:bg-surface-subtle/50 transition"
                   >
                     <span className="flex items-center gap-2.5">
-                      <HelpCircle className="w-4 h-4 text-[#14B8A6] shrink-0" />
+                      <HelpCircle className="w-4 h-4 text-teal-600 dark:text-[#14B8A6] shrink-0" />
                       <span>{faq.q[lang]}</span>
                     </span>
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-[#14B8A6]' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-theme-muted transition-transform duration-200 shrink-0 ${isOpen ? 'rotate-180 text-teal-600 dark:text-[#14B8A6]' : ''}`} />
                   </button>
 
                   {isOpen && (
-                    <div className="px-4 sm:px-5 pb-4 pt-1 text-theme-secondary text-xs leading-relaxed border-t border-theme-subtle bg-surface-subtle/40 font-mono">
+                    <div className="px-4 sm:px-5 pb-4 pt-2 text-theme-secondary text-xs sm:text-sm leading-relaxed border-t border-theme bg-surface-subtle/50 font-sans">
                       {faq.a[lang]}
                     </div>
                   )}
@@ -1841,23 +2075,23 @@ export default function App() {
 
       {/* SECTION 06: Download & Installation CTA */}
       <section id="preuzmi" className="max-w-7xl mx-auto px-4 sm:px-5 py-12 sm:py-20 text-center">
-        <div className="max-w-2xl mx-auto glass-panel p-6 sm:p-12 rounded-xl">
-          <div className="w-12 h-12 rounded bg-[#14B8A6]/10 border border-[#14B8A6]/30 text-[#14B8A6] flex items-center justify-center mx-auto mb-4">
+        <div className="max-w-2xl mx-auto glass-panel p-6 sm:p-12 rounded-xl shadow-sm">
+          <div className="w-12 h-12 rounded bg-teal-500/10 border border-teal-500/30 text-teal-600 dark:text-[#14B8A6] flex items-center justify-center mx-auto mb-4">
             <Download className="w-6 h-6" />
           </div>
           <h2 className="text-xl sm:text-3xl font-bold text-theme-primary tracking-tight">{t('dl_title')}</h2>
-          <p className="text-xs sm:text-sm text-slate-400 mt-3 max-w-md mx-auto">{t('dl_desc')}</p>
+          <p className="text-xs sm:text-sm text-theme-muted mt-3 max-w-md mx-auto">{t('dl_desc')}</p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
             <button 
               onClick={() => { playScannerBeep(); setShowOnboardingModal(true); }}
-              className="w-full sm:w-auto px-6 py-3.5 sm:py-3 btn-brand-cta text-white font-bold text-xs rounded transition shadow-lg cursor-pointer min-h-[44px]"
+              className="w-full sm:w-auto px-6 py-3.5 sm:py-3 btn-brand-cta text-white font-bold text-xs rounded-lg transition shadow-lg cursor-pointer min-h-[44px]"
             >
               {t('btn_dl_full')}
             </button>
             <a 
               href="#lab" 
-              className="w-full sm:w-auto px-5 py-3.5 sm:py-3 bg-surface-subtle hover:bg-surface text-theme-primary border border-theme text-xs rounded font-mono transition inline-flex items-center justify-center min-h-[44px] shadow-sm"
+              className="w-full sm:w-auto px-5 py-3.5 sm:py-3 bg-surface hover:bg-surface-subtle text-theme-primary border border-theme text-xs rounded-lg font-sans font-medium transition inline-flex items-center justify-center min-h-[44px] shadow-sm"
             >
               {t('btn_view_demo')}
             </a>
@@ -1866,52 +2100,52 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-theme bg-surface py-8 text-xs text-theme-muted font-mono mt-auto">
+      <footer className="border-t border-theme bg-surface py-8 text-xs text-theme-muted font-sans mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-center md:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <PotvrdioLogo variant="horizontal" mode={theme} />
-            <span className="text-white/20 hidden sm:inline">•</span>
+            <span className="text-theme-muted/40 hidden sm:inline">•</span>
             <span>{t('footer_sub')}</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-theme-muted">
             <button 
               onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-              className="hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
+              className="hover:text-teal-600 dark:hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{t('footer_privacy')}</span>
             </button>
-            <span className="text-white/20 hidden sm:inline">•</span>
+            <span className="text-theme-muted/40 hidden sm:inline">•</span>
             <button 
               onClick={() => { playClickSound(); setShowTermsModal(true); }} 
-              className="hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
+              className="hover:text-teal-600 dark:hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
             >
-              <FileText className="w-3.5 h-3.5 text-teal-400 shrink-0" />
+              <FileText className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
               <span>{t('footer_terms')}</span>
             </button>
-            <span className="text-white/20 hidden sm:inline">•</span>
+            <span className="text-theme-muted/40 hidden sm:inline">•</span>
             <span>{t('footer_location')}</span>
-            <span className="text-white/20 hidden sm:inline">•</span>
-            <a href="mailto:info@potvrdio.online" className="hover:text-white transition">info@potvrdio.online</a>
+            <span className="text-theme-muted/40 hidden sm:inline">•</span>
+            <a href="mailto:info@potvrdio.online" className="hover:text-theme-primary transition">info@potvrdio.online</a>
           </div>
         </div>
       </footer>
 
       {/* Address Edit Token Modal */}
       {showAddressModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-surface border border-[#14B8A6]/50 rounded-xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-mono text-xs animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+          <div className="bg-surface border border-theme rounded-xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs animate-in fade-in zoom-in-95 duration-150">
             
             {/* Browser Header / URL bar */}
             <div className="bg-surface-subtle px-3.5 sm:px-4 py-2.5 border-b border-theme flex items-center justify-between text-[11px] text-theme-muted shrink-0">
-              <div className="flex items-center gap-2 text-[#14B8A6] font-mono truncate mr-2">
-                <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
-                <span className="text-slate-200 truncate">potvrdio.online/edit-address?token=vbr_9842</span>
+              <div className="flex items-center gap-2 text-teal-600 dark:text-[#14B8A6] font-mono truncate mr-2">
+                <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <span className="text-theme-primary truncate">potvrdio.online/edit-address?token=vbr_9842</span>
               </div>
               <button 
                 onClick={() => setShowAddressModal(false)}
-                className="text-slate-400 hover:text-white transition p-1 cursor-pointer shrink-0"
+                className="text-theme-muted hover:text-theme-primary transition p-1 cursor-pointer shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1920,15 +2154,15 @@ export default function App() {
             {/* Modal Body */}
             <div className="p-4 sm:p-5 space-y-3.5 overflow-y-auto touch-scroll">
               <div>
-                <div className="text-[10px] text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
+                <div className="text-[10px] text-teal-600 dark:text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
                   {t('modal_badge')}
                 </div>
                 <h3 className="text-base font-bold text-theme-primary font-sans">{t('modal_title')}</h3>
-                <p className="text-[11px] text-slate-400 mt-1">{t('modal_subtitle')}</p>
+                <p className="text-[11px] text-theme-muted mt-1">{t('modal_subtitle')}</p>
               </div>
 
-              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded text-amber-300 text-[11px] flex items-start gap-2 font-sans">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div className="p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg text-amber-800 dark:text-amber-300 text-[11px] flex items-start gap-2 font-sans">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                 <span>
                   {lang === 'sr' ? '⚡ Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.' : lang === 'mk' ? '⚡ Пополнете кат и стан за курирот без застој да го најде вашиот влез.' : '⚡ Fill floor and apartment so the courier can find your entrance without delay.'}
                 </span>
@@ -1936,12 +2170,12 @@ export default function App() {
 
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">{t('modal_street')}</label>
+                  <label className="block text-[11px] text-theme-muted mb-1 font-medium">{t('modal_street')}</label>
                   <input 
                     type="text" 
                     readOnly 
                     value={currentScenConfig.address[lang]}
-                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-400 font-mono text-xs cursor-not-allowed min-h-[40px]"
+                    className="w-full bg-surface-subtle border border-theme rounded-lg px-3 py-2 text-theme-muted font-mono text-xs cursor-not-allowed min-h-[40px]"
                   />
                 </div>
 
@@ -1952,7 +2186,7 @@ export default function App() {
                       type="text" 
                       value={floorInput}
                       onChange={(e) => setFloorInput(e.target.value)}
-                      className="w-full bg-surface border border-[#14B8A6] rounded px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
                     />
                   </div>
                   <div>
@@ -1961,17 +2195,17 @@ export default function App() {
                       type="text" 
                       value={aptInput}
                       onChange={(e) => setAptInput(e.target.value)}
-                      className="w-full bg-surface border border-[#14B8A6] rounded px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-[#14B8A6] min-h-[40px]"
+                      className="w-full bg-surface border border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] text-slate-400 mb-1">{t('modal_intercom')}</label>
+                  <label className="block text-[11px] text-theme-muted mb-1 font-medium">{t('modal_intercom')}</label>
                   <input 
                     type="text" 
                     defaultValue={lang === 'sr' ? 'Radi interfon, ime na zvonu Ninković' : lang === 'mk' ? 'Работи интерфон, име на ѕвоно Ниновиќ' : 'Intercom works, ring name Ninkovic'}
-                    className="w-full bg-[#070A13] border border-white/10 rounded px-3 py-2 text-slate-300 text-xs focus:outline-none focus:border-white/30 font-sans min-h-[40px]"
+                    className="w-full bg-surface border border-theme rounded-lg px-3 py-2 text-theme-secondary text-xs focus:outline-none focus:border-teal-500 font-sans min-h-[40px]"
                   />
                 </div>
               </div>
@@ -1984,12 +2218,12 @@ export default function App() {
                 <span>{t('modal_btn_save')}</span>
               </button>
 
-              <div className="pt-2 text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1.5 text-center leading-normal">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <div className="pt-2 text-[10px] text-theme-muted font-sans flex items-center justify-center gap-1.5 text-center leading-normal">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>{t('modal_legal_notice')}</span>
                 <button 
                   onClick={() => { playClickSound(); setShowPrivacyModal(true); }}
-                  className="text-[#14B8A6] hover:underline cursor-pointer ml-1"
+                  className="text-teal-600 dark:text-[#14B8A6] hover:underline cursor-pointer ml-1 font-medium"
                 >
                   [{t('footer_privacy')}]
                 </button>

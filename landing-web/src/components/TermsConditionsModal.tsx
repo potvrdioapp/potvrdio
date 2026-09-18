@@ -115,21 +115,21 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
   const t = content[lang];
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-[#111827] light:bg-white border border-slate-700/60 light:border-slate-200/80 rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-slate-300 light:text-slate-700 animate-in fade-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-5">
+      <div className="bg-surface border border-theme rounded-2xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs text-theme-secondary animate-in fade-in zoom-in-95 duration-150">
         
         {/* Header */}
-        <div className="bg-[#0B0F19] light:bg-slate-50 px-4 sm:px-6 py-3.5 border-b border-slate-800 light:border-slate-200 flex items-center justify-between shrink-0 font-sans">
-          <div className="flex items-center gap-2 text-[#14B8A6]">
-            <FileText className="w-5 h-5 text-teal-400 light:text-teal-600 shrink-0" />
+        <div className="bg-surface-subtle px-4 sm:px-6 py-3.5 border-b border-theme flex items-center justify-between shrink-0 font-sans">
+          <div className="flex items-center gap-2 text-teal-600 dark:text-[#14B8A6]">
+            <FileText className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />
             <div>
-              <h2 className="text-sm sm:text-base font-bold text-white light:text-slate-900 tracking-tight">{t.title}</h2>
-              <p className="text-[10px] text-slate-400 light:text-slate-500 font-sans">{t.updated}</p>
+              <h2 className="text-sm sm:text-base font-bold text-theme-primary tracking-tight">{t.title}</h2>
+              <p className="text-[10px] text-theme-muted font-sans">{t.updated}</p>
             </div>
           </div>
           <button 
             onClick={onClose}
-            className="text-slate-400 hover:text-white light:hover:text-slate-900 transition p-1.5 rounded-lg hover:bg-white/5 light:hover:bg-slate-200/50 cursor-pointer shrink-0"
+            className="text-theme-muted hover:text-theme-primary transition p-1.5 rounded-lg hover:bg-surface-subtle cursor-pointer shrink-0"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
@@ -138,34 +138,34 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
 
         {/* Scrollable Body */}
         <div className="p-5 sm:p-7 space-y-5 overflow-y-auto touch-scroll leading-relaxed">
-          <div className="p-3.5 bg-teal-500/10 border border-teal-500/30 rounded-xl text-teal-300 text-[11px] font-sans flex items-start gap-2.5">
-            <Scale className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
+          <div className="p-3.5 bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/30 rounded-xl text-teal-800 dark:text-teal-300 text-[11px] font-sans flex items-start gap-2.5">
+            <Scale className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
             <span>{t.subtitle}</span>
           </div>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec1_title}
             </h3>
-            <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec1_p1}</p>
-            <p className="text-slate-400 text-[11px] leading-relaxed">{t.sec1_p2}</p>
+            <p className="text-theme-secondary text-[11px] leading-relaxed">{t.sec1_p1}</p>
+            <p className="text-theme-muted text-[11px] leading-relaxed">{t.sec1_p2}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec2_title}
             </h3>
-            <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec2_p}</p>
+            <p className="text-theme-secondary text-[11px] leading-relaxed">{t.sec2_p}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec3_title}
             </h3>
-            <ul className="space-y-1.5 text-[11px] text-slate-300">
+            <ul className="space-y-1.5 text-[11px] text-theme-secondary">
               {t.sec3_items.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-teal-400 shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </li>
               ))}
@@ -173,41 +173,41 @@ export const TermsConditionsModal: React.FC<TermsConditionsModalProps> = ({ isOp
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec4_title}
             </h3>
-            <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec4_p1}</p>
-            <p className="text-slate-400 text-[11px] leading-relaxed">{t.sec4_p2}</p>
+            <p className="text-theme-secondary text-[11px] leading-relaxed">{t.sec4_p1}</p>
+            <p className="text-theme-muted text-[11px] leading-relaxed">{t.sec4_p2}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec5_title}
             </h3>
-            <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec5_p}</p>
+            <p className="text-theme-secondary text-[11px] leading-relaxed">{t.sec5_p}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec6_title}
             </h3>
-            <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec6_p}</p>
+            <p className="text-theme-secondary text-[11px] leading-relaxed">{t.sec6_p}</p>
           </section>
 
-          <section className="space-y-2 border-t border-white/10 pt-4">
-            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-[#14B8A6]">
+          <section className="space-y-2 border-t border-theme pt-4">
+            <h3 className="text-xs font-bold uppercase tracking-wider font-sans text-teal-700 dark:text-[#14B8A6]">
               {t.sec7_title}
             </h3>
-            <p className="text-slate-300 text-[11px] leading-relaxed">{t.sec7_p}</p>
+            <p className="text-theme-secondary text-[11px] leading-relaxed">{t.sec7_p}</p>
           </section>
         </div>
 
         {/* Footer */}
-        <div className="bg-[#0B0F19] px-5 py-3 border-t border-slate-800 flex items-center justify-between text-[11px] font-sans shrink-0">
-          <span className="text-slate-400">Potvrdio Merchant Terms Protection</span>
+        <div className="bg-surface-subtle px-5 py-3 border-t border-theme flex items-center justify-between text-[11px] font-sans shrink-0">
+          <span className="text-theme-muted">Potvrdio Merchant Terms Protection</span>
           <button 
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition cursor-pointer"
+            className="px-4 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle text-theme-primary border border-theme font-bold text-xs transition cursor-pointer shadow-sm"
           >
             {t.btn_close}
           </button>
