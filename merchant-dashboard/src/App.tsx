@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
-  Copy, Check, ChevronRight, Monitor, Store, Globe
+  Copy, Check, ChevronRight, Monitor, Store
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { translations, Language } from './i18n';
@@ -135,81 +135,70 @@ export default function App() {
 
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* STORE BANNER HEADER (Positioned as full-width top dashboard header with language code) */}
-        <header className="sticky top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-theme px-6 md:px-8 py-4 transition-colors">
-          <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            {/* Store Information Banner */}
-            <div className="flex items-center gap-3.5 text-left">
-              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shrink-0 shadow-xs">
-                <Store className="w-5 h-5" />
+        {/* Streamlined Store Banner Header */}
+        <header className="sticky top-0 z-20 bg-surface/90 backdrop-blur-md border-b border-theme px-6 md:px-8 h-16 flex items-center transition-colors">
+          <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4">
+            {/* Store Information & Language Code */}
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 font-bold shrink-0 shadow-xs">
+                <Store className="w-4 h-4" />
               </div>
-              <div className="text-left">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-lg md:text-xl font-bold text-theme-primary tracking-tight">
+              <div className="min-w-0 text-left">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-sm md:text-base font-bold text-theme-primary tracking-tight truncate">
                     {t.storeName}
                   </h1>
                   {/* Language Code Badge */}
-                  <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold bg-surface-subtle text-theme-primary border border-theme px-2 py-0.5 rounded-md shadow-xs" title="Jezik i tržište prodavnice">
-                    <Globe className="w-3 h-3 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span className="text-[11px] font-mono font-bold bg-surface-subtle text-teal-600 dark:text-teal-400 border border-theme px-2 py-0.5 rounded-md shrink-0 shadow-xs">
                     {t.langCode}
                   </span>
                   {/* WooCommerce Connected Status */}
-                  <span className="inline-flex items-center gap-1.5 text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
                     {t.connected}
                   </span>
                 </div>
-                <p className="text-xs text-theme-muted mt-0.5 flex flex-wrap items-center gap-2 text-left">
-                  <span className="font-mono text-teal-600 dark:text-teal-400 font-medium">{t.storeDomain}</span>
-                  <span>·</span>
-                  <span>{t.storeSubtitle}</span>
-                </p>
+                <div className="text-[11px] text-theme-muted font-mono truncate">
+                  {t.storeDomain}
+                </div>
               </div>
             </div>
 
-            {/* Action Controls: Language Switcher, Theme Switcher, Credit Pool, Main CTA */}
-            <div className="flex flex-wrap items-center gap-3">
-              {/* Language Code Switcher */}
+            {/* Streamlined Action Controls */}
+            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              {/* Language Switcher */}
               <div className="flex items-center bg-surface-subtle border border-theme rounded-xl p-1 text-xs font-semibold shadow-xs">
-                <button
-                  onClick={() => setSelectedLang('sr')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                    selectedLang === 'sr'
-                      ? 'bg-teal-600 text-white shadow-xs'
-                      : 'text-theme-muted hover:text-theme-primary'
-                  }`}
-                  title="Srbija (sr-RS)"
-                >
-                  SR
-                </button>
-                <button
-                  onClick={() => setSelectedLang('mk')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                    selectedLang === 'mk'
-                      ? 'bg-teal-600 text-white shadow-xs'
-                      : 'text-theme-muted hover:text-theme-primary'
-                  }`}
-                  title="Северна Македонија (mk-MK)"
-                >
-                  MK
-                </button>
-                <button
-                  onClick={() => setSelectedLang('en')}
-                  className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                    selectedLang === 'en'
-                      ? 'bg-teal-600 text-white shadow-xs'
-                      : 'text-theme-muted hover:text-theme-primary'
-                  }`}
-                  title="International (en-US)"
-                >
-                  EN
-                </button>
+                {(['sr', 'mk', 'en'] as const).map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => setSelectedLang(lang)}
+                    className={`px-2.5 py-1 rounded-lg text-xs transition-all cursor-pointer ${
+                      selectedLang === lang
+                        ? 'bg-teal-600 text-white font-bold shadow-xs'
+                        : 'text-theme-muted hover:text-theme-primary'
+                    }`}
+                    title={lang === 'sr' ? 'Srbija (sr-RS)' : lang === 'mk' ? 'Северна Македонија (mk-MK)' : 'International (en-US)'}
+                  >
+                    {lang.toUpperCase()}
+                  </button>
+                ))}
               </div>
+
+              {/* Quick Credit Top-up Pill */}
+              <button 
+                onClick={() => setActiveTab('credits')}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-subtle hover:bg-surface border border-theme hover:border-teal-500/40 text-theme-primary font-bold text-xs transition-all cursor-pointer shadow-xs"
+                title={t.topUpCredits}
+              >
+                <Zap className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 animate-pulse shrink-0" />
+                <span>{credits}</span>
+                <span className="text-theme-muted text-[11px] font-normal hidden md:inline">{t.remaining}</span>
+              </button>
 
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
-                className="p-2.5 rounded-xl bg-surface-subtle border border-theme text-theme-secondary hover:text-theme-primary hover:border-theme-emphasis transition-all cursor-pointer flex items-center justify-center shadow-xs"
+                className="p-2 rounded-xl bg-surface-subtle hover:bg-surface border border-theme text-theme-secondary hover:text-theme-primary transition-all cursor-pointer flex items-center justify-center shadow-xs"
                 title={theme === 'dark' ? t.themeLightTitle : t.themeDarkTitle}
                 aria-label="Toggle theme"
               >
@@ -218,24 +207,6 @@ export default function App() {
                 ) : (
                   <Moon className="w-4 h-4 text-indigo-600" />
                 )}
-              </button>
-
-              {/* Credit Pool Display */}
-              <div className="bg-surface-subtle border border-theme px-3.5 py-2 rounded-xl flex items-center gap-2.5 shadow-xs">
-                <Zap className="w-4 h-4 text-teal-600 dark:text-teal-400 animate-pulse shrink-0" />
-                <div className="text-left">
-                  <div className="text-[10px] text-theme-muted uppercase tracking-wider font-semibold leading-none">{t.creditPool}</div>
-                  <div className="text-sm font-bold text-theme-primary leading-tight">{credits} <span className="text-theme-muted text-xs font-normal">{t.remaining}</span></div>
-                </div>
-              </div>
-
-              {/* Primary Top-up CTA */}
-              <button 
-                onClick={() => setActiveTab('credits')}
-                className="btn-brand-cta text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-              >
-                <CreditCard className="w-4 h-4" />
-                <span>{t.topUpCredits}</span>
               </button>
             </div>
           </div>

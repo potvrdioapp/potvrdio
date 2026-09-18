@@ -129,7 +129,7 @@ export interface TranslationSchema {
 export const translations: Record<Language, TranslationSchema> = {
   sr: {
     langCode: 'sr-RS',
-    storeName: 'Balkan Style Shop (Srbija)',
+    storeName: 'Balkan Style Shop',
     storeDomain: 'balkanshop.rs',
     storeSubtitle: 'Sprečite COD troškove i povećajte dostavu paketa na 98%+',
     connected: 'WooCommerce Connected',
@@ -251,7 +251,7 @@ export const translations: Record<Language, TranslationSchema> = {
   },
   mk: {
     langCode: 'mk-MK',
-    storeName: 'Balkan Style Shop (Северна Македонија)',
+    storeName: 'Balkan Style Shop',
     storeDomain: 'balkanshop.mk',
     storeSubtitle: 'Спречете COD трошоци и зголемете ја испораката на пратки на 98%+',
     connected: 'WooCommerce Connected',
@@ -373,7 +373,7 @@ export const translations: Record<Language, TranslationSchema> = {
   },
   en: {
     langCode: 'en-US',
-    storeName: 'Balkan Style Shop (International)',
+    storeName: 'Balkan Style Shop',
     storeDomain: 'balkanshop.com',
     storeSubtitle: 'Prevent COD return costs and boost parcel delivery rate to 98%+',
     connected: 'WooCommerce Connected',
