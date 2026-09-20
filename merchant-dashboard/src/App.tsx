@@ -5,6 +5,7 @@ import {
   Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail, XCircle, Calendar
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
+import { DateRangePicker, PeriodType } from './components/DateRangePicker';
 import { translations, Language } from './i18n';
 
 type Theme = 'dark' | 'light';
@@ -27,7 +28,7 @@ export default function App() {
     return saved && ['sr', 'mk', 'en'].includes(saved) ? saved : 'sr';
   });
 
-  const [timeframe, setTimeframe] = useState<'30d' | 'lifetime' | '7d'>('30d');
+  const [timeframe, setTimeframe] = useState<PeriodType>('30d');
 
   useEffect(() => {
     localStorage.setItem('potvrdio_lang', selectedLang);
@@ -35,7 +36,17 @@ export default function App() {
 
   const t = translations[selectedLang];
 
-  const statsConfig = {
+  const statsConfig: Record<PeriodType, {
+    confirmed: string;
+    confirmedBadge: string;
+    confirmedSub: string;
+    deliveryRate: string;
+    deliverySub: string;
+    saved: string;
+    savedSub: string;
+    viberOpen: string;
+    viberSub: string;
+  }> = {
     '30d': {
       confirmed: '412',
       confirmedBadge: t.statConfirmedBadge,
@@ -68,6 +79,39 @@ export default function App() {
       savedSub: selectedLang === 'sr' ? 'Ušteda na kurirskim službama' : selectedLang === 'mk' ? 'Заштеда на курирски служби' : 'Saved on carrier return costs',
       viberOpen: '94.6%',
       viberSub: selectedLang === 'sr' ? 'Odziv kupaca unutar 1.8 min' : selectedLang === 'mk' ? 'Одѕив на купувачи под 1.8 мин' : 'Customer response in < 1.8 mins',
+    },
+    '90d': {
+      confirmed: '1,180',
+      confirmedBadge: selectedLang === 'sr' ? '+14% u kvartalu' : selectedLang === 'mk' ? '+14% во квартал' : '+14% this quarter',
+      confirmedSub: selectedLang === 'sr' ? 'Verifikovano u zadnjih 90 dana' : selectedLang === 'mk' ? 'Верификувано во последните 90 дена' : 'Verified in the last 90 days',
+      deliveryRate: '96.1%',
+      deliverySub: selectedLang === 'sr' ? 'Stabilan prosek na 1.200 pošiljki' : selectedLang === 'mk' ? 'Стабилен просек на 1.200 пратки' : 'Stable average across 1,200 parcels',
+      saved: '€3,540',
+      savedSub: selectedLang === 'sr' ? 'Kumulativna ušteda u 3 meseca' : selectedLang === 'mk' ? 'Кумулативна заштеда за 3 месеци' : 'Cumulative 3-month savings',
+      viberOpen: '93.2%',
+      viberSub: selectedLang === 'sr' ? 'Konstantan visok odziv kupaca' : selectedLang === 'mk' ? 'Константен висок одѕив' : 'Sustained high response rate',
+    },
+    'ytd': {
+      confirmed: '3,120',
+      confirmedBadge: selectedLang === 'sr' ? 'U toku 2026. god' : selectedLang === 'mk' ? 'Во текот на 2026 год' : 'Year-to-date 2026',
+      confirmedSub: selectedLang === 'sr' ? 'Od 1. januara do danas' : selectedLang === 'mk' ? 'Од 1 јануари до денес' : 'From Jan 1 until today',
+      deliveryRate: '95.9%',
+      deliverySub: selectedLang === 'sr' ? 'Godišnji prosek uspešnih COD paketa' : selectedLang === 'mk' ? 'Годишен просек на успешни COD пратки' : 'Annual delivery completion benchmark',
+      saved: '€9,360',
+      savedSub: selectedLang === 'sr' ? 'Sačuvano od poštanskih penala' : selectedLang === 'mk' ? 'Заштедено од поштенски пенали' : 'Saved in courier return fees',
+      viberOpen: '92.9%',
+      viberSub: selectedLang === 'sr' ? 'Godišnja stopa otvaranja poruka' : selectedLang === 'mk' ? 'Годишна стапка на отворање' : 'Annual message read rate',
+    },
+    'custom': {
+      confirmed: '286',
+      confirmedBadge: selectedLang === 'sr' ? 'Prilagođen raspon' : selectedLang === 'mk' ? 'Прилагоден опсег' : 'Custom range',
+      confirmedSub: selectedLang === 'sr' ? 'Izabrani period na kalendaru' : selectedLang === 'mk' ? 'Избран период на календарот' : 'Selected dates from calendar',
+      deliveryRate: '96.8%',
+      deliverySub: selectedLang === 'sr' ? 'Isporučenost u izabranim danima' : selectedLang === 'mk' ? 'Испорака во избраните денови' : 'Delivery rate in selected range',
+      saved: '€858',
+      savedSub: selectedLang === 'sr' ? 'Sprečeni neisporučeni troškovi' : selectedLang === 'mk' ? 'Спречени неиспорачани troškovi' : 'Prevented return expenses',
+      viberOpen: '94.1%',
+      viberSub: selectedLang === 'sr' ? 'Odziv za odabrane dane' : selectedLang === 'mk' ? 'Одѕив за избраните денови' : 'Response rate in selected range',
     }
   };
   const activeStats = statsConfig[timeframe];
@@ -280,39 +324,12 @@ export default function App() {
                   </p>
                 </div>
 
-                {/* Timeframe Selector Pills */}
-                <div className="flex items-center bg-surface-subtle p-1 rounded-xl border border-theme text-xs font-semibold self-start sm:self-auto shadow-xs">
-                  <button
-                    onClick={() => setTimeframe('30d')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      timeframe === '30d'
-                        ? 'bg-teal-600 text-white shadow-xs font-bold'
-                        : 'text-theme-muted hover:text-theme-primary'
-                    }`}
-                  >
-                    {t.timeframe30d}
-                  </button>
-                  <button
-                    onClick={() => setTimeframe('lifetime')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      timeframe === 'lifetime'
-                        ? 'bg-teal-600 text-white shadow-xs font-bold'
-                        : 'text-theme-muted hover:text-theme-primary'
-                    }`}
-                  >
-                    {t.timeframeLifetime}
-                  </button>
-                  <button
-                    onClick={() => setTimeframe('7d')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      timeframe === '7d'
-                        ? 'bg-teal-600 text-white shadow-xs font-bold'
-                        : 'text-theme-muted hover:text-theme-primary'
-                    }`}
-                  >
-                    {t.timeframe7d}
-                  </button>
-                </div>
+                {/* Timeframe Date Range Picker Dropdown */}
+                <DateRangePicker 
+                  selectedPeriod={timeframe} 
+                  onApply={(p) => setTimeframe(p)} 
+                  lang={selectedLang} 
+                />
               </div>
 
               {/* Stats Cards Grid */}
