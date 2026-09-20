@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
-  Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail
+  Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail, XCircle, Calendar
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { translations, Language } from './i18n';
@@ -27,11 +27,50 @@ export default function App() {
     return saved && ['sr', 'mk', 'en'].includes(saved) ? saved : 'sr';
   });
 
+  const [timeframe, setTimeframe] = useState<'30d' | 'lifetime' | '7d'>('30d');
+
   useEffect(() => {
     localStorage.setItem('potvrdio_lang', selectedLang);
   }, [selectedLang]);
 
   const t = translations[selectedLang];
+
+  const statsConfig = {
+    '30d': {
+      confirmed: '412',
+      confirmedBadge: t.statConfirmedBadge,
+      confirmedSub: t.statConfirmedSub,
+      deliveryRate: '96.4%',
+      deliverySub: t.statDeliverySub,
+      saved: '€1,240',
+      savedSub: t.statSavedSub,
+      viberOpen: '93.8%',
+      viberSub: t.statViberSub,
+    },
+    'lifetime': {
+      confirmed: '3,840',
+      confirmedBadge: selectedLang === 'sr' ? 'Ukupno od početka' : selectedLang === 'mk' ? 'Вкупно од почетокот' : 'All-time verified',
+      confirmedSub: selectedLang === 'sr' ? 'Automatski obrađene COD porudžbine' : selectedLang === 'mk' ? 'Автоматски обработени COD нарачки' : 'Automated COD orders processed',
+      deliveryRate: '95.8%',
+      deliverySub: selectedLang === 'sr' ? 'Pre Potvrdio: 74% (Kumulativni prosek)' : selectedLang === 'mk' ? 'Пред Potvrdio: 74% (Кумулативен просек)' : 'Baseline was 74% (Cumulative)',
+      saved: '€11,520',
+      savedSub: selectedLang === 'sr' ? 'Sprečeni troškovi povratne poštarine' : selectedLang === 'mk' ? 'Спречени трошоци за повратна поштарина' : 'Saved in prevented return carrier fees',
+      viberOpen: '92.5%',
+      viberSub: selectedLang === 'sr' ? 'Globalna stopa uspešne isporuke' : selectedLang === 'mk' ? 'Глобална стапка на испорака' : 'Global message delivery rate',
+    },
+    '7d': {
+      confirmed: '94',
+      confirmedBadge: selectedLang === 'sr' ? '+6% ove nedelje' : selectedLang === 'mk' ? '+6% оваа недела' : '+6% this week',
+      confirmedSub: selectedLang === 'sr' ? 'Verifikovano u zadnjih 7 dana' : selectedLang === 'mk' ? 'Верификувано во последните 7 дена' : 'Verified in the last 7 days',
+      deliveryRate: '97.2%',
+      deliverySub: selectedLang === 'sr' ? 'Vrhunska isporučenost ove sedmice' : selectedLang === 'mk' ? 'Врвна испорака оваа недела' : 'Peak weekly delivery performance',
+      saved: '€295',
+      savedSub: selectedLang === 'sr' ? 'Ušteda na kurirskim službama' : selectedLang === 'mk' ? 'Заштеда на курирски служби' : 'Saved on carrier return costs',
+      viberOpen: '94.6%',
+      viberSub: selectedLang === 'sr' ? 'Odziv kupaca unutar 1.8 min' : selectedLang === 'mk' ? 'Одѕив на купувачи под 1.8 мин' : 'Customer response in < 1.8 mins',
+    }
+  };
+  const activeStats = statsConfig[timeframe];
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -228,55 +267,108 @@ export default function App() {
         <main className="flex-1 p-6 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
           {/* TAB 1: OVERVIEW */}
           {activeTab === 'overview' && (
-            <div className="space-y-8">
+            <div className="space-y-6">
+              {/* Header & Timeframe Filter Bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h2 className="text-xl font-bold text-theme-primary flex items-center gap-2">
+                    <BarChart2 className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                    {t.navOverview}
+                  </h2>
+                  <p className="text-xs text-theme-muted mt-0.5">
+                    {selectedLang === 'sr' ? 'Ključni pokazatelji COD poslovanja i operativne verifikacije' : selectedLang === 'mk' ? 'Клучни показатели за COD работење и оперативна верификација' : 'Key COD performance & live parcel verification metrics'}
+                  </p>
+                </div>
+
+                {/* Timeframe Selector Pills */}
+                <div className="flex items-center bg-surface-subtle p-1 rounded-xl border border-theme text-xs font-semibold self-start sm:self-auto shadow-xs">
+                  <button
+                    onClick={() => setTimeframe('30d')}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      timeframe === '30d'
+                        ? 'bg-teal-600 text-white shadow-xs font-bold'
+                        : 'text-theme-muted hover:text-theme-primary'
+                    }`}
+                  >
+                    {t.timeframe30d}
+                  </button>
+                  <button
+                    onClick={() => setTimeframe('lifetime')}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      timeframe === 'lifetime'
+                        ? 'bg-teal-600 text-white shadow-xs font-bold'
+                        : 'text-theme-muted hover:text-theme-primary'
+                    }`}
+                  >
+                    {t.timeframeLifetime}
+                  </button>
+                  <button
+                    onClick={() => setTimeframe('7d')}
+                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      timeframe === '7d'
+                        ? 'bg-teal-600 text-white shadow-xs font-bold'
+                        : 'text-theme-muted hover:text-theme-primary'
+                    }`}
+                  >
+                    {t.timeframe7d}
+                  </button>
+                </div>
+              </div>
+
               {/* Stats Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
+                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-all shadow-card">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>{t.statConfirmedTitle}</span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-theme-primary">412 <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">{t.statConfirmedBadge}</span></div>
-                  <div className="text-[11px] text-theme-muted">{t.statConfirmedSub}</div>
+                  <div className="text-2xl font-extrabold text-theme-primary flex items-baseline gap-2">
+                    {activeStats.confirmed} 
+                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      {activeStats.confirmedBadge}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-theme-muted">{activeStats.confirmedSub}</div>
                 </div>
 
-                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
+                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-all shadow-card">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>{t.statDeliveryTitle}</span>
                     <TrendingUp className="w-4 h-4 text-teal-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-theme-primary">96.4%</div>
-                  <div className="text-[11px] text-theme-muted">{t.statDeliverySub}</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">{activeStats.deliveryRate}</div>
+                  <div className="text-[11px] text-theme-muted">{activeStats.deliverySub}</div>
                 </div>
 
-                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
+                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-all shadow-card">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>{t.statSavedTitle}</span>
                     <Layers className="w-4 h-4 text-indigo-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-theme-primary">€1,240</div>
-                  <div className="text-[11px] text-theme-muted">{t.statSavedSub}</div>
+                  <div className="text-2xl font-extrabold text-theme-primary text-emerald-600 dark:text-emerald-400">{activeStats.saved}</div>
+                  <div className="text-[11px] text-theme-muted">{activeStats.savedSub}</div>
                 </div>
 
-                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-colors">
+                <div className="glass-panel rounded-2xl p-5 border border-theme space-y-2 hover:border-teal-500/30 transition-all shadow-card">
                   <div className="flex items-center justify-between text-theme-muted text-xs">
                     <span>{t.statViberTitle}</span>
                     <MessageSquare className="w-4 h-4 text-pink-500" />
                   </div>
-                  <div className="text-2xl font-extrabold text-theme-primary">93.8%</div>
-                  <div className="text-[11px] text-theme-muted">{t.statViberSub}</div>
+                  <div className="text-2xl font-extrabold text-theme-primary">{activeStats.viberOpen}</div>
+                  <div className="text-[11px] text-theme-muted">{activeStats.viberSub}</div>
                 </div>
               </div>
 
               {/* Logs Table Section */}
               <div className="glass-panel rounded-2xl p-6 border border-theme space-y-4 shadow-card">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
-                    <h3 className="text-lg font-bold text-theme-primary">{t.tableTitle}</h3>
+                    <h3 className="text-base font-bold text-theme-primary">{t.tableTitle}</h3>
                     <p className="text-xs text-theme-muted">{t.tableSubtitle}</p>
                   </div>
-                  <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full">
-                    {t.tableBadge}
+                  <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+                    {t.tableBadge} · {t.logs.length} {selectedLang === 'sr' ? 'naloga' : selectedLang === 'mk' ? 'нарачки' : 'orders'}
                   </span>
                 </div>
 
@@ -316,6 +408,14 @@ export default function App() {
                             {log.status === 'SMS_FALLBACK' && (
                               <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
                                 <AlertTriangle className="w-3 h-3" /> {t.statusSmsFallback}
+                              </span>
+                            )}
+                            {log.status === 'CANCELLED' && (
+                              <span 
+                                className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full font-semibold"
+                                title={selectedLang === 'sr' ? 'Kupac otkazao pre slanja — sprečen trošak povrata paketa!' : selectedLang === 'mk' ? 'Купувачот откажа пред праќање — спречен трошок за поврат!' : 'Buyer cancelled before shipping — prevented return courier fee!'}
+                              >
+                                <XCircle className="w-3 h-3" /> {t.statusCancelled} ({log.channel})
                               </span>
                             )}
                           </td>

@@ -19,6 +19,11 @@ export interface TranslationSchema {
   navCredits: string;
   navSettings: string;
   
+  // Timeframe Filter
+  timeframe30d: string;
+  timeframeLifetime: string;
+  timeframe7d: string;
+
   // Overview Stats
   statConfirmedTitle: string;
   statConfirmedBadge: string;
@@ -46,12 +51,13 @@ export interface TranslationSchema {
   statusApproved: string;
   statusAddressEdited: string;
   statusSmsFallback: string;
+  statusCancelled: string;
   
   logs: Array<{
     id: string;
     customer: string;
     phone: string;
-    status: 'APPROVED' | 'EDITED_ADDRESS' | 'SMS_FALLBACK';
+    status: 'APPROVED' | 'EDITED_ADDRESS' | 'SMS_FALLBACK' | 'CANCELLED';
     channel: string;
     city: string;
     amount: string;
@@ -146,6 +152,11 @@ export const translations: Record<Language, TranslationSchema> = {
     navCredits: 'Krediti & Dopuna',
     navSettings: 'WooCommerce API Ključ',
     
+    // Timeframe Filter
+    timeframe30d: 'Poslednjih 30 dana',
+    timeframeLifetime: 'Ukupno (Lifetime)',
+    timeframe7d: 'Poslednjih 7 dana',
+
     // Overview Stats
     statConfirmedTitle: 'Potvrđene COD Porudžbine',
     statConfirmedBadge: '+18% ovog meseca',
@@ -173,6 +184,7 @@ export const translations: Record<Language, TranslationSchema> = {
     statusApproved: 'Potvrđeno',
     statusAddressEdited: 'Izmenjena Adresa',
     statusSmsFallback: 'SMS Fallback',
+    statusCancelled: 'Otkazano (Kupac)',
     
     logs: [
       { id: '#7482', customer: 'Nikola Petrović', phone: '+381 64 123 ****', status: 'APPROVED', channel: 'Viber', city: 'Beograd', amount: '4.850 RSD', time: 'Pre 4 min' },
@@ -180,6 +192,13 @@ export const translations: Record<Language, TranslationSchema> = {
       { id: '#7480', customer: 'Stefan Ilić', phone: '+381 61 456 ****', status: 'APPROVED', channel: 'Viber', city: 'Niš', amount: '3.100 RSD', time: 'Pre 42 min' },
       { id: '#7479', customer: 'Jelena Stojanović', phone: '+387 65 321 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Banja Luka', amount: '6.400 RSD', time: 'Pre 1h 12m' },
       { id: '#7478', customer: 'Marko Đorđević', phone: '+381 62 888 ****', status: 'APPROVED', channel: 'Viber', city: 'Kragujevac', amount: '5.900 RSD', time: 'Pre 2h 05m' },
+      { id: '#7477', customer: 'Bojan Radovanović', phone: '+381 60 777 ****', status: 'CANCELLED', channel: 'Viber (1-klik)', city: 'Subotica', amount: '7.350 RSD', time: 'Pre 2h 45m' },
+      { id: '#7476', customer: 'Tamara Simić', phone: '+381 65 554 ****', status: 'APPROVED', channel: 'Viber', city: 'Čačak', amount: '3.890 RSD', time: 'Pre 3h 10m' },
+      { id: '#7475', customer: 'Dragan Vasić', phone: '+381 69 443 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Pančevo', amount: '12.400 RSD', time: 'Pre 4h 25m' },
+      { id: '#7474', customer: 'Anja Kovačević', phone: '+381 64 332 ****', status: 'APPROVED', channel: 'Viber', city: 'Kruševac', amount: '4.150 RSD', time: 'Pre 5h 50m' },
+      { id: '#7473', customer: 'Miloš Tešić', phone: '+381 63 221 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Zrenjanin', amount: '2.950 RSD', time: 'Pre 7h 15m' },
+      { id: '#7472', customer: 'Aleksandra Popović', phone: '+381 61 990 ****', status: 'APPROVED', channel: 'Viber', city: 'Šabac', amount: '6.800 RSD', time: 'Pre 9h 30m' },
+      { id: '#7471', customer: 'Vladimir Lukić', phone: '+381 62 112 ****', status: 'CANCELLED', channel: 'Viber (1-klik)', city: 'Valjevo', amount: '5.400 RSD', time: 'Pre 11h' },
     ],
 
     // Credits Tab
@@ -268,6 +287,11 @@ export const translations: Record<Language, TranslationSchema> = {
     navCredits: 'Кредити и Дополнување',
     navSettings: 'WooCommerce API Клуч',
     
+    // Timeframe Filter
+    timeframe30d: 'Последните 30 дена',
+    timeframeLifetime: 'Вкупно (Lifetime)',
+    timeframe7d: 'Последните 7 дена',
+
     // Overview Stats
     statConfirmedTitle: 'Потврдени COD Нарачки',
     statConfirmedBadge: '+18% овој месец',
@@ -295,6 +319,7 @@ export const translations: Record<Language, TranslationSchema> = {
     statusApproved: 'Потврдено',
     statusAddressEdited: 'Изменета Адреса',
     statusSmsFallback: 'SMS Алтернатива',
+    statusCancelled: 'Откажано (Купувач)',
     
     logs: [
       { id: '#7482', customer: 'Александар Николов', phone: '+389 70 123 ***', status: 'APPROVED', channel: 'Viber', city: 'Скопје', amount: '2.450 ден', time: 'Пред 4 мин' },
@@ -302,6 +327,13 @@ export const translations: Record<Language, TranslationSchema> = {
       { id: '#7480', customer: 'Стефан Трајков', phone: '+389 75 456 ***', status: 'APPROVED', channel: 'Viber', city: 'Охрид', amount: '1.850 ден', time: 'Пред 42 мин' },
       { id: '#7479', customer: 'Марија Димитриевска', phone: '+389 78 321 ***', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Куманово', amount: '3.200 ден', time: 'Пред 1ч 12м' },
       { id: '#7478', customer: 'Горан Ристов', phone: '+389 72 888 ***', status: 'APPROVED', channel: 'Viber', city: 'Прилеп', amount: '2.900 ден', time: 'Пред 2ч 05м' },
+      { id: '#7477', customer: 'Бојан Костовски', phone: '+389 70 554 ***', status: 'CANCELLED', channel: 'Viber (1-клик)', city: 'Тетово', amount: '3.650 ден', time: 'Пред 2ч 45м' },
+      { id: '#7476', customer: 'Тамара Илиевска', phone: '+389 76 776 ***', status: 'APPROVED', channel: 'Viber', city: 'Струмица', amount: '1.990 ден', time: 'Пред 3ч 10м' },
+      { id: '#7475', customer: 'Драган Спасов', phone: '+389 71 443 ***', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Велес', amount: '6.200 ден', time: 'Пред 4ч 25м' },
+      { id: '#7474', customer: 'Ања Георгиева', phone: '+389 75 332 ***', status: 'APPROVED', channel: 'Viber', city: 'Штип', amount: '2.150 ден', time: 'Пред 5ч 50м' },
+      { id: '#7473', customer: 'Милош Ангелов', phone: '+389 78 221 ***', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Гостивар', amount: '1.450 ден', time: 'Пред 7ч 15м' },
+      { id: '#7472', customer: 'Александра Петрова', phone: '+389 72 990 ***', status: 'APPROVED', channel: 'Viber', city: 'Кавадарци', amount: '3.400 ден', time: 'Пред 9ч 30м' },
+      { id: '#7471', customer: 'Владимир Иванов', phone: '+389 70 112 ***', status: 'CANCELLED', channel: 'Viber (1-клик)', city: 'Кочани', amount: '2.700 ден', time: 'Пред 11ч' },
     ],
 
     // Credits Tab
@@ -390,6 +422,11 @@ export const translations: Record<Language, TranslationSchema> = {
     navCredits: 'Credits & Top-up',
     navSettings: 'WooCommerce API Key',
     
+    // Timeframe Filter
+    timeframe30d: 'Last 30 Days',
+    timeframeLifetime: 'All-time (Lifetime)',
+    timeframe7d: 'Last 7 Days',
+
     // Overview Stats
     statConfirmedTitle: 'Confirmed COD Orders',
     statConfirmedBadge: '+18% this month',
@@ -417,6 +454,7 @@ export const translations: Record<Language, TranslationSchema> = {
     statusApproved: 'Approved',
     statusAddressEdited: 'Address Updated',
     statusSmsFallback: 'SMS Fallback',
+    statusCancelled: 'Cancelled by Buyer',
     
     logs: [
       { id: '#7482', customer: 'Nikola Petrovic', phone: '+381 64 123 ****', status: 'APPROVED', channel: 'Viber', city: 'Belgrade', amount: '€42.00', time: '4 mins ago' },
@@ -424,6 +462,13 @@ export const translations: Record<Language, TranslationSchema> = {
       { id: '#7480', customer: 'Stefan Ilic', phone: '+381 61 456 ****', status: 'APPROVED', channel: 'Viber', city: 'Novi Sad', amount: '€26.50', time: '42 mins ago' },
       { id: '#7479', customer: 'Marija Dimitrievska', phone: '+389 78 321 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Bitola', amount: '€54.00', time: '1h 12m ago' },
       { id: '#7478', customer: 'Goran Ristov', phone: '+381 62 888 ****', status: 'APPROVED', channel: 'Viber', city: 'Sarajevo', amount: '€49.00', time: '2h 05m ago' },
+      { id: '#7477', customer: 'Bojan Kostovski', phone: '+389 70 554 ****', status: 'CANCELLED', channel: 'Viber (1-click)', city: 'Tetovo', amount: '€31.00', time: '2h 45m ago' },
+      { id: '#7476', customer: 'Tamara Simic', phone: '+381 65 554 ****', status: 'APPROVED', channel: 'Viber', city: 'Nis', amount: '€33.00', time: '3h 10m ago' },
+      { id: '#7475', customer: 'Dragan Vasic', phone: '+381 69 443 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Banja Luka', amount: '€105.00', time: '4h 25m ago' },
+      { id: '#7474', customer: 'Anja Kovacevic', phone: '+381 64 332 ****', status: 'APPROVED', channel: 'Viber', city: 'Kragujevac', amount: '€35.00', time: '5h 50m ago' },
+      { id: '#7473', customer: 'Milos Tesic', phone: '+381 63 221 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Podgorica', amount: '€25.00', time: '7h 15m ago' },
+      { id: '#7472', customer: 'Aleksandra Popovic', phone: '+381 61 990 ****', status: 'APPROVED', channel: 'Viber', city: 'Subotica', amount: '€58.00', time: '9h 30m ago' },
+      { id: '#7471', customer: 'Vladimir Lukic', phone: '+381 62 112 ****', status: 'CANCELLED', channel: 'Viber (1-click)', city: 'Ohrid', amount: '€46.00', time: '11h ago' },
     ],
 
     // Credits Tab
