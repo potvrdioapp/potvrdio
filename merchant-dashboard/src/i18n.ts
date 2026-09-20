@@ -9,8 +9,8 @@ export interface TranslationSchema {
   creditPool: string;
   remaining: string;
   topUpCredits: string;
-  morTitle: string;
-  morDesc: string;
+  supportTitle: string;
+  supportDesc: string;
   themeLightTitle: string;
   themeDarkTitle: string;
   
@@ -110,8 +110,6 @@ export interface TranslationSchema {
 
   guideTitle: string;
   guideSubtitle: string;
-  method1Tab: string;
-  method2Tab: string;
   
   // Guide step cards
   step1Title: string;
@@ -136,8 +134,8 @@ export const translations: Record<Language, TranslationSchema> = {
     creditPool: 'Bazen Kredita',
     remaining: 'Preostalo',
     topUpCredits: 'Dopuni Kredite',
-    morTitle: 'MoR Model Plaćanja',
-    morDesc: '100% legalna MoR infrastruktura bez poreza i administrativnih tereta.',
+    supportTitle: 'Korisnička Podrška',
+    supportDesc: 'Pomoć oko integracije i podešavanja',
     themeLightTitle: 'Prebaci na Svetlu Temu',
     themeDarkTitle: 'Prebaci na Tamnu Temu',
     
@@ -234,8 +232,6 @@ export const translations: Record<Language, TranslationSchema> = {
 
     guideTitle: 'Vizuelni Prikaz: Gde se unosi u WordPress-u?',
     guideSubtitle: 'Pratite označeni meni sa leve strane vaše administratorske table',
-    method1Tab: 'Metod 1: Potvrdio Eklentija (Preporučeno)',
-    method2Tab: 'Metod 2: WooCommerce REST API',
     
     // Guide step cards
     step1Title: 'Otvorite Podešavanja',
@@ -258,8 +254,8 @@ export const translations: Record<Language, TranslationSchema> = {
     creditPool: 'Базен на Кредити',
     remaining: 'Преостанато',
     topUpCredits: 'Дополни Кредити',
-    morTitle: 'MoR Модел на Плаќање',
-    morDesc: '100% легална MoR инфраструктура без даночни и административни оптоварувања.',
+    supportTitle: 'Корисничка Поддршка',
+    supportDesc: 'Помош околу интеграцијата и поставките',
     themeLightTitle: 'Префрли на Светла Тема',
     themeDarkTitle: 'Префрли на Темна Тема',
     
@@ -356,8 +352,6 @@ export const translations: Record<Language, TranslationSchema> = {
 
     guideTitle: 'Визуелен Приказ: Каде се внесува во WordPress?',
     guideSubtitle: 'Следете го означеното мени од левата страна на вашата администраторска табла',
-    method1Tab: 'Метод 1: Potvrdio Додаток (Препорачано)',
-    method2Tab: 'Метод 2: WooCommerce REST API',
     
     // Guide step cards
     step1Title: 'Отворете Поставки',
@@ -380,8 +374,8 @@ export const translations: Record<Language, TranslationSchema> = {
     creditPool: 'Credit Pool',
     remaining: 'Remaining',
     topUpCredits: 'Top-up Credits',
-    morTitle: 'MoR Billing Infrastructure',
-    morDesc: '100% compliant Merchant of Record billing with zero tax and admin friction.',
+    supportTitle: 'Support & Helpdesk',
+    supportDesc: 'Help with setup & WooCommerce integration',
     themeLightTitle: 'Switch to Light Theme',
     themeDarkTitle: 'Switch to Dark Theme',
     
@@ -478,8 +472,6 @@ export const translations: Record<Language, TranslationSchema> = {
 
     guideTitle: 'Visual Walkthrough: Where to paste in WordPress',
     guideSubtitle: 'Follow the highlighted navigation path in your WordPress admin menu',
-    method1Tab: 'Method 1: Potvrdio Plugin (Recommended)',
-    method2Tab: 'Method 2: WooCommerce REST API',
     
     // Guide step cards
     step1Title: 'Open Settings',

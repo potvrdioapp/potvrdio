@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
-  Copy, Check, ChevronRight, Monitor, Store
+  Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { translations, Language } from './i18n';
@@ -15,7 +15,6 @@ export default function App() {
   const [, setBalance] = useState(45.00);
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [activeGuideTab, setActiveGuideTab] = useState<'plugin_settings' | 'wc_rest_api'>('plugin_settings');
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
 
   const [selectedLang, setSelectedLang] = useState<Language>(() => {
@@ -120,15 +119,23 @@ export default function App() {
           </nav>
         </div>
 
-        <div className="glass-panel rounded-2xl p-4 border border-theme space-y-3 text-left">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-theme-muted">{t.morTitle}</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> Paddle Active
-            </span>
+        {/* Support & Helpdesk Card */}
+        <div className="glass-panel rounded-2xl p-3.5 border border-theme space-y-2 text-left">
+          <div className="flex items-center gap-1.5 text-xs text-theme-muted font-medium">
+            <LifeBuoy className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+            <span>{t.supportTitle}</span>
           </div>
-          <div className="text-xs text-theme-secondary font-medium text-left">
-            {t.morDesc}
+
+          <a 
+            href="mailto:support@potvrdio.online" 
+            className="flex items-center gap-2 text-xs font-bold text-theme-primary hover:text-teal-600 dark:hover:text-teal-400 transition-colors group"
+          >
+            <Mail className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0 group-hover:scale-110 transition-transform" />
+            <span className="truncate">support@potvrdio.online</span>
+          </a>
+
+          <div className="text-[10px] text-theme-muted leading-relaxed">
+            {t.supportDesc}
           </div>
         </div>
       </aside>
@@ -136,7 +143,7 @@ export default function App() {
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Streamlined Store Banner Header */}
-        <header className="sticky top-0 z-20 bg-surface/90 backdrop-blur-md border-b border-theme px-6 md:px-8 h-16 flex items-center transition-colors">
+        <header className="sticky top-0 z-20 bg-surface/98 backdrop-blur-lg shadow-xs border-b border-theme px-6 md:px-8 h-16 flex items-center transition-colors">
           <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-4">
             {/* Store Information & Language Code */}
             <div className="flex items-center gap-3 min-w-0">
@@ -590,265 +597,172 @@ export default function App() {
                       <p className="text-[11px] text-theme-muted">{t.guideSubtitle}</p>
                     </div>
                   </div>
-
-                  {/* Method Switcher Tabs */}
-                  <div className="flex items-center bg-surface p-1 rounded-xl border border-theme text-xs font-semibold">
-                    <button
-                      onClick={() => setActiveGuideTab('plugin_settings')}
-                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                        activeGuideTab === 'plugin_settings'
-                          ? 'bg-teal-600 text-white shadow-sm'
-                          : 'text-theme-muted hover:text-theme-primary'
-                      }`}
-                    >
-                      {t.method1Tab}
-                    </button>
-                    <button
-                      onClick={() => setActiveGuideTab('wc_rest_api')}
-                      className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                        activeGuideTab === 'wc_rest_api'
-                          ? 'bg-teal-600 text-white shadow-sm'
-                          : 'text-theme-muted hover:text-theme-primary'
-                      }`}
-                    >
-                      {t.method2Tab}
-                    </button>
-                  </div>
                 </div>
 
-                {/* METHOD 1 CONTENT: Potvrdio Plugin Settings Page */}
-                {activeGuideTab === 'plugin_settings' && (
-                  <div className="p-5 sm:p-6 space-y-6">
-                    {/* Breadcrumbs Banner */}
-                    <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-700 dark:text-teal-300 flex flex-wrap items-center gap-2">
-                      <span className="font-bold uppercase text-[10px] tracking-wider bg-teal-500/20 px-2 py-0.5 rounded">Putanja / Мену / Path:</span>
-                      <span className="font-semibold text-theme-primary">WordPress Admin</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-                      <span className="font-semibold text-theme-primary">Settings</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
-                      <span className="font-bold text-teal-700 dark:text-teal-300 bg-teal-500/20 px-2 py-0.5 rounded">Potvrdio Viber COD</span>
-                    </div>
-
-                    {/* Realistic WordPress UI Mockup */}
-                    <div className="rounded-xl border border-slate-700/80 light:border-slate-300 overflow-hidden bg-[#1E1E1E] text-slate-200 text-xs shadow-2xl font-sans">
-                      {/* WP Top Bar Mockup */}
-                      <div className="bg-[#1D2327] text-slate-300 px-4 py-2 border-b border-black flex items-center justify-between text-[11px]">
-                        <div className="flex items-center gap-3">
-                          <span className="font-bold text-white flex items-center gap-1">
-                            <span className="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-white">W</span>
-                            {t.storeName}
-                          </span>
-                          <span className="text-slate-500 hidden sm:inline">|</span>
-                          <span className="text-slate-400 hidden sm:inline">Comments (0)</span>
-                          <span className="text-slate-400 hidden sm:inline">+ New</span>
-                        </div>
-                        <span className="text-slate-400 text-[10px]">admin</span>
-                      </div>
-
-                      {/* WP Split Layout: Sidebar + Main Content */}
-                      <div className="flex flex-col md:flex-row min-h-[380px]">
-                        {/* WP Sidebar Mockup */}
-                        <div className="w-full md:w-56 bg-[#1D2327] text-slate-300 p-2 text-xs border-r border-slate-800 shrink-0 space-y-0.5">
-                          <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <BarChart2 className="w-3.5 h-3.5" /> Dashboard
-                          </div>
-                          <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <Layers className="w-3.5 h-3.5" /> Posts
-                          </div>
-                          <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <Zap className="w-3.5 h-3.5" /> WooCommerce
-                          </div>
-                          <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <CreditCard className="w-3.5 h-3.5" /> Products
-                          </div>
-                          <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
-                            <Key className="w-3.5 h-3.5" /> Plugins
-                          </div>
-                          
-                          {/* HIGHLIGHTED SETTINGS MENU */}
-                          <div className="bg-[#2271B1] text-white rounded-t font-semibold px-3 py-2 flex items-center gap-2 shadow-sm">
-                            <Settings className="w-3.5 h-3.5" /> Settings
-                          </div>
-                          <div className="bg-[#2C3338] rounded-b py-1 pl-6 pr-2 space-y-1 text-[11px]">
-                            <div className="py-1 text-slate-400">General</div>
-                            <div className="py-1 text-slate-400">Writing</div>
-                            <div className="py-1 text-slate-400">Reading</div>
-                            
-                            {/* ACTIVE HIGHLIGHTED PLUGIN SUBMENU */}
-                            <div className="py-1.5 px-2 rounded bg-teal-500 text-black font-extrabold flex items-center justify-between shadow-md animate-pulse">
-                              <span className="flex items-center gap-1.5">
-                                <ShieldCheck className="w-3.5 h-3.5" /> Potvrdio Viber COD
-                              </span>
-                              <span className="text-[9px] bg-black text-white px-1.5 py-0.2 rounded font-bold">CLICK</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* WP Main Settings Content Form Mockup */}
-                        <div className="flex-1 bg-[#F0F0F1] text-slate-800 p-5 sm:p-7 space-y-4">
-                          <div className="border-b border-slate-300 pb-3">
-                            <h4 className="text-base font-bold text-[#1D2327]">Potvrdio - Viber COD & Cart Recovery Settings</h4>
-                            <p className="text-[11px] text-slate-600 mt-0.5">{t.storeSubtitle}</p>
-                          </div>
-
-                          <div className="space-y-4 bg-white p-5 rounded-lg border border-slate-300 shadow-sm max-w-xl">
-                            <div>
-                              <label className="block text-xs font-bold text-[#1D2327] mb-1">
-                                {t.labelEndpoint}
-                              </label>
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="text"
-                                  readOnly
-                                  value="https://api.potvrdio.online/api/v1"
-                                  className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
-                                />
-                                <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
-                                  {t.pasteHereBadge}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-xs font-bold text-[#1D2327] mb-1">
-                                {t.labelApiKey}
-                              </label>
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="text"
-                                  readOnly
-                                  value="demo_api_key_123"
-                                  className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
-                                />
-                                <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
-                                  {t.pasteHereBadge}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="block text-xs font-bold text-[#1D2327] mb-1">
-                                {t.labelApiSecret}
-                              </label>
-                              <div className="flex items-center gap-2">
-                                <input
-                                  type="password"
-                                  readOnly
-                                  value="••••••••••••••••••••••••"
-                                  className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
-                                />
-                                <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
-                                  {t.pasteHereBadge}
-                                </span>
-                              </div>
-                            </div>
-
-                            <div className="pt-2">
-                              <div className="inline-flex items-center gap-2 bg-[#2271B1] text-white px-4 py-2 rounded font-bold text-xs shadow hover:bg-[#135E96] transition cursor-pointer">
-                                <span>{t.saveChangesBtn}</span>
-                                <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">{t.finalStepBadge}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Step-by-Step 3-Column Instruction Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                      <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                        <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">1</div>
-                        <h5 className="font-bold text-xs text-theme-primary">{t.step1Title}</h5>
-                        <p className="text-[11px] text-theme-secondary leading-relaxed">
-                          {t.step1Desc}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                        <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">2</div>
-                        <h5 className="font-bold text-xs text-theme-primary">{t.step2Title}</h5>
-                        <p className="text-[11px] text-theme-secondary leading-relaxed">
-                          {t.step2Desc}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                        <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">3</div>
-                        <h5 className="font-bold text-xs text-theme-primary">{t.step3Title}</h5>
-                        <p className="text-[11px] text-theme-secondary leading-relaxed">
-                          {t.step3Desc}
-                        </p>
-                      </div>
-                    </div>
+                {/* Potvrdio Plugin Settings Page Walkthrough */}
+                <div className="p-5 sm:p-6 space-y-6">
+                  {/* Breadcrumbs Banner */}
+                  <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-700 dark:text-teal-300 flex flex-wrap items-center gap-2">
+                    <span className="font-bold uppercase text-[10px] tracking-wider bg-teal-500/20 px-2 py-0.5 rounded">Putanja / Мену / Path:</span>
+                    <span className="font-semibold text-theme-primary">WordPress Admin</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                    <span className="font-semibold text-theme-primary">Settings</span>
+                    <ChevronRight className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                    <span className="font-bold text-teal-700 dark:text-teal-300 bg-teal-500/20 px-2 py-0.5 rounded">Potvrdio Viber COD</span>
                   </div>
-                )}
 
-                {/* METHOD 2 CONTENT: WooCommerce REST API Key Generation */}
-                {activeGuideTab === 'wc_rest_api' && (
-                  <div className="p-5 sm:p-6 space-y-6">
-                    {/* Breadcrumbs Banner */}
-                    <div className="p-3.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-700 dark:text-indigo-300 flex flex-wrap items-center gap-2">
-                      <span className="font-bold uppercase text-[10px] tracking-wider bg-indigo-500/20 px-2 py-0.5 rounded">Putanja / Мену / Path:</span>
-                      <span className="font-semibold text-theme-primary">WooCommerce</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span className="font-semibold text-theme-primary">Settings</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span className="font-semibold text-theme-primary">Advanced</span>
-                      <ChevronRight className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-                      <span className="font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded">REST API</span>
+                  {/* Realistic WordPress UI Mockup */}
+                  <div className="rounded-xl border border-slate-700/80 light:border-slate-300 overflow-hidden bg-[#1E1E1E] text-slate-200 text-xs shadow-2xl font-sans">
+                    {/* WP Top Bar Mockup */}
+                    <div className="bg-[#1D2327] text-slate-300 px-4 py-2 border-b border-black flex items-center justify-between text-[11px]">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-white flex items-center gap-1">
+                          <span className="w-4 h-4 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-white">W</span>
+                          {t.storeName}
+                        </span>
+                        <span className="text-slate-500 hidden sm:inline">|</span>
+                        <span className="text-slate-400 hidden sm:inline">Comments (0)</span>
+                        <span className="text-slate-400 hidden sm:inline">+ New</span>
+                      </div>
+                      <span className="text-slate-400 text-[10px]">admin</span>
                     </div>
 
-                    {/* Visual WooCommerce Tabs Mockup */}
-                    <div className="rounded-xl border border-slate-700/80 light:border-slate-300 overflow-hidden bg-[#F0F0F1] text-slate-800 p-5 space-y-4 shadow-lg font-sans">
-                      <div className="flex flex-wrap items-center gap-1 border-b border-slate-300 pb-2 text-xs font-semibold text-slate-600">
-                        <span className="px-3 py-1.5 text-slate-500">General</span>
-                        <span className="px-3 py-1.5 text-slate-500">Products</span>
-                        <span className="px-3 py-1.5 text-slate-500">Shipping</span>
-                        <span className="px-3 py-1.5 text-slate-500">Payments</span>
-                        <span className="px-3 py-1.5 text-slate-500">Accounts</span>
-                        <span className="px-3 py-1.5 bg-[#2271B1] text-white rounded font-bold shadow-sm">Advanced</span>
-                      </div>
-
-                      {/* Subtabs Mockup */}
-                      <div className="flex items-center gap-3 text-xs text-slate-600 pl-1">
-                        <span className="font-bold text-[#1D2327] border-b-2 border-[#2271B1] pb-1">REST API</span>
-                        <span className="text-slate-400">|</span>
-                        <span className="text-slate-500">Webhooks</span>
-                        <span className="text-slate-400">|</span>
-                        <span className="text-slate-500">Legacy API</span>
-                      </div>
-
-                      {/* Key Generation Form Mockup */}
-                      <div className="bg-white p-5 rounded-lg border border-slate-300 space-y-3 max-w-xl shadow-sm text-xs">
-                        <h5 className="font-bold text-sm text-[#1D2327]">Key Details</h5>
+                    {/* WP Split Layout: Sidebar + Main Content */}
+                    <div className="flex flex-col md:flex-row min-h-[380px]">
+                      {/* WP Sidebar Mockup */}
+                      <div className="w-full md:w-56 bg-[#1D2327] text-slate-300 p-2 text-xs border-r border-slate-800 shrink-0 space-y-0.5">
+                        <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
+                          <BarChart2 className="w-3.5 h-3.5" /> Dashboard
+                        </div>
+                        <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
+                          <Layers className="w-3.5 h-3.5" /> Posts
+                        </div>
+                        <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
+                          <Zap className="w-3.5 h-3.5" /> WooCommerce
+                        </div>
+                        <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
+                          <CreditCard className="w-3.5 h-3.5" /> Products
+                        </div>
+                        <div className="px-3 py-2 text-slate-400 hover:text-white flex items-center gap-2">
+                          <Key className="w-3.5 h-3.5" /> Plugins
+                        </div>
                         
-                        <div>
-                          <label className="block font-bold text-slate-700 mb-1">Description:</label>
-                          <input
-                            type="text"
-                            readOnly
-                            value="Potvrdio Viber COD Gateway"
-                            className="w-full bg-[#F6F7F7] border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-medium"
-                          />
+                        {/* HIGHLIGHTED SETTINGS MENU */}
+                        <div className="bg-[#2271B1] text-white rounded-t font-semibold px-3 py-2 flex items-center gap-2 shadow-sm">
+                          <Settings className="w-3.5 h-3.5" /> Settings
                         </div>
-
-                        <div>
-                          <label className="block font-bold text-slate-700 mb-1">Permissions:</label>
-                          <div className="w-full bg-[#F6F7F7] border border-slate-300 rounded px-3 py-1.5 text-xs text-slate-800 font-bold text-emerald-700 flex items-center justify-between">
-                            <span>Read / Write</span>
-                            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Required</span>
+                        <div className="bg-[#2C3338] rounded-b py-1 pl-6 pr-2 space-y-1 text-[11px]">
+                          <div className="py-1 text-slate-400">General</div>
+                          <div className="py-1 text-slate-400">Writing</div>
+                          <div className="py-1 text-slate-400">Reading</div>
+                          
+                          {/* ACTIVE HIGHLIGHTED PLUGIN SUBMENU */}
+                          <div className="py-1.5 px-2 rounded bg-teal-500 text-black font-extrabold flex items-center justify-between shadow-md animate-pulse">
+                            <span className="flex items-center gap-1.5">
+                              <ShieldCheck className="w-3.5 h-3.5" /> Potvrdio Viber COD
+                            </span>
+                            <span className="text-[9px] bg-black text-white px-1.5 py-0.2 rounded font-bold">CLICK</span>
                           </div>
                         </div>
+                      </div>
 
-                        <div className="pt-2">
-                          <span className="inline-block bg-[#2271B1] text-white px-4 py-1.5 rounded font-bold text-xs">
-                            Generate API Key
-                          </span>
+                      {/* WP Main Settings Content Form Mockup */}
+                      <div className="flex-1 bg-[#F0F0F1] text-slate-800 p-5 sm:p-7 space-y-4">
+                        <div className="border-b border-slate-300 pb-3">
+                          <h4 className="text-base font-bold text-[#1D2327]">Potvrdio - Viber COD & Cart Recovery Settings</h4>
+                          <p className="text-[11px] text-slate-600 mt-0.5">{t.storeSubtitle}</p>
+                        </div>
+
+                        <div className="space-y-4 bg-white p-5 rounded-lg border border-slate-300 shadow-sm max-w-xl">
+                          <div>
+                            <label className="block text-xs font-bold text-[#1D2327] mb-1">
+                              {t.labelEndpoint}
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                readOnly
+                                value="https://api.potvrdio.online/api/v1"
+                                className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
+                              />
+                              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
+                                {t.pasteHereBadge}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-[#1D2327] mb-1">
+                              {t.labelApiKey}
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="text"
+                                readOnly
+                                value="demo_api_key_123"
+                                className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
+                              />
+                              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
+                                {t.pasteHereBadge}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-[#1D2327] mb-1">
+                              {t.labelApiSecret}
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="password"
+                                readOnly
+                                value="••••••••••••••••••••••••"
+                                className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
+                              />
+                              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
+                                {t.pasteHereBadge}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="pt-2">
+                            <div className="inline-flex items-center gap-2 bg-[#2271B1] text-white px-4 py-2 rounded font-bold text-xs shadow hover:bg-[#135E96] transition cursor-pointer">
+                              <span>{t.saveChangesBtn}</span>
+                              <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">{t.finalStepBadge}</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
+
+                  {/* Step-by-Step 3-Column Instruction Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">1</div>
+                      <h5 className="font-bold text-xs text-theme-primary">{t.step1Title}</h5>
+                      <p className="text-[11px] text-theme-secondary leading-relaxed">
+                        {t.step1Desc}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">2</div>
+                      <h5 className="font-bold text-xs text-theme-primary">{t.step2Title}</h5>
+                      <p className="text-[11px] text-theme-secondary leading-relaxed">
+                        {t.step2Desc}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">3</div>
+                      <h5 className="font-bold text-xs text-theme-primary">{t.step3Title}</h5>
+                      <p className="text-[11px] text-theme-secondary leading-relaxed">
+                        {t.step3Desc}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           )}
