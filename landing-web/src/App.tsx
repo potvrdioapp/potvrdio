@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
@@ -91,7 +91,6 @@ export default function App() {
 
   const [currentScenario, setCurrentScenario] = useState<number>(1);
   const [simState, setSimState] = useState<'initial' | 'confirmed' | 'edited'>('initial');
-  const [wrongClickNotice, setWrongClickNotice] = useState<boolean>(false);
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
@@ -101,6 +100,42 @@ export default function App() {
   const [floorInput, setFloorInput] = useState<string>('3');
   const [aptInput, setAptInput] = useState<string>('14');
   
+  // Dynamic Simulator Arrow Tracking
+  const phoneContainerRef = useRef<HTMLDivElement | null>(null);
+  const [arrowTop, setArrowTop] = useState<number>(380);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      if (!phoneContainerRef.current) return;
+      const targetSelector = showAddressModal 
+        ? '[data-sim-target="save"]'
+        : currentScenario === 1 
+          ? '[data-sim-target="edit"]'
+          : '[data-sim-target="confirm"]';
+
+      const targetBtn = phoneContainerRef.current.querySelector<HTMLButtonElement>(targetSelector);
+      if (targetBtn && phoneContainerRef.current) {
+        const phoneRect = phoneContainerRef.current.getBoundingClientRect();
+        const btnRect = targetBtn.getBoundingClientRect();
+        if (btnRect.height > 0 && phoneRect.height > 0) {
+          const relativeTop = (btnRect.top - phoneRect.top) + (btnRect.height / 2);
+          setArrowTop(Math.round(relativeTop));
+        }
+      }
+    };
+
+    updatePosition();
+    const t1 = setTimeout(updatePosition, 60);
+    const t2 = setTimeout(updatePosition, 320);
+
+    window.addEventListener('resize', updatePosition);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('resize', updatePosition);
+    };
+  }, [currentScenario, showAddressModal, simState, lang]);
+
   // ROI Calculator States
   const [ordersCount, setOrdersCount] = useState<number>(450);
   const [failureRate, setFailureRate] = useState<number>(13);
@@ -137,7 +172,7 @@ export default function App() {
         scen1_desc: "Kupac je zaboravio broj stana i sprat. Koriguje podatke jednim klikom preko token linka.",
         scen2_title: "Kupac se predomislio (Niš)",
         scen2_desc: "Kupac ignoriše Viber poruku i SMS. Paket ostaje u skladištu, a prodavac štedi 820 RSD.",
-        scen3_title: "Instant 1-Click Potvrda",
+        scen3_title: "Potvrda jednim klikom (Kragujevac)",
         scen3_desc: "Verifikacija u jednom dodiru. Webhook automatski generiše Post Express adresnicu.",
         scen_common_tag: "Uobičajeno (62%)",
         scen_saved_tag: "Izbegnut trošak",
@@ -335,7 +370,7 @@ export default function App() {
         scen1_desc: "Купувачот заборавил број на стан и кат. Ги корегира податоците со еден клик преку токен линк.",
         scen2_title: "Купувачот се премисли (Битола)",
         scen2_desc: "Купувачот ја игнорира Viber пораката и SMS. Пакетот останува во магацин, а продавачот заштедува 820 RSD.",
-        scen3_title: "Инстант 1-Click Потврда",
+        scen3_title: "Потврда со еден клик (Охрид)",
         scen3_desc: "Верификација со еден допир. Webhook автоматски генерира адресар.",
         scen_common_tag: "Вообичаено (62%)",
         scen_saved_tag: "Избегнат трошок",
@@ -533,7 +568,7 @@ export default function App() {
         scen1_desc: "Customer missed apartment & floor numbers. Fixes details with a single tap passwordless link.",
         scen2_title: "Customer Changed Mind (Niš)",
         scen2_desc: "Customer ignores Viber and SMS. Parcel stays safely in storage; store saves 820 RSD.",
-        scen3_title: "Instant 1-Click Approval",
+        scen3_title: "1-Click Confirmation (Kragujevac)",
         scen3_desc: "Immediate 1-tap verification. Webhook releases Post Express shipping manifest in seconds.",
         scen_common_tag: "Common (62%)",
         scen_saved_tag: "Cost Avoided",
@@ -756,21 +791,14 @@ export default function App() {
     playClickSound();
     setCurrentScenario(scenNum);
     setSimState('initial');
-    setWrongClickNotice(false);
     setShowAddressModal(false);
   };
 
-  const handleSimAction = (action: 'confirm' | 'edit', forceConfirm: boolean = false) => {
+  const handleSimAction = (action: 'confirm' | 'edit') => {
     playScannerBeep();
     if (action === 'edit') {
-      setWrongClickNotice(false);
       setShowAddressModal(true);
     } else {
-      if (currentScenario === 1 && !forceConfirm) {
-        setWrongClickNotice(true);
-        return;
-      }
-      setWrongClickNotice(false);
       setSimState('confirmed');
     }
   };
@@ -778,7 +806,6 @@ export default function App() {
   const handleResetSim = () => {
     playClickSound();
     setSimState('initial');
-    setWrongClickNotice(false);
     setShowAddressModal(false);
   };
 
@@ -801,7 +828,7 @@ export default function App() {
     <div className="min-h-[100dvh] flex flex-col saas-bg text-theme-secondary font-['Inter',sans-serif] selection:bg-[#14B8A6] selection:text-white transition-colors duration-200">
       
       {/* Top Network & Legal Bar */}
-      <aside className="border-b border-theme bg-surface/90 px-3 sm:px-4 py-1.5 text-xs transition-colors">
+      <aside className="border-b border-theme bg-surface/95 px-3 sm:px-4 py-1.5 text-xs transition-colors">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] font-sans">
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="inline-flex items-center gap-1.5 text-emerald-500">
@@ -824,7 +851,7 @@ export default function App() {
       </aside>
 
       {/* Header Navigation */}
-      <header className="sticky top-0 z-40 border-b border-theme bg-surface/90 backdrop-blur-md transition-colors">
+      <header className="sticky top-0 z-40 border-b border-theme bg-surface/96 backdrop-blur-lg shadow-xs transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-5 h-16 flex items-center justify-between">
           
           {/* Logo */}
@@ -953,9 +980,11 @@ export default function App() {
 
       {/* Hero Section */}
       <section className="border-b border-theme bg-canvas pt-10 sm:pt-14 pb-12 sm:pb-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col gap-8 sm:gap-10">
+
+          {/* Top Row: Text + Image */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 items-start">
-            
+
             {/* Left Column */}
             <div className="lg:col-span-7 flex flex-col gap-4 sm:gap-5">
               <div className="inline-flex items-center gap-2 border border-theme bg-surface-subtle px-3 py-1 rounded-full text-xs text-theme-secondary w-fit max-w-full flex-wrap shadow-sm">
@@ -990,83 +1019,40 @@ export default function App() {
                   <span>{t('hero_btn_activate')}</span>
                 </button>
               </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-theme mt-2 sm:mt-3 font-sans">
-                <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
-                  <div className="text-[10px] sm:text-xs text-theme-muted mb-0.5 sm:mb-1 font-medium">{t('stat_open_rate')}</div>
-                  <div className="text-base sm:text-2xl font-bold text-theme-primary tracking-tight">89.6%</div>
-                  <div className="text-[9px] sm:text-[10px] text-emerald-400 mt-0.5 truncate font-medium">{t('stat_open_sub')}</div>
-                </div>
-                <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
-                  <div className="text-[10px] sm:text-xs text-theme-muted mb-0.5 sm:mb-1 font-medium">{t('stat_hold_cost')}</div>
-                  <div className="text-base sm:text-2xl font-bold text-amber-400 tracking-tight">{t('stat_hold_val')}</div>
-                  <div className="text-[9px] sm:text-[10px] text-theme-muted mt-0.5 truncate font-medium">{t('stat_hold_sub')}</div>
-                </div>
-                <div className="glass-panel p-2.5 sm:p-3 rounded-lg">
-                  <div className="text-[10px] sm:text-xs text-theme-muted mb-0.5 sm:mb-1 font-medium">{t('stat_recovery')}</div>
-                  <div className="text-base sm:text-2xl font-bold text-emerald-400 tracking-tight">-83%</div>
-                  <div className="text-[9px] sm:text-[10px] text-theme-muted mt-0.5 truncate font-medium">{t('stat_recovery_sub')}</div>
-                </div>
-              </div>
             </div>
 
-            {/* Right Column: Live Status Dashboard */}
-            <div className="lg:col-span-5 glass-panel rounded-xl p-4 sm:p-5 shadow-2xl relative border-theme">
-              <div className="flex items-center justify-between border-b border-theme pb-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#14B8A6]"></span>
-                  <span className="text-xs font-semibold text-theme-primary tracking-wide">WooCommerce Integration</span>
-                </div>
-                <div className="text-[10px] font-mono text-teal-500 bg-teal-500/10 px-2 py-0.5 rounded border border-teal-500/20 font-semibold">HPOS Ready</div>
-              </div>
-
-              {/* Order Card */}
-              <div className="bg-surface-subtle p-3 sm:p-3.5 rounded-lg border border-theme mb-4 text-xs space-y-2">
-                <div className="flex justify-between items-center text-[11px] text-theme-muted border-b border-theme pb-2">
-                  <span>{t('order_word')} #RS-8492</span>
-                  <span>17. Sep 2026, 09:14</span>
-                </div>
-                <div className="flex justify-between items-center text-theme-primary pt-1">
-                  <span className="font-bold font-sans text-sm">{t('dash_customer_name')}</span>
-                  <span className="text-[#14B8A6] font-bold">{t('dash_order_amount')}</span>
-                </div>
-                <div className="text-[11px] text-theme-muted flex items-start gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
-                  <span>{t('dash_address')}</span>
-                </div>
-                <div className="flex items-center justify-between pt-2 text-[11px]">
-                  <span className="text-slate-400">{t('dash_courier')}</span>
-                  <span className="text-theme-primary font-medium">{t('dash_courier_val')}</span>
-                </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">{t('dash_risk_label')}</span>
-                  <span className="text-red-400">{t('dash_risk_val')}</span>
-                </div>
-              </div>
-
-              {/* Logistics State */}
-              <div className="p-3 bg-surface rounded border border-theme font-mono text-[11px] space-y-2 mb-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">{t('dash_order_status_label')}</span>
-                  <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-bold">
-                    HOLD_WAITING_VIBER
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">{t('dash_label_print_label')}</span>
-                  <span className="text-red-400 font-semibold">{t('dash_label_blocked')}</span>
-                </div>
-              </div>
-
-              {/* Note */}
-              <div className="text-[11px] text-theme-muted font-mono leading-relaxed border-t border-theme pt-3 flex items-start gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#14B8A6] shrink-0 mt-0.5" />
-                <span>{t('hero_box_note')}</span>
-              </div>
+            {/* Right Column: Hero Image */}
+            <div className="lg:col-span-5 lg:mt-11 overflow-hidden lg:rounded-2xl lg:shadow-2xl">
+              <img
+                key={lang}
+                src={lang === 'en' ? '/hero-en.jpg' : lang === 'mk' ? '/hero-mk.jpg' : '/hero-sr.jpg'}
+                alt={lang === 'en' ? 'Potvrdio in action' : lang === 'mk' ? 'Potvrdio во акција' : 'Potvrdio u akciji'}
+                className="w-full rounded-2xl shadow-2xl lg:rounded-none lg:shadow-none lg:max-h-[260px] lg:object-cover lg:object-top"
+                style={{ animation: 'heroFadeIn 0.4s ease-in-out' }}
+              />
             </div>
 
           </div>
+
+          {/* Stats Row — full width below both columns */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-5 sm:pt-6 border-t border-theme font-sans">
+            <div className="glass-panel p-2.5 sm:p-3 rounded-lg flex flex-col gap-1">
+              <div className="text-[10px] sm:text-xs text-theme-muted font-medium">{t('stat_open_rate')}</div>
+              <div className="text-base sm:text-xl font-bold text-theme-primary tracking-tight">89.6%</div>
+              <div className="text-[9px] sm:text-[10px] text-emerald-400 font-medium leading-snug">{t('stat_open_sub')}</div>
+            </div>
+            <div className="glass-panel p-2.5 sm:p-3 rounded-lg flex flex-col gap-1">
+              <div className="text-[10px] sm:text-xs text-theme-muted font-medium">{t('stat_hold_cost')}</div>
+              <div className="text-sm sm:text-base font-bold text-amber-400 tracking-tight leading-tight">{t('stat_hold_val')}</div>
+              <div className="text-[9px] sm:text-[10px] text-theme-muted font-medium leading-snug">{t('stat_hold_sub')}</div>
+            </div>
+            <div className="glass-panel p-2.5 sm:p-3 rounded-lg flex flex-col gap-1">
+              <div className="text-[10px] sm:text-xs text-theme-muted font-medium">{t('stat_recovery')}</div>
+              <div className="text-base sm:text-xl font-bold text-emerald-400 tracking-tight">-83%</div>
+              <div className="text-[9px] sm:text-[10px] text-theme-muted font-medium leading-snug">{t('stat_recovery_sub')}</div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1083,222 +1069,536 @@ export default function App() {
           </div>
         </div>
 
-        {/* Scenario Selectors */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 sm:mb-8">
+        {/* Scenario Tabs */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5" role="tablist" aria-label="Scenario tabs">
+          {/* Tab 1 - Scenario A */}
           <button 
+            role="tab"
+            aria-selected={currentScenario === 1}
             onClick={() => handleScenarioChange(1)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 1 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30 bg-teal-50/40 dark:bg-[#14B8A6]/5' : 'border border-theme hover:border-[#14B8A6]/40'}`}
+            className={`relative text-left p-4 rounded-xl transition-all shadow-sm cursor-pointer overflow-hidden ${
+              currentScenario === 1 
+                ? 'bg-surface border-2 border-[#14B8A6] ring-4 ring-[#14B8A6]/15 shadow-lg shadow-[#14B8A6]/10' 
+                : 'bg-surface/30 dark:bg-surface/10 border border-theme/60 opacity-60 hover:opacity-100 hover:bg-surface/60 hover:border-[#14B8A6]/40'
+            }`}
           >
-            <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 1 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario A</span>
-              <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">{t('scen_common_tag')}</span>
+            {/* Top active accent bar */}
+            {currentScenario === 1 && (
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#14B8A6] to-emerald-400" />
+            )}
+            
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                  currentScenario === 1 
+                    ? 'bg-[#14B8A6] text-white shadow-xs' 
+                    : 'bg-surface-subtle text-theme-muted border border-theme'
+                }`}>
+                  A
+                </span>
+                <span className={`font-bold text-xs uppercase tracking-wider ${
+                  currentScenario === 1 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'
+                }`}>
+                  Scenario A
+                </span>
+              </div>
+
+              {currentScenario === 1 ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#14B8A6] text-white shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                  {lang === 'sr' ? 'IZABRANO' : lang === 'mk' ? 'ИЗБРАНО' : 'ACTIVE'}
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-theme-muted bg-surface-subtle px-2 py-0.5 rounded-full border border-theme">
+                  {t('scen_common_tag')}
+                </span>
+              )}
             </div>
-            <div className="font-bold text-theme-primary text-sm mb-1">{t('scen1_title')}</div>
-            <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen1_desc')}</div>
+
+            <div className={`font-bold text-sm mb-1 ${currentScenario === 1 ? 'text-theme-primary' : 'text-theme-secondary'}`}>
+              {t('scen1_title')}
+            </div>
+            <div className="text-theme-muted text-[11px] leading-relaxed">
+              {t('scen1_desc')}
+            </div>
           </button>
 
+          {/* Tab 2 - Scenario B */}
           <button 
+            role="tab"
+            aria-selected={currentScenario === 2}
             onClick={() => handleScenarioChange(2)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 2 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30 bg-teal-50/40 dark:bg-[#14B8A6]/5' : 'border border-theme hover:border-[#14B8A6]/40'}`}
+            className={`relative text-left p-4 rounded-xl transition-all shadow-sm cursor-pointer overflow-hidden ${
+              currentScenario === 2 
+                ? 'bg-surface border-2 border-[#14B8A6] ring-4 ring-[#14B8A6]/15 shadow-lg shadow-[#14B8A6]/10' 
+                : 'bg-surface/30 dark:bg-surface/10 border border-theme/60 opacity-60 hover:opacity-100 hover:bg-surface/60 hover:border-[#14B8A6]/40'
+            }`}
           >
-            <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 2 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario B</span>
-              <span className="text-[10px] font-semibold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/10 px-2 py-0.5 rounded-full border border-red-200 dark:border-red-500/20">{t('scen_saved_tag')}</span>
+            {/* Top active accent bar */}
+            {currentScenario === 2 && (
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#14B8A6] to-emerald-400" />
+            )}
+            
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                  currentScenario === 2 
+                    ? 'bg-[#14B8A6] text-white shadow-xs' 
+                    : 'bg-surface-subtle text-theme-muted border border-theme'
+                }`}>
+                  B
+                </span>
+                <span className={`font-bold text-xs uppercase tracking-wider ${
+                  currentScenario === 2 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'
+                }`}>
+                  Scenario B
+                </span>
+              </div>
+
+              {currentScenario === 2 ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#14B8A6] text-white shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                  {lang === 'sr' ? 'IZABRANO' : lang === 'mk' ? 'ИЗБРАНО' : 'ACTIVE'}
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-theme-muted bg-surface-subtle px-2 py-0.5 rounded-full border border-theme">
+                  {t('scen_saved_tag')}
+                </span>
+              )}
             </div>
-            <div className="font-bold text-theme-primary text-sm mb-1">{t('scen2_title')}</div>
-            <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen2_desc')}</div>
+
+            <div className={`font-bold text-sm mb-1 ${currentScenario === 2 ? 'text-theme-primary' : 'text-theme-secondary'}`}>
+              {t('scen2_title')}
+            </div>
+            <div className="text-theme-muted text-[11px] leading-relaxed">
+              {t('scen2_desc')}
+            </div>
           </button>
 
+          {/* Tab 3 - Scenario C */}
           <button 
+            role="tab"
+            aria-selected={currentScenario === 3}
             onClick={() => handleScenarioChange(3)} 
-            className={`text-left p-3.5 sm:p-4 rounded-xl glass-panel text-xs transition-all shadow-sm cursor-pointer ${currentScenario === 3 ? 'border border-[#14B8A6] ring-1 ring-[#14B8A6]/30 bg-teal-50/40 dark:bg-[#14B8A6]/5' : 'border border-theme hover:border-[#14B8A6]/40'}`}
+            className={`relative text-left p-4 rounded-xl transition-all shadow-sm cursor-pointer overflow-hidden ${
+              currentScenario === 3 
+                ? 'bg-surface border-2 border-[#14B8A6] ring-4 ring-[#14B8A6]/15 shadow-lg shadow-[#14B8A6]/10' 
+                : 'bg-surface/30 dark:bg-surface/10 border border-theme/60 opacity-60 hover:opacity-100 hover:bg-surface/60 hover:border-[#14B8A6]/40'
+            }`}
           >
-            <div className="flex items-center justify-between mb-1.5 font-sans">
-              <span className={`font-bold text-xs uppercase tracking-wider ${currentScenario === 3 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'}`}>Scenario C</span>
-              <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20">{t('scen_fast_tag')}</span>
+            {/* Top active accent bar */}
+            {currentScenario === 3 && (
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#14B8A6] to-emerald-400" />
+            )}
+            
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <span className={`w-6 h-6 rounded-lg flex items-center justify-center font-black text-xs ${
+                  currentScenario === 3 
+                    ? 'bg-[#14B8A6] text-white shadow-xs' 
+                    : 'bg-surface-subtle text-theme-muted border border-theme'
+                }`}>
+                  C
+                </span>
+                <span className={`font-bold text-xs uppercase tracking-wider ${
+                  currentScenario === 3 ? 'text-teal-600 dark:text-[#14B8A6]' : 'text-theme-muted'
+                }`}>
+                  Scenario C
+                </span>
+              </div>
+
+              {currentScenario === 3 ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#14B8A6] text-white shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                  {lang === 'sr' ? 'IZABRANO' : lang === 'mk' ? 'ИЗБРАНО' : 'ACTIVE'}
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-theme-muted bg-surface-subtle px-2 py-0.5 rounded-full border border-theme">
+                  {t('scen_fast_tag')}
+                </span>
+              )}
             </div>
-            <div className="font-bold text-theme-primary text-sm mb-1">{t('scen3_title')}</div>
-            <div className="text-theme-muted text-[11px] leading-relaxed">{t('scen3_desc')}</div>
+
+            <div className={`font-bold text-sm mb-1 ${currentScenario === 3 ? 'text-theme-primary' : 'text-theme-secondary'}`}>
+              {t('scen3_title')}
+            </div>
+            <div className="text-theme-muted text-[11px] leading-relaxed">
+              {t('scen3_desc')}
+            </div>
           </button>
         </div>
 
         {/* Simulator Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start glass-panel p-4 sm:p-6 rounded-lg">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start glass-panel p-4 sm:p-6 rounded-2xl">
+          
+          {/* Active Scenario Info Header Bar */}
+          <div className="lg:col-span-12 flex flex-wrap items-center justify-between gap-3 pb-3 mb-1 border-b border-theme text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#14B8A6] animate-pulse shrink-0"></span>
+              <span className="font-extrabold text-theme-primary uppercase tracking-wider text-[11px]">
+                {lang === 'sr' ? `Aktivna simulacija: Scenario ${currentScenario === 1 ? 'A' : currentScenario === 2 ? 'B' : 'C'}` : lang === 'mk' ? `Активна симулација: Сценарио ${currentScenario === 1 ? 'А' : currentScenario === 2 ? 'Б' : 'В'}` : `Active Simulation: Scenario ${currentScenario === 1 ? 'A' : currentScenario === 2 ? 'B' : 'C'}`}
+              </span>
+              <span className="text-theme-muted hidden sm:inline">•</span>
+              <span className="text-theme-secondary font-medium hidden sm:inline">
+                {currentScenario === 1 ? t('scen1_title') : currentScenario === 2 ? t('scen2_title') : t('scen3_title')}
+              </span>
+            </div>
+            <button
+              onClick={handleResetSim}
+              className="text-[11px] text-theme-muted hover:text-[#14B8A6] flex items-center gap-1.5 cursor-pointer transition-colors px-2 py-1 rounded-md hover:bg-surface-subtle"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>{lang === 'sr' ? 'Resetuj scenario' : lang === 'mk' ? 'Ресетирај сценарио' : 'Reset scenario'}</span>
+            </button>
+          </div>
           
           {/* Viber Phone Mockup Left */}
-          <div className="lg:col-span-5 bg-[#F8F9FE] dark:bg-[#1E1838] border border-[#E2DEF6] dark:border-[#46377B] rounded-xl p-3.5 sm:p-4 shadow-lg transition-colors">
-            <div className="flex items-center justify-between border-b border-[#E2DEF6] dark:border-[#46377B] pb-3 mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[#7360F2] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm">
-                  VB
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 flex-wrap">
-                    <span>Potvrdio · {t('viber_verified_title')}</span>
-                    <span className="text-[9px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 py-0.5 rounded font-mono font-medium">{t('viber_verified_badge')}</span>
-                  </div>
-                  <div className="text-[10px] font-mono text-slate-500 dark:text-[#A798CE]">Viber Business Gateway #782</div>
-                </div>
-              </div>
-              <span className="text-[10px] font-mono text-slate-400 dark:text-[#8B79B2] shrink-0">13:42</span>
-            </div>
+          <div className="lg:col-span-5 flex justify-center items-start">
+            {/* Phone Shell */}
+            <div ref={phoneContainerRef} className="relative w-full max-w-[300px] mx-auto select-none">
+              
+              {/* External Guidance Arrow (pointing to the expected button from outside) */}
+              {simState === 'initial' && currentScenario !== 2 && (
+                <>
+                  {/* Floating Guidance Callout with Diagonal Arrow pointing down-left into the button */}
+                  <div 
+                    className="flex items-center gap-1.5 absolute z-50 transition-all duration-300 pointer-events-none left-[calc(100%-145px)] sm:left-[calc(100%-110px)]"
+                    style={{
+                      top: `${arrowTop - 16}px`,
+                      transform: 'translateY(-50%)',
+                    }}
+                  >
+                    {/* Animated Diagonal Arrow pointing DOWN-LEFT (↙) directly into the button */}
+                    <div className="text-[#14B8A6] flex items-center shrink-0 animate-bounce-diagonal">
+                      <svg className="w-8 h-8 drop-shadow-[0_2px_12px_rgba(20,184,166,0.6)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="19" y1="5" x2="5" y2="19" />
+                        <polyline points="15 19 5 19 5 9" />
+                      </svg>
+                    </div>
 
-            <div className="space-y-3 text-xs leading-relaxed text-slate-800 dark:text-[#E6DDFA]">
-              {/* Scenario 1 Warning Banner */}
-              {currentScenario === 1 && simState === 'initial' && (
-                <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-500/20 border border-amber-200 dark:border-amber-400/40 text-amber-800 dark:text-amber-200 text-[11px] font-mono flex items-start gap-2 shadow-sm animate-pulse">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                  <span>{t('scen1_warning')}</span>
-                </div>
-              )}
-
-              {/* Scenario 2 Warning Banner */}
-              {currentScenario === 2 && (
-                <div className="p-2.5 rounded-lg bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-400/40 text-red-800 dark:text-red-200 text-[11px] font-mono flex items-start gap-2 shadow-sm">
-                  <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
-                  <span>{t('scen2_warning')}</span>
-                </div>
-              )}
-
-              <div className="bg-white dark:bg-[#29204A] p-3 sm:p-3.5 rounded-lg border border-[#E2DEF6] dark:border-[#46377B] shadow-sm">
-                <p className="mb-2 text-slate-800 dark:text-[#E6DDFA]">
-                  {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong>{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount[lang]}).
-                </p>
-                <div className="p-2.5 rounded bg-[#F1EFFB] dark:bg-[#1E1838] border border-[#DDD8F4] dark:border-[#46377B] font-mono text-[11px] text-slate-900 dark:text-[#C4B5FD] mb-3">
-                  <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('viber_shipping_address')}</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
-                    {simState === 'edited' ? (
+                    {/* Tooltip Badge overlapping the phone bezel and overflowing to the right */}
+                    <div 
+                      onClick={() => showAddressModal ? handleSaveModalAddress() : handleSimAction(currentScenario === 1 ? 'edit' : 'confirm')}
+                      className="bg-[#14B8A6] hover:bg-[#0D9488] active:scale-95 text-white text-[10.5px] sm:text-[11px] font-black px-3 sm:px-3.5 py-1.5 rounded-xl shadow-2xl shadow-[#14B8A6]/40 flex items-center gap-1.5 whitespace-nowrap border border-white/40 tracking-tight pointer-events-auto cursor-pointer transition-all"
+                    >
+                      <span className="w-2 h-2 rounded-full bg-white animate-ping shrink-0" />
                       <span>
-                        {currentScenConfig.address[lang]}
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded bg-blue-100 dark:bg-blue-500/20 text-blue-800 dark:text-blue-300 font-bold text-[10px] border border-blue-200 dark:border-blue-400/40 animate-pulse">
-                          + {lang === 'sr' ? `Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `Кат ${floorInput}, Стан ${aptInput}` : `Floor ${floorInput}, Apt ${aptInput}`}
-                        </span>
-                      </span>
-                    ) : currentScenConfig.address[lang]}
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-600 dark:text-[#DDD6FE]">
-                  {t('viber_confirm_prompt')}
-                </p>
-              </div>
-
-              {currentScenario === 2 ? (
-                <div className="p-3 rounded-lg bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 text-red-800 dark:text-red-300 text-xs font-mono text-center flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1.5 font-bold">
-                    <XCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
-                    <span>{t('status_saved')}</span>
-                  </div>
-                  <p className="text-[10px] text-slate-600 dark:text-slate-300 font-sans">
-                    {lang === 'sr' ? 'Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.' : lang === 'mk' ? 'Купувачот не одговори 24ч. Нарачката е откажана пред пакување.' : 'Customer ignored for 24h. Order cancelled before packing.'}
-                  </p>
-                </div>
-              ) : simState === 'initial' ? (
-                <div className="space-y-3 pt-1">
-                  {currentScenario === 1 ? (
-                    <>
-                      {/* Secondary / De-emphasized button (Confirm) with soft guidance */}
-                      <div className="space-y-1.5">
-                        <button 
-                          onClick={() => handleSimAction('confirm')} 
-                          className="w-full bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 font-medium py-2 rounded text-xs transition opacity-50 hover:opacity-80 flex items-center justify-center gap-1.5 cursor-pointer min-h-[38px] border border-dashed border-slate-300 dark:border-white/10"
-                        >
-                          <Check className="w-3.5 h-3.5" />
-                          <span>{t('viber_btn_yes')}</span>
-                          <span className="text-[10px] text-amber-600 dark:text-amber-400 font-normal">({t('scen_btn_not_recommended')})</span>
-                        </button>
-
-                        {/* Wrong Click Notice Banner */}
-                        {wrongClickNotice && (
-                          <div className="p-2.5 rounded-lg bg-amber-50 dark:bg-amber-500/20 border border-amber-300 dark:border-amber-400/40 text-amber-900 dark:text-amber-200 text-[11px] font-sans flex flex-col gap-1.5 shadow-sm animate-pulse">
-                            <div className="flex items-start gap-1.5 font-medium">
-                              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                              <span>{t('scen1_wrong_click_hint')}</span>
-                            </div>
-                            <button
-                              onClick={() => handleSimAction('confirm', true)}
-                              className="self-end text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white underline cursor-pointer"
-                            >
-                              {t('scen_btn_force_confirm')} →
-                            </button>
-                          </div>
+                        {showAddressModal ? (
+                          lang === 'sr' ? '1. Sačuvajte adresu' : lang === 'mk' ? '1. Зачувајте адреса' : '1. Save address'
+                        ) : currentScenario === 1 ? (
+                          lang === 'sr' ? '1. Kliknite "IZMENI ADRESU"' : lang === 'mk' ? '1. Кликнете "ИЗМЕНИ"' : '1. Click "EDIT ADDRESS"'
+                        ) : (
+                          lang === 'sr' ? '1. Kliknite "DA, ADRESA JE TAČNA"' : lang === 'mk' ? '1. Кликнете "ДА, ТОЧНА Е"' : '1. Click "YES, ACCURATE"'
                         )}
-                      </div>
-
-                      {/* Primary / Spotlight Hero Button (Edit Address) */}
-                      <div className="relative pt-1">
-                        <div className="flex items-center justify-center mb-1.5">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#7360F2] text-white shadow-md shadow-[#7360F2]/30 animate-bounce">
-                            <span>{t('scen1_btn_badge')}</span>
-                          </span>
-                        </div>
-                        <button 
-                          onClick={() => handleSimAction('edit')} 
-                          className="w-full bg-[#7360F2] hover:bg-[#6250E0] text-white font-bold py-3.5 rounded-xl text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-[#7360F2]/30 ring-2 ring-[#7360F2] ring-offset-2 ring-offset-[#F8F9FE] dark:ring-offset-[#1E1838] cursor-pointer min-h-[46px]"
-                        >
-                          <CheckCircle2 className="w-4 h-4 text-white" />
-                          <span className="tracking-wide text-xs font-extrabold">{t('viber_btn_edit')}</span>
-                        </button>
-                      </div>
-                    </>
-                  ) : currentScenario === 3 ? (
-                    <>
-                      {/* Primary / Spotlight Hero Button (Confirm in 1 click) */}
-                      <div className="relative pt-1">
-                        <div className="flex items-center justify-center mb-1.5">
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-600 text-white shadow-md shadow-emerald-600/30 animate-bounce">
-                            <span>{t('scen3_btn_badge')}</span>
-                          </span>
-                        </div>
-                        <button 
-                          onClick={() => handleSimAction('confirm')} 
-                          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 ring-2 ring-emerald-500 ring-offset-2 ring-offset-[#F8F9FE] dark:ring-offset-[#1E1838] cursor-pointer min-h-[46px]"
-                        >
-                          <Check className="w-4 h-4 text-white" />
-                          <span className="tracking-wide text-xs font-extrabold">{t('viber_btn_yes')}</span>
-                        </button>
-                      </div>
-
-                      {/* Secondary / De-emphasized button (Edit) */}
-                      <button 
-                        onClick={() => handleSimAction('edit')} 
-                        className="w-full bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 dark:text-slate-500 font-medium py-2 rounded text-xs transition opacity-50 hover:opacity-80 flex items-center justify-center gap-1.5 border border-slate-200 dark:border-white/10 cursor-pointer min-h-[36px]"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{t('viber_btn_edit')}</span>
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button 
-                        onClick={() => handleSimAction('confirm')} 
-                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded text-xs transition active:scale-[0.99] flex items-center justify-center gap-2 shadow-md cursor-pointer min-h-[44px]"
-                      >
-                        <Check className="w-4 h-4" />
-                        <span>{t('viber_btn_yes')}</span>
-                      </button>
-                      <button 
-                        onClick={() => handleSimAction('edit')} 
-                        className="w-full bg-white hover:bg-slate-50 dark:bg-[#191A2B] dark:hover:bg-[#252840] text-slate-700 dark:text-slate-200 font-semibold py-2.5 rounded text-xs transition border border-slate-300 dark:border-white/10 flex items-center justify-center gap-2 cursor-pointer min-h-[42px] shadow-sm"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                        <span>{t('viber_btn_edit')}</span>
-                      </button>
-                    </>
-                  )}
-                </div>
-              ) : simState === 'edited' ? (
-                <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 text-blue-800 dark:text-blue-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
-                  <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-                  <span>{t('viber_success_edited')}</span>
-                </div>
-              ) : (
-                <div className="p-3 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300 text-xs font-mono text-center flex items-center justify-center gap-1.5">
-                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>{t('viber_success_confirmed')}</span>
-                </div>
+                      </span>
+                    </div>
+                  </div>
+                </>
               )}
+
+              {/* Device Bezel */}
+              <div className="relative bg-[#1A1A1A] dark:bg-[#0D0D0D] rounded-[2.8rem] p-[10px] shadow-[0_0_0_1.5px_#3a3a3a,0_20px_60px_rgba(0,0,0,0.5),inset_0_0_0_1px_rgba(255,255,255,0.06)]">
+                {/* Side buttons */}
+                <div className="absolute -left-[3px] top-[88px] w-[3px] h-8 bg-[#2a2a2a] rounded-l-sm" />
+                <div className="absolute -left-[3px] top-[130px] w-[3px] h-8 bg-[#2a2a2a] rounded-l-sm" />
+                <div className="absolute -right-[3px] top-[110px] w-[3px] h-12 bg-[#2a2a2a] rounded-r-sm" />
+
+                {/* Screen */}
+                <div className="bg-[#EEEAF8] rounded-[2.2rem] overflow-hidden relative" style={{minHeight: '560px'}}>
+
+                  {/* Dynamic Island */}
+                  <div className="flex items-center justify-center pt-3 pb-1">
+                    <div className="bg-black rounded-full h-6 w-[90px]" />
+                  </div>
+
+                  {/* Status Bar */}
+                  <div className="flex items-center justify-between px-5 pb-1">
+                    <span className="text-[10px] font-bold text-[#1a1a1a]">9:41</span>
+                    <div className="flex items-center gap-1">
+                      {/* WiFi */}
+                      <svg className="w-3 h-2.5" viewBox="0 0 24 18" fill="#1a1a1a"><path d="M12 3C7.95 3 4.21 4.34 1.2 6.6L3 8.4C5.5 6.52 8.62 5.5 12 5.5s6.5 1.02 9 2.9l1.8-1.8C19.79 4.34 16.05 3 12 3zm0 5c-2.76 0-5.26 1.12-7.09 2.93L6.7 12.7c1.35-1.35 3.22-2.2 5.3-2.2s3.95.85 5.3 2.2l1.79-1.77C17.26 9.12 14.76 8 12 8zm0 5c-1.38 0-2.63.56-3.54 1.46L12 18l3.54-3.54C14.63 13.56 13.38 13 12 13z"/></svg>
+                      {/* Battery */}
+                      <div className="flex items-center gap-0.5">
+                        <div className="w-5 h-2.5 border border-[#1a1a1a] rounded-sm p-px flex items-center">
+                          <div className="h-full bg-[#1a1a1a] rounded-sm" style={{width:'80%'}} />
+                        </div>
+                        <div className="w-0.5 h-1.5 bg-[#1a1a1a] rounded-r-sm" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Viber App Bar */}
+                  <div className="bg-[#7360F2] px-3.5 py-2.5 flex items-center justify-between shadow-sm">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {/* Back arrow */}
+                      <svg className="w-4 h-4 text-white shrink-0 cursor-pointer" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                      {/* Potvrdio Avatar */}
+                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center p-1.5 shrink-0 shadow-sm border border-white/40">
+                        <img src="/logo-icon-light.svg" alt="Potvrdio" className="w-full h-full object-contain" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-white font-bold text-[12px] leading-tight truncate">
+                          Potvrdio.online
+                        </div>
+                        <div className="text-white/80 text-[9px] flex items-center gap-1 leading-tight">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span>{lang === 'sr' ? 'Verifikovani biznis nalog' : lang === 'mk' ? 'Верификуван бизнис налог' : 'Verified Business Account'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Dots menu */}
+                    <div className="flex items-center gap-2 text-white/90">
+                      <svg className="w-4 h-4 cursor-pointer" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                      <svg className="w-4 h-4 cursor-pointer" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                    </div>
+                  </div>
+
+                  {/* Chat Background — Authentic Viber Default Doodle Pattern Wallpaper */}
+                  <div className="viber-chat-bg px-3 pt-3 pb-3 min-h-[460px] flex flex-col justify-between">
+
+                    <div className="space-y-2">
+                      {/* Date badge */}
+                      <div className="flex justify-center mb-1">
+                        <span className="text-[9px] text-[#7360F2] bg-white/80 backdrop-blur-xs px-3 py-0.5 rounded-full font-medium shadow-xs">
+                          {lang === 'sr' ? 'Danas' : lang === 'mk' ? 'Денес' : 'Today'}
+                        </span>
+                      </div>
+
+                      {/* Business Avatar + Message Row */}
+                      <div className="flex items-end gap-1.5">
+                        {/* Sender Avatar */}
+                        <div className="w-6 h-6 rounded-full bg-white p-1 flex items-center justify-center shrink-0 mb-0.5 shadow-sm border border-purple-200">
+                          <img src="/logo-icon-light.svg" alt="Potvrdio" className="w-full h-full object-contain" />
+                        </div>
+
+                        {/* Message Bubble */}
+                        <div className="flex-1 max-w-[230px]">
+                          <div className="bg-white rounded-2xl rounded-bl-xs shadow-md border border-purple-100/50 overflow-hidden">
+                            {/* Sender bar inside bubble */}
+                            <div className="bg-purple-50/60 px-3 py-1 border-b border-purple-100/40 flex items-center justify-between">
+                              <span className="text-[9px] font-bold text-[#7360F2]">
+                                Potvrdio.online
+                              </span>
+                              <span className="text-[8px] text-gray-400">12:00</span>
+                            </div>
+
+                            {/* Message text */}
+                            <div className="px-3 pt-2 pb-2 text-[11px] leading-relaxed text-[#1a1a1a] space-y-2">
+                              <p>
+                                {t('viber_greeting')} <strong>{currentScenConfig.customer.split(' ')[0]}</strong>! {t('viber_order_received')} <strong className="text-[#7360F2]">{currentScenConfig.orderId}</strong> ({currentScenConfig.orderAmount[lang]}).
+                              </p>
+
+                              {/* Address block */}
+                              <div className="rounded-xl border border-[#E2DEF6] bg-[#F7F5FE] p-2.5">
+                                <div className="text-[9px] text-[#7360F2] font-bold uppercase tracking-wider mb-0.5">
+                                  {t('viber_shipping_address')}
+                                </div>
+                                <div className="text-[10.5px] font-mono text-[#1a1a1a] font-medium leading-snug">
+                                  {simState === 'edited' ? (
+                                    <span>
+                                      {currentScenConfig.address[lang]}
+                                      <span className="ml-1 text-emerald-600 font-bold block">
+                                        {lang === 'sr' ? `✓ Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `✓ Кат ${floorInput}, Стан ${aptInput}` : `✓ Floor ${floorInput}, Apt ${aptInput}`}
+                                      </span>
+                                    </span>
+                                  ) : (
+                                    <span>{currentScenConfig.address[lang]}</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <p className="text-[9.5px] text-gray-500">{t('viber_confirm_prompt')}</p>
+                            </div>
+
+                            {/* Viber Interactive Action Buttons */}
+                            {currentScenario === 2 ? (
+                              /* Scenario B: timed out */
+                              <div className="border-t border-gray-100 bg-gray-50/80 px-3 py-2 text-center">
+                                <span className="text-[10px] text-gray-400 font-medium">
+                                  {lang === 'sr' ? 'Isteklo vreme za odgovor (24h)' : lang === 'mk' ? 'Истечено време за одговор (24h)' : 'Response window expired (24h)'}
+                                </span>
+                              </div>
+                            ) : simState !== 'initial' ? (
+                              /* Done / Confirmed state */
+                              <div className="border-t border-emerald-100 bg-emerald-50 px-3 py-2.5 flex items-center justify-center gap-1.5">
+                                <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                                <span className="text-[10.5px] text-emerald-700 font-bold">
+                                  {simState === 'edited' ? t('viber_success_edited') : t('viber_success_confirmed')}
+                                </span>
+                              </div>
+                            ) : (
+                              /* Real Viber Business Action Buttons */
+                              <div className="border-t border-[#EAE6F8] flex flex-col divide-y divide-[#EAE6F8]">
+                                <button
+                                  data-sim-target="confirm"
+                                  onClick={() => handleSimAction('confirm')}
+                                  className="w-full py-2.5 px-3 text-center font-bold text-[11px] text-[#7360F2] hover:bg-[#F5F3FE] active:bg-[#ECE7F8] transition-colors cursor-pointer"
+                                >
+                                  {t('viber_btn_yes')}
+                                </button>
+                                <button
+                                  data-sim-target="edit"
+                                  onClick={() => handleSimAction('edit')}
+                                  className="w-full py-2.5 px-3 text-center font-bold text-[11px] text-[#7360F2] hover:bg-[#F5F3FE] active:bg-[#ECE7F8] transition-colors cursor-pointer"
+                                >
+                                  {t('viber_btn_edit')}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom chat input bar placeholder (Viber UI) */}
+                    <div className="pt-2 border-t border-purple-200/50 flex items-center justify-between text-[#7360F2] px-1">
+                      <span className="text-[9.5px] text-gray-400 italic">
+                        {lang === 'sr' ? 'Poruka za Potvrdio.online...' : lang === 'mk' ? 'Порака за Potvrdio.online...' : 'Message to Potvrdio.online...'}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <svg className="w-3.5 h-3.5 text-[#7360F2]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Home Indicator */}
+                  <div className="flex justify-center py-2" style={{background: '#E3DEF4'}}>
+                    <div className="w-20 h-1 bg-[#7360F2]/30 rounded-full" />
+                  </div>
+
+                  {/* ─── In-App Browser Sheet / Pop up (slides up from bottom inside phone) ─── */}
+                  <div
+                    className="absolute inset-0 rounded-[2.2rem] overflow-hidden flex flex-col justify-end transition-all duration-300 ease-out z-20"
+                    style={{
+                      pointerEvents: showAddressModal ? 'auto' : 'none',
+                      background: showAddressModal ? 'rgba(0,0,0,0.45)' : 'transparent',
+                    }}
+                  >
+                    <div
+                      className="bg-white rounded-t-2xl shadow-2xl flex flex-col h-[90%] transition-transform duration-300 ease-out"
+                      style={{transform: showAddressModal ? 'translateY(0)' : 'translateY(100%)'}}
+                    >
+                      {/* Browser Chrome Header */}
+                      <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-gray-100 bg-gray-50/80">
+                        <button
+                          onClick={() => setShowAddressModal(false)}
+                          className="text-[#7360F2] hover:text-[#5d4ad4] text-[11px] font-bold cursor-pointer transition-colors"
+                        >
+                          {lang === 'sr' ? 'Zatvori' : lang === 'mk' ? 'Затвори' : 'Close'}
+                        </button>
+                        <div className="flex-1 mx-2.5 bg-white border border-gray-200 rounded-full px-2.5 py-1 flex items-center gap-1 shadow-xs min-w-0">
+                          <svg className="w-2.5 h-2.5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                          <span className="text-[9.5px] text-gray-700 font-mono font-medium truncate">potvrdio.online/v/verify</span>
+                        </div>
+                        <button onClick={() => setShowAddressModal(false)} className="text-gray-400 hover:text-gray-600 p-0.5">
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                      </div>
+
+                      {/* Page content — authentic Potvrdio mobile-address-app view */}
+                      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 font-sans text-left">
+                        {/* Potvrdio Brand & Security Badge */}
+                        <div className="flex items-center justify-between pb-2 border-b border-gray-100">
+                          <div className="flex items-center gap-1.5">
+                            <div className="w-6 h-6 rounded-lg bg-white p-0.5 border border-purple-100 flex items-center justify-center shadow-xs">
+                              <img src="/logo-icon-light.svg" alt="Potvrdio" className="w-full h-full object-contain" />
+                            </div>
+                            <span className="font-extrabold text-[12px] text-gray-900 tracking-tight">Potvrdio</span>
+                          </div>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            {lang === 'sr' ? 'Sigurna Dostava' : lang === 'mk' ? 'Безбедна Достава' : 'Secure Delivery'}
+                          </span>
+                        </div>
+
+                        {/* Order info badge */}
+                        <div className="bg-[#F8F7FD] border border-[#E9E4F8] rounded-xl p-2.5">
+                          <div className="flex items-center justify-between text-[10px]">
+                            <span className="text-gray-500">{lang === 'sr' ? 'Porudžbina' : lang === 'mk' ? 'Нарачка' : 'Order'}:</span>
+                            <span className="font-mono font-bold text-[#7360F2]">{currentScenConfig.orderId}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[10px] mt-0.5">
+                            <span className="text-gray-500">{lang === 'sr' ? 'Iznos (Pouzećem)' : lang === 'mk' ? 'Износ (При достава)' : 'Total (COD)'}:</span>
+                            <span className="font-bold text-gray-900">{currentScenConfig.orderAmount[lang]}</span>
+                          </div>
+                        </div>
+
+                        {/* Current street address */}
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl p-2.5">
+                          <div className="text-[8.5px] text-gray-400 uppercase font-bold tracking-wide mb-0.5">
+                            {t('viber_shipping_address')}
+                          </div>
+                          <div className="text-[10.5px] text-gray-800 font-mono font-medium leading-snug">
+                            {currentScenConfig.address[lang]}
+                          </div>
+                        </div>
+
+                        {/* Address completion inputs */}
+                        <div className="space-y-2">
+                          <div className="text-[10px] font-bold text-gray-800">
+                            {lang === 'sr' ? 'Dopunite podatke za kurira:' : lang === 'mk' ? 'Дополнете ги податоците за курирот:' : 'Complete delivery details:'}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-[8.5px] text-gray-500 font-bold uppercase block mb-1">
+                                {lang === 'sr' ? 'Sprat *' : lang === 'mk' ? 'Кат *' : 'Floor *'}
+                              </label>
+                              <input
+                                type="text"
+                                value={floorInput}
+                                onChange={e => setFloorInput(e.target.value)}
+                                className="w-full border-2 border-[#E2DEF6] focus:border-[#7360F2] bg-white rounded-lg px-2 py-1.5 text-[11px] font-mono text-center outline-none transition-colors"
+                                placeholder="3"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-[8.5px] text-gray-500 font-bold uppercase block mb-1">
+                                {lang === 'sr' ? 'Stan / Interfon *' : lang === 'mk' ? 'Стан / Домофон *' : 'Apt / Intercom *'}
+                              </label>
+                              <input
+                                type="text"
+                                value={aptInput}
+                                onChange={e => setAptInput(e.target.value)}
+                                className="w-full border-2 border-[#E2DEF6] focus:border-[#7360F2] bg-white rounded-lg px-2 py-1.5 text-[11px] font-mono text-center outline-none transition-colors"
+                                placeholder="14"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-[8.5px] text-gray-500 font-bold uppercase block mb-1">
+                              {lang === 'sr' ? 'Napomena za kurira (opciono)' : lang === 'mk' ? 'Забелешка за курир (опционално)' : 'Courier note (optional)'}
+                            </label>
+                            <input
+                              type="text"
+                              defaultValue={lang === 'sr' ? 'Zvoniti na interfon Petrović' : lang === 'mk' ? 'Ѕвонете на домофон' : 'Ring Petrovic buzzer'}
+                              className="w-full border border-gray-200 focus:border-[#7360F2] bg-white rounded-lg px-2 py-1 text-[10px] text-gray-700 outline-none"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Submit Button */}
+                        <button
+                          data-sim-target="save"
+                          onClick={handleSaveModalAddress}
+                          className="w-full bg-[#7360F2] hover:bg-[#6250E0] active:scale-[0.99] text-white font-bold py-2.5 rounded-xl text-[11.5px] transition-all cursor-pointer shadow-md shadow-[#7360F2]/30 flex items-center justify-center gap-1.5 mt-1"
+                        >
+                          <span>✅</span>
+                          <span>{lang === 'sr' ? 'Sačuvaj i Potvrdi Pošiljku' : lang === 'mk' ? 'Зачувај и Потврди Нарачка' : 'Save & Confirm Delivery'}</span>
+                        </button>
+
+                        <p className="text-[8px] text-center text-gray-400">
+                          {lang === 'sr' ? '🔒 Jednokratni token • Podaci zaštićeni (ZZPL / GDPR)' : lang === 'mk' ? '🔒 Еднократен токен • Податоците се заштитени' : '🔒 Single-use token • Protected by GDPR'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
             </div>
           </div>
+
+
 
           {/* Live WooCommerce Order Flow Right */}
           <div className="lg:col-span-7 flex flex-col justify-between h-full space-y-4 font-sans text-xs">
@@ -1943,23 +2243,75 @@ export default function App() {
           </div>
         </div>
 
-        {/* Full Legal Documents Action Row */}
-        <div className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-4 font-sans text-xs">
-          <button 
-            onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-            className="px-4 py-2.5 rounded-lg glass-panel border border-teal-500/40 hover:border-teal-500 text-theme-primary hover:text-teal-600 dark:hover:text-teal-400 font-bold transition flex items-center gap-2 cursor-pointer min-h-[42px] shadow-sm"
-          >
-            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span>{t('leg_action_privacy')}</span>
-          </button>
+        {/* Full Legal Documents Action Row - Matching Grid Card Layout */}
+        <div className="mt-6 pt-5 border-t border-theme/60">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-teal-600 dark:text-[#14B8A6]" />
+              <h4 className="text-xs sm:text-sm font-bold text-theme-primary uppercase font-sans tracking-wider">
+                {lang === 'sr' ? 'Interni Pravni Akti i Uslovi Platforme' : lang === 'mk' ? 'Интерни Правни Акти и Услови на Платформата' : 'Platform Legal Agreements & Compliance Documents'}
+              </h4>
+            </div>
+            <span className="text-[10px] text-theme-muted font-sans hidden sm:inline">
+              {lang === 'sr' ? 'Kliknite karticu za pregled' : lang === 'mk' ? 'Кликнете картичка за преглед' : 'Click card to view document'}
+            </span>
+          </div>
 
-          <button 
-            onClick={() => { playClickSound(); setShowTermsModal(true); }} 
-            className="px-4 py-2.5 rounded-lg glass-panel border border-theme hover:border-teal-500/50 text-theme-secondary hover:text-theme-primary transition flex items-center gap-2 cursor-pointer min-h-[42px] shadow-sm"
-          >
-            <FileText className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-            <span>{t('leg_action_terms')}</span>
-          </button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-sans">
+            {/* Document Card 1: Privacy Policy */}
+            <button 
+              onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm text-left w-full"
+            >
+              <div>
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>{t('leg_action_privacy')}</span>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                </div>
+                <p className="text-[10px] text-theme-muted mt-1 font-sans">
+                  {lang === 'sr' 
+                    ? 'Pravilnik o obradi podataka kupaca, bezbednosti, kriptografskim tokenima i pravima lica' 
+                    : lang === 'mk' 
+                      ? 'Правилник за обработка на податоци за купувачите, безбедност и права на корисниците' 
+                      : 'Comprehensive policy on customer data processing, encryption tokens & privacy rights'}
+                </p>
+              </div>
+              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                <span>{lang === 'sr' ? 'Prikaži zvanični dokument (ZZPL & GDPR)' : lang === 'mk' ? 'Прегледај официјален документ' : 'Open complete document (ZZPL & GDPR)'} →</span>
+              </div>
+            </button>
+
+            {/* Document Card 2: Terms & Conditions */}
+            <button 
+              onClick={() => { playClickSound(); setShowTermsModal(true); }} 
+              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm text-left w-full"
+            >
+              <div>
+                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
+                  <div className="flex items-center gap-1.5">
+                    <FileText className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                    <span>{t('leg_action_terms')}</span>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
+                </div>
+                <p className="text-[10px] text-theme-muted mt-1 font-sans">
+                  {lang === 'sr' 
+                    ? 'Pravni okvir licenciranja softvera, ugovor o nivou usluge (SLA) i obaveze trgovaca' 
+                    : lang === 'mk' 
+                      ? 'Правна рамка за лиценцирање, договор за ниво на услуга (SLA) и обврски на трговците' 
+                      : 'Master SaaS software agreement, SLA availability guarantees & merchant terms'}
+                </p>
+              </div>
+              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
+                <CheckCircle2 className="w-3 h-3 shrink-0" />
+                <span>{lang === 'sr' ? 'Prikaži zvanične uslove korišćenja' : lang === 'mk' ? 'Прегледај официјални услови' : 'Open SaaS terms & conditions'} →</span>
+              </div>
+            </button>
+          </div>
         </div>
       </section>
 
@@ -2131,108 +2483,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-
-      {/* Address Edit Token Modal */}
-      {showAddressModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-surface border border-theme rounded-xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden font-sans text-xs animate-in fade-in zoom-in-95 duration-150">
-            
-            {/* Browser Header / URL bar */}
-            <div className="bg-surface-subtle px-3.5 sm:px-4 py-2.5 border-b border-theme flex items-center justify-between text-[11px] text-theme-muted shrink-0">
-              <div className="flex items-center gap-2 text-teal-600 dark:text-[#14B8A6] font-mono truncate mr-2">
-                <Lock className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span className="text-theme-primary truncate">potvrdio.online/edit-address?token=vbr_9842</span>
-              </div>
-              <button 
-                onClick={() => setShowAddressModal(false)}
-                className="text-theme-muted hover:text-theme-primary transition p-1 cursor-pointer shrink-0"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-4 sm:p-5 space-y-3.5 overflow-y-auto touch-scroll">
-              <div>
-                <div className="text-[10px] text-teal-600 dark:text-[#14B8A6] uppercase font-bold tracking-wider mb-0.5">
-                  {t('modal_badge')}
-                </div>
-                <h3 className="text-base font-bold text-theme-primary font-sans">{t('modal_title')}</h3>
-                <p className="text-[11px] text-theme-muted mt-1">{t('modal_subtitle')}</p>
-              </div>
-
-              <div className="p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded-lg text-amber-800 dark:text-amber-300 text-[11px] flex items-start gap-2 font-sans">
-                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                <span>
-                  {lang === 'sr' ? '⚡ Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.' : lang === 'mk' ? '⚡ Пополнете кат и стан за курирот без застој да го најде вашиот влез.' : '⚡ Fill floor and apartment so the courier can find your entrance without delay.'}
-                </span>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-[11px] text-theme-muted mb-1 font-medium">{t('modal_street')}</label>
-                  <input 
-                    type="text" 
-                    readOnly 
-                    value={currentScenConfig.address[lang]}
-                    className="w-full bg-surface-subtle border border-theme rounded-lg px-3 py-2 text-theme-muted font-mono text-xs cursor-not-allowed min-h-[40px]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] text-theme-primary font-bold mb-1">{t('modal_floor')}</label>
-                    <input 
-                      type="text" 
-                      value={floorInput}
-                      onChange={(e) => setFloorInput(e.target.value)}
-                      className="w-full bg-surface border border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-theme-primary font-bold mb-1">{t('modal_apt')}</label>
-                    <input 
-                      type="text" 
-                      value={aptInput}
-                      onChange={(e) => setAptInput(e.target.value)}
-                      className="w-full bg-surface border border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-bold text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-theme-muted mb-1 font-medium">{t('modal_intercom')}</label>
-                  <input 
-                    type="text" 
-                    defaultValue={lang === 'sr' ? 'Radi interfon, ime na zvonu Ninković' : lang === 'mk' ? 'Работи интерфон, име на ѕвоно Ниновиќ' : 'Intercom works, ring name Ninkovic'}
-                    className="w-full bg-surface border border-theme rounded-lg px-3 py-2 text-theme-secondary text-xs focus:outline-none focus:border-teal-500 font-sans min-h-[40px]"
-                  />
-                </div>
-              </div>
-
-              <button 
-                onClick={handleSaveModalAddress}
-                className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg cursor-pointer mt-2 min-h-[44px]"
-              >
-                <Check className="w-4 h-4" />
-                <span>{t('modal_btn_save')}</span>
-              </button>
-
-              <div className="pt-2 text-[10px] text-theme-muted font-sans flex items-center justify-center gap-1.5 text-center leading-normal">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{t('modal_legal_notice')}</span>
-                <button 
-                  onClick={() => { playClickSound(); setShowPrivacyModal(true); }}
-                  className="text-teal-600 dark:text-[#14B8A6] hover:underline cursor-pointer ml-1 font-medium"
-                >
-                  [{t('footer_privacy')}]
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
 
       {/* Legal Modals */}
       <PrivacyPolicyModal 

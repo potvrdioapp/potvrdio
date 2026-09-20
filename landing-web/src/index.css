@@ -150,6 +150,17 @@
     }
   }
 
+  @keyframes heroFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
   /* Call-To-Action Button with Dynamic Color Wave on Hover */
   .btn-brand-cta {
     position: relative;
@@ -282,3 +293,47 @@ input[type=range]::-moz-range-thumb {
   border: none;
   box-shadow: 0 0 12px rgba(20, 184, 166, 0.6);
 }
+
+@keyframes bounceLeft {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-8px);
+  }
+}
+
+.animate-bounce-left {
+  animation: bounceLeft 1s infinite ease-in-out;
+}
+
+@keyframes bounceDiagonalDownLeft {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-6px, 6px);
+  }
+}
+
+.animate-bounce-diagonal {
+  animation: bounceDiagonalDownLeft 1s infinite ease-in-out;
+}
+
+/* Authentic Viber Default Chat Pattern Wallpaper */
+.viber-chat-bg {
+  background-color: #EEEAF8;
+  background-image: url('/viber-doodle-bg.svg');
+  background-repeat: repeat;
+  background-size: 190px 190px;
+}
+
+.dark .viber-chat-bg {
+  background-color: #1F1B2C;
+  background-image: url('/viber-doodle-bg-dark.svg');
+  background-repeat: repeat;
+  background-size: 190px 190px;
+}
+
+
+

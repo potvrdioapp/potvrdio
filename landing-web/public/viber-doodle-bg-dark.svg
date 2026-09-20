@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220" viewBox="0 0 220 220">
+  <g fill="none" stroke="#9A8BF6" stroke-opacity="0.14" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Chat Bubble with dots -->
+    <path d="M14 26 C14 18 21 13 30 13 C39 13 46 18 46 26 C46 34 39 39 30 39 C27 39 23 40 19 43 C20 39 20 38 19 37 C15 34 14 31 14 26 Z" />
+    <circle cx="24" cy="26" r="1.1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="30" cy="26" r="1.1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="36" cy="26" r="1.1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+
+    <!-- Heart -->
+    <path d="M88 20 C83 14 74 16 74 23 C74 31 88 38 88 38 C88 38 102 31 102 23 C102 16 93 14 88 20 Z" />
+
+    <!-- Paper Airplane -->
+    <path d="M142 38 L162 18 L136 25 L146 29 L156 22 L148 31 L142 38 Z" />
+
+    <!-- Star -->
+    <polygon points="198,12 200,18 206,18 201,22 203,28 198,24 193,28 195,22 190,18 196,18" />
+
+    <!-- Coffee Cup -->
+    <path d="M24 82 L42 82 C42 82 43 96 33 96 C23 96 24 82 24 82 Z" />
+    <path d="M42 85 C46 85 47 90 42 92" />
+    <path d="M30 77 C30 79 32 79 32 81" />
+    <path d="M36 77 C36 79 38 79 38 81" />
+
+    <!-- Viber / Phone Handset -->
+    <path d="M96 76 C94 74 97 71 99 73 L104 76 C105 77 105 80 103 81 L101 82 C103 87 107 91 112 93 L114 91 C115 89 118 90 119 91 L123 95 C124 98 122 100 120 99 C110 97 99 87 97 78 Z" />
+
+    <!-- Camera -->
+    <rect x="156" y="76" width="24" height="17" rx="3" />
+    <circle cx="168" cy="84.5" r="4.5" />
+    <path d="M161 76 L163 73 L173 73 L175 76" />
+
+    <!-- Music Note -->
+    <circle cx="24" cy="154" r="3.2" />
+    <circle cx="38" cy="149" r="3.2" />
+    <path d="M27 154 L27 138 L41 133 L41 149" />
+    <path d="M27 144 L41 139" />
+
+    <!-- Gift Box -->
+    <rect x="86" y="145" width="20" height="16" rx="2" />
+    <rect x="84" y="140" width="24" height="6" rx="1.5" />
+    <line x1="96" y1="140" x2="96" y2="161" />
+    <path d="M96 140 C93 135 87 136 90 140 C94 140 96 140 96 140 C96 140 98 140 102 140 C105 136 99 135 96 140 Z" />
+
+    <!-- Envelope -->
+    <rect x="146" y="142" width="22" height="15" rx="2" />
+    <polyline points="146,142 157,151 168,142" />
+
+    <!-- Smiley Face -->
+    <circle cx="200" cy="100" r="9" />
+    <circle cx="197" cy="98" r="1.1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="203" cy="98" r="1.1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <path d="M196 103 C198 106 202 106 204 103" />
+
+    <!-- Sun / Sparkle -->
+    <circle cx="48" cy="196" r="4.5" />
+    <line x1="48" y1="187" x2="48" y2="189" />
+    <line x1="48" y1="203" x2="48" y2="205" />
+    <line x1="39" y1="196" x2="41" y2="196" />
+    <line x1="55" y1="196" x2="57" y2="196" />
+
+    <!-- Thumbs Up -->
+    <path d="M118 202 L118 194 C118 191 120 189 123 189 L124 189 C126 189 126 192 125 195 L131 195 C133 195 135 196 135 198 L133 203 C132 205 130 207 127 207 L120 207 C118 207 118 205 118 202 Z" />
+    <rect x="113" y="194" width="4" height="13" rx="1" />
+
+    <!-- Clock -->
+    <circle cx="180" cy="195" r="8" />
+    <polyline points="180,191 180,195 184,197" />
+
+    <!-- Mini decorative accents -->
+    <circle cx="64" cy="56" r="1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="178" cy="46" r="1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="68" cy="112" r="1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="132" cy="116" r="1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="18" cy="188" r="1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+    <circle cx="150" cy="186" r="1" fill="#9A8BF6" fill-opacity="0.14" stroke="none" />
+  </g>
+</svg>
