@@ -601,6 +601,33 @@ export default function App() {
 
                 {/* Potvrdio Plugin Settings Page Walkthrough */}
                 <div className="p-5 sm:p-6 space-y-6">
+                  {/* Step-by-Step 3-Column Instruction Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">1</div>
+                      <h5 className="font-bold text-xs text-theme-primary">{t.step1Title}</h5>
+                      <p className="text-[11px] text-theme-secondary leading-relaxed">
+                        {t.step1Desc}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">2</div>
+                      <h5 className="font-bold text-xs text-theme-primary">{t.step2Title}</h5>
+                      <p className="text-[11px] text-theme-secondary leading-relaxed">
+                        {t.step2Desc}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">3</div>
+                      <h5 className="font-bold text-xs text-theme-primary">{t.step3Title}</h5>
+                      <p className="text-[11px] text-theme-secondary leading-relaxed">
+                        {t.step3Desc}
+                      </p>
+                    </div>
+                  </div>
+
                   {/* Breadcrumbs Banner */}
                   <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-xs text-teal-700 dark:text-teal-300 flex flex-wrap items-center gap-2">
                     <span className="font-bold uppercase text-[10px] tracking-wider bg-teal-500/20 px-2 py-0.5 rounded">Putanja / Мену / Path:</span>
@@ -733,33 +760,6 @@ export default function App() {
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Step-by-Step 3-Column Instruction Cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">1</div>
-                      <h5 className="font-bold text-xs text-theme-primary">{t.step1Title}</h5>
-                      <p className="text-[11px] text-theme-secondary leading-relaxed">
-                        {t.step1Desc}
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">2</div>
-                      <h5 className="font-bold text-xs text-theme-primary">{t.step2Title}</h5>
-                      <p className="text-[11px] text-theme-secondary leading-relaxed">
-                        {t.step2Desc}
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">3</div>
-                      <h5 className="font-bold text-xs text-theme-primary">{t.step3Title}</h5>
-                      <p className="text-[11px] text-theme-secondary leading-relaxed">
-                        {t.step3Desc}
-                      </p>
                     </div>
                   </div>
                 </div>
