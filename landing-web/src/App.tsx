@@ -1951,57 +1951,88 @@ export default function App() {
             </div>
 
             <div className="overflow-x-auto touch-scroll">
-              <table className="w-full text-left text-xs font-sans min-w-[500px]">
-                <thead className="bg-surface-subtle text-theme-muted border-b border-theme text-[11px]">
+              <table className="w-full text-left text-xs font-sans">
+                <thead className="bg-surface-subtle text-theme-muted border-b border-theme text-[10px] sm:text-[11px]">
                   <tr>
-                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_tier')}</th>
-                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_deposit')}</th>
-                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_viber_rate')}</th>
-                    <th className="p-3.5 sm:p-4 font-semibold">{t('th_sms_rate')}</th>
-                    <th className="p-3.5 sm:p-4 font-semibold text-right">{t('price_btn_select')}</th>
+                    <th className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 font-semibold">{t('th_tier')}</th>
+                    <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 font-semibold">{t('th_deposit')}</th>
+                    <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 font-semibold">{t('th_viber_rate')}</th>
+                    <th className="px-2 sm:px-4 py-2.5 sm:py-3.5 font-semibold">{t('th_sms_rate')}</th>
+                    <th className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 font-semibold text-right">{t('price_btn_select')}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-theme text-theme-secondary">
+                <tbody className="divide-y divide-theme text-theme-secondary text-[11px] sm:text-xs">
+                  {/* Starter Paket */}
                   <tr className="hover:bg-surface-subtle/50 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Starter Paket</td>
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">15 €</td>
-                    <td className="p-3.5 sm:p-4 text-emerald-600 dark:text-emerald-400 font-bold">0.026 €</td>
-                    <td className="p-3.5 sm:p-4 text-theme-muted">0.048 €</td>
-                    <td className="p-3.5 sm:p-4 text-right">
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 font-bold text-theme-primary whitespace-nowrap">
+                      Starter Paket
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 font-bold text-theme-primary whitespace-nowrap">
+                      15 €
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
+                      0.026 €
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-theme-muted whitespace-nowrap">
+                      0.048 €
+                    </td>
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
                         onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
-                        className="btn-select-wave px-3.5 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm"
+                        className="btn-select-wave px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[10px] sm:text-[11px] font-semibold transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
+
+                  {/* Growth Paket (Popular) */}
                   <tr className="bg-teal-50/50 dark:bg-[#14B8A6]/5 hover:bg-teal-50/80 dark:hover:bg-[#14B8A6]/10 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary flex items-center gap-2">
-                      Growth Paket
-                      <span className="text-[9px] font-semibold bg-teal-100 dark:bg-[#14B8A6]/20 text-teal-800 dark:text-[#14B8A6] px-2 py-0.5 rounded-full border border-teal-200 dark:border-[#14B8A6]/30">{t('price_badge_popular')}</span>
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 font-bold text-theme-primary">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
+                        <span className="whitespace-nowrap">Growth Paket</span>
+                        <span className="w-fit text-[7.5px] sm:text-[9px] font-bold bg-teal-100 dark:bg-[#14B8A6]/20 text-teal-800 dark:text-[#14B8A6] px-1.5 py-0.5 rounded-full border border-teal-200 dark:border-[#14B8A6]/30 uppercase tracking-tight whitespace-nowrap">
+                          {t('price_badge_popular')}
+                        </span>
+                      </div>
                     </td>
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">45 €</td>
-                    <td className="p-3.5 sm:p-4 text-emerald-600 dark:text-emerald-400 font-bold">0.024 €</td>
-                    <td className="p-3.5 sm:p-4 text-theme-muted">0.042 €</td>
-                    <td className="p-3.5 sm:p-4 text-right">
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 font-bold text-theme-primary whitespace-nowrap">
+                      45 €
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
+                      0.024 €
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-theme-muted whitespace-nowrap">
+                      0.042 €
+                    </td>
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
                         onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
-                        className="btn-brand-cta px-3.5 py-1.5 rounded-lg text-white font-bold text-[11px] transition cursor-pointer min-h-[32px] shadow-sm"
+                        className="btn-brand-cta px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-white font-bold text-[10px] sm:text-[11px] transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
                       </button>
                     </td>
                   </tr>
+
+                  {/* Scale Paket */}
                   <tr className="hover:bg-surface-subtle/50 transition">
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">Scale Paket</td>
-                    <td className="p-3.5 sm:p-4 font-bold text-theme-primary">120 €</td>
-                    <td className="p-3.5 sm:p-4 text-emerald-600 dark:text-emerald-400 font-bold">0.020 €</td>
-                    <td className="p-3.5 sm:p-4 text-theme-muted">0.038 €</td>
-                    <td className="p-3.5 sm:p-4 text-right">
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 font-bold text-theme-primary whitespace-nowrap">
+                      Scale Paket
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 font-bold text-theme-primary whitespace-nowrap">
+                      120 €
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">
+                      0.020 €
+                    </td>
+                    <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-theme-muted whitespace-nowrap">
+                      0.038 €
+                    </td>
+                    <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
                         onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
-                        className="btn-select-wave px-3.5 py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[11px] font-semibold transition cursor-pointer min-h-[32px] shadow-sm"
+                        className="btn-select-wave px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[10px] sm:text-[11px] font-semibold transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
                       </button>
