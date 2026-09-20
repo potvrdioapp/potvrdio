@@ -1,3 +1,6 @@
+import { getVerificationLogs, VerificationLogItem, LogTimelineEvent } from './verificationLogs';
+
+export type { VerificationLogItem, LogTimelineEvent };
 export type Language = 'sr' | 'mk' | 'en';
 
 export interface TranslationSchema {
@@ -52,17 +55,16 @@ export interface TranslationSchema {
   statusAddressEdited: string;
   statusSmsFallback: string;
   statusCancelled: string;
+  tableExpandHint: string;
+  timelineHeading: string;
+  timelineSummaryTitle: string;
+  timelineResponseTimeLabel: string;
+  timelineChannelLabel: string;
+  timelineOutcomeLabel: string;
+  timelineSavingsLabel: string;
+  timelineAddressCorrectionLabel: string;
   
-  logs: Array<{
-    id: string;
-    customer: string;
-    phone: string;
-    status: 'APPROVED' | 'EDITED_ADDRESS' | 'SMS_FALLBACK' | 'CANCELLED';
-    channel: string;
-    city: string;
-    amount: string;
-    time: string;
-  }>;
+  logs: VerificationLogItem[];
 
   // Credits Tab
   creditsHeading: string;
@@ -90,6 +92,30 @@ export interface TranslationSchema {
   reserveBtn: string;
   loadingText: string;
   successTopupAlert: (count: number, cost: number) => string;
+
+  // Credit Ledger & Usage History
+  ledgerHeading: string;
+  ledgerSubheading: string;
+  ledgerTimeframeSinceLast: string;
+  ledgerTimeframe7d: string;
+  ledgerTimeframe30d: string;
+  ledgerTimeframe90d: string;
+  ledgerTimeframeYtd: string;
+  ledgerTimeframeLifetime: string;
+  ledgerStartingBalance: string;
+  ledgerTopupsLabel: string;
+  ledgerViberSent: string;
+  ledgerSmsSent: string;
+  ledgerRemainingBalance: string;
+  ledgerCreditsUnit: string;
+  ledgerTableColDate: string;
+  ledgerTableColType: string;
+  ledgerTableColDesc: string;
+  ledgerTableColChange: string;
+  ledgerTableColBalance: string;
+  ledgerTableColReceipt: string;
+  ledgerDownloadReceipt: string;
+  ledgerEmpty: string;
 
   // Settings Tab
   settingsHeading: string;
@@ -185,21 +211,16 @@ export const translations: Record<Language, TranslationSchema> = {
     statusAddressEdited: 'Izmenjena Adresa',
     statusSmsFallback: 'SMS Fallback',
     statusCancelled: 'Otkazano (Kupac)',
+    tableExpandHint: 'Kliknite na red za detaljnu istoriju i hronologiju verifikacije',
+    timelineHeading: 'Hronologija Verifikacije Paketa',
+    timelineSummaryTitle: 'Operativni Detalji',
+    timelineResponseTimeLabel: 'Brzina odziva kupca',
+    timelineChannelLabel: 'Verifikacioni kanal',
+    timelineOutcomeLabel: 'Status u magacinu',
+    timelineSavingsLabel: 'Ušteda troškova povrata',
+    timelineAddressCorrectionLabel: 'Korigovana adresa za kurira',
     
-    logs: [
-      { id: '#7482', customer: 'Nikola Petrović', phone: '+381 64 123 ****', status: 'APPROVED', channel: 'Viber', city: 'Beograd', amount: '4.850 RSD', time: 'Pre 4 min' },
-      { id: '#7481', customer: 'Milica Jovanović', phone: '+381 63 987 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Novi Sad', amount: '8.200 RSD', time: 'Pre 18 min' },
-      { id: '#7480', customer: 'Stefan Ilić', phone: '+381 61 456 ****', status: 'APPROVED', channel: 'Viber', city: 'Niš', amount: '3.100 RSD', time: 'Pre 42 min' },
-      { id: '#7479', customer: 'Jelena Stojanović', phone: '+387 65 321 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Banja Luka', amount: '6.400 RSD', time: 'Pre 1h 12m' },
-      { id: '#7478', customer: 'Marko Đorđević', phone: '+381 62 888 ****', status: 'APPROVED', channel: 'Viber', city: 'Kragujevac', amount: '5.900 RSD', time: 'Pre 2h 05m' },
-      { id: '#7477', customer: 'Bojan Radovanović', phone: '+381 60 777 ****', status: 'CANCELLED', channel: 'Viber (1-klik)', city: 'Subotica', amount: '7.350 RSD', time: 'Pre 2h 45m' },
-      { id: '#7476', customer: 'Tamara Simić', phone: '+381 65 554 ****', status: 'APPROVED', channel: 'Viber', city: 'Čačak', amount: '3.890 RSD', time: 'Pre 3h 10m' },
-      { id: '#7475', customer: 'Dragan Vasić', phone: '+381 69 443 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Pančevo', amount: '12.400 RSD', time: 'Pre 4h 25m' },
-      { id: '#7474', customer: 'Anja Kovačević', phone: '+381 64 332 ****', status: 'APPROVED', channel: 'Viber', city: 'Kruševac', amount: '4.150 RSD', time: 'Pre 5h 50m' },
-      { id: '#7473', customer: 'Miloš Tešić', phone: '+381 63 221 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Zrenjanin', amount: '2.950 RSD', time: 'Pre 7h 15m' },
-      { id: '#7472', customer: 'Aleksandra Popović', phone: '+381 61 990 ****', status: 'APPROVED', channel: 'Viber', city: 'Šabac', amount: '6.800 RSD', time: 'Pre 9h 30m' },
-      { id: '#7471', customer: 'Vladimir Lukić', phone: '+381 62 112 ****', status: 'CANCELLED', channel: 'Viber (1-klik)', city: 'Valjevo', amount: '5.400 RSD', time: 'Pre 11h' },
-    ],
+    logs: getVerificationLogs('sr'),
 
     // Credits Tab
     creditsHeading: 'Zajednički Bazen Viber Kredita',
@@ -227,6 +248,30 @@ export const translations: Record<Language, TranslationSchema> = {
     reserveBtn: 'Aktiviraj Pretplatu',
     loadingText: 'Učitavanje...',
     successTopupAlert: (count: number, cost: number) => `[PADDLE / LEMON SQUEEZY] Uspešno ste dopunili ${count} kredita za €${cost}!`,
+
+    // Credit Ledger & Usage History
+    ledgerHeading: 'Istorijat dopuna i potrošnje kredita (Kreditna kartica)',
+    ledgerSubheading: 'Pregled početnog stanja, utrošenih Viber i SMS poruka i preostalog stanja po odabranom periodu.',
+    ledgerTimeframeSinceLast: 'Od poslednje kupovine',
+    ledgerTimeframe7d: 'Poslednjih 7 dana',
+    ledgerTimeframe30d: 'Poslednjih 30 dana',
+    ledgerTimeframe90d: 'Poslednjih 90 dana',
+    ledgerTimeframeYtd: 'Od početka godine (YTD)',
+    ledgerTimeframeLifetime: 'Sve vreme (Lifetime)',
+    ledgerStartingBalance: 'Početni balans',
+    ledgerTopupsLabel: 'Dopunjeno u periodu',
+    ledgerViberSent: 'Viber poruke (period)',
+    ledgerSmsSent: 'SMS fallback (period)',
+    ledgerRemainingBalance: 'Trenutni preostali balans',
+    ledgerCreditsUnit: 'kredita',
+    ledgerTableColDate: 'Datum i vreme',
+    ledgerTableColType: 'Kanal / Tip',
+    ledgerTableColDesc: 'Opis transakcije',
+    ledgerTableColChange: 'Promena kredita',
+    ledgerTableColBalance: 'Stanje posle',
+    ledgerTableColReceipt: 'Priznanica / Račun',
+    ledgerDownloadReceipt: 'Preuzmi PDF',
+    ledgerEmpty: 'Nema transakcija za odabrani period.',
 
     // Settings Tab
     settingsHeading: 'WooCommerce API Ključevi & Povezivanje Prodavnice',
@@ -320,21 +365,16 @@ export const translations: Record<Language, TranslationSchema> = {
     statusAddressEdited: 'Изменета Адреса',
     statusSmsFallback: 'SMS Алтернатива',
     statusCancelled: 'Откажано (Купувач)',
+    tableExpandHint: 'Кликнете на редот за детална историја и хронологија на верификација',
+    timelineHeading: 'Хронологија на Верификација на Пратката',
+    timelineSummaryTitle: 'Оперативни Детали',
+    timelineResponseTimeLabel: 'Брзина на одѕив на купувачот',
+    timelineChannelLabel: 'Канал за верификација',
+    timelineOutcomeLabel: 'Статус во магацинот',
+    timelineSavingsLabel: 'Заштеда на курирски трошоци',
+    timelineAddressCorrectionLabel: 'Коригирана адреса за достава',
     
-    logs: [
-      { id: '#7482', customer: 'Александар Николов', phone: '+389 70 123 ***', status: 'APPROVED', channel: 'Viber', city: 'Скопје', amount: '2.450 ден', time: 'Пред 4 мин' },
-      { id: '#7481', customer: 'Елена Стојановска', phone: '+389 71 987 ***', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Битола', amount: '4.100 ден', time: 'Пред 18 мин' },
-      { id: '#7480', customer: 'Стефан Трајков', phone: '+389 75 456 ***', status: 'APPROVED', channel: 'Viber', city: 'Охрид', amount: '1.850 ден', time: 'Пред 42 мин' },
-      { id: '#7479', customer: 'Марија Димитриевска', phone: '+389 78 321 ***', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Куманово', amount: '3.200 ден', time: 'Пред 1ч 12м' },
-      { id: '#7478', customer: 'Горан Ристов', phone: '+389 72 888 ***', status: 'APPROVED', channel: 'Viber', city: 'Прилеп', amount: '2.900 ден', time: 'Пред 2ч 05м' },
-      { id: '#7477', customer: 'Бојан Костовски', phone: '+389 70 554 ***', status: 'CANCELLED', channel: 'Viber (1-клик)', city: 'Тетово', amount: '3.650 ден', time: 'Пред 2ч 45м' },
-      { id: '#7476', customer: 'Тамара Илиевска', phone: '+389 76 776 ***', status: 'APPROVED', channel: 'Viber', city: 'Струмица', amount: '1.990 ден', time: 'Пред 3ч 10м' },
-      { id: '#7475', customer: 'Драган Спасов', phone: '+389 71 443 ***', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Велес', amount: '6.200 ден', time: 'Пред 4ч 25м' },
-      { id: '#7474', customer: 'Ања Георгиева', phone: '+389 75 332 ***', status: 'APPROVED', channel: 'Viber', city: 'Штип', amount: '2.150 ден', time: 'Пред 5ч 50м' },
-      { id: '#7473', customer: 'Милош Ангелов', phone: '+389 78 221 ***', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Гостивар', amount: '1.450 ден', time: 'Пред 7ч 15м' },
-      { id: '#7472', customer: 'Александра Петрова', phone: '+389 72 990 ***', status: 'APPROVED', channel: 'Viber', city: 'Кавадарци', amount: '3.400 ден', time: 'Пред 9ч 30м' },
-      { id: '#7471', customer: 'Владимир Иванов', phone: '+389 70 112 ***', status: 'CANCELLED', channel: 'Viber (1-клик)', city: 'Кочани', amount: '2.700 ден', time: 'Пред 11ч' },
-    ],
+    logs: getVerificationLogs('mk'),
 
     // Credits Tab
     creditsHeading: 'Заеднички Базен на Viber Кредити',
@@ -362,6 +402,30 @@ export const translations: Record<Language, TranslationSchema> = {
     reserveBtn: 'Активирај Претплата',
     loadingText: 'Вчитување...',
     successTopupAlert: (count: number, cost: number) => `[PADDLE / LEMON SQUEEZY] Успешно надополнивте ${count} кредити за €${cost}!`,
+
+    // Credit Ledger & Usage History
+    ledgerHeading: 'Историја на надополнување и потрошувачка на кредити',
+    ledgerSubheading: 'Преглед на почетно салдо, потрошени Viber и SMS пораки и преостанато салдо за избраниот период.',
+    ledgerTimeframeSinceLast: 'Од последно купување',
+    ledgerTimeframe7d: 'Последни 7 дена',
+    ledgerTimeframe30d: 'Последни 30 дена',
+    ledgerTimeframe90d: 'Последни 90 дена',
+    ledgerTimeframeYtd: 'Од почетокот на годината (YTD)',
+    ledgerTimeframeLifetime: 'Цело време (Lifetime)',
+    ledgerStartingBalance: 'Почетно салдо',
+    ledgerTopupsLabel: 'Надополнето во периодот',
+    ledgerViberSent: 'Viber пораки (период)',
+    ledgerSmsSent: 'SMS fallback (период)',
+    ledgerRemainingBalance: 'Тековно преостанато салдо',
+    ledgerCreditsUnit: 'кредити',
+    ledgerTableColDate: 'Датум и време',
+    ledgerTableColType: 'Канал / Тип',
+    ledgerTableColDesc: 'Опис на трансакција',
+    ledgerTableColChange: 'Промена на кредити',
+    ledgerTableColBalance: 'Салдо потоа',
+    ledgerTableColReceipt: 'Сметка / Фактура',
+    ledgerDownloadReceipt: 'Преземи PDF',
+    ledgerEmpty: 'Нема трансакции за избраниот период.',
 
     // Settings Tab
     settingsHeading: 'WooCommerce API Клучеви и Поврзување на Продавница',
@@ -455,21 +519,16 @@ export const translations: Record<Language, TranslationSchema> = {
     statusAddressEdited: 'Address Updated',
     statusSmsFallback: 'SMS Fallback',
     statusCancelled: 'Cancelled by Buyer',
+    tableExpandHint: 'Click any row to view full verification history and timeline',
+    timelineHeading: 'Parcel Verification Lifecycle',
+    timelineSummaryTitle: 'Operational Summary',
+    timelineResponseTimeLabel: 'Customer Response Time',
+    timelineChannelLabel: 'Verification Channel',
+    timelineOutcomeLabel: 'Warehouse Dispatch Status',
+    timelineSavingsLabel: 'Prevented Return Expenses',
+    timelineAddressCorrectionLabel: 'Updated Delivery Address',
     
-    logs: [
-      { id: '#7482', customer: 'Nikola Petrovic', phone: '+381 64 123 ****', status: 'APPROVED', channel: 'Viber', city: 'Belgrade', amount: '€42.00', time: '4 mins ago' },
-      { id: '#7481', customer: 'Elena Stojanovska', phone: '+389 71 987 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Skopje', amount: '€70.00', time: '18 mins ago' },
-      { id: '#7480', customer: 'Stefan Ilic', phone: '+381 61 456 ****', status: 'APPROVED', channel: 'Viber', city: 'Novi Sad', amount: '€26.50', time: '42 mins ago' },
-      { id: '#7479', customer: 'Marija Dimitrievska', phone: '+389 78 321 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Bitola', amount: '€54.00', time: '1h 12m ago' },
-      { id: '#7478', customer: 'Goran Ristov', phone: '+381 62 888 ****', status: 'APPROVED', channel: 'Viber', city: 'Sarajevo', amount: '€49.00', time: '2h 05m ago' },
-      { id: '#7477', customer: 'Bojan Kostovski', phone: '+389 70 554 ****', status: 'CANCELLED', channel: 'Viber (1-click)', city: 'Tetovo', amount: '€31.00', time: '2h 45m ago' },
-      { id: '#7476', customer: 'Tamara Simic', phone: '+381 65 554 ****', status: 'APPROVED', channel: 'Viber', city: 'Nis', amount: '€33.00', time: '3h 10m ago' },
-      { id: '#7475', customer: 'Dragan Vasic', phone: '+381 69 443 ****', status: 'EDITED_ADDRESS', channel: 'potvrdio.online', city: 'Banja Luka', amount: '€105.00', time: '4h 25m ago' },
-      { id: '#7474', customer: 'Anja Kovacevic', phone: '+381 64 332 ****', status: 'APPROVED', channel: 'Viber', city: 'Kragujevac', amount: '€35.00', time: '5h 50m ago' },
-      { id: '#7473', customer: 'Milos Tesic', phone: '+381 63 221 ****', status: 'SMS_FALLBACK', channel: 'SMS Fallback', city: 'Podgorica', amount: '€25.00', time: '7h 15m ago' },
-      { id: '#7472', customer: 'Aleksandra Popovic', phone: '+381 61 990 ****', status: 'APPROVED', channel: 'Viber', city: 'Subotica', amount: '€58.00', time: '9h 30m ago' },
-      { id: '#7471', customer: 'Vladimir Lukic', phone: '+381 62 112 ****', status: 'CANCELLED', channel: 'Viber (1-click)', city: 'Ohrid', amount: '€46.00', time: '11h ago' },
-    ],
+    logs: getVerificationLogs('en'),
 
     // Credits Tab
     creditsHeading: 'Shared Viber Credit Pool',
@@ -497,6 +556,30 @@ export const translations: Record<Language, TranslationSchema> = {
     reserveBtn: 'Activate Subscription',
     loadingText: 'Loading...',
     successTopupAlert: (count: number, cost: number) => `[PADDLE / LEMON SQUEEZY] Successfully topped up ${count} credits for €${cost}!`,
+
+    // Credit Ledger & Usage History
+    ledgerHeading: 'Credit Top-Up and Usage History (Credit Ledger)',
+    ledgerSubheading: 'Audit breakdown of starting balance, Viber & SMS dispatches, and remaining balance for the selected period.',
+    ledgerTimeframeSinceLast: 'Since last purchase',
+    ledgerTimeframe7d: 'Last 7 days',
+    ledgerTimeframe30d: 'Last 30 days',
+    ledgerTimeframe90d: 'Last 90 days',
+    ledgerTimeframeYtd: 'Year-to-date (YTD)',
+    ledgerTimeframeLifetime: 'All-time (Lifetime)',
+    ledgerStartingBalance: 'Starting Balance',
+    ledgerTopupsLabel: 'Top-ups in Period',
+    ledgerViberSent: 'Viber Messages (Period)',
+    ledgerSmsSent: 'SMS Fallback (Period)',
+    ledgerRemainingBalance: 'Current Remaining Balance',
+    ledgerCreditsUnit: 'credits',
+    ledgerTableColDate: 'Date & Time',
+    ledgerTableColType: 'Channel / Type',
+    ledgerTableColDesc: 'Transaction Description',
+    ledgerTableColChange: 'Credit Change',
+    ledgerTableColBalance: 'Balance After',
+    ledgerTableColReceipt: 'Receipt / Invoice',
+    ledgerDownloadReceipt: 'Download PDF',
+    ledgerEmpty: 'No transactions found for the selected period.',
 
     // Settings Tab
     settingsHeading: 'WooCommerce API Credentials & Store Connection',

@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
   MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
-  Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail, XCircle, Calendar
+  Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail, XCircle, Calendar,
+  Clock, MapPin, Eye, Download, ArrowDownRight, ArrowUpRight, History, FileText, Send, Coins
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
-import { DateRangePicker, PeriodType } from './components/DateRangePicker';
+import { DateRangePicker, PeriodType, DateRange, formatDateRange } from './components/DateRangePicker';
 import { translations, Language } from './i18n';
+import { CreditTimeframe, getCreditLedgerData } from './creditLedger';
 
 type Theme = 'dark' | 'light';
 
@@ -18,6 +20,13 @@ export default function App() {
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
   const [activeStepHighlight, setActiveStepHighlight] = useState<number | null>(null);
+  const [expandedRowId, setExpandedRowId] = useState<string | null>('#7482');
+  const [creditTimeframe, setCreditTimeframe] = useState<CreditTimeframe>('since_last_purchase');
+  const [downloadingReceiptId, setDownloadingReceiptId] = useState<string | null>(null);
+
+  const toggleRowExpand = (id: string) => {
+    setExpandedRowId(prev => (prev === id ? null : id));
+  };
 
   const toggleStepHighlight = (stepNum: number) => {
     setActiveStepHighlight(prev => (prev === stepNum ? null : stepNum));
@@ -29,6 +38,12 @@ export default function App() {
   });
 
   const [timeframe, setTimeframe] = useState<PeriodType>('30d');
+  const [customRange, setCustomRange] = useState<DateRange>({
+    start: new Date(2026, 8, 10),
+    end: new Date(2026, 8, 20),
+  });
+
+  const customDays = Math.max(1, Math.round((customRange.end.getTime() - customRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 
   useEffect(() => {
     localStorage.setItem('potvrdio_lang', selectedLang);
@@ -103,18 +118,29 @@ export default function App() {
       viberSub: selectedLang === 'sr' ? 'Godišnja stopa otvaranja poruka' : selectedLang === 'mk' ? 'Годишна стапка на отворање' : 'Annual message read rate',
     },
     'custom': {
-      confirmed: '286',
-      confirmedBadge: selectedLang === 'sr' ? 'Prilagođen raspon' : selectedLang === 'mk' ? 'Прилагоден опсег' : 'Custom range',
-      confirmedSub: selectedLang === 'sr' ? 'Izabrani period na kalendaru' : selectedLang === 'mk' ? 'Избран период на календарот' : 'Selected dates from calendar',
+      confirmed: Math.round(customDays * 13.7).toLocaleString(),
+      confirmedBadge: selectedLang === 'sr' ? `${customDays} dana` : selectedLang === 'mk' ? `${customDays} дена` : `${customDays} days`,
+      confirmedSub: formatDateRange(customRange.start, customRange.end, selectedLang),
       deliveryRate: '96.8%',
       deliverySub: selectedLang === 'sr' ? 'Isporučenost u izabranim danima' : selectedLang === 'mk' ? 'Испорака во избраните денови' : 'Delivery rate in selected range',
-      saved: '€858',
+      saved: `€${Math.round(customDays * 41.3).toLocaleString()}`,
       savedSub: selectedLang === 'sr' ? 'Sprečeni neisporučeni troškovi' : selectedLang === 'mk' ? 'Спречени неиспорачани troškovi' : 'Prevented return expenses',
       viberOpen: '94.1%',
       viberSub: selectedLang === 'sr' ? 'Odziv za odabrane dane' : selectedLang === 'mk' ? 'Одѕив за избраните денови' : 'Response rate in selected range',
-    }
+    },
+    'since_last_purchase': {
+      confirmed: '28',
+      confirmedBadge: selectedLang === 'sr' ? 'Od zadnje dopune' : selectedLang === 'mk' ? 'Од последно надополнување' : 'Since last top-up',
+      confirmedSub: selectedLang === 'sr' ? '18. sep 2026 – danas' : selectedLang === 'mk' ? '18 сеп 2026 – денес' : 'Sep 18, 2026 – today',
+      deliveryRate: '96.8%',
+      deliverySub: selectedLang === 'sr' ? 'Stopa isporuke u tekućem ciklusu' : selectedLang === 'mk' ? 'Стапка на испорака во тековниот циклус' : 'Delivery rate in current cycle',
+      saved: '€84',
+      savedSub: selectedLang === 'sr' ? 'Sprečeni troškovi povrata' : selectedLang === 'mk' ? 'Спречени трошоци за поврат' : 'Saved return expenses',
+      viberOpen: '94.2%',
+      viberSub: selectedLang === 'sr' ? 'Prosečan odziv: 2.1 min' : selectedLang === 'mk' ? 'Просечен одѕив: 2.1 мин' : 'Average turnaround: 2.1 min',
+    },
   };
-  const activeStats = statsConfig[timeframe];
+  const activeStats = statsConfig[timeframe] || statsConfig['30d'];
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -188,7 +214,7 @@ export default function App() {
                 activeTab === 'credits' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/30 shadow-xs' : 'text-theme-muted hover:bg-surface-subtle hover:text-theme-primary'
               }`}
             >
-              <Zap className="w-4 h-4 shrink-0 text-left" />
+              <Coins className="w-4 h-4 shrink-0 text-left" />
               <span className="truncate text-left">{t.navCredits}</span>
               <span className="ml-auto bg-teal-500/15 text-teal-600 dark:text-teal-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-teal-500/30 shrink-0">
                 {credits}
@@ -285,7 +311,7 @@ export default function App() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-subtle hover:bg-surface border border-theme hover:border-teal-500/40 text-theme-primary font-bold text-xs transition-all cursor-pointer shadow-xs"
                 title={t.topUpCredits}
               >
-                <Zap className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 animate-pulse shrink-0" />
+                <Coins className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
                 <span>{credits}</span>
                 <span className="text-theme-muted text-[11px] font-normal hidden md:inline">{t.remaining}</span>
               </button>
@@ -327,7 +353,13 @@ export default function App() {
                 {/* Timeframe Date Range Picker Dropdown */}
                 <DateRangePicker 
                   selectedPeriod={timeframe} 
-                  onApply={(p) => setTimeframe(p)} 
+                  customRange={customRange}
+                  onApply={(p, _label, range) => {
+                    setTimeframe(p);
+                    if (range) {
+                      setCustomRange(range);
+                    }
+                  }} 
                   lang={selectedLang} 
                 />
               </div>
@@ -381,9 +413,12 @@ export default function App() {
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <h3 className="text-base font-bold text-theme-primary">{t.tableTitle}</h3>
-                    <p className="text-xs text-theme-muted">{t.tableSubtitle}</p>
+                    <p className="text-xs text-theme-muted mt-0.5">{t.tableSubtitle}</p>
+                    <span className="text-[11px] text-teal-600 dark:text-teal-400 font-medium flex items-center gap-1 mt-1">
+                      <ChevronRight className="w-3 h-3" /> {t.tableExpandHint}
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
                     <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
                     {t.tableBadge} · {t.logs.length} {selectedLang === 'sr' ? 'naloga' : selectedLang === 'mk' ? 'нарачки' : 'orders'}
                   </span>
@@ -402,43 +437,203 @@ export default function App() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme">
-                      {t.logs.map((log, index) => (
-                        <tr key={index} className="hover:bg-surface-subtle/50 transition-colors">
-                          <td className="py-3.5 px-4 font-bold text-theme-primary font-mono">{log.id}</td>
-                          <td className="py-3.5 px-4">
-                            <div className="font-bold text-theme-primary">{log.customer}</div>
-                            <div className="text-[10px] text-theme-muted font-mono">{log.phone}</div>
-                          </td>
-                          <td className="py-3.5 px-4 text-theme-secondary">{log.city}</td>
-                          <td className="py-3.5 px-4 font-bold text-teal-600 dark:text-teal-400 font-mono">{log.amount}</td>
-                          <td className="py-3.5 px-4">
-                            {log.status === 'APPROVED' && (
-                              <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                <CheckCircle2 className="w-3 h-3" /> {t.statusApproved} ({log.channel})
-                              </span>
+                      {t.logs.map((log) => {
+                        const isExpanded = expandedRowId === log.id;
+                        return (
+                          <React.Fragment key={log.id}>
+                            <tr 
+                              onClick={() => toggleRowExpand(log.id)}
+                              className={`cursor-pointer transition-all ${
+                                isExpanded 
+                                  ? 'bg-surface-subtle/80 shadow-2xs' 
+                                  : 'hover:bg-surface-subtle/50'
+                              }`}
+                            >
+                              <td className="py-3.5 px-4">
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      toggleRowExpand(log.id);
+                                    }}
+                                    className={`p-1 rounded-md hover:bg-surface border border-transparent hover:border-theme transition-all ${
+                                      isExpanded 
+                                        ? 'text-teal-600 dark:text-teal-400 rotate-90 bg-surface shadow-2xs' 
+                                        : 'text-theme-muted'
+                                    }`}
+                                    aria-label="Toggle verification history"
+                                  >
+                                    <ChevronRight className="w-3.5 h-3.5 transition-transform duration-200" />
+                                  </button>
+                                  <span className="font-bold text-theme-primary font-mono">{log.id}</span>
+                                </div>
+                              </td>
+                              <td className="py-3.5 px-4">
+                                <div className="font-bold text-theme-primary">{log.customer}</div>
+                                <div className="text-[10px] text-theme-muted font-mono">{log.phone}</div>
+                              </td>
+                              <td className="py-3.5 px-4 text-theme-secondary">{log.city}</td>
+                              <td className="py-3.5 px-4 font-bold text-teal-600 dark:text-teal-400 font-mono">{log.amount}</td>
+                              <td className="py-3.5 px-4">
+                                {log.status === 'APPROVED' && (
+                                  <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
+                                    <CheckCircle2 className="w-3 h-3" /> {t.statusApproved} ({log.channel})
+                                  </span>
+                                )}
+                                {log.status === 'EDITED_ADDRESS' && (
+                                  <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
+                                    <Sparkles className="w-3 h-3" /> {t.statusAddressEdited}
+                                  </span>
+                                )}
+                                {log.status === 'SMS_FALLBACK' && (
+                                  <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
+                                    <AlertTriangle className="w-3 h-3" /> {t.statusSmsFallback}
+                                  </span>
+                                )}
+                                {log.status === 'CANCELLED' && (
+                                  <span 
+                                    className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full font-semibold"
+                                    title={selectedLang === 'sr' ? 'Kupac otkazao pre slanja — sprečen trošak povrata paketa!' : selectedLang === 'mk' ? 'Купувачот откажа пред праќање — спречен трошок за поврат!' : 'Buyer cancelled before shipping — prevented return courier fee!'}
+                                  >
+                                    <XCircle className="w-3 h-3" /> {t.statusCancelled} ({log.channel})
+                                  </span>
+                                )}
+                              </td>
+                              <td className="py-3.5 px-4 text-theme-muted font-medium">{log.time}</td>
+                            </tr>
+
+                            {/* Expandable History Drawer */}
+                            {isExpanded && (
+                              <tr className="bg-surface-subtle/30 border-b border-theme">
+                                <td colSpan={6} className="p-0">
+                                  <div className="p-4 sm:p-6 border-l-4 border-l-teal-500 bg-surface/70 dark:bg-surface-subtle/40 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {/* Drawer Header */}
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-theme/60">
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="w-7 h-7 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400 shrink-0">
+                                          <Clock className="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                          <div className="text-xs font-bold text-theme-primary flex items-center gap-2">
+                                            <span>{t.timelineHeading}</span>
+                                            <span className="font-mono text-[10px] text-teal-700 dark:text-teal-300 bg-teal-500/10 px-1.5 py-0.5 rounded border border-teal-500/20 font-bold">
+                                              {log.id}
+                                            </span>
+                                          </div>
+                                          <div className="text-[10px] text-theme-muted mt-0.5">
+                                            {log.customer} · {log.city} · {log.amount}
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-2 flex-wrap text-xs">
+                                        <div className="flex items-center gap-1.5 bg-surface px-2.5 py-1 rounded-xl border border-theme shadow-2xs">
+                                          <span className="text-[10px] font-semibold text-theme-muted">{t.timelineResponseTimeLabel}:</span>
+                                          <span className="font-bold text-[11px] text-theme-primary font-mono">{log.responseTime}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 bg-surface px-2.5 py-1 rounded-xl border border-theme shadow-2xs">
+                                          <span className="text-[10px] font-semibold text-theme-muted">{t.timelineChannelLabel}:</span>
+                                          <span className="font-bold text-[11px] text-teal-600 dark:text-teal-400">{log.channel}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* Drawer Body: Timeline + Summary Box */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                      {/* Vertical Timeline */}
+                                      <div className="lg:col-span-2 pt-1">
+                                        <div className="relative pl-7 space-y-4 before:absolute before:left-3 before:top-2 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-teal-500 before:via-emerald-500 before:to-slate-300 dark:before:to-slate-700">
+                                          {log.history.map((event, eventIdx) => (
+                                            <div key={eventIdx} className="relative group">
+                                              {/* Milestone Node Icon on line */}
+                                              <div className="absolute -left-[32px] top-0 w-6 h-6 rounded-full flex items-center justify-center shadow-xs ring-4 ring-surface bg-surface border border-theme">
+                                                {event.type === 'order' && <Store className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
+                                                {event.type === 'dispatch' && <MessageSquare className="w-3 h-3 text-viber-purple" />}
+                                                {event.type === 'read' && <Eye className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />}
+                                                {event.type === 'action' && (log.status === 'EDITED_ADDRESS' ? <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" /> : <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />)}
+                                                {event.type === 'fallback' && <AlertTriangle className="w-3 h-3 text-amber-500" />}
+                                                {event.type === 'cancel' && <XCircle className="w-3 h-3 text-rose-500" />}
+                                                {event.type === 'saved' && <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
+                                              </div>
+
+                                              <div className="bg-surface rounded-xl p-3 border border-theme shadow-2xs space-y-1">
+                                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                  <div className="flex items-center gap-2">
+                                                    <span className="font-bold text-xs text-theme-primary">{event.title}</span>
+                                                    {event.badge && (
+                                                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-subtle border border-theme text-theme-secondary">
+                                                        {event.badge}
+                                                      </span>
+                                                    )}
+                                                  </div>
+                                                  <span className="font-mono text-[10px] font-semibold text-theme-muted bg-surface-subtle px-1.5 py-0.5 rounded border border-theme">
+                                                    {event.time}
+                                                  </span>
+                                                </div>
+                                                <p className="text-xs text-theme-muted leading-relaxed">{event.desc}</p>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      {/* Right Operational Summary Card */}
+                                      <div className="space-y-3">
+                                        <div className="p-4 rounded-xl bg-surface border border-theme shadow-xs space-y-3">
+                                          <div className="text-xs font-bold text-theme-primary uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-theme/60">
+                                            <ShieldCheck className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                                            {t.timelineSummaryTitle}
+                                          </div>
+
+                                          {/* Warehouse Outcome */}
+                                          <div className="space-y-1">
+                                            <div className="text-[10px] uppercase font-bold text-theme-muted">{t.timelineOutcomeLabel}</div>
+                                            <div className="text-xs font-semibold text-theme-primary bg-surface-subtle p-2.5 rounded-lg border border-theme flex items-start gap-2">
+                                              <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 mt-0.5 shrink-0" />
+                                              <span>{log.warehouseAction}</span>
+                                            </div>
+                                          </div>
+
+                                          {/* Updated Address if applicable */}
+                                          {log.updatedAddress && (
+                                            <div className="space-y-1">
+                                              <div className="text-[10px] uppercase font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                                                <MapPin className="w-3 h-3" /> {t.timelineAddressCorrectionLabel}
+                                              </div>
+                                              <div className="text-xs font-medium text-blue-950 dark:text-blue-200 bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20">
+                                                {log.updatedAddress}
+                                              </div>
+                                            </div>
+                                          )}
+
+                                          {/* Prevented Costs if applicable */}
+                                          {log.costSaved && (
+                                            <div className="space-y-1">
+                                              <div className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                                                <ShieldCheck className="w-3 h-3" /> {t.timelineSavingsLabel}
+                                              </div>
+                                              <div className="text-xs font-bold text-emerald-950 dark:text-emerald-200 bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20">
+                                                {log.costSaved}
+                                              </div>
+                                            </div>
+                                          )}
+
+                                          {/* Customer Contact Quick Reference */}
+                                          <div className="pt-2 border-t border-theme/60 flex items-center justify-between text-[11px] text-theme-muted font-mono">
+                                            <span>{log.phone}</span>
+                                            <span className="font-bold text-theme-primary">{log.amount}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
                             )}
-                            {log.status === 'EDITED_ADDRESS' && (
-                              <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                <Sparkles className="w-3 h-3" /> {t.statusAddressEdited}
-                              </span>
-                            )}
-                            {log.status === 'SMS_FALLBACK' && (
-                              <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                <AlertTriangle className="w-3 h-3" /> {t.statusSmsFallback}
-                              </span>
-                            )}
-                            {log.status === 'CANCELLED' && (
-                              <span 
-                                className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full font-semibold"
-                                title={selectedLang === 'sr' ? 'Kupac otkazao pre slanja — sprečen trošak povrata paketa!' : selectedLang === 'mk' ? 'Купувачот откажа пред праќање — спречен трошок за поврат!' : 'Buyer cancelled before shipping — prevented return courier fee!'}
-                              >
-                                <XCircle className="w-3 h-3" /> {t.statusCancelled} ({log.channel})
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-3.5 px-4 text-theme-muted">{log.time}</td>
-                        </tr>
-                      ))}
+                          </React.Fragment>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -526,6 +721,239 @@ export default function App() {
                   </button>
                 </div>
               </div>
+
+              {/* CREDIT TOP-UP & USAGE HISTORY (LEDGER) */}
+              {(() => {
+                const ledgerData = getCreditLedgerData(selectedLang);
+                const activeStats = ledgerData.stats[creditTimeframe] || ledgerData.stats.since_last_purchase;
+                const activeTransactions = ledgerData.transactions[creditTimeframe] || [];
+
+                const handleDownloadReceipt = (receiptNo: string, e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  setDownloadingReceiptId(receiptNo);
+                  setTimeout(() => {
+                    setDownloadingReceiptId(null);
+                    const blob = new Blob([
+                      `POTVRDIO VIBER COD - OFFICIAL RECEIPT / POTVRDA O DOPUNI\n` +
+                      `=======================================================\n` +
+                      `Receipt Reference: ${receiptNo}\n` +
+                      `Store Domain: ${t.storeDomain}\n` +
+                      `Date of Issue: ${new Date().toISOString().split('T')[0]}\n` +
+                      `Current Balance: 1,875 credits\n` +
+                      `Processor: Paddle / Lemon Squeezy Merchant of Record (MoR)\n` +
+                      `Security Status: Verified via SHA-256 HMAC\n` +
+                      `=======================================================\n`
+                    ], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `potvrdio-receipt-${receiptNo}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                  }, 600);
+                };
+
+                return (
+                  <div className="glass-panel rounded-2xl border border-theme p-6 sm:p-7 space-y-6 shadow-card">
+                    {/* Header & Timeframe Filter */}
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 border-b border-theme">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                          <History className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-bold text-theme-primary">{t.ledgerHeading}</h3>
+                          <p className="text-xs text-theme-muted mt-0.5">{t.ledgerSubheading}</p>
+                        </div>
+                      </div>
+
+                      {/* Date Range Picker Dropdown (Same component as Overview) */}
+                      <DateRangePicker
+                        mode="credits"
+                        selectedPeriod={creditTimeframe}
+                        lang={selectedLang}
+                        onApply={(period) => {
+                          if (period !== 'custom') {
+                            setCreditTimeframe(period as CreditTimeframe);
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {/* 4 Metric Summary Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* 1: Starting Balance */}
+                      <div className="p-4 rounded-xl bg-surface-subtle/50 border border-theme flex flex-col justify-between">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-theme-muted uppercase tracking-wider">{t.ledgerStartingBalance}</span>
+                          <Clock className="w-4 h-4 text-theme-muted" />
+                        </div>
+                        <div className="mt-2 flex items-baseline gap-1.5">
+                          <span className="text-2xl font-black text-theme-primary">{activeStats.startingBalance.toLocaleString()}</span>
+                          <span className="text-xs text-theme-muted">{t.ledgerCreditsUnit}</span>
+                        </div>
+                        <div className="mt-1 text-[11px] text-theme-muted">
+                          {activeStats.topUps > 0 ? `+${activeStats.topUps.toLocaleString()} ${t.ledgerCreditsUnit} ${t.ledgerTopupsLabel.toLowerCase()}` : `0 ${t.ledgerCreditsUnit}`}
+                        </div>
+                      </div>
+
+                      {/* 2: Viber Dispatches */}
+                      <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 flex flex-col justify-between">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{t.ledgerViberSent}</span>
+                          <MessageSquare className="w-4 h-4 text-viber-purple" />
+                        </div>
+                        <div className="mt-2 flex items-baseline gap-1.5">
+                          <span className="text-2xl font-black text-viber-purple">-{activeStats.viberSpent.toLocaleString()}</span>
+                          <span className="text-xs text-purple-600/70 dark:text-purple-400/70">{t.ledgerCreditsUnit}</span>
+                        </div>
+                        <div className="mt-1 text-[11px] text-purple-600/80 dark:text-purple-400/80 font-medium">
+                          €0.024 / msg · Viber Business
+                        </div>
+                      </div>
+
+                      {/* 3: SMS Fallback */}
+                      <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 flex flex-col justify-between">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">{t.ledgerSmsSent}</span>
+                          <Send className="w-4 h-4 text-amber-500" />
+                        </div>
+                        <div className="mt-2 flex items-baseline gap-1.5">
+                          <span className="text-2xl font-black text-amber-600 dark:text-amber-400">-{activeStats.smsSpent.toLocaleString()}</span>
+                          <span className="text-xs text-amber-600/70 dark:text-amber-400/70">{t.ledgerCreditsUnit}</span>
+                        </div>
+                        <div className="mt-1 text-[11px] text-amber-600/80 dark:text-amber-400/80 font-medium">
+                          Tier-1 Direct Carrier Routes
+                        </div>
+                      </div>
+
+                      {/* 4: Remaining Balance */}
+                      <div className="p-4 rounded-xl bg-teal-500/10 border-2 border-teal-500/40 flex flex-col justify-between shadow-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold text-teal-700 dark:text-teal-300 uppercase tracking-wider">{t.ledgerRemainingBalance}</span>
+                          <Coins className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                        </div>
+                        <div className="mt-2 flex items-baseline gap-1.5">
+                          <span className="text-2xl font-black text-teal-600 dark:text-teal-400">{activeStats.remainingBalance.toLocaleString()}</span>
+                          <span className="text-xs font-semibold text-teal-600/80 dark:text-teal-400/80">{t.ledgerCreditsUnit}</span>
+                        </div>
+                        <div className="mt-1 text-[11px] text-teal-600/90 dark:text-teal-400/90 font-medium">
+                          ≈ {activeStats.remainingBalance} parcel verifications ready
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Itemized Transaction Table */}
+                    <div className="border border-theme rounded-xl overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-surface-subtle text-theme-muted uppercase tracking-wider text-[10px] border-b border-theme">
+                            <tr>
+                              <th className="py-3 px-4">{t.ledgerTableColDate}</th>
+                              <th className="py-3 px-4">{t.ledgerTableColType}</th>
+                              <th className="py-3 px-4">{t.ledgerTableColDesc}</th>
+                              <th className="py-3 px-4 text-right">{t.ledgerTableColChange}</th>
+                              <th className="py-3 px-4 text-right">{t.ledgerTableColBalance}</th>
+                              <th className="py-3 px-4 text-right">{t.ledgerTableColReceipt}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-theme">
+                            {activeTransactions.length === 0 ? (
+                              <tr>
+                                <td colSpan={6} className="py-8 text-center text-theme-muted text-xs">
+                                  {t.ledgerEmpty}
+                                </td>
+                              </tr>
+                            ) : (
+                              activeTransactions.map((tx) => {
+                                const isTopup = tx.type === 'TOPUP';
+                                const isViber = tx.type === 'VIBER';
+                                const isSms = tx.type === 'SMS';
+
+                                return (
+                                  <tr key={tx.id} className="hover:bg-surface-subtle/50 transition-colors">
+                                    {/* Date */}
+                                    <td className="py-3 px-4 text-theme-muted whitespace-nowrap font-mono text-[11px]">
+                                      {tx.date}
+                                    </td>
+
+                                    {/* Type / Channel Badge */}
+                                    <td className="py-3 px-4 whitespace-nowrap">
+                                      {isTopup && (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                          <ArrowUpRight className="w-3 h-3" />
+                                          TOP-UP
+                                        </span>
+                                      )}
+                                      {isViber && (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-purple-500/10 text-viber-purple border border-purple-500/20">
+                                          <MessageSquare className="w-3 h-3" />
+                                          Viber
+                                        </span>
+                                      )}
+                                      {isSms && (
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                          <ArrowDownRight className="w-3 h-3" />
+                                          SMS Fallback
+                                        </span>
+                                      )}
+                                    </td>
+
+                                    {/* Description */}
+                                    <td className="py-3 px-4">
+                                      <div className="font-semibold text-theme-primary">{tx.title}</div>
+                                      <div className="text-[11px] text-theme-muted">{tx.description}</div>
+                                    </td>
+
+                                    {/* Credit Change */}
+                                    <td className="py-3 px-4 text-right whitespace-nowrap font-mono font-bold">
+                                      {isTopup ? (
+                                        <span className="text-emerald-600 dark:text-emerald-400">
+                                          +{tx.creditsChange.toLocaleString()}
+                                        </span>
+                                      ) : (
+                                        <span className="text-theme-primary">
+                                          {tx.creditsChange.toLocaleString()}
+                                        </span>
+                                      )}
+                                    </td>
+
+                                    {/* Running Balance */}
+                                    <td className="py-3 px-4 text-right whitespace-nowrap font-mono font-semibold text-theme-muted">
+                                      {tx.balanceAfter.toLocaleString()}
+                                    </td>
+
+                                    {/* Receipt Download */}
+                                    <td className="py-3 px-4 text-right whitespace-nowrap">
+                                      {tx.receiptNumber ? (
+                                        <button
+                                          onClick={(e) => handleDownloadReceipt(tx.receiptNumber!, e)}
+                                          disabled={downloadingReceiptId === tx.receiptNumber}
+                                          className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-teal-600 dark:text-teal-400 hover:text-teal-500 bg-teal-500/10 hover:bg-teal-500/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                                          title={`Receipt ${tx.receiptNumber}`}
+                                        >
+                                          {downloadingReceiptId === tx.receiptNumber ? (
+                                            <RefreshCw className="w-3 h-3 animate-spin" />
+                                          ) : (
+                                            <Download className="w-3 h-3" />
+                                          )}
+                                          {tx.receiptNumber}
+                                        </button>
+                                      ) : (
+                                        <span className="text-[11px] text-theme-muted/50">—</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
 
