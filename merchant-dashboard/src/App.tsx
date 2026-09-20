@@ -16,6 +16,11 @@ export default function App() {
   const [purchasing, setPurchasing] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
+  const [activeStepHighlight, setActiveStepHighlight] = useState<number | null>(null);
+
+  const toggleStepHighlight = (stepNum: number) => {
+    setActiveStepHighlight(prev => (prev === stepNum ? null : stepNum));
+  };
 
   const [selectedLang, setSelectedLang] = useState<Language>(() => {
     const saved = localStorage.getItem('potvrdio_lang') as Language | null;
@@ -601,31 +606,103 @@ export default function App() {
 
                 {/* Potvrdio Plugin Settings Page Walkthrough */}
                 <div className="p-5 sm:p-6 space-y-6">
-                  {/* Step-by-Step 3-Column Instruction Cards */}
+                  {/* Step-by-Step 3-Column Instruction Cards (Clickable) */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">1</div>
+                    {/* Step 1 Card */}
+                    <button
+                      type="button"
+                      onClick={() => toggleStepHighlight(1)}
+                      className={`w-full text-left p-4 rounded-xl border transition-all cursor-pointer space-y-2 relative group ${
+                        activeStepHighlight === 1
+                          ? 'bg-teal-500/15 border-teal-500 ring-2 ring-teal-500/40 shadow-lg scale-[1.02]'
+                          : 'bg-surface-subtle border-theme hover:border-teal-500/50 hover:bg-surface'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className={`w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition-all ${
+                          activeStepHighlight === 1
+                            ? 'bg-teal-500 text-white ring-4 ring-teal-300 animate-pulse shadow'
+                            : 'bg-teal-500/20 text-teal-600 dark:text-teal-400 group-hover:scale-110'
+                        }`}>
+                          1
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${
+                          activeStepHighlight === 1
+                            ? 'bg-teal-500 text-white animate-pulse'
+                            : 'bg-surface border border-theme text-theme-muted group-hover:text-theme-primary'
+                        }`}>
+                          {activeStepHighlight === 1 ? t.stepActiveBadge : t.clickToLocate}
+                        </span>
+                      </div>
                       <h5 className="font-bold text-xs text-theme-primary">{t.step1Title}</h5>
                       <p className="text-[11px] text-theme-secondary leading-relaxed">
                         {t.step1Desc}
                       </p>
-                    </div>
+                    </button>
 
-                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">2</div>
+                    {/* Step 2 Card */}
+                    <button
+                      type="button"
+                      onClick={() => toggleStepHighlight(2)}
+                      className={`w-full text-left p-4 rounded-xl border transition-all cursor-pointer space-y-2 relative group ${
+                        activeStepHighlight === 2
+                          ? 'bg-emerald-500/15 border-emerald-500 ring-2 ring-emerald-500/40 shadow-lg scale-[1.02]'
+                          : 'bg-surface-subtle border-theme hover:border-emerald-500/50 hover:bg-surface'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className={`w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition-all ${
+                          activeStepHighlight === 2
+                            ? 'bg-emerald-500 text-white ring-4 ring-emerald-300 animate-pulse shadow'
+                            : 'bg-teal-500/20 text-teal-600 dark:text-teal-400 group-hover:scale-110'
+                        }`}>
+                          2
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${
+                          activeStepHighlight === 2
+                            ? 'bg-emerald-500 text-white animate-pulse'
+                            : 'bg-surface border border-theme text-theme-muted group-hover:text-theme-primary'
+                        }`}>
+                          {activeStepHighlight === 2 ? t.stepActiveBadge : t.clickToLocate}
+                        </span>
+                      </div>
                       <h5 className="font-bold text-xs text-theme-primary">{t.step2Title}</h5>
                       <p className="text-[11px] text-theme-secondary leading-relaxed">
                         {t.step2Desc}
                       </p>
-                    </div>
+                    </button>
 
-                    <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2">
-                      <div className="w-6 h-6 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs flex items-center justify-center">3</div>
+                    {/* Step 3 Card */}
+                    <button
+                      type="button"
+                      onClick={() => toggleStepHighlight(3)}
+                      className={`w-full text-left p-4 rounded-xl border transition-all cursor-pointer space-y-2 relative group ${
+                        activeStepHighlight === 3
+                          ? 'bg-blue-500/15 border-blue-500 ring-2 ring-blue-500/40 shadow-lg scale-[1.02]'
+                          : 'bg-surface-subtle border-theme hover:border-blue-500/50 hover:bg-surface'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className={`w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition-all ${
+                          activeStepHighlight === 3
+                            ? 'bg-blue-600 text-white ring-4 ring-blue-300 animate-pulse shadow'
+                            : 'bg-teal-500/20 text-teal-600 dark:text-teal-400 group-hover:scale-110'
+                        }`}>
+                          3
+                        </div>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all ${
+                          activeStepHighlight === 3
+                            ? 'bg-blue-600 text-white animate-pulse'
+                            : 'bg-surface border border-theme text-theme-muted group-hover:text-theme-primary'
+                        }`}>
+                          {activeStepHighlight === 3 ? t.stepActiveBadge : t.clickToLocate}
+                        </span>
+                      </div>
                       <h5 className="font-bold text-xs text-theme-primary">{t.step3Title}</h5>
                       <p className="text-[11px] text-theme-secondary leading-relaxed">
                         {t.step3Desc}
                       </p>
-                    </div>
+                    </button>
                   </div>
 
                   {/* Breadcrumbs Banner */}
@@ -683,12 +760,27 @@ export default function App() {
                           <div className="py-1 text-slate-400">Writing</div>
                           <div className="py-1 text-slate-400">Reading</div>
                           
-                          {/* ACTIVE HIGHLIGHTED PLUGIN SUBMENU */}
-                          <div className="py-1.5 px-2 rounded bg-teal-500 text-black font-extrabold flex items-center justify-between shadow-md animate-pulse">
+                          {/* ACTIVE HIGHLIGHTED PLUGIN SUBMENU (STEP 1 TARGET) */}
+                          <div className={`py-1.5 px-2 rounded font-extrabold flex items-center justify-between shadow-md transition-all duration-300 ${
+                            activeStepHighlight === 1
+                              ? 'bg-teal-400 text-black ring-4 ring-teal-300 ring-offset-2 ring-offset-[#1D2327] scale-105 shadow-xl shadow-teal-500/50 animate-pulse'
+                              : 'bg-teal-500 text-black animate-pulse'
+                          }`}>
                             <span className="flex items-center gap-1.5">
-                              <ShieldCheck className="w-3.5 h-3.5" /> Potvrdio Viber COD
+                              {activeStepHighlight === 1 ? (
+                                <span className="w-5 h-5 rounded-full bg-black text-teal-300 flex items-center justify-center font-black text-xs shadow-lg animate-bounce shrink-0">
+                                  1
+                                </span>
+                              ) : (
+                                <ShieldCheck className="w-3.5 h-3.5" />
+                              )}
+                              Potvrdio Viber COD
                             </span>
-                            <span className="text-[9px] bg-black text-white px-1.5 py-0.2 rounded font-bold">CLICK</span>
+                            <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
+                              activeStepHighlight === 1 ? 'bg-black text-white animate-pulse' : 'bg-black text-white'
+                            }`}>
+                              {activeStepHighlight === 1 ? '① CLICK' : 'CLICK'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -700,7 +792,19 @@ export default function App() {
                           <p className="text-[11px] text-slate-600 mt-0.5">{t.storeSubtitle}</p>
                         </div>
 
-                        <div className="space-y-4 bg-white p-5 rounded-lg border border-slate-300 shadow-sm max-w-xl">
+                        {/* STEP 2 TARGET: Form Inputs Container */}
+                        <div className={`space-y-4 bg-white p-5 rounded-lg border shadow-sm max-w-xl transition-all duration-300 relative ${
+                          activeStepHighlight === 2
+                            ? 'border-2 border-emerald-500 ring-4 ring-emerald-400 ring-offset-4 ring-offset-[#F0F0F1] shadow-2xl shadow-emerald-500/30'
+                            : 'border-slate-300'
+                        }`}>
+                          {activeStepHighlight === 2 && (
+                            <div className="absolute -top-3.5 right-4 bg-emerald-600 text-white text-[11px] font-black px-3 py-1 rounded-full shadow-xl flex items-center gap-1.5 animate-bounce z-10 border-2 border-white">
+                              <span className="w-4 h-4 rounded-full bg-white text-emerald-700 flex items-center justify-center text-[10px] font-black">2</span>
+                              <span>{t.step2Title}</span>
+                            </div>
+                          )}
+
                           <div>
                             <label className="block text-xs font-bold text-[#1D2327] mb-1">
                               {t.labelEndpoint}
@@ -710,9 +814,20 @@ export default function App() {
                                 type="text"
                                 readOnly
                                 value="https://api.potvrdio.online/api/v1"
-                                className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
+                                className={`w-full rounded px-3 py-1.5 text-xs font-mono transition-all ${
+                                  activeStepHighlight === 2
+                                    ? 'border-2 border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-300/60 text-slate-900 font-bold'
+                                    : 'bg-[#F6F7F7] border border-[#8C8F94] text-slate-700'
+                                }`}
                               />
-                              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
+                              <span className={`text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                                activeStepHighlight === 2
+                                  ? 'bg-emerald-600 text-white border border-emerald-400 shadow-lg animate-pulse font-black scale-105'
+                                  : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              }`}>
+                                {activeStepHighlight === 2 && (
+                                  <span className="w-3.5 h-3.5 rounded-full bg-white text-emerald-700 flex items-center justify-center text-[9px] font-black animate-bounce">2</span>
+                                )}
                                 {t.pasteHereBadge}
                               </span>
                             </div>
@@ -727,9 +842,20 @@ export default function App() {
                                 type="text"
                                 readOnly
                                 value="demo_api_key_123"
-                                className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
+                                className={`w-full rounded px-3 py-1.5 text-xs font-mono transition-all ${
+                                  activeStepHighlight === 2
+                                    ? 'border-2 border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-300/60 text-slate-900 font-bold'
+                                    : 'bg-[#F6F7F7] border border-[#8C8F94] text-slate-700'
+                                }`}
                               />
-                              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
+                              <span className={`text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                                activeStepHighlight === 2
+                                  ? 'bg-emerald-600 text-white border border-emerald-400 shadow-lg animate-pulse font-black scale-105'
+                                  : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              }`}>
+                                {activeStepHighlight === 2 && (
+                                  <span className="w-3.5 h-3.5 rounded-full bg-white text-emerald-700 flex items-center justify-center text-[9px] font-black animate-bounce">2</span>
+                                )}
                                 {t.pasteHereBadge}
                               </span>
                             </div>
@@ -744,19 +870,46 @@ export default function App() {
                                 type="password"
                                 readOnly
                                 value="••••••••••••••••••••••••"
-                                className="w-full bg-[#F6F7F7] border border-[#8C8F94] rounded px-3 py-1.5 text-xs text-slate-700 font-mono"
+                                className={`w-full rounded px-3 py-1.5 text-xs font-mono transition-all ${
+                                  activeStepHighlight === 2
+                                    ? 'border-2 border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-300/60 text-slate-900 font-bold'
+                                    : 'bg-[#F6F7F7] border border-[#8C8F94] text-slate-700'
+                                }`}
                               />
-                              <span className="text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-1 rounded font-bold whitespace-nowrap">
+                              <span className={`text-[10px] px-2 py-1 rounded font-bold whitespace-nowrap flex items-center gap-1 transition-all ${
+                                activeStepHighlight === 2
+                                  ? 'bg-emerald-600 text-white border border-emerald-400 shadow-lg animate-pulse font-black scale-105'
+                                  : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                              }`}>
+                                {activeStepHighlight === 2 && (
+                                  <span className="w-3.5 h-3.5 rounded-full bg-white text-emerald-700 flex items-center justify-center text-[9px] font-black animate-bounce">2</span>
+                                )}
                                 {t.pasteHereBadge}
                               </span>
                             </div>
                           </div>
 
-                          <div className="pt-2">
-                            <div className="inline-flex items-center gap-2 bg-[#2271B1] text-white px-4 py-2 rounded font-bold text-xs shadow hover:bg-[#135E96] transition cursor-pointer">
+                          {/* STEP 3 TARGET: Save Changes Button */}
+                          <div className="pt-2 flex items-center gap-3">
+                            <div className={`inline-flex items-center gap-2 bg-[#2271B1] text-white px-4 py-2 rounded font-bold text-xs shadow hover:bg-[#135E96] transition-all cursor-pointer relative ${
+                              activeStepHighlight === 3
+                                ? 'ring-4 ring-amber-400 ring-offset-2 ring-offset-white scale-110 shadow-2xl shadow-amber-500/40 animate-pulse bg-blue-700'
+                                : ''
+                            }`}>
+                              {activeStepHighlight === 3 && (
+                                <span className="w-4 h-4 rounded-full bg-amber-400 text-black flex items-center justify-center text-[10px] font-black animate-bounce shadow">
+                                  3
+                                </span>
+                              )}
                               <span>{t.saveChangesBtn}</span>
                               <span className="text-[10px] bg-white/20 px-1.5 py-0.5 rounded font-normal">{t.finalStepBadge}</span>
                             </div>
+                            {activeStepHighlight === 3 && (
+                              <div className="inline-flex items-center gap-1.5 text-xs font-black text-amber-900 bg-amber-200 border border-amber-400 px-3 py-1.5 rounded-full animate-bounce shadow-md">
+                                <span className="w-4 h-4 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px]">3</span>
+                                <span>{t.step3Title}</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

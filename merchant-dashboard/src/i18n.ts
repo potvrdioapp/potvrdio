@@ -122,6 +122,8 @@ export interface TranslationSchema {
   saveChangesBtn: string;
   finalStepBadge: string;
   pasteHereBadge: string;
+  clickToLocate: string;
+  stepActiveBadge: string;
 }
 
 export const translations: Record<Language, TranslationSchema> = {
@@ -243,7 +245,9 @@ export const translations: Record<Language, TranslationSchema> = {
     
     saveChangesBtn: 'Sačuvaj izmene (Save Changes)',
     finalStepBadge: 'Poslednji korak',
-    pasteHereBadge: '✓ Nalepiti ovde'
+    pasteHereBadge: '✓ Nalepiti ovde',
+    clickToLocate: 'Kliknite za prikaz ↓',
+    stepActiveBadge: '● Označeno dole ↓'
   },
   mk: {
     langCode: 'mk-MK',
@@ -363,7 +367,9 @@ export const translations: Record<Language, TranslationSchema> = {
     
     saveChangesBtn: 'Зачувај измени (Save Changes)',
     finalStepBadge: 'Последен чекор',
-    pasteHereBadge: '✓ Вметнете овде'
+    pasteHereBadge: '✓ Вметнете овде',
+    clickToLocate: 'Кликнете за приказ ↓',
+    stepActiveBadge: '● Означено долу ↓'
   },
   en: {
     langCode: 'en-US',
@@ -483,6 +489,8 @@ export const translations: Record<Language, TranslationSchema> = {
     
     saveChangesBtn: 'Save Changes',
     finalStepBadge: 'Final Step',
-    pasteHereBadge: '✓ Paste here'
+    pasteHereBadge: '✓ Paste here',
+    clickToLocate: 'Click to locate ↓',
+    stepActiveBadge: '● Active below ↓'
   }
 };
