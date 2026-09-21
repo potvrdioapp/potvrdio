@@ -9,6 +9,7 @@ import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
+import { FloatingContactWidget } from './components/FloatingContactWidget';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;
@@ -2535,6 +2536,9 @@ export default function App() {
         lang={lang}
         playSuccessSound={playScannerBeep}
       />
+
+      {/* Floating Quick Contact Widget (WhatsApp & Viber) */}
+      <FloatingContactWidget lang={lang} />
     </div>
   );
 }
