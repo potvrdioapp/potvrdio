@@ -16,8 +16,8 @@
 - **Automatic 30-Day Purge**: Customer phone numbers, addresses, and session tokens are automatically anonymized and purged 30 days post-delivery. Zero marketing spam or cross-store profiling.
 
 ## Pricing & Economic Impact
-- **Pay-As-You-Go (PAYG Credit Pool)**: Wholesale unit pricing per verified message without monthly aggregator retainers. Credits never expire.
-- **Pro Reserve Plan**: €29/month including 1,800 verification sessions (~€0.016 / message).
+- **Pay-As-You-Go (PAYG Credit Pool)**: Wholesale unit pricing per verified message without monthly aggregator retainers (Viber: €0.020 - €0.026; SMS Fallback: €0.17 - €0.20 due to local telecom tariffs). Credits never expire.
+- **Pro Reserve Plan**: €29/month including 1,800 verification credits (~€0.016 / Viber message). 1 Viber message = 1 credit, 1 SMS message = 11 credits due to operator tariffs.
 - **ROI**: Reduces COD parcel return rates from ~14.8% down to 2.5%, saving stores an average of 780 RSD (€6.65) per avoided return parcel with ROI > 14x.
 
 ## Technical Architecture & Links

@@ -3,7 +3,7 @@ import {
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
   X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket, Sun, Moon,
-  Package, Key, Send, Clock, Sparkles
+  Package, Key, Send, Clock, Sparkles, Info
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
@@ -223,7 +223,7 @@ export default function App() {
         th_deposit: "Iznos uplate",
         th_viber_rate: "Viber cena",
         th_sms_rate: "SMS Fallback",
-        price_note: "Obračun se vrši u dinarima po srednjem kursu NBS na dan izdavanja e-fakture. Bez automatskih skidanja sa kartice bez vašeg odobrenja.",
+        price_note: "Obračun se vrši u dinarima po srednjem kursu NBS na dan izdavanja e-fakture. Bez automatskih skidanja sa kartice bez vašeg odobrenja. SMS je zbog troškova operatera u Srbiji znatno skuplji kanal od Vibera, zato preporučujemo da kad god je moguće koristite Viber.",
         pro_tag: "Opciono: Za veće radnje (> 500 porudžbina)",
         btn_act_pro: "Izaberi Pro Opciju",
         leg_tag: "04.1 / PRAVNA USKLAĐENOST & PRIVATNOST",
@@ -271,6 +271,8 @@ export default function App() {
         price_per_month: "/ mesečno",
         price_pro_desc: "Za radnje sa preko 500 porudžbina mesečno kojima je potreban namenski prioritetni prolaz i tehnička podrška. (Standardni sistem je 0€ pretplata).",
         price_pro_feat1: "1.800 uključenih kredita / mesec",
+        price_pro_credit_ratio: "1 Viber poruka = 1 kredit. 1 SMS poruka = 11 kredita.",
+        price_pro_tooltip: "SMS poruke zbog troškova operatera troše više kredita. Vaši krediti traju znatno duže kada se koristi Viber.",
         price_pro_feat2: "Automatski oporavak napuštenih korpi",
         price_pro_feat3: "HPOS i WP-CLI tehnička podrška",
         calc_rate_ideal: "4% (Idealno)",
@@ -421,7 +423,7 @@ export default function App() {
         th_deposit: "Износ за уплата",
         th_viber_rate: "Viber цена",
         th_sms_rate: "SMS Fallback",
-        price_note: "Фактурирање во денари/евра. Без автоматско одземање од картичка.",
+        price_note: "Фактурирање во денари/евра. Без автоматско одземање од картичка. SMS пораките поради трошоците на операторите во регионот се значително поскап канал од Viber, затоа препорачуваме секогаш кога е можно да користите Viber.",
         pro_tag: "Опционо: За поголеми продавници (> 500 нарачки)",
         btn_act_pro: "Избери Pro Опција",
         leg_tag: "04.1 / ПРАВНА СООДВЕТНОСТ И ПРИВАТНОСТ",
@@ -469,6 +471,8 @@ export default function App() {
         price_per_month: "/ месечно",
         price_pro_desc: "За продавници со над 500 нарачки месечно со приоритетен деловен премин и техничка поддршка. (Стандардниот систем е 0€ претплата).",
         price_pro_feat1: "1.800 вклучени кредити / месец",
+        price_pro_credit_ratio: "1 Viber порака = 1 кредит. 1 SMS порака = 11 кредити.",
+        price_pro_tooltip: "SMS пораките поради трошоците на операторите трошат повеќе кредити. Вашите кредити траат значително подолго кога се користи Viber.",
         price_pro_feat2: "Автоматско враќање на напуштени кошнички",
         price_pro_feat3: "HPOS и WP-CLI техничка поддршка",
         calc_rate_ideal: "4% (Идеално)",
@@ -619,7 +623,7 @@ export default function App() {
         th_deposit: "Deposit Amount",
         th_viber_rate: "Viber Rate",
         th_sms_rate: "SMS Fallback",
-        price_note: "Invoiced in local RSD or EUR via official central bank rate. Zero automated credit card charges without consent.",
+        price_note: "Invoiced in local RSD or EUR via official central bank rate. Zero automated credit card charges without consent. SMS is significantly more expensive than Viber due to telecom operator costs in Serbia, so we recommend using Viber whenever possible.",
         pro_tag: "Optional for high-volume stores (> 500 orders)",
         btn_act_pro: "Select Pro Option",
         leg_tag: "04.1 / LEGAL COMPLIANCE & PRIVACY",
@@ -667,6 +671,8 @@ export default function App() {
         price_per_month: "/ month",
         price_pro_desc: "For stores with > 500 monthly orders requiring a dedicated priority pipeline and live support. (Standard usage is €0 subscription).",
         price_pro_feat1: "1,800 included credits / month",
+        price_pro_credit_ratio: "1 Viber message = 1 credit. 1 SMS message = 11 credits.",
+        price_pro_tooltip: "SMS messages consume more credits due to telecom operator fees. Your credits last significantly longer when Viber is used.",
         price_pro_feat2: "Automated abandoned cart recovery",
         price_pro_feat3: "HPOS & WP-CLI technical support",
         calc_rate_ideal: "4% (Ideal)",
@@ -1975,7 +1981,7 @@ export default function App() {
                       0.026 €
                     </td>
                     <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-theme-muted whitespace-nowrap">
-                      0.048 €
+                      0.20 €
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
@@ -2004,7 +2010,7 @@ export default function App() {
                       0.024 €
                     </td>
                     <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-theme-muted whitespace-nowrap">
-                      0.042 €
+                      0.19 €
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
@@ -2028,7 +2034,7 @@ export default function App() {
                       0.020 €
                     </td>
                     <td className="px-2 sm:px-4 py-2.5 sm:py-3.5 text-theme-muted whitespace-nowrap">
-                      0.038 €
+                      0.17 €
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
@@ -2062,9 +2068,24 @@ export default function App() {
             </p>
 
             <ul className="space-y-2.5 my-5 text-theme-secondary text-[11px]">
-              <li className="flex items-center gap-2">
-                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{t('price_pro_feat1')}</span>
+              <li className="flex items-start gap-2">
+                <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span>{t('price_pro_feat1')}</span>
+                  <div className="text-[10px] text-theme-muted mt-1 flex items-center gap-1.5 flex-wrap">
+                    <span>{t('price_pro_credit_ratio')}</span>
+                    <span 
+                      className="group relative inline-flex items-center cursor-pointer text-theme-muted hover:text-theme-primary transition-colors"
+                      title={t('price_pro_tooltip')}
+                    >
+                      <Info className="w-3.5 h-3.5 text-theme-muted" />
+                      <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 hidden group-hover:block z-30 w-56 p-2.5 bg-slate-900 text-slate-100 dark:bg-slate-800 dark:text-slate-100 text-[10px] rounded-lg shadow-lg border border-slate-700 pointer-events-none leading-relaxed text-center">
+                        {t('price_pro_tooltip')}
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900 dark:border-t-slate-800"></span>
+                      </span>
+                    </span>
+                  </div>
+                </div>
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />

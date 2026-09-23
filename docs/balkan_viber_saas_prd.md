@@ -54,7 +54,7 @@
 * **FR-2.1 (API Gateway & Authentication):** Eklentilerden gelen istekleri `API Key` / `Secret` ile doğrular.
 * **FR-2.2 (Credit Engine):** Satıcının ön ödemeli bakiye hesabını kontrol eder. Bakiye yetersizse e-posta ile bakiye yükleme uyarısı atar.
 * **FR-2.3 (Messaging Queue & Rate Limit):** Mesaj isteklerini Celery / BullMQ ile kuyruğa alır. Viber API teslimat durumunu (Sent, Delivered, Read, Failed) takip eder.
-* **FR-2.4 (SMS Fallback Automation):** Viber mesajı gönderildikten sonra **5 dakika içinde** `Delivered` veya `Read` bilgisi gelmezse, sistemi otomatik olarak ucuz SMS gateway'ine düşürür.
+* **FR-2.4 (SMS Fallback Automation):** Viber mesajı gönderildikten sonra **5 dakika içinde** `Delivered` veya `Read` bilgisi gelmezse, sistemi otomatik olarak SMS fallback gateway'ine düşürür (Sırbistan operatör maliyetleri nedeniyle SMS daha pahalı bir kanaldır; PAYG tarifesinde €0.17 - €0.20 / SMS, Pro Reserve modelinde 1 SMS = 11 kredi tüketir).
 
 ### 3.3 Viber Mesajı ve İnteraktif Butonlar
 * **FR-3.1 (Dynamic Message Template):** Mesaj içeriği dinamik değişkenler içerir:

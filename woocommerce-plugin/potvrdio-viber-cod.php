@@ -66,8 +66,10 @@ class Potvrdio_Viber_COD {
         // 5. Universal Order Creation Hook (Fires for CartFlows, FunnelKit, REST API, Elementor, One-Click Buy)
         add_action('woocommerce_new_order', array($this, 'intercept_from_universal_new_order'), 20, 2);
 
-        // 6. Thank You / Order Received Page Hook: Display clear On-Hold status banner to customer
-        add_action('woocommerce_thankyou', array($this, 'ensure_cod_order_on_hold'), 5, 1);
+        // 6. Thank You / Order Received Page Hook: Display clear On-Hold status banner at the very top of the page
+        add_action('woocommerce_before_thankyou', array($this, 'ensure_cod_order_on_hold'), 1, 1);
+        add_action('woocommerce_before_thankyou', array($this, 'display_on_hold_viber_notice'), 5, 1);
+        // Fallback for themes omitting woocommerce_before_thankyou
         add_action('woocommerce_thankyou', array($this, 'display_on_hold_viber_notice'), 10, 1);
 
         // =========================================================================
@@ -115,6 +117,12 @@ class Potvrdio_Viber_COD {
         // 24-Hour Timeout Cron & Action Scheduler Handler for Unconfirmed Orders
         add_action('potvrdio_order_timeout_check', array($this, 'handle_order_timeout'), 10, 1);
 
+        // Edge Case 11: Asynchronous Dispatch Queue via Action Scheduler
+        add_action('potvrdio_async_dispatch_intercept', array($this, 'handle_async_dispatch_intercept'), 10, 1);
+
+        // Edge Case 9: Admin Manual Order Verification Action
+        add_action('admin_post_potvrdio_manual_verify', array($this, 'handle_admin_manual_verify'));
+
         // Admin Menu Settings
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
@@ -146,6 +154,16 @@ class Potvrdio_Viber_COD {
             $is_verified = (bool)$order->get_meta('_potvrdio_verified');
 
             if (!$is_verified) {
+                // Edge Case 9: Allow manual store manager / administrator override in WP-Admin
+                if (is_admin() && current_user_can('manage_woocommerce')) {
+                    $order->update_meta_data('_potvrdio_verified', '1');
+                    $order->update_meta_data('_potvrdio_admin_override', '1');
+                    $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+                    $order->add_order_note(__('Potvrdio: Upravnik prodavnice je ručno odobrio porudžbinu (Admin Override).', 'potvrdio-viber-cod'));
+                    $order->save();
+                    return;
+                }
+
                 $this->is_reverting_status = true;
                 $order->update_status('on-hold', __('Potvrdio Gatekeeper: Redirection to On-Hold. Shipping paused pending Viber address verification.', 'potvrdio-viber-cod'));
                 $this->is_reverting_status = false;
@@ -202,13 +220,6 @@ class Potvrdio_Viber_COD {
             return;
         }
 
-        // Set on-hold status and mark intercepted
-        $order->update_meta_data('_potvrdio_intercepted', '1');
-        if ('on-hold' !== $order->get_status()) {
-            $order->update_status('on-hold', __('Potvrdio: Order paused for Viber verification.', 'potvrdio-viber-cod'));
-        }
-        $order->save();
-
         // 3. Universal Phone Extraction & Balkan E.164 Normalization
         $country = $order->get_shipping_country() ?: ($order->get_billing_country() ?: 'RS');
         $raw_phone = $this->extract_order_phone($order);
@@ -221,6 +232,45 @@ class Potvrdio_Viber_COD {
             $order->save();
             return;
         }
+
+        // Compute deterministic hash of Phone + Exact Delivery Address
+        $address_hash = $this->compute_address_phone_hash($normalized_phone, $order);
+        if (!empty($address_hash)) {
+            $order->update_meta_data('_potvrdio_address_phone_hash', $address_hash);
+        }
+
+        // TODO-5: Smart Bypass for Verified Returning Customer ONLY IF DELIVERY ADDRESS MATCHES EXACTLY
+        $auto_approve_enabled = (get_option('potvrdio_auto_approve_returning', '0') === '1');
+        if ($auto_approve_enabled && !empty($address_hash)) {
+            $prev_orders = wc_get_orders(array(
+                'limit'        => 1,
+                'status'       => array('completed', 'processing'),
+                'meta_key'     => '_potvrdio_address_phone_hash',
+                'meta_value'   => $address_hash,
+                'exclude'      => array($order->get_id()),
+            ));
+
+            if (!empty($prev_orders)) {
+                $prev_order = $prev_orders[0];
+                $prev_id    = $prev_order->get_id();
+
+                $order->update_meta_data('_potvrdio_intercepted', '1');
+                $order->update_meta_data('_potvrdio_verified', '1');
+                $order->update_meta_data('_potvrdio_smart_bypass', '1');
+                $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+                $order->update_meta_data('_potvrdio_normalized_phone', $normalized_phone);
+                $order->update_status('processing', sprintf(__('Potvrdio Smart Bypass: Kupac i tačna adresa isporuke su već verifikovani u prethodnoj porudžbini #%d. Automatski pušteno u pripremu za kurira.', 'potvrdio-viber-cod'), $prev_id));
+                $order->save();
+                return;
+            }
+        }
+
+        // Set on-hold status and mark intercepted
+        $order->update_meta_data('_potvrdio_intercepted', '1');
+        if ('on-hold' !== $order->get_status()) {
+            $order->update_status('on-hold', __('Potvrdio: Order paused for Viber verification.', 'potvrdio-viber-cod'));
+        }
+        $order->save();
 
         $customer_name = trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name());
         if (empty($customer_name)) {
@@ -276,7 +326,38 @@ class Potvrdio_Viber_COD {
             wp_schedule_single_event(time() + DAY_IN_SECONDS, 'potvrdio_order_timeout_check', array($order_id));
         }
 
-        $this->send_to_central_backend('/orders/intercept', $payload);
+        // Edge Case 11: Asynchronous Dispatch via Action Scheduler (zero latency checkout)
+        if (function_exists('as_schedule_single_action')) {
+            as_schedule_single_action(time(), 'potvrdio_async_dispatch_intercept', array('payload' => $payload), 'potvrdio');
+        } else {
+            $this->send_to_central_backend('/orders/intercept', $payload);
+        }
+    }
+
+    /**
+     * Async Action Scheduler Callback for Background Delivery
+     */
+    public function handle_async_dispatch_intercept($payload) {
+        if (!empty($payload) && is_array($payload)) {
+            $this->send_to_central_backend('/orders/intercept', $payload);
+        }
+    }
+
+    /**
+     * Compute a deterministic normalized hash of Delivery Phone + Delivery Address
+     * Only identical phone AND identical delivery address will produce the same hash.
+     */
+    public function compute_address_phone_hash($phone, $order) {
+        if (empty($phone) || !$order) {
+            return '';
+        }
+
+        $address_1   = strtolower(trim((string)($order->get_shipping_address_1() ?: $order->get_billing_address_1())));
+        $city        = strtolower(trim((string)($order->get_shipping_city() ?: $order->get_billing_city())));
+        $postcode    = preg_replace('/[^\d\w]/', '', strtolower(trim((string)($order->get_shipping_postcode() ?: $order->get_billing_postcode()))));
+        $clean_phone = preg_replace('/[^\d]/', '', (string)$phone);
+
+        return md5($clean_phone . '|' . $address_1 . '|' . $city . '|' . $postcode);
     }
 
     /**
@@ -426,6 +507,16 @@ class Potvrdio_Viber_COD {
                 'mk' => __('Вашата пратка е привремено задржана за потврда на точноста на адресата и спречување грешки при испорака.<br><strong>Испратено ви е Viber барање за верификација.</strong> Штом ја потврдите адресата преку Viber порака, нарачката автоматски се испраќа во подготовка за курир.', 'potvrdio-viber-cod'),
                 'en' => __('Your shipment is temporarily on hold to verify address accuracy and prevent return fees.<br><strong>A Viber verification request has been sent to your phone.</strong> As soon as you confirm your address on Viber, your order will be dispatched.', 'potvrdio-viber-cod'),
             ),
+            'thankyou_verified_title' => array(
+                'sr' => __('Potvrdio: Porudžbina #{order_id} je uspešno verifikovana! (Viber)', 'potvrdio-viber-cod'),
+                'mk' => __('Potvrdio: Нарачката #{order_id} е успешно верификувана! (Viber)', 'potvrdio-viber-cod'),
+                'en' => __('Potvrdio: Order #{order_id} is successfully verified! (Viber)', 'potvrdio-viber-cod'),
+            ),
+            'thankyou_verified_body' => array(
+                'sr' => __('Vaša adresa i porudžbina su potvrđeni putem Viber poruke. Porudžbina je prosleđena u magacin i priprema se za slanje kurirskom službom.', 'potvrdio-viber-cod'),
+                'mk' => __('Вашата адреса и нарачка се потврдени преку Viber порака. Нарачката е препратена во магацин и се подготвува за испраќање со курир.', 'potvrdio-viber-cod'),
+                'en' => __('Your delivery address and order have been verified via Viber. Your order has been released and is being prepared for courier dispatch.', 'potvrdio-viber-cod'),
+            ),
             'privacy_consent' => array(
                 'sr' => __('Saglasan/na sam da primim poruku putem Viber-a/SMS-a radi verifikacije adrese i statusa pošiljke (Potvrdio.online).', 'potvrdio-viber-cod'),
                 'mk' => __('Се согласувам да примам порака преку Viber/SMS за верификација на адресата и статусот на пратката (Potvrdio.online).', 'potvrdio-viber-cod'),
@@ -456,13 +547,28 @@ class Potvrdio_Viber_COD {
      * Display a prominent notice on the Thank You page
      */
     public function display_on_hold_viber_notice($order_id) {
-        if (!$order_id) return;
+        static $displayed_orders = array();
+        if (!$order_id || isset($displayed_orders[$order_id])) return;
         $order = wc_get_order($order_id);
         if (!$order || 'cod' !== $order->get_payment_method()) return;
 
-        if (!$order->get_meta('_potvrdio_verified')) {
+        $displayed_orders[$order_id] = true;
+
+        if ($order->get_meta('_potvrdio_verified')) {
+            $title = $this->get_message('thankyou_verified_title', $order, array('order_id' => $order_id));
+            $body  = $this->get_message('thankyou_verified_body', $order);
+
+            echo '<div style="background:#ECFDF5; border:2px solid #10B981; border-radius:12px; padding:18px 22px; margin:24px 0; color:#065F46; font-family:inherit;">';
+            echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
+            echo '<span style="color:#059669; font-size:20px;">✓</span> <span>' . esc_html($title) . '</span>';
+            echo '</div>';
+            echo '<p style="margin:0; font-size:14px; line-height:1.5; color:#047857;">';
+            echo wp_kses_post($body);
+            echo '</p>';
+            echo '</div>';
+        } else {
             $title = $this->get_message('thankyou_title', $order, array('order_id' => $order_id));
-            $body = $this->get_message('thankyou_body', $order);
+            $body  = $this->get_message('thankyou_body', $order);
 
             echo '<div style="background:#FFFBEB; border:2px solid #F59E0B; border-radius:12px; padding:18px 22px; margin:24px 0; color:#92400E; font-family:inherit;">';
             echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
@@ -477,9 +583,20 @@ class Potvrdio_Viber_COD {
 
     /**
      * Enforce Billing Phone as strictly required on checkout (Billing Fields)
+     * Re-injects the field if any theme or custom funnel accidentally unset/deleted it.
      */
     public function enforce_phone_required_on_checkout($fields) {
-        if (isset($fields['billing_phone'])) {
+        if (!isset($fields['billing_phone']) || !is_array($fields['billing_phone'])) {
+            $fields['billing_phone'] = array(
+                'type'        => 'tel',
+                'label'       => $this->get_message('phone_label'),
+                'placeholder' => $this->get_message('phone_placeholder'),
+                'required'    => true,
+                'class'       => array('form-row-wide'),
+                'clear'       => true,
+                'priority'    => 100,
+            );
+        } else {
             $fields['billing_phone']['required'] = true;
             $fields['billing_phone']['label'] = $this->get_message('phone_label');
         }
@@ -488,9 +605,20 @@ class Potvrdio_Viber_COD {
 
     /**
      * Enforce Phone across all checkout fields (ThemeHigh Checkout Field Editor, CartFlows, Flexible Checkout)
+     * Re-injects the field if deleted.
      */
     public function enforce_all_checkout_fields_phone_required($fields) {
-        if (isset($fields['billing']['billing_phone'])) {
+        if (!isset($fields['billing']['billing_phone']) || !is_array($fields['billing']['billing_phone'])) {
+            $fields['billing']['billing_phone'] = array(
+                'type'        => 'tel',
+                'label'       => $this->get_message('phone_label'),
+                'placeholder' => $this->get_message('phone_placeholder'),
+                'required'    => true,
+                'class'       => array('form-row-wide'),
+                'clear'       => true,
+                'priority'    => 100,
+            );
+        } else {
             $fields['billing']['billing_phone']['required'] = true;
             $fields['billing']['billing_phone']['label'] = $this->get_message('phone_label');
         }
@@ -817,6 +945,15 @@ class Potvrdio_Viber_COD {
                 if (!empty($params['order_note'])) $order->add_order_note(__('Potvrdio Customer Note: ', 'potvrdio-viber-cod') . sanitize_text_field($params['order_note']));
             }
 
+            // Save phone + address hash for future smart bypass
+            $raw_phone = $this->extract_order_phone($order);
+            $country = $order->get_shipping_country() ?: ($order->get_billing_country() ?: 'RS');
+            $normalized_phone = $this->normalize_balkan_phone($raw_phone, $country);
+            $addr_hash = $this->compute_address_phone_hash($normalized_phone, $order);
+            if (!empty($addr_hash)) {
+                $order->update_meta_data('_potvrdio_address_phone_hash', $addr_hash);
+            }
+
             // 3. RELEASE TO PROCESSING: Gatekeeper will allow this because _potvrdio_verified = 1
             $order->update_status('processing', __('Potvrdio: Address verified by customer via Viber/potvrdio.online. Order released for courier label generation.', 'potvrdio-viber-cod'));
             $order->save();
@@ -912,6 +1049,11 @@ class Potvrdio_Viber_COD {
             echo '<div style="background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:10px; margin-bottom:10px; color:#065F46;">';
             echo '<strong>✓ ADRES DOĞRULANDI</strong><br>';
             echo '<small>Onay Zamanı: ' . esc_html($verified_at) . '</small><br>';
+            if ($order->get_meta('_potvrdio_smart_bypass')) {
+                echo '<small style="color:#047857; font-weight:600;">(Smart Bypass: Eşleşen Adres)</small><br>';
+            } elseif ($order->get_meta('_potvrdio_admin_override')) {
+                echo '<small style="color:#047857; font-weight:600;">(Yönetici Manuel Onayı)</small><br>';
+            }
             echo '<small>Kargo etiketi basılabilir.</small>';
             echo '</div>';
         } else {
@@ -920,10 +1062,47 @@ class Potvrdio_Viber_COD {
             echo '<small>Sipariş On-Hold durumunda bekletiliyor.</small><br>';
             echo '<small>Kargo etiketi basılmamalıdır.</small>';
             echo '</div>';
+
+            // Edge Case 9: Manual Verify Button for Store Manager
+            $verify_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_manual_verify&order_id=' . $order->get_id()), 'potvrdio_manual_verify_action');
+            echo '<p style="margin-top:10px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center;">✓ Ručno odobri (Bypass)</a></p>';
         }
 
         echo '<p style="margin:6px 0;"><strong>Normal Telefon:</strong> ' . esc_html($phone) . '</p>';
         echo '</div>';
+    }
+
+    /**
+     * Admin Manual Verify Action Handler
+     */
+    public function handle_admin_manual_verify() {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(esc_html__('Nemate ovlašćenje za ovu radnju.', 'potvrdio-viber-cod'));
+        }
+
+        check_admin_referer('potvrdio_manual_verify_action');
+
+        $order_id = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
+        $order = wc_get_order($order_id);
+        if ($order) {
+            $order->update_meta_data('_potvrdio_verified', '1');
+            $order->update_meta_data('_potvrdio_admin_override', '1');
+            $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+
+            $raw_phone = $this->extract_order_phone($order);
+            $country = $order->get_shipping_country() ?: ($order->get_billing_country() ?: 'RS');
+            $normalized_phone = $this->normalize_balkan_phone($raw_phone, $country);
+            $addr_hash = $this->compute_address_phone_hash($normalized_phone, $order);
+            if (!empty($addr_hash)) {
+                $order->update_meta_data('_potvrdio_address_phone_hash', $addr_hash);
+            }
+
+            $order->update_status('processing', __('Potvrdio: Porudžbina je ručno odobrena od strane administratora putem Potvrdio panela.', 'potvrdio-viber-cod'));
+            $order->save();
+        }
+
+        wp_safe_redirect(wp_get_referer() ?: admin_url('edit.php?post_type=shop_order'));
+        exit;
     }
 
     /**
@@ -943,6 +1122,7 @@ class Potvrdio_Viber_COD {
         register_setting('potvrdio_settings_group', 'potvrdio_api_endpoint');
         register_setting('potvrdio_settings_group', 'potvrdio_api_key');
         register_setting('potvrdio_settings_group', 'potvrdio_api_secret');
+        register_setting('potvrdio_settings_group', 'potvrdio_auto_approve_returning');
     }
 
     public function render_admin_settings_page() {
@@ -967,6 +1147,16 @@ class Potvrdio_Viber_COD {
                     <tr valign="top">
                         <th scope="row">API Secret</th>
                         <td><input type="password" name="potvrdio_api_secret" value="<?php echo esc_attr(get_option('potvrdio_api_secret', 'demo_secret_456')); ?>" class="regular-text" /></td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">Akıllı Otomatik Onay (Smart Bypass)</th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="potvrdio_auto_approve_returning" value="1" <?php checked(1, get_option('potvrdio_auto_approve_returning', '0')); ?> />
+                                Daha önce doğrulanmış müşterileri <strong>aynı teslimat adresine</strong> sipariş verdiklerinde tekrar bekletmeden otomatik onayla
+                            </label>
+                            <p class="description">Güvenlik Kuralı: Telefon aynı olsa bile teslimat adresi farklıysa sistem güvenlik gereği tekrar Viber doğrulaması ister.</p>
+                        </td>
                     </tr>
                 </table>
                 <?php submit_button(); ?>

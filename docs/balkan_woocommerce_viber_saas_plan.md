@@ -57,14 +57,17 @@ Satıcının ana referans noktası mesajın `€0.018` veya `€0.024` olması d
 
 | Paket | Yükleme Tutarı | Toptan Alış (Ort.) | Yeni Satış Fiyatı | Brüt Kar Marjı | SMS Fallback |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Starter** | **€15** | €0.009 | **€0.026** / mesaj | **%65** (€0.017 kâr) | €0.048 / mesaj |
-| **Growth** | **€45** | €0.009 | **€0.024** / mesaj | **%63** (€0.015 kâr) | €0.042 / mesaj |
-| **Pro** | **€120** | €0.009 | **€0.020** / mesaj | **%55** (€0.011 kâr) | €0.038 / mesaj |
+| **Starter** | **€15** | €0.009 | **€0.026** / mesaj | **%65** (€0.017 kâr) | **€0.20** / mesaj |
+| **Growth** | **€45** | €0.009 | **€0.024** / mesaj | **%63** (€0.015 kâr) | **€0.19** / mesaj |
+| **Pro (Scale)** | **€120** | €0.009 | **€0.020** / mesaj | **%55** (€0.011 kâr) | **€0.17** / mesaj |
+
+> **SMS Operatör Maliyeti Dipnotu:** SMS, Sırbistan'da telekom operatör maliyetleri nedeniyle Viber'e kıyasla belirgin şekilde daha pahalı bir kanaldır (€0.17 - €0.20 / SMS). Bu nedenle platform öncelikli olarak Viber kanalını tercih eder, SMS yalnızca müşterinin Viber kullanmaması veya belirlenen süre içinde yanıt vermemesi durumunda fallback olarak devreye girer.
 
 ### B. Opsiyonel "Pro Reserve" Abonelik Planı (Öngörülebilir MRR)
 
 Daha yüksek hacimli ve kararlı mağazalar için opsiyonel bir sabit bakiye aboneliği sunulur:
 * **Pro Reserve Planı:** **€29/ay = 1.800 Mesaj Kredisi** (Birim mesaj maliyeti ~€0.016/mesaj — Pay-as-you-go'dan daha ucuz, mesaj başı net kâr: **€0.007**).
+* **Kredi Tüketim Oranı:** **1 Viber mesajı = 1 kredi. 1 SMS mesajı = 11 kredi.** (SMS operatör maliyetleri nedeniyle 1 SMS mesajı 11 kat kredi harcar; krediler Viber üzerinde tüketildiğinde tam 1.800 mesajlık maksimum hacim sağlanır).
 * **Stratejik Avantajı:** Küçük mağazalar $0 giriş kancasıyla sisteme girerken, olgunlaşan mağazalar aylık sabit garanti MRR kaynağına dönüşür. 100 mağazanın 15-20'si bu plana geçtiğinde **€435 - €580/ay garanti sabit gelir** sağlanır.
 
 ### C. Finansal Maliyet Yapısı ve Tutarlı Başabaş (Breakeven) Analizi
