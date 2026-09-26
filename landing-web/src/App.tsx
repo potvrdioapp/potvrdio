@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
-  RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle, FileText,
-  X, Lock, ExternalLink, Menu, Scale, HelpCircle, ChevronDown, Rocket, Sun, Moon,
+  RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle,
+  X, Lock, Menu, HelpCircle, ChevronDown, Rocket, Sun, Moon,
   Package, Key, Send, Clock, Sparkles, Info
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
+import { RefundPolicyModal } from './components/RefundPolicyModal';
+import { DeliveryPolicyModal } from './components/DeliveryPolicyModal';
+import { CookiePolicyModal } from './components/CookiePolicyModal';
 import { OnboardingModal } from './components/OnboardingModal';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { FloatingContactWidget } from './components/FloatingContactWidget';
+import { Footer } from './components/Footer';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;
@@ -95,8 +99,27 @@ export default function App() {
   const [showAddressModal, setShowAddressModal] = useState<boolean>(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState<boolean>(false);
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
+  const [showRefundModal, setShowRefundModal] = useState<boolean>(false);
+  const [showDeliveryModal, setShowDeliveryModal] = useState<boolean>(false);
+  const [showCookieModal, setShowCookieModal] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  // Deep-link / pathname checking for bank audits (e.g. /uslovi-koriscenja, /reklamacije-i-povracaj)
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.includes('uslovi-koriscenja')) {
+      setShowTermsModal(true);
+    } else if (path.includes('politika-privatnosti')) {
+      setShowPrivacyModal(true);
+    } else if (path.includes('reklamacije-i-povracaj')) {
+      setShowRefundModal(true);
+    } else if (path.includes('isporuka-usluga')) {
+      setShowDeliveryModal(true);
+    } else if (path.includes('politika-kolacica')) {
+      setShowCookieModal(true);
+    }
+  }, []);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [floorInput, setFloorInput] = useState<string>('3');
   const [aptInput, setAptInput] = useState<string>('14');
@@ -285,20 +308,9 @@ export default function App() {
         leg_item2_desc: "Brojevi telefona i jednokratni verifikacioni tokeni se automatski anonimizuju i trajno brišu sa procesnih servera 30 dana nakon uručenja. Nema profilisanja niti deljenja trećim licima.",
         leg_item3_title: "3. Enkripcija & Jednokratni Passwordless Tokeni",
         leg_item3_desc: "Korekcija adrese se vrši preko jedinstvenog HMAC-SHA256 tokena preko TLS 1.3 enkripcije. Potvrdio nema pristup privatnim Viber porukama kupca niti platnim karticama.",
-        leg_proof_title: "Zvanični Pravni Registri i Zakonski Dokazi",
-        leg_ref_pis: "Pravno-informacioni sistem RS",
-        leg_ref_pis_sub: "Sl. glasnik RS 87/2018 (Član 12 - Zakonitost obrade)",
-        leg_ref_poverenik: "Poverenik za informacije RS",
-        leg_ref_poverenik_sub: "Organ nadzora za zaštitu podataka (poverenik.rs)",
-        leg_ref_gdpr: "EU GDPR EUR-Lex Portal",
-        leg_ref_gdpr_sub: "Uredba (EU) 2016/679 - Član 6.1.b (Contract Law)",
-        leg_ref_azlp: "AZLP Severna Makedonija",
-        leg_ref_azlp_sub: "Agencija za zaštitu ličnih podataka (azlp.mk)",
         modal_legal_notice: "🔒 Kriptografski HMAC Token · Usklađeno sa Čl. 12 ZZPL RS & GDPR Art. 6",
         footer_privacy: "Politika Privatnosti",
         footer_terms: "Uslovi Korišćenja",
-        leg_action_privacy: "Politika Privatnosti (ZZPL & GDPR)",
-        leg_action_terms: "Uslovi Korišćenja SaaS Platforme",
         dev_code_comment: "// 1. Presretanje porudžbine u functions.php ili pluginu",
         dev_status_note: "Potvrdio: Čeka Viber potvrdu kupca",
         dev_hpos_note: "100% kompatibilno sa WooCommerce 7.0 do 9.x sa uključenim HPOS-om.",
@@ -485,20 +497,9 @@ export default function App() {
         leg_item2_desc: "Телефонските броеви и токени автоматски се анонимизираат и трајно се бришат од серверите 30 дена по доставата. Без профилирање или споделување со трети лица.",
         leg_item3_title: "3. Енкрипција & Еднократни Passwordless Токени",
         leg_item3_desc: "Корекцијата на адреса се врши преку единствен HMAC-SHA256 токен со TLS 1.3 енкрипција. Potvrdio нема пристап до приватни Viber пораки ниту картички.",
-        leg_proof_title: "Официјални Правни Регистри и Законски Докази",
-        leg_ref_pis: "Правно-информационен систем на Србија",
-        leg_ref_pis_sub: "Сл. гласник RS 87/2018 (Член 12 - Законитост)",
-        leg_ref_poverenik: "Повереник за информации на Србија",
-        leg_ref_poverenik_sub: "Надзорен орган за заштита на податоци (poverenik.rs)",
-        leg_ref_gdpr: "ЕУ GDPR EUR-Lex Портал",
-        leg_ref_gdpr_sub: "Уредба (ЕУ) 2016/679 - Член 6.1.б (Договор)",
-        leg_ref_azlp: "АЗЛП Северна Македонија",
-        leg_ref_azlp_sub: "Агенција за заштита на личните податоци (azlp.mk)",
         modal_legal_notice: "🔒 Криптографски HMAC Токен · Усогласено со Чл. 10 ZZLP MK & GDPR Art. 6",
         footer_privacy: "Политика за Приватност",
         footer_terms: "Услови за Користење",
-        leg_action_privacy: "Политика за Приватност (ZZLP & GDPR)",
-        leg_action_terms: "Услови за Користење на Платформата",
         dev_code_comment: "// 1. Интерцепција во functions.php или приклучок",
         dev_status_note: "Potvrdio: Се чека Viber потврда",
         dev_hpos_note: "100% компатибилно со WooCommerce 7.0 до 9.x со вклучен HPOS.",
@@ -685,20 +686,9 @@ export default function App() {
         leg_item2_desc: "Phone numbers and single-use verification tokens are automatically anonymized and permanently purged from gateway servers 30 days post-delivery. Zero cross-store profiling or data sharing.",
         leg_item3_title: "3. Cryptographic Token & TLS 1.3 Security",
         leg_item3_desc: "Address edits use single-use HMAC-SHA256 tokens over TLS 1.3. Potvrdio has zero access to private Viber chat messages or financial payment cards.",
-        leg_proof_title: "Official Legal Registries & Evidence Links",
-        leg_ref_pis: "Serbian Legal Information System",
-        leg_ref_pis_sub: "Official Gazette RS 87/2018 (Art. 12 Lawfulness)",
-        leg_ref_poverenik: "RS Data Protection Commissioner",
-        leg_ref_poverenik_sub: "Data Inspectorate Authority (poverenik.rs)",
-        leg_ref_gdpr: "EU GDPR EUR-Lex Official Portal",
-        leg_ref_gdpr_sub: "Regulation (EU) 2016/679 - Art. 6.1.b (Contract Law)",
-        leg_ref_azlp: "AZLP North Macedonia",
-        leg_ref_azlp_sub: "Personal Data Protection Agency (azlp.mk)",
         modal_legal_notice: "🔒 Cryptographic HMAC Token · Compliant with Art. 12 ZZPL & EU GDPR Art. 6",
         footer_privacy: "Privacy Policy",
         footer_terms: "Terms & Conditions",
-        leg_action_privacy: "Privacy Policy (ZZPL & GDPR)",
-        leg_action_terms: "SaaS Platform Terms & Conditions",
         dev_code_comment: "// 1. Intercept order inside functions.php or custom plugin",
         dev_status_note: "Potvrdio: Awaiting buyer Viber confirmation",
         dev_hpos_note: "100% compatible with WooCommerce 7.0 through 9.x with HPOS enabled.",
@@ -2149,10 +2139,25 @@ export default function App() {
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-surface-subtle border border-theme text-[11px] font-sans text-theme-muted flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>{t('leg_bottom_note')}</span>
-            </div>
+            <a 
+              href="#footer"
+              onClick={(e) => {
+                e.preventDefault();
+                playClickSound();
+                document.getElementById('footer')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="p-3 rounded-lg bg-surface-subtle border border-theme hover:border-emerald-500/50 hover:bg-surface transition group text-[11px] font-sans text-theme-muted hover:text-theme-primary flex items-center justify-between gap-2 cursor-pointer shadow-sm"
+              title={lang === 'sr' ? 'Pogledajte pravna dokumenta i registre u podnožju' : lang === 'mk' ? 'Прегледајте ги правните документи во подножјето' : 'View legal documents & registries in footer'}
+            >
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 group-hover:scale-110 transition-transform" />
+                <span>{t('leg_bottom_note')}</span>
+              </div>
+              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                <span>{lang === 'sr' ? 'Pravna dokumenta' : lang === 'mk' ? 'Правни документи' : 'Legal Documents'}</span>
+                <span className="text-xs group-hover:translate-y-0.5 transition-transform">↓</span>
+              </span>
+            </a>
           </div>
 
           <div className="lg:col-span-6 space-y-4">
@@ -2201,169 +2206,6 @@ export default function App() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{t('dev_hpos_note')}</span>
             </div>
-          </div>
-        </div>
-
-        {/* Official Legal Evidence & Regulatory Links Grid */}
-        <div className="mt-10 pt-8 border-t border-theme">
-          <div className="flex items-center gap-2 mb-4">
-            <Scale className="w-4 h-4 text-teal-600 dark:text-[#14B8A6]" />
-            <h3 className="text-xs sm:text-sm font-bold text-theme-primary uppercase font-sans tracking-wider">
-              {t('leg_proof_title')}
-            </h3>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Link 1: Pravno-informacioni sistem RS */}
-            <a 
-              href="https://www.pravno-informacioni-sistem.rs/SlGlasnikPortal/eli/rep/sgrs/skupstina/zakon/2018/87/1/reg" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
-            >
-              <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
-                  <span className="line-clamp-1">{t('leg_ref_pis')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
-                </div>
-                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_pis_sub')}</p>
-              </div>
-              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-3 h-3 shrink-0" />
-                <span>Sl. Glasnik RS 87/2018</span>
-              </div>
-            </a>
-
-            {/* Link 2: Poverenik RS */}
-            <a 
-              href={lang === 'en' ? 'https://www.poverenik.rs/en/' : 'https://www.poverenik.rs/sr-lat/'} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
-            >
-              <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
-                  <span className="line-clamp-1">{t('leg_ref_poverenik')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
-                </div>
-                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_poverenik_sub')}</p>
-              </div>
-              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
-                <ShieldCheck className="w-3 h-3 shrink-0" />
-                <span>poverenik.rs</span>
-              </div>
-            </a>
-
-            {/* Link 3: EUR-Lex EU GDPR */}
-            <a 
-              href={lang === 'sr' ? 'https://eur-lex.europa.eu/legal-content/HR/TXT/?uri=CELEX:32016R0679' : 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679'} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
-            >
-              <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
-                  <span className="line-clamp-1">{t('leg_ref_gdpr')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
-                </div>
-                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_gdpr_sub')}</p>
-              </div>
-              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-3 h-3 shrink-0" />
-                <span>CELEX 32016R0679</span>
-              </div>
-            </a>
-
-            {/* Link 4: AZLP MK */}
-            <a 
-              href={lang === 'en' ? 'https://azlp.mk/en' : 'https://azlp.mk'} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm"
-            >
-              <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
-                  <span className="line-clamp-1">{t('leg_ref_azlp')}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
-                </div>
-                <p className="text-[10px] text-theme-muted mt-1 font-sans">{t('leg_ref_azlp_sub')}</p>
-              </div>
-              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
-                <ShieldCheck className="w-3 h-3 shrink-0" />
-                <span>azlp.mk</span>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        {/* Full Legal Documents Action Row - Matching Grid Card Layout */}
-        <div className="mt-6 pt-5 border-t border-theme/60">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-teal-600 dark:text-[#14B8A6]" />
-              <h4 className="text-xs sm:text-sm font-bold text-theme-primary uppercase font-sans tracking-wider">
-                {lang === 'sr' ? 'Interni Pravni Akti i Uslovi Platforme' : lang === 'mk' ? 'Интерни Правни Акти и Услови на Платформата' : 'Platform Legal Agreements & Compliance Documents'}
-              </h4>
-            </div>
-            <span className="text-[10px] text-theme-muted font-sans hidden sm:inline">
-              {lang === 'sr' ? 'Kliknite karticu za pregled' : lang === 'mk' ? 'Кликнете картичка за преглед' : 'Click card to view document'}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-sans">
-            {/* Document Card 1: Privacy Policy */}
-            <button 
-              onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm text-left w-full"
-            >
-              <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
-                  <div className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    <span>{t('leg_action_privacy')}</span>
-                  </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
-                </div>
-                <p className="text-[10px] text-theme-muted mt-1 font-sans">
-                  {lang === 'sr' 
-                    ? 'Pravilnik o obradi podataka kupaca, bezbednosti, kriptografskim tokenima i pravima lica' 
-                    : lang === 'mk' 
-                      ? 'Правилник за обработка на податоци за купувачите, безбедност и права на корисниците' 
-                      : 'Comprehensive policy on customer data processing, encryption tokens & privacy rights'}
-                </p>
-              </div>
-              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-3 h-3 shrink-0" />
-                <span>{lang === 'sr' ? 'Prikaži zvanični dokument (ZZPL & GDPR)' : lang === 'mk' ? 'Прегледај официјален документ' : 'Open complete document (ZZPL & GDPR)'} →</span>
-              </div>
-            </button>
-
-            {/* Document Card 2: Terms & Conditions */}
-            <button 
-              onClick={() => { playClickSound(); setShowTermsModal(true); }} 
-              className="p-3.5 rounded-xl glass-panel border border-theme hover:border-teal-500/60 transition group flex flex-col justify-between cursor-pointer min-h-[105px] shadow-sm text-left w-full"
-            >
-              <div>
-                <div className="flex items-center justify-between text-theme-primary font-bold text-xs group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] transition">
-                  <div className="flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-                    <span>{t('leg_action_terms')}</span>
-                  </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-theme-muted group-hover:text-teal-600 dark:group-hover:text-[#14B8A6] shrink-0 ml-1" />
-                </div>
-                <p className="text-[10px] text-theme-muted mt-1 font-sans">
-                  {lang === 'sr' 
-                    ? 'Pravni okvir licenciranja softvera, ugovor o nivou usluge (SLA) i obaveze trgovaca' 
-                    : lang === 'mk' 
-                      ? 'Правна рамка за лиценцирање, договор за ниво на услуга (SLA) и обврски на трговците' 
-                      : 'Master SaaS software agreement, SLA availability guarantees & merchant terms'}
-                </p>
-              </div>
-              <div className="mt-3 text-[10px] text-emerald-700 dark:text-emerald-400 font-sans flex items-center gap-1 font-semibold">
-                <CheckCircle2 className="w-3 h-3 shrink-0" />
-                <span>{lang === 'sr' ? 'Prikaži zvanične uslove korišćenja' : lang === 'mk' ? 'Прегледај официјални услови' : 'Open SaaS terms & conditions'} →</span>
-              </div>
-            </button>
           </div>
         </div>
       </section>
@@ -2504,49 +2346,60 @@ export default function App() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-theme bg-surface py-8 text-xs text-theme-muted font-sans mt-auto">
-        <div className="max-w-7xl mx-auto px-4 sm:px-5 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-center md:text-left">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <PotvrdioLogo variant="horizontal" mode={theme} />
-            <span className="text-theme-muted/40 hidden sm:inline">•</span>
-            <span>{t('footer_sub')}</span>
-          </div>
+      {/* Comprehensive Bank-Compliant Footer */}
+      <Footer 
+        theme={theme}
+        lang={lang}
+        onOpenPrivacy={() => { playClickSound(); setShowPrivacyModal(true); }}
+        onOpenTerms={() => { playClickSound(); setShowTermsModal(true); }}
+        onOpenRefund={() => { playClickSound(); setShowRefundModal(true); }}
+        onOpenDelivery={() => { playClickSound(); setShowDeliveryModal(true); }}
+        onOpenCookie={() => { playClickSound(); setShowCookieModal(true); }}
+      />
 
-          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-theme-muted">
-            <button 
-              onClick={() => { playClickSound(); setShowPrivacyModal(true); }} 
-              className="hover:text-teal-600 dark:hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>{t('footer_privacy')}</span>
-            </button>
-            <span className="text-theme-muted/40 hidden sm:inline">•</span>
-            <button 
-              onClick={() => { playClickSound(); setShowTermsModal(true); }} 
-              className="hover:text-teal-600 dark:hover:text-[#14B8A6] transition cursor-pointer flex items-center gap-1.5"
-            >
-              <FileText className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
-              <span>{t('footer_terms')}</span>
-            </button>
-            <span className="text-theme-muted/40 hidden sm:inline">•</span>
-            <span>{t('footer_location')}</span>
-            <span className="text-theme-muted/40 hidden sm:inline">•</span>
-            <a href="mailto:info@potvrdio.online" className="hover:text-theme-primary transition">info@potvrdio.online</a>
-          </div>
-        </div>
-      </footer>
-
-      {/* Legal Modals */}
+      {/* Legal Modals (AllSecure & Raiffeisen Bank Compliance) */}
       <PrivacyPolicyModal 
         isOpen={showPrivacyModal} 
-        onClose={() => setShowPrivacyModal(false)} 
+        onClose={() => {
+          setShowPrivacyModal(false);
+          if (window.history && window.history.replaceState) window.history.replaceState(null, '', '/');
+        }} 
         lang={lang} 
       />
 
       <TermsConditionsModal 
         isOpen={showTermsModal} 
-        onClose={() => setShowTermsModal(false)} 
+        onClose={() => {
+          setShowTermsModal(false);
+          if (window.history && window.history.replaceState) window.history.replaceState(null, '', '/');
+        }} 
+        lang={lang} 
+      />
+
+      <RefundPolicyModal 
+        isOpen={showRefundModal} 
+        onClose={() => {
+          setShowRefundModal(false);
+          if (window.history && window.history.replaceState) window.history.replaceState(null, '', '/');
+        }} 
+        lang={lang} 
+      />
+
+      <DeliveryPolicyModal 
+        isOpen={showDeliveryModal} 
+        onClose={() => {
+          setShowDeliveryModal(false);
+          if (window.history && window.history.replaceState) window.history.replaceState(null, '', '/');
+        }} 
+        lang={lang} 
+      />
+
+      <CookiePolicyModal 
+        isOpen={showCookieModal} 
+        onClose={() => {
+          setShowCookieModal(false);
+          if (window.history && window.history.replaceState) window.history.replaceState(null, '', '/');
+        }} 
         lang={lang} 
       />
 
