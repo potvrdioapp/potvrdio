@@ -258,7 +258,7 @@ app.post('/api/v1/address-token/:token/submit', async (req: Request, res: Respon
 
   // Dispatch signed webhook to WooCommerce to update shipping address & transition to Processing
   await webhookService.dispatchToWooCommerce(session.storeDomain, session.apiSecret || 'demo_secret_456', {
-    order_id: Number(session.orderId),
+    order_id: parseInt(String(session.orderId).replace(/\D/g, ''), 10) || 101,
     action: 'UPDATED_ADDRESS',
     updated_address: {
       address_1,
@@ -299,7 +299,7 @@ app.post('/api/v1/address-token/:token/cancel', async (req: Request, res: Respon
   console.log(`[CUSTOMER CANCELLED VIA WEB] Order #${session.orderId} cancelled by customer via web link.`);
 
   await webhookService.dispatchToWooCommerce(session.storeDomain, session.apiSecret || 'demo_secret_456', {
-    order_id: Number(session.orderId),
+    order_id: parseInt(String(session.orderId).replace(/\D/g, ''), 10) || 101,
     action: 'CANCELLED',
     timestamp: Math.floor(Date.now() / 1000),
   });

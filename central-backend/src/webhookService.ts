@@ -31,7 +31,10 @@ export class WebhookService {
     apiSecret: string,
     payload: WebhookPayload
   ): Promise<{ success: boolean; responseStatus?: number; data?: any }> {
-    const cleanUrl = storeDomain.replace(/\/+$/, '');
+    const rawUrl = storeDomain.startsWith('http://') || storeDomain.startsWith('https://')
+      ? storeDomain
+      : `https://${storeDomain}`;
+    const cleanUrl = rawUrl.replace(/\/+$/, '');
     const targetUrl = `${cleanUrl}/wp-json/potvrdio/v1/webhook`;
     const bodyString = JSON.stringify(payload);
 
