@@ -167,7 +167,7 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
       totalAmount: total_amount || 0,
       currency: currency || 'RSD',
       address: billing_address?.address_1 || '',
-      city: billing_address?.city || 'Beograd',
+      city: billing_address?.city || '',
     }).catch((err) => {
       console.warn('[EMAIL NOTIFICATION NON-BLOCKING WARNING]', err?.message || err);
     });

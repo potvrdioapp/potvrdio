@@ -81,9 +81,9 @@ export class EmailService {
       <div class="badge">Sigurna Verifikacija Pošiljke</div>
     </div>
     <div class="content">
-      <div class="greeting">Zdravo ${params.customerName},</div>
+      <div class="greeting">Poštovani ${params.customerName},</div>
       <div class="lead">
-        Vaša porudžbina <strong>#${params.orderId}</strong> je uspešno primljena. Kako bi vam kurir uručio pošiljku bez odlaganja, molimo proverite ili po potrebi izmenite vašu adresu dostave pre slanja paketa.
+        Vaša porudžbina <strong>#${params.orderId}</strong> je uspešno primljena. Kako bi Vam kurir uručio pošiljku bez odlaganja, molimo Vas da proverite ili po potrebi izmenite Vašu adresu dostave pre slanja paketa.
       </div>
 
       <div class="card">
@@ -150,9 +150,9 @@ export class EmailService {
           name: params.customerName || 'Kupac',
         },
       ],
-      subject: `Potvrdio: Potvrdite ili izmenite adresu za porudžbinu #${params.orderId}`,
+      subject: `Potvrdio: Molimo potvrdite adresu za porudžbinu #${params.orderId}`,
       htmlContent: this.generateHtmlTemplate(params),
-      textContent: `Potvrdio: Zdravo ${params.customerName}, potvrdite ili izmenite adresu za porudžbinu #${params.orderId}: ${params.editUrl}`,
+      textContent: `Potvrdio: Poštovani ${params.customerName}, molimo Vas da potvrdite ili izmenite adresu za porudžbinu #${params.orderId}: ${params.editUrl}`,
     };
 
     console.log(`[BREVO EMAIL] Dispatching verification email for Order #${params.orderId} to ${params.customerEmail}...`);
