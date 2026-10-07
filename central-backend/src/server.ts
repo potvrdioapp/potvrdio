@@ -20,6 +20,20 @@ const webhookService = WebhookService.getInstance();
 // In-memory registry for intercepted store associations
 const orderStoreRegistry = new Map<string, { storeDomain: string; apiSecret: string }>();
 
+// Pre-seed persistent test token for mobile-address-app live testing
+tokenService.setToken('test_token_123', {
+  orderId: 'TEST-101',
+  storeDomain: 'prodavnica.rs',
+  customerName: 'Atıl Bilge',
+  customerPhone: '+381616036556',
+  address1: 'Knez Mihailova 42',
+  address2: 'Stan 12, 3. sprat',
+  city: 'Beograd',
+  postcode: '11000',
+  totalAmount: 4850,
+  currency: 'RSD',
+});
+
 // Healthcheck
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'OK', service: 'Potvrdio Central Backend API', timestamp: new Date() });

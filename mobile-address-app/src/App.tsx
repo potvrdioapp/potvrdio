@@ -30,7 +30,11 @@ interface OrderData {
 
 type Locale = 'sr' | 'mk' | 'en' | 'tr';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4001/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
+  typeof window !== 'undefined' && !window.location.hostname.includes('localhost')
+    ? 'https://api.potvrdio.online/api/v1'
+    : 'http://localhost:4001/api/v1'
+);
 
 const translations = {
   sr: {

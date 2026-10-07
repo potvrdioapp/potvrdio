@@ -43,6 +43,18 @@ export class TokenService {
     return token;
   }
 
+  public setToken(customToken: string, sessionData: Omit<TokenSession, 'token' | 'expiresAt' | 'used'>): string {
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days for testing/demo tokens
+    const session: TokenSession = {
+      ...sessionData,
+      token: customToken,
+      expiresAt,
+      used: false,
+    };
+    this.tokens.set(customToken, session);
+    return customToken;
+  }
+
   public validateToken(token: string): TokenSession | null {
     const session = this.tokens.get(token);
     if (!session) return null;
