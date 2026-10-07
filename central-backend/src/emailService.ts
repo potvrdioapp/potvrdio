@@ -297,4 +297,146 @@ Vaš ${storeDisplay} tim`;
       return { success: false, error: message };
     }
   }
+
+  /**
+   * Dispatches a simulation email containing the exact text of both Viber and SMS messages
+   * for admin/merchant review during testing.
+   */
+  public async sendSimulationEmail(params: {
+    orderId: string;
+    storeName?: string;
+    storeDomain?: string;
+    customerName: string;
+    customerPhone: string;
+    recipientEmail: string;
+    totalAmount?: number;
+    currency?: string;
+    address?: string;
+    city?: string;
+    editUrl: string;
+  }): Promise<SendEmailResult> {
+    if (!this.apiKey) {
+      return { success: false, error: 'BREVO_API_KEY_NOT_CONFIGURED' };
+    }
+
+    const storeDisplay = this.getStoreDisplayName(params.storeName, params.storeDomain);
+    const formattedAmount = params.totalAmount ? `${params.totalAmount} ${params.currency || 'RSD'}` : 'Plaćanje pouzećem';
+    const addressDisplay = params.address ? `${params.address}${params.city ? ', ' + params.city : ''}` : 'Knez Mihailova 42, Beograd';
+
+    const viberText = `Poštovani ${params.customerName},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}.\n\nKako bi Vam kurir paket uručio bez zastoja i na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 Adresa: ${addressDisplay}\n💵 Iznos pouzećem: ${formattedAmount}\n\nKlikom ispod potvrdite ili po potrebi izmenite adresu:`;
+    const smsText = `${storeDisplay}: Poštovani, molimo proverite adresu isporuke za Vaš paket: ${params.editUrl}`;
+
+    const subject = `[SIMULACIJA PORUKA] Viber & SMS predlog za slanje – ${storeDisplay}`;
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulacija Viber i SMS poruka</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; margin: 0; padding: 24px 12px; color: #1e293b; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08); }
+    .header { background: #1e293b; color: #ffffff; padding: 24px; text-align: center; }
+    .header h2 { margin: 0; font-size: 20px; font-weight: 800; }
+    .header p { margin: 6px 0 0 0; font-size: 13px; color: #94a3b8; }
+    .content { padding: 28px; }
+    .section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 10px; border-radius: 6px; margin-bottom: 12px; }
+    .badge-viber { background: #7360F2; color: #ffffff; }
+    .badge-sms { background: #0284c7; color: #ffffff; }
+    .bubble { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.6; color: #0f172a; white-space: pre-wrap; word-break: break-word; }
+    .btn-mock { display: inline-block; background: #7360F2; color: #ffffff !important; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; }
+    .meta { font-size: 12px; color: #64748b; margin-top: 8px; }
+    .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 12px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>Simulacija Obaveštenja: Viber &amp; SMS</h2>
+      <p>Testni prikaz poruka koje bi kupac primio za porudžbinu #${params.orderId} (${storeDisplay})</p>
+    </div>
+    <div class="content">
+
+      <!-- VIBER SECTION -->
+      <div class="section">
+        <span class="badge badge-viber">📱 1. VIBER BUSINESS PORUKA</span>
+        <div class="meta" style="margin-bottom: 8px;"><strong>Pošiljalac (Sender ID):</strong> ${storeDisplay}</div>
+        <div class="bubble">${viberText}</div>
+        <div style="margin-top: 12px;">
+          <a href="${params.editUrl}" target="_blank" class="btn-mock">Proverite adresu &rarr;</a>
+        </div>
+        <div class="meta" style="margin-top: 10px;">
+          <strong>Ciljani broj:</strong> ${params.customerPhone}<br>
+          <strong>Dugme vodi na:</strong> ${params.editUrl}
+        </div>
+      </div>
+
+      <!-- SMS SECTION -->
+      <div class="section">
+        <span class="badge badge-sms">💬 2. SMS PORUKA (GSM 7-bit standard)</span>
+        <div class="meta" style="margin-bottom: 8px;"><strong>Pošiljalac (Sender):</strong> ${storeDisplay}</div>
+        <div class="bubble">${smsText}</div>
+        <div class="meta" style="margin-top: 10px;">
+          <strong>Ciljani broj:</strong> ${params.customerPhone}<br>
+          <strong>Dužina poruke:</strong> ${smsText.length} karaktera (1 standardni SMS segment)
+        </div>
+      </div>
+
+      <div style="background: #fef3c7; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; font-size: 12px; color: #92400e; line-height: 1.5;">
+        ℹ️ <strong>Napomena:</strong> BulkGate SMS krediti su trenutno pauzirani na vaš zahtev. Bu simülasyon e-postası, gerçek SMS/Viber gönderildiğinde müşterinin telefonunda belirecek birebir metinleri kontrol edebilmeniz için gönderilmiştir.
+      </div>
+    </div>
+    <div class="footer">
+      Sistem Potvrdio &bull; Testna verifikacija poruka za prodavnicu ${storeDisplay}
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const payload = {
+      sender: {
+        name: `${storeDisplay} (Test Poruke)`,
+        email: this.senderEmail,
+      },
+      to: [
+        {
+          email: params.recipientEmail,
+          name: 'Atıl Bilge (Admin Test)',
+        },
+      ],
+      subject,
+      htmlContent,
+      textContent: `SIMULACIJA VIBER & SMS PORUKA ZA PRODAVNICU ${storeDisplay}\n\n1. VIBER:\n${viberText}\nDugme: ${params.editUrl}\n\n2. SMS (${smsText.length} karaktera):\n${smsText}`,
+    };
+
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          'api-key': this.apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok || data.message || data.code) {
+        const errorMsg = String(data.message || data.code || `HTTP ${response.status}`);
+        console.warn(`[SIMULATION EMAIL WARNING] Failed: ${errorMsg}`);
+        return { success: false, error: errorMsg };
+      }
+
+      const messageId = String(data.messageId || `sim_${Date.now()}`);
+      console.log(`[SIMULATION EMAIL SUCCESS] Sent to ${params.recipientEmail}, MessageId: ${messageId}`);
+      return { success: true, messageId };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[SIMULATION EMAIL NETWORK ERROR] Non-blocking: ${message}`);
+      return { success: false, error: message };
+    }
+  }
 }
+

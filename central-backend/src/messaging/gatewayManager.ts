@@ -85,6 +85,8 @@ export class GatewayManager {
       console.log(`[STATE_3 MODE] Viber Business (#Vn4snFkTw99g4i5m) in operator verification. Dispatching direct SMS link to ${params.customerPhone}...`);
       const smsResult: SendMessageResult = await this.provider.sendSmsFallback({
         orderId: params.orderId,
+        storeDomain: params.storeDomain,
+        storeName: params.storeName,
         customerPhone: params.customerPhone,
         customerName: params.customerName,
         editUrl: params.editUrl,

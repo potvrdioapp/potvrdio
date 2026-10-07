@@ -19,6 +19,32 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
     return cleaned.startsWith('+') ? cleaned.slice(1) : cleaned;
   }
 
+  private getStoreDisplayName(storeName?: string, storeDomain?: string): string {
+    if (storeName && storeName.trim()) {
+      const trimmed = storeName.trim();
+      if (trimmed !== 'WordPress' && trimmed !== 'WooCommerce') {
+        return trimmed;
+      }
+    }
+    if (storeDomain) {
+      try {
+        const clean = storeDomain
+          .replace(/^https?:\/\//i, '')
+          .replace(/\/.*$/, '')
+          .replace(/^www\./i, '');
+        if (clean && !clean.includes('localhost') && !clean.includes('127.0.0.1')) {
+          return clean.charAt(0).toUpperCase() + clean.slice(1);
+        }
+      } catch {
+        // fallback
+      }
+    }
+    if (storeName && storeName.trim()) {
+      return storeName.trim();
+    }
+    return 'Internet Prodavnica';
+  }
+
   public async sendViberVerification(params: ViberVerificationParams): Promise<SendMessageResult> {
     if (!this.appId || !this.appToken) {
       return {
@@ -30,15 +56,17 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
       };
     }
 
+    const storeDisplay = this.getStoreDisplayName(params.storeName, params.storeDomain);
     const number = this.cleanPhoneNumber(params.customerPhone);
-    const text = `Zdravo ${params.customerName}!\nVaša porudžbina #${params.orderId} (${params.totalAmount} ${params.currency}) je primljena.\nAdresa: ${params.address}, ${params.city}.\n\nPotvrdite ili izmenite podatke:`;
+    const amountStr = params.totalAmount ? `${params.totalAmount} ${params.currency}` : '';
+    const text = `Poštovani ${params.customerName},\n\nHvala Vam na porudžbini u prodavnici ${storeDisplay}.\nKako bi Vam kurir paket uručio na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 ${params.address}, ${params.city}${amountStr ? `\n💵 Iznos (pouzećem): ${amountStr}` : ''}\n\nKlikom ispod potvrdite ili po potrebi izmenite adresu:`;
 
     const payload = {
       application_id: this.appId,
       application_token: this.appToken,
       number,
       text,
-      button_text: 'Izmeni adresu',
+      button_text: 'Proverite adresu',
       button_url: params.editUrl,
     };
 
@@ -98,8 +126,9 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
       };
     }
 
+    const storeDisplay = this.getStoreDisplayName(params.storeName, params.storeDomain);
     const number = this.cleanPhoneNumber(params.customerPhone);
-    const text = `Potvrdio: Zdravo ${params.customerName}, potvrdite ili izmenite adresu za porudžbinu #${params.orderId}: ${params.editUrl}`;
+    const text = `${storeDisplay}: Poštovani, molimo proverite adresu isporuke za Vaš paket: ${params.editUrl}`;
 
     const isNumericProfile = /^\d+$/.test(this.senderId);
     const payload: Record<string, unknown> = {

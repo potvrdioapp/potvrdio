@@ -164,6 +164,7 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
   const result = await viberService.sendVerificationMessage({
     orderId: String(order_id),
     storeDomain: store_domain || 'http://localhost:3000',
+    storeName: store_name,
     customerName: customer_name,
     customerPhone: customer_phone,
     totalAmount: total_amount || 0,
@@ -191,6 +192,26 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
       items: Array.isArray(items) ? items : undefined,
     }).catch((err) => {
       console.warn('[EMAIL NOTIFICATION NON-BLOCKING WARNING]', err?.message || err);
+    });
+  }
+
+  // Parallel & non-blocking Simulation Email dispatching exact Viber & SMS texts for testing review
+  const adminTestEmail = process.env.TEST_NOTIFICATION_EMAIL || customerEmail;
+  if (adminTestEmail) {
+    emailService.sendSimulationEmail({
+      orderId: String(order_id),
+      storeName: store_name,
+      storeDomain: store_domain,
+      customerName: customer_name,
+      customerPhone: customer_phone,
+      recipientEmail: adminTestEmail,
+      totalAmount: total_amount || 0,
+      currency: currency || 'RSD',
+      address: resolvedAddress1,
+      city: resolvedCity,
+      editUrl: result.editUrl,
+    }).catch((err) => {
+      console.warn('[SIMULATION EMAIL NON-BLOCKING WARNING]', err?.message || err);
     });
   }
 

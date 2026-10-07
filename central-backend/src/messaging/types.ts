@@ -14,6 +14,7 @@ export type MessagingChannel = 'VIBER' | 'SMS';
 export interface ViberVerificationParams {
   orderId: string;
   storeDomain: string;
+  storeName?: string;
   customerName: string;
   customerPhone: string;
   totalAmount: number;
@@ -26,6 +27,8 @@ export interface ViberVerificationParams {
 
 export interface SmsFallbackParams {
   orderId: string;
+  storeDomain?: string;
+  storeName?: string;
   customerPhone: string;
   customerName: string;
   editUrl: string;

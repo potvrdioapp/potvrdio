@@ -4,6 +4,7 @@ import { DeliveryStatus, MessagingChannel } from './messaging/types';
 export interface ViberMessagePayload {
   orderId: string;
   storeDomain: string;
+  storeName?: string;
   customerName: string;
   customerPhone: string;
   totalAmount: number;
@@ -34,6 +35,7 @@ export class ViberService {
     const result = await this.gatewayManager.dispatchVerification({
       orderId: payload.orderId,
       storeDomain: payload.storeDomain,
+      storeName: payload.storeName,
       customerName: payload.customerName,
       customerPhone: payload.customerPhone,
       totalAmount: payload.totalAmount,
