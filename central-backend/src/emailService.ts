@@ -323,7 +323,7 @@ Vaš ${storeDisplay} tim`;
     const formattedAmount = params.totalAmount ? `${params.totalAmount} ${params.currency || 'RSD'}` : 'Plaćanje pouzećem';
     const addressDisplay = params.address ? `${params.address}${params.city ? ', ' + params.city : ''}` : 'Knez Mihailova 42, Beograd';
 
-    const viberText = `Poštovani ${params.customerName},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}.\n\nKako bi Vam kurir paket uručio bez zastoja i na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 Adresa: ${addressDisplay}\n💵 Iznos pouzećem: ${formattedAmount}\n\nKlikom ispod potvrdite ili po potrebi izmenite adresu:`;
+    const viberText = `Poštovani ${params.customerName},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}.\n\nKako bi Vam kurir paket uručio bez zastoja i na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 Adresa: ${addressDisplay}\n💵 Iznos pouzećem: ${formattedAmount}\n\nPotvrdite ili izmenite adresu isporuke jednim klikom:\n👉 ${params.editUrl}`;
     const smsText = `${storeDisplay}: Poštovani, molimo proverite adresu isporuke za Vaš paket: ${params.editUrl}`;
 
     const subject = `[SIMULACIJA PORUKA] Viber & SMS predlog za slanje – ${storeDisplay}`;
@@ -346,7 +346,6 @@ Vaš ${storeDisplay} tim`;
     .badge-viber { background: #7360F2; color: #ffffff; }
     .badge-sms { background: #0284c7; color: #ffffff; }
     .bubble { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; font-family: monospace; font-size: 13px; line-height: 1.6; color: #0f172a; white-space: pre-wrap; word-break: break-word; }
-    .btn-mock { display: inline-block; background: #7360F2; color: #ffffff !important; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; margin-top: 12px; }
     .meta { font-size: 12px; color: #64748b; margin-top: 8px; }
     .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 12px; color: #64748b; }
   </style>
@@ -361,15 +360,12 @@ Vaš ${storeDisplay} tim`;
 
       <!-- VIBER SECTION -->
       <div class="section">
-        <span class="badge badge-viber">📱 1. VIBER BUSINESS PORUKA</span>
+        <span class="badge badge-viber">📱 1. VIBER BUSINESS PORUKA (Direktan link u tekstu)</span>
         <div class="meta" style="margin-bottom: 8px;"><strong>Pošiljalac (Sender ID):</strong> ${storeDisplay}</div>
         <div class="bubble">${viberText}</div>
-        <div style="margin-top: 12px;">
-          <a href="${params.editUrl}" target="_blank" class="btn-mock">Proverite adresu &rarr;</a>
-        </div>
         <div class="meta" style="margin-top: 10px;">
           <strong>Ciljani broj:</strong> ${params.customerPhone}<br>
-          <strong>Dugme vodi na:</strong> ${params.editUrl}
+          <strong>Način funkcionisanja:</strong> 1-Way transakciona poruka sa direktnim linkom (bez zavisnosti od dugmeta/sesije)
         </div>
       </div>
 

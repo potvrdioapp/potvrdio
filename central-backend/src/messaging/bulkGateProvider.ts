@@ -59,15 +59,13 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
     const storeDisplay = this.getStoreDisplayName(params.storeName, params.storeDomain);
     const number = this.cleanPhoneNumber(params.customerPhone);
     const amountStr = params.totalAmount ? `${params.totalAmount} ${params.currency}` : '';
-    const text = `Poštovani ${params.customerName},\n\nHvala Vam na porudžbini u prodavnici ${storeDisplay}.\nKako bi Vam kurir paket uručio na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 ${params.address}, ${params.city}${amountStr ? `\n💵 Iznos (pouzećem): ${amountStr}` : ''}\n\nKlikom ispod potvrdite ili po potrebi izmenite adresu:`;
+    const text = `Poštovani ${params.customerName},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}.\n\nKako bi Vam kurir paket uručio bez zastoja i na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 Adresa: ${params.address}, ${params.city}${amountStr ? `\n💵 Iznos pouzećem: ${amountStr}` : ''}\n\nPotvrdite ili izmenite adresu isporuke jednim klikom:\n👉 ${params.editUrl}`;
 
-    const payload = {
+    const payload: Record<string, unknown> = {
       application_id: this.appId,
       application_token: this.appToken,
       number,
       text,
-      button_text: 'Proverite adresu',
-      button_url: params.editUrl,
     };
 
     try {
