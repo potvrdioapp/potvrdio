@@ -14,12 +14,14 @@ export const PotvrdioLogo: React.FC<PotvrdioLogoProps> = ({
   showSuffix = true,
 }) => {
   const isDark = mode === 'dark';
+  const rawBase = import.meta.env.BASE_URL || './';
+  const prefix = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
   if (variant === 'icon') {
     return (
       <div className={`relative inline-flex items-center justify-center shrink-0 ${className}`}>
         <img 
-          src={isDark ? "/logo-icon-dark.png" : "/logo-icon-light.png"} 
+          src={`${prefix}${isDark ? "logo-icon-dark.png" : "logo-icon-light.png"}`} 
           alt="Potvrdio Logo Icon" 
           className="w-full h-full object-contain select-none"
           loading="eager"
@@ -32,7 +34,7 @@ export const PotvrdioLogo: React.FC<PotvrdioLogoProps> = ({
     return (
       <div className={`inline-flex flex-col items-center select-none ${className}`}>
         <img 
-          src={isDark ? "/logo-stacked-dark.png" : "/logo-stacked-light.png"} 
+          src={`${prefix}${isDark ? "logo-stacked-dark.png" : "logo-stacked-light.png"}`} 
           alt="Potvrdio Logo" 
           className="w-full h-auto object-contain"
           loading="eager"
@@ -46,7 +48,7 @@ export const PotvrdioLogo: React.FC<PotvrdioLogoProps> = ({
     <div className={`inline-flex items-center gap-2 select-none ${className}`}>
       <div className="w-8 h-8 shrink-0 flex items-center justify-center">
         <img 
-          src={isDark ? "/logo-icon-dark.png" : "/logo-icon-light.png"} 
+          src={`${prefix}${isDark ? "logo-icon-dark.png" : "logo-icon-light.png"}`} 
           alt="Potvrdio" 
           className="w-full h-full object-contain"
           loading="eager"
