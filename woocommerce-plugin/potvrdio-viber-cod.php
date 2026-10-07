@@ -291,12 +291,14 @@ class Potvrdio_Viber_COD {
             'store_domain'    => get_site_url(),
             'customer_name'   => $customer_name,
             'customer_phone'  => $normalized_phone,
+            'customer_email'  => $order->get_billing_email(),
             'billing_address' => array(
                 'address_1' => $order->get_billing_address_1() ?: 'Knez Mihailova 42',
                 'address_2' => $order->get_billing_address_2() ?: '',
                 'city'      => $order->get_billing_city() ?: 'Beograd',
                 'postcode'  => $order->get_billing_postcode() ?: '11000',
                 'country'   => $country,
+                'email'     => $order->get_billing_email(),
             ),
             'shipping_address' => array(
                 'address_1' => $order->get_shipping_address_1() ?: ($order->get_billing_address_1() ?: 'Knez Mihailova 42'),

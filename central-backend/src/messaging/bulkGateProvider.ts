@@ -111,6 +111,24 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
       ...(isNumericProfile ? { sender_id_value: this.senderId } : {}),
     };
 
+    // =========================================================================
+    // BULKGATE KREDİLERİ YENİLENENE KADAR CANLI SMS ÇAĞRISI YORUM SATIRINA ALINDI
+    // =========================================================================
+    console.log(`[BULKGATE SMS SIMULATION] (Live SMS paused due to credits) Simulated dispatch to ${number}: "${text}"`);
+    return {
+      success: true,
+      providerMessageId: `sim_sms_${Date.now()}`,
+      channel: 'SMS',
+      status: 'SMS_FALLBACK',
+      rawResponse: {
+        status: 'simulated_success',
+        note: 'Live SMS call commented out per user request until credits are refilled',
+        number,
+        text,
+      },
+    };
+
+    /* CANLI BULKGATE API ÇAĞRISI (KREDİ YÜKLENİNCE YORUMDAN ÇIKARILACAK):
     try {
       const response = await fetch(`${this.baseUrl}/simple/transactional`, {
         method: 'POST',
@@ -154,5 +172,6 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
         error: `Network error connecting to BulkGate SMS: ${message}`,
       };
     }
+    */
   }
 }

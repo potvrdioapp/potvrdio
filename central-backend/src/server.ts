@@ -5,6 +5,7 @@ import { ViberService } from './viberService';
 import { TokenService } from './tokenService';
 import { BillingService } from './billingService';
 import { WebhookService } from './webhookService';
+import { EmailService } from './emailService';
 
 const app = express();
 const PORT = process.env.PORT || 4001;
@@ -16,6 +17,7 @@ const viberService = ViberService.getInstance();
 const tokenService = TokenService.getInstance();
 const billingService = BillingService.getInstance();
 const webhookService = WebhookService.getInstance();
+const emailService = EmailService.getInstance();
 
 // In-memory registry for intercepted store associations
 const orderStoreRegistry = new Map<string, { storeDomain: string; apiSecret: string }>();
@@ -154,9 +156,26 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     token,
   });
 
+  // Parallel & non-blocking Email notification via Brevo
+  const customerEmail = req.body.customer_email || billing_address?.email || req.body.email || process.env.TEST_NOTIFICATION_EMAIL;
+  if (customerEmail) {
+    emailService.sendOrderVerificationEmail({
+      orderId: String(order_id),
+      customerName: customer_name,
+      customerEmail,
+      editUrl: result.editUrl,
+      totalAmount: total_amount || 0,
+      currency: currency || 'RSD',
+      address: billing_address?.address_1 || '',
+      city: billing_address?.city || 'Beograd',
+    }).catch((err) => {
+      console.warn('[EMAIL NOTIFICATION NON-BLOCKING WARNING]', err?.message || err);
+    });
+  }
+
   res.json({
     success: true,
-    message: 'Order intercepted and Viber message queued',
+    message: 'Order intercepted and verification dispatched',
     viberMessageId: result.messageId,
     editUrl: result.editUrl,
   });
