@@ -29,7 +29,7 @@ export class EmailService {
 
   private constructor() {
     this.apiKey = process.env.BREVO_API_KEY || '';
-    this.senderEmail = process.env.BREVO_SENDER_EMAIL || 'atilbilge@gmail.com';
+    this.senderEmail = process.env.BREVO_SENDER_EMAIL || 'info@potvrdio.online';
     this.senderName = process.env.BREVO_SENDER_NAME || 'Potvrdio';
   }
 
