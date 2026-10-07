@@ -101,12 +101,14 @@ export class BulkGateMessagingProvider implements IMessagingProvider {
     const number = this.cleanPhoneNumber(params.customerPhone);
     const text = `Potvrdio: Zdravo ${params.customerName}, potvrdite ili izmenite adresu za porudžbinu #${params.orderId}: ${params.editUrl}`;
 
-    const payload = {
+    const isNumericProfile = /^\d+$/.test(this.senderId);
+    const payload: Record<string, unknown> = {
       application_id: this.appId,
       application_token: this.appToken,
       number,
       text,
-      sender_id: this.senderId,
+      sender_id: isNumericProfile ? 'gProfile' : this.senderId,
+      ...(isNumericProfile ? { sender_id_value: this.senderId } : {}),
     };
 
     try {

@@ -1,9 +1,11 @@
+export type PlanType = 'STARTER' | 'GROWTH' | 'PRO_SCALE' | 'PRO_RESERVE' | 'PAYG';
+
 export interface MerchantAccount {
   apiKey: string;
   storeName: string;
   creditBalance: number; // In Euros (€)
   messageCreditsRemaining: number;
-  planType: 'PAYG' | 'PRO_RESERVE';
+  planType: PlanType;
 }
 
 export interface DeductCreditResult {
@@ -11,6 +13,7 @@ export interface DeductCreditResult {
   inGraceBuffer: boolean;
   creditsRemaining: number;
   exhausted: boolean;
+  creditsDeducted: number;
 }
 
 export class BillingService {
@@ -27,14 +30,14 @@ export class BillingService {
         storeName: 'Balkan Style Shop (Srbija)',
         creditBalance: 45.00,
         messageCreditsRemaining: 1875,
-        planType: 'PAYG',
+        planType: 'GROWTH',
       });
       BillingService.instance.merchants.set('pk_test_balkan_demo_123', {
         apiKey: 'pk_test_balkan_demo_123',
         storeName: 'Mock WooCommerce Demo Store',
         creditBalance: 50.00,
         messageCreditsRemaining: 2000,
-        planType: 'PAYG',
+        planType: 'GROWTH',
       });
     }
     return BillingService.instance;
@@ -44,46 +47,79 @@ export class BillingService {
     return this.merchants.get(apiKey);
   }
 
-  public deductCredit(apiKey: string, cost: number = 0.024): boolean {
-    return this.deductCreditWithGrace(apiKey, cost).allowed;
-  }
-
-  public deductCreditWithGrace(apiKey: string, cost: number = 0.024): DeductCreditResult {
-    const merchant = this.merchants.get(apiKey);
-    if (!merchant) {
-      return { allowed: false, inGraceBuffer: false, creditsRemaining: 0, exhausted: true };
+  /**
+   * Calculates required credit deduction based on channel and merchant package
+   * Viber: 1 credit
+   * SMS (State 3 direct SMS or State 4 fallback):
+   *   - Starter: 8 credits
+   *   - Growth: 8 credits
+   *   - Pro Scale: 9 credits
+   *   - Pro Reserve: 11 credits
+   */
+  public getRequiredCredits(planType: PlanType, channel: 'VIBER' | 'SMS'): number {
+    if (channel === 'VIBER') {
+      return 1;
     }
 
+    switch (planType) {
+      case 'STARTER':
+        return 8;
+      case 'GROWTH':
+      case 'PAYG':
+        return 8;
+      case 'PRO_SCALE':
+        return 9;
+      case 'PRO_RESERVE':
+        return 11;
+      default:
+        return 8;
+    }
+  }
+
+  public deductCredit(apiKey: string, channel: 'VIBER' | 'SMS' = 'VIBER'): boolean {
+    return this.deductCreditWithGrace(apiKey, channel).allowed;
+  }
+
+  public deductCreditWithGrace(apiKey: string, channel: 'VIBER' | 'SMS' = 'VIBER'): DeductCreditResult {
+    const merchant = this.merchants.get(apiKey);
+    if (!merchant) {
+      return { allowed: false, inGraceBuffer: false, creditsRemaining: 0, exhausted: true, creditsDeducted: 0 };
+    }
+
+    const creditsToDeduct = this.getRequiredCredits(merchant.planType, channel);
+
     // Check if within normal credits
-    if (merchant.messageCreditsRemaining > 0) {
-      merchant.messageCreditsRemaining -= 1;
-      merchant.creditBalance = Math.max(0, merchant.creditBalance - cost);
+    if (merchant.messageCreditsRemaining >= creditsToDeduct) {
+      merchant.messageCreditsRemaining -= creditsToDeduct;
       return {
         allowed: true,
         inGraceBuffer: false,
         creditsRemaining: merchant.messageCreditsRemaining,
         exhausted: false,
+        creditsDeducted: creditsToDeduct,
       };
     }
 
-    // Check if within emergency grace buffer (-1 to -20)
+    // Check if within emergency grace buffer
     if (merchant.messageCreditsRemaining > -BillingService.GRACE_BUFFER) {
-      merchant.messageCreditsRemaining -= 1;
-      console.warn(`[GRACE BUFFER ACTIVE] Merchant ${apiKey} is using emergency credits! Remaining grace: ${BillingService.GRACE_BUFFER + merchant.messageCreditsRemaining}`);
+      merchant.messageCreditsRemaining -= creditsToDeduct;
+      console.warn(`[GRACE BUFFER ACTIVE] Merchant ${apiKey} is using emergency credits! Remaining: ${merchant.messageCreditsRemaining}`);
       return {
         allowed: true,
         inGraceBuffer: true,
         creditsRemaining: merchant.messageCreditsRemaining,
         exhausted: false,
+        creditsDeducted: creditsToDeduct,
       };
     }
 
-    // Completely exhausted (exceeded 20 emergency grace credits)
+    // Completely exhausted
     return {
       allowed: false,
       inGraceBuffer: false,
       creditsRemaining: merchant.messageCreditsRemaining,
       exhausted: true,
+      creditsDeducted: 0,
     };
   }
 

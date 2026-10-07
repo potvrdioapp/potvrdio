@@ -73,10 +73,47 @@ export class GatewayManager {
   }
 
   /**
-   * Dispatches initial Viber verification message and schedules automated 5-minute SMS fallback
+   * Dispatches verification message.
+   * In STATE_3 (Viber pending operator approval), routes directly to SMS link via BulkGate.
+   * In STATE_4 (Viber active), sends Viber and schedules automated 5-minute SMS fallback.
    */
-  public async dispatchVerification(params: ViberVerificationParams): Promise<{ messageId: string; editUrl: string }> {
-    const internalId = `vbr_${crypto.randomBytes(8).toString('hex')}`;
+  public async dispatchVerification(params: ViberVerificationParams): Promise<{ messageId: string; editUrl: string; channel: MessagingChannel }> {
+    const isState3 = (process.env.SYSTEM_STATE || 'STATE_3') === 'STATE_3' || process.env.VIBER_STATUS !== 'ACTIVE';
+    const internalId = `msg_${crypto.randomBytes(8).toString('hex')}`;
+
+    if (isState3) {
+      console.log(`[STATE_3 MODE] Viber Business (#Vn4snFkTw99g4i5m) in operator verification. Dispatching direct SMS link to ${params.customerPhone}...`);
+      const smsResult: SendMessageResult = await this.provider.sendSmsFallback({
+        orderId: params.orderId,
+        customerPhone: params.customerPhone,
+        customerName: params.customerName,
+        editUrl: params.editUrl,
+      });
+
+      const record: GatewayMessageRecord = {
+        id: internalId,
+        providerMessageId: smsResult.providerMessageId || internalId,
+        orderId: params.orderId,
+        phone: params.customerPhone,
+        channel: 'SMS',
+        status: smsResult.success ? 'SENT' : 'FAILED',
+        providerName: this.provider.name,
+        editUrl: params.editUrl,
+        sentAt: new Date(),
+        error: smsResult.error,
+      };
+
+      this.messageRecords.set(internalId, record);
+      this.messageRecords.set(params.orderId, record);
+
+      return {
+        messageId: internalId,
+        editUrl: params.editUrl,
+        channel: 'SMS',
+      };
+    }
+
+    // STATE_4: Viber is active, send Viber verification & schedule SMS fallback
     const result: SendMessageResult = await this.provider.sendViberVerification(params);
 
     const record: GatewayMessageRecord = {
@@ -106,6 +143,7 @@ export class GatewayManager {
     return {
       messageId: internalId,
       editUrl: params.editUrl,
+      channel: 'VIBER',
     };
   }
 

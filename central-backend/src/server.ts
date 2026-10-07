@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { ViberService } from './viberService';
@@ -25,6 +26,41 @@ app.get('/health', (req: Request, res: Response) => {
 });
 
 /**
+ * 0. Central Store & System Dynamic Status Engine (State Machine)
+ * Endpoint: GET /api/v1/store/status
+ */
+app.get('/api/v1/store/status', (req: Request, res: Response) => {
+  const apiKey = (req.headers['x-potvrdio-api-key'] as string) || (req.query.api_key as string) || 'demo_api_key_123';
+  const merchant = billingService.getMerchant(apiKey);
+
+  const systemState = process.env.SYSTEM_STATE || 'STATE_3';
+  const viberStatus = process.env.VIBER_STATUS || 'PENDING_OPERATOR_APPROVAL';
+  const viberAppId = process.env.VIBER_APPLICATION_ID || '#Vn4snFkTw99g4i5m';
+  const activeChannel = (systemState === 'STATE_3' || viberStatus !== 'ACTIVE') ? 'SMS_LINK' : 'VIBER_INTERACTIVE';
+
+  const planType = merchant?.planType || 'GROWTH';
+  const smsMultiplier = billingService.getRequiredCredits(planType, 'SMS');
+
+  res.json({
+    system_state: systemState,
+    viber_status: viberStatus,
+    viber_application_id: viberAppId,
+    active_channel: activeChannel,
+    messaging_provider: viberService.getGatewayManager().getProviderName(),
+    banner: {
+      sr: 'Viber Business nalog je u toku verifikacije operatera (#Vn4snFkTw99g4i5m). Vaše COD porudžbine su zaštićene putem SMS mobilnog linka.',
+      en: 'Viber Business account is undergoing operator verification (#Vn4snFkTw99g4i5m). COD orders are active via SMS mobile link.',
+    },
+    credit_rules: {
+      viber_cost: 1,
+      sms_cost: smsMultiplier,
+      merchant_plan: planType,
+      credits_remaining: merchant?.messageCreditsRemaining ?? 0,
+    },
+  });
+});
+
+/**
  * 1. WooCommerce Intercepted Order Receiver
  * Endpoint: POST /api/v1/orders/intercept
  */
@@ -43,8 +79,11 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     apiSecret,
   });
 
-  // Deduct 1 credit from merchant balance pool with emergency grace buffer
-  const creditStatus = billingService.deductCreditWithGrace(apiKey);
+  const isState3 = (process.env.SYSTEM_STATE || 'STATE_3') === 'STATE_3' || process.env.VIBER_STATUS !== 'ACTIVE';
+  const targetChannel: 'VIBER' | 'SMS' = isState3 ? 'SMS' : 'VIBER';
+
+  // Deduct credits from merchant balance pool based on channel and package
+  const creditStatus = billingService.deductCreditWithGrace(apiKey, targetChannel);
   if (creditStatus.exhausted) {
     console.warn(`[CREDIT ALERT] Merchant ${apiKey} has completely exhausted credits & grace buffer!`);
     await webhookService.dispatchToWooCommerce(store_domain || 'http://localhost:3000', apiSecret, {
