@@ -64,10 +64,16 @@ export class TokenService {
     return session;
   }
 
-  public consumeToken(token: string): TokenSession | null {
+  public consumeToken(token: string, updatedData?: Partial<TokenSession>): TokenSession | null {
     const session = this.validateToken(token);
     if (session) {
-      session.used = true;
+      if (updatedData) {
+        Object.assign(session, updatedData);
+      }
+      // Keep persistent test tokens reusable during QA/development
+      if (!token.startsWith('test_token_')) {
+        session.used = true;
+      }
       this.tokens.set(token, session);
     }
     return session;

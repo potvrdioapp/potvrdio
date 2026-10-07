@@ -34,6 +34,20 @@ tokenService.setToken('test_token_123', {
   currency: 'RSD',
 });
 
+// Pre-seed persistent token specifically for Address Change testing (missing house number / apt)
+tokenService.setToken('test_token_change', {
+  orderId: 'TEST-202',
+  storeDomain: 'prodavnica.rs',
+  customerName: 'Milica Jovanović',
+  customerPhone: '+381616036556',
+  address1: 'Bulevar Kralja Aleksandra bb', // 'bb' = without number, needs correction!
+  address2: '',
+  city: 'Beograd',
+  postcode: '11000',
+  totalAmount: 6490,
+  currency: 'RSD',
+});
+
 // Healthcheck
 app.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'OK', service: 'Potvrdio Central Backend API', timestamp: new Date() });
@@ -228,7 +242,12 @@ app.post('/api/v1/address-token/:token/submit', async (req: Request, res: Respon
   const { token } = req.params;
   const { address_1, address_2, city, postcode, order_note } = req.body;
 
-  const session = tokenService.consumeToken(token);
+  const session = tokenService.consumeToken(token, {
+    address1: address_1,
+    address2: address_2,
+    city,
+    postcode,
+  });
   if (!session) {
     return res.status(400).json({ error: 'Nevažeći ili istekao token za slanje' });
   }
