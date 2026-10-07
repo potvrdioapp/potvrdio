@@ -1024,7 +1024,7 @@ class Potvrdio_Viber_COD {
 
         add_meta_box(
             'potvrdio_verification_box',
-            'Potvrdio Viber COD Doğrulama Durumu',
+            __('Potvrdio - Status verifikacije porudžbine', 'potvrdio-viber-cod'),
             array($this, 'render_order_meta_box'),
             $screen,
             'side',
@@ -1043,35 +1043,35 @@ class Potvrdio_Viber_COD {
 
         echo '<div style="font-size:13px; line-height:1.6;">';
         if (!$is_cod) {
-            echo '<p style="color:#64748B;">Bu sipariş Kapıda Ödeme (COD) ile verilmediği için Potvrdio filtresi uygulanmadı.</p>';
+            echo '<p style="color:#64748B;">' . esc_html__('Ova porudžbina nije sa plaćanjem pouzećem (COD), pa Potvrdio verifikacija nije primenjena.', 'potvrdio-viber-cod') . '</p>';
             echo '</div>';
             return;
         }
 
         if ($verified) {
             echo '<div style="background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:10px; margin-bottom:10px; color:#065F46;">';
-            echo '<strong>✓ ADRES DOĞRULANDI</strong><br>';
-            echo '<small>Onay Zamanı: ' . esc_html($verified_at) . '</small><br>';
+            echo '<strong>' . esc_html__('✓ ADRESA JE VERIFIKOVANA', 'potvrdio-viber-cod') . '</strong><br>';
+            echo '<small>' . esc_html__('Vreme potvrde:', 'potvrdio-viber-cod') . ' ' . esc_html($verified_at) . '</small><br>';
             if ($order->get_meta('_potvrdio_smart_bypass')) {
-                echo '<small style="color:#047857; font-weight:600;">(Smart Bypass: Eşleşen Adres)</small><br>';
+                echo '<small style="color:#047857; font-weight:600;">(' . esc_html__('Smart Bypass: Prethodno potvrđena adresa', 'potvrdio-viber-cod') . ')</small><br>';
             } elseif ($order->get_meta('_potvrdio_admin_override')) {
-                echo '<small style="color:#047857; font-weight:600;">(Yönetici Manuel Onayı)</small><br>';
+                echo '<small style="color:#047857; font-weight:600;">(' . esc_html__('Ručno odobrenje administratora', 'potvrdio-viber-cod') . ')</small><br>';
             }
-            echo '<small>Kargo etiketi basılabilir.</small>';
+            echo '<small>' . esc_html__('Paket je spreman za slanje i štampu adresnice kuriru.', 'potvrdio-viber-cod') . '</small>';
             echo '</div>';
         } else {
             echo '<div style="background:#FFFBEB; border:1px solid #F59E0B; border-radius:8px; padding:10px; margin-bottom:10px; color:#92400E;">';
-            echo '<strong>⏳ DOĞRULAMA BEKLENİYOR</strong><br>';
-            echo '<small>Sipariş On-Hold durumunda bekletiliyor.</small><br>';
-            echo '<small>Kargo etiketi basılmamalıdır.</small>';
+            echo '<strong>' . esc_html__('⏳ ČEKA SE VERIFIKACIJA ADRESE', 'potvrdio-viber-cod') . '</strong><br>';
+            echo '<small>' . esc_html__('Porudžbina je privremeno na čekanju (On-Hold).', 'potvrdio-viber-cod') . '</small><br>';
+            echo '<small>' . esc_html__('Ne predavati kurirskoj službi pre potvrde kupca.', 'potvrdio-viber-cod') . '</small>';
             echo '</div>';
 
             // Edge Case 9: Manual Verify Button for Store Manager
             $verify_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_manual_verify&order_id=' . $order->get_id()), 'potvrdio_manual_verify_action');
-            echo '<p style="margin-top:10px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center;">✓ Ručno odobri (Bypass)</a></p>';
+            echo '<p style="margin-top:10px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center;">' . esc_html__('✓ Ručno odobri (Bypass)', 'potvrdio-viber-cod') . '</a></p>';
         }
 
-        echo '<p style="margin:6px 0;"><strong>Normal Telefon:</strong> ' . esc_html($phone) . '</p>';
+        echo '<p style="margin:6px 0;"><strong>' . esc_html__('Verifikovani telefon:', 'potvrdio-viber-cod') . '</strong> ' . esc_html($phone) . '</p>';
         echo '</div>';
     }
 
@@ -1131,8 +1131,8 @@ class Potvrdio_Viber_COD {
     public function render_admin_settings_page() {
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('Potvrdio - Viber COD & Cart Recovery Settings', 'potvrdio-viber-cod'); ?></h1>
-            <p>WooCommerce Balkan kapıda ödeme iade önleme ve adres doğrulama motoru.</p>
+            <h1><?php esc_html_e('Potvrdio - Podešavanja za Viber COD verifikaciju', 'potvrdio-viber-cod'); ?></h1>
+            <p><?php esc_html_e('Sistem za automatsku verifikaciju adresa i smanjenje povrata pošiljki za Balkan COD porudžbine.', 'potvrdio-viber-cod'); ?></p>
             <form method="post" action="options.php">
                 <?php
                 settings_fields('potvrdio_settings_group');
@@ -1140,29 +1140,29 @@ class Potvrdio_Viber_COD {
                 ?>
                 <table class="form-table">
                     <tr valign="top">
-                        <th scope="row">Central Backend API Endpoint</th>
-                        <td><input type="url" name="potvrdio_api_endpoint" value="<?php echo esc_attr(get_option('potvrdio_api_endpoint', 'http://localhost:4001/api/v1')); ?>" class="regular-text" /></td>
+                        <th scope="row"><?php esc_html_e('Central Backend API Endpoint', 'potvrdio-viber-cod'); ?></th>
+                        <td><input type="url" name="potvrdio_api_endpoint" value="<?php echo esc_attr(get_option('potvrdio_api_endpoint', 'https://api.potvrdio.online/api/v1')); ?>" class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row">API Key</th>
+                        <th scope="row"><?php esc_html_e('API Key', 'potvrdio-viber-cod'); ?></th>
                         <td><input type="text" name="potvrdio_api_key" value="<?php echo esc_attr(get_option('potvrdio_api_key', 'demo_api_key_123')); ?>" class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row">API Secret</th>
+                        <th scope="row"><?php esc_html_e('API Secret', 'potvrdio-viber-cod'); ?></th>
                         <td><input type="password" name="potvrdio_api_secret" value="<?php echo esc_attr(get_option('potvrdio_api_secret', 'demo_secret_456')); ?>" class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
-                        <th scope="row">Akıllı Otomatik Onay (Smart Bypass)</th>
+                        <th scope="row"><?php esc_html_e('Pametno automatsko odobrenje (Smart Bypass)', 'potvrdio-viber-cod'); ?></th>
                         <td>
                             <label>
                                 <input type="checkbox" name="potvrdio_auto_approve_returning" value="1" <?php checked(1, get_option('potvrdio_auto_approve_returning', '0')); ?> />
-                                Daha önce doğrulanmış müşterileri <strong>aynı teslimat adresine</strong> sipariş verdiklerinde tekrar bekletmeden otomatik onayla
+                                <?php echo wp_kses_post(__('Automatski odobri prethodno verifikovane kupce kada naručuju na <strong>istu adresu isporuke</strong>', 'potvrdio-viber-cod')); ?>
                             </label>
-                            <p class="description">Güvenlik Kuralı: Telefon aynı olsa bile teslimat adresi farklıysa sistem güvenlik gereği tekrar Viber doğrulaması ister.</p>
+                            <p class="description"><?php esc_html_e('Sigurnosno pravilo: Čak i ako je broj telefona isti, ukoliko je adresa isporuke promenjena, sistem iz bezbednosnih razloga ponovo pokreće verifikaciju.', 'potvrdio-viber-cod'); ?></p>
                         </td>
                     </tr>
                 </table>
-                <?php submit_button(); ?>
+                <?php submit_button(__('Sačuvaj podešavanja', 'potvrdio-viber-cod')); ?>
             </form>
         </div>
         <?php
