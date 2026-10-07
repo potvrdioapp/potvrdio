@@ -96,7 +96,18 @@ app.get('/api/v1/store/status', (req: Request, res: Response) => {
  */
 app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
   const apiKey = (req.headers['x-potvrdio-api-key'] as string) || 'demo_api_key_123';
-  const { order_id, store_domain, customer_name, customer_phone, billing_address, total_amount, currency } = req.body;
+  const {
+    order_id,
+    store_domain,
+    store_name,
+    customer_name,
+    customer_phone,
+    billing_address,
+    shipping_address,
+    total_amount,
+    currency,
+    items,
+  } = req.body;
 
   if (!order_id || !customer_phone) {
     return res.status(400).json({ error: 'Missing required order fields' });
@@ -128,17 +139,23 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     });
   }
 
+  const resolvedAddress1 = shipping_address?.address_1 || billing_address?.address_1 || '';
+  const resolvedAddress2 = shipping_address?.address_2 || billing_address?.address_2 || '';
+  const resolvedCity = shipping_address?.city || billing_address?.city || 'Beograd';
+  const resolvedPostcode = shipping_address?.postcode || billing_address?.postcode || '11000';
+
   // Create 24-hour single-use token for address edit link
   const token = tokenService.createToken({
     orderId: String(order_id),
     storeDomain: store_domain || 'http://localhost:3000',
+    storeName: store_name,
     apiSecret,
     customerName: customer_name,
     customerPhone: customer_phone,
-    address1: billing_address?.address_1 || '',
-    address2: billing_address?.address_2 || '',
-    city: billing_address?.city || 'Beograd',
-    postcode: billing_address?.postcode || '11000',
+    address1: resolvedAddress1,
+    address2: resolvedAddress2,
+    city: resolvedCity,
+    postcode: resolvedPostcode,
     totalAmount: total_amount || 0,
     currency: currency || 'RSD',
   });
@@ -151,8 +168,8 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     customerPhone: customer_phone,
     totalAmount: total_amount || 0,
     currency: currency || 'RSD',
-    address: billing_address?.address_1 || '',
-    city: billing_address?.city || 'Beograd',
+    address: resolvedAddress1,
+    city: resolvedCity,
     token,
   });
 
@@ -161,13 +178,17 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
   if (customerEmail) {
     emailService.sendOrderVerificationEmail({
       orderId: String(order_id),
+      storeName: store_name,
+      storeDomain: store_domain,
       customerName: customer_name,
+      customerPhone: customer_phone,
       customerEmail,
       editUrl: result.editUrl,
       totalAmount: total_amount || 0,
       currency: currency || 'RSD',
-      address: billing_address?.address_1 || '',
-      city: billing_address?.city || '',
+      address: resolvedAddress1,
+      city: resolvedCity,
+      items: Array.isArray(items) ? items : undefined,
     }).catch((err) => {
       console.warn('[EMAIL NOTIFICATION NON-BLOCKING WARNING]', err?.message || err);
     });
@@ -241,6 +262,7 @@ app.get('/api/v1/address-token/:token', (req: Request, res: Response) => {
 
   res.json({
     orderId: session.orderId,
+    storeName: session.storeName,
     customerName: session.customerName,
     customerPhone: session.customerPhone,
     address1: session.address1,

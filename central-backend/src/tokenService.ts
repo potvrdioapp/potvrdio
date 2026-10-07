@@ -4,6 +4,7 @@ export interface TokenSession {
   token: string;
   orderId: string;
   storeDomain: string;
+  storeName?: string;
   apiSecret?: string;
   customerName: string;
   customerPhone: string;

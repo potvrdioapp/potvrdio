@@ -289,6 +289,7 @@ class Potvrdio_Viber_COD {
         $payload = array(
             'order_id'        => (string)$order->get_id(),
             'store_domain'    => get_site_url(),
+            'store_name'      => get_bloginfo('name'),
             'customer_name'   => $customer_name,
             'customer_phone'  => $normalized_phone,
             'customer_email'  => $order->get_billing_email(),
