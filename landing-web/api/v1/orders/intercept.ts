@@ -62,7 +62,7 @@ export default async function handler(req: any, res: any) {
 
     const formattedAmount = total_amount ? `${Number(total_amount).toLocaleString()} ${currency || 'RSD'}` : 'Plaćanje pouzećem';
     const randomToken = Math.random().toString(36).substring(2, 12);
-    const editUrl = `https://potvrdio.online/edit?order_id=${encodeURIComponent(order_id)}&token=${randomToken}&store=${encodeURIComponent(store_domain || '')}`;
+    const editUrl = `https://potvrdio.online/edit/?order_id=${encodeURIComponent(order_id)}&token=${randomToken}&store=${encodeURIComponent(store_domain || '')}`;
 
     // Format items list for email
     let itemsHtml = '';
