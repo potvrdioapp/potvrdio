@@ -39,7 +39,7 @@ class Potvrdio_Viber_COD {
 
     private function __construct() {
         $endpoint = get_option('potvrdio_api_endpoint');
-        $this->api_endpoint = !empty($endpoint) ? $endpoint : 'http://localhost:4001/api/v1';
+        $this->api_endpoint = !empty($endpoint) ? $endpoint : 'https://potvrdio.online/api/v1';
 
         $key = get_option('potvrdio_api_key');
         $this->api_key      = !empty($key) ? $key : 'demo_api_key_123';
