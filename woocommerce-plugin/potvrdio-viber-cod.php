@@ -331,11 +331,14 @@ class Potvrdio_Viber_COD {
             wp_schedule_single_event(time() + DAY_IN_SECONDS, 'potvrdio_order_timeout_check', array($order_id));
         }
 
-        // Edge Case 11: Asynchronous Dispatch via Action Scheduler (zero latency checkout)
-        if (function_exists('as_schedule_single_action')) {
-            as_schedule_single_action(time(), 'potvrdio_async_dispatch_intercept', array('payload' => $payload), 'potvrdio');
-        } else {
-            $this->send_to_central_backend('/orders/intercept', $payload);
+        // Immediate real-time dispatch to Potvrdio Cloud backend
+        $sent = $this->send_to_central_backend('/orders/intercept', $payload);
+
+        if ($sent) {
+            $order->add_order_note(__('Potvrdio: Signal uspešno poslat serveru. Verifikacioni e-mail poslat kupcu.', 'potvrdio-viber-cod'));
+        } elseif (function_exists('as_schedule_single_action')) {
+            // Resilient fallback: If immediate HTTP call failed or timed out, schedule retry in Action Scheduler
+            as_schedule_single_action(time() + 30, 'potvrdio_async_dispatch_intercept', array('payload' => $payload), 'potvrdio');
         }
     }
 
