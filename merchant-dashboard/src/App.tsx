@@ -9,6 +9,7 @@ import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { DateRangePicker, PeriodType, DateRange, formatDateRange } from './components/DateRangePicker';
 import { translations, Language } from './i18n';
 import { CreditTimeframe, getCreditLedgerData } from './creditLedger';
+import { IpsPaymentModal, IpsPaymentPlan } from './components/IpsPaymentModal';
 
 type Theme = 'dark' | 'light';
 
@@ -17,6 +18,8 @@ export default function App() {
   const [credits, setCredits] = useState(1875);
   const [, setBalance] = useState(45.00);
   const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [selectedPaymentPlan, setSelectedPaymentPlan] = useState<IpsPaymentPlan | null>(null);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
   const [activeStepHighlight, setActiveStepHighlight] = useState<number | null>(null);
@@ -177,14 +180,55 @@ export default function App() {
     setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  const PLAN_DETAILS: Record<string, IpsPaymentPlan> = {
+    starter: {
+      id: 'starter',
+      name: 'Starter Paket',
+      euroPrice: 15,
+      credits: 600,
+      type: 'ONE_TIME',
+    },
+    growth: {
+      id: 'growth',
+      name: 'Growth Paket',
+      euroPrice: 45,
+      credits: 1875,
+      type: 'ONE_TIME',
+    },
+    pro: {
+      id: 'pro',
+      name: 'Pro Scale Paket',
+      euroPrice: 120,
+      credits: 6000,
+      type: 'ONE_TIME',
+    },
+    reserve: {
+      id: 'reserve',
+      name: 'Pro Reserve Pretplata',
+      euroPrice: 29,
+      credits: 1800,
+      type: 'MONTHLY',
+    },
+  };
+
   const handleBuyCredit = (planId: string, cost: number, count: number) => {
-    setPurchasing(planId);
-    setTimeout(() => {
-      setCredits(prev => prev + count);
-      setBalance(prev => prev + cost);
-      setPurchasing(null);
-      alert(t.successTopupAlert(count, cost));
-    }, 1000);
+    const plan = PLAN_DETAILS[planId] || {
+      id: planId,
+      name: `${planId.toUpperCase()} Paket`,
+      euroPrice: cost,
+      credits: count,
+      type: 'ONE_TIME',
+    };
+    setSelectedPaymentPlan(plan);
+    setIsPaymentModalOpen(true);
+  };
+
+  const handlePaymentSuccess = (addedCredits: number, planId: string) => {
+    const plan = PLAN_DETAILS[planId];
+    setCredits(prev => prev + addedCredits);
+    if (plan) {
+      setBalance(prev => prev + plan.euroPrice);
+    }
   };
 
   return (
@@ -1466,6 +1510,15 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* Official B2B Predračun & NBS IPS QR Code Payment Modal */}
+      <IpsPaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        plan={selectedPaymentPlan}
+        lang={selectedLang}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 }

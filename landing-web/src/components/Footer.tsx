@@ -32,6 +32,10 @@ export const Footer: React.FC<FooterProps> = ({
       address_2: "21000 Novi Sad, Republika Srbija",
       pib_label: "PIB:",
       mb_label: "Matični broj (MB):",
+      account_label: "Tekući račun:",
+      account_val: "265-7590310000855-51 (Raiffeisen)",
+      payment_method_label: "Način plaćanja:",
+      payment_method_val: "NBS IPS QR / E-banking virman (Šifra 221)",
       activity_label: "Delatnost:",
       activity_val: "7022 - Konsultantske aktivnosti u vezi s poslovanjem",
       vat_status: "Preduzetnik nije u sistemu PDV-a (prema čl. 33 Zakona o PDV-u RS)",
@@ -64,6 +68,10 @@ export const Footer: React.FC<FooterProps> = ({
       address_2: "21000 Нови Сад, Република Србија",
       pib_label: "Даночен број (ПИБ):",
       mb_label: "Матичен број (МБ):",
+      account_label: "Сметка:",
+      account_val: "265-7590310000855-51 (Raiffeisen)",
+      payment_method_label: "Начин на плаќање:",
+      payment_method_val: "NBS IPS QR / Вирман (Шифра 221)",
       activity_label: "Дејност:",
       activity_val: "7022 - Консалтинг и деловни активности",
       vat_status: "Претприемачот не е во системот на ДДВ (според чл. 33 од Законот за ДДВ на РС)",
@@ -96,6 +104,10 @@ export const Footer: React.FC<FooterProps> = ({
       address_2: "21000 Novi Sad, Republic of Serbia",
       pib_label: "Tax ID (PIB):",
       mb_label: "Reg. Number (MB):",
+      account_label: "Bank Account:",
+      account_val: "265-7590310000855-51 (Raiffeisen Bank)",
+      payment_method_label: "Payment Method:",
+      payment_method_val: "NBS IPS QR / Wire Transfer (Code 221)",
       activity_label: "Activity:",
       activity_val: "7022 - Business & Management Consultancy",
       vat_status: "Sole proprietorship exempt from VAT (pursuant to Art. 33 of Serbian VAT Law)",
@@ -163,7 +175,9 @@ export const Footer: React.FC<FooterProps> = ({
               <li className="text-[11px] text-slate-400">{t.address_2}</li>
               <li className="text-[11px]"><span className="text-slate-500 font-mono">{t.pib_label}</span> <span className="font-mono text-slate-300">115512104</span></li>
               <li className="text-[11px]"><span className="text-slate-500 font-mono">{t.mb_label}</span> <span className="font-mono text-slate-300">68423937</span></li>
+              <li className="text-[11px]"><span className="text-slate-500 font-mono">{t.account_label}</span> <span className="font-mono text-teal-400 font-semibold">{t.account_val}</span></li>
               <li className="text-[11px]"><span className="text-slate-500">{t.activity_label}</span> {t.activity_val}</li>
+              <li className="text-[11px]"><span className="text-slate-500">{t.payment_method_label}</span> <span className="text-slate-300">{t.payment_method_val}</span></li>
               <li className="text-[11px] text-slate-400 bg-slate-900/60 p-1.5 rounded border border-slate-800">
                 {t.vat_status}
               </li>
