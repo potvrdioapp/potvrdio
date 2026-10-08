@@ -3,7 +3,7 @@ import {
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle,
   X, Lock, Menu, HelpCircle, ChevronDown, Rocket, Sun, Moon,
-  Package, Key, Send, Clock, Sparkles, Info
+  Package, Key, Send, Clock, Sparkles, Info, LayoutDashboard, ExternalLink, Coins, ArrowRight
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
@@ -11,7 +11,6 @@ import { RefundPolicyModal } from './components/RefundPolicyModal';
 import { DeliveryPolicyModal } from './components/DeliveryPolicyModal';
 import { CookiePolicyModal } from './components/CookiePolicyModal';
 import { OnboardingModal } from './components/OnboardingModal';
-import { IpsPaymentModal, IpsPaymentPlan } from './components/IpsPaymentModal';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { FloatingContactWidget } from './components/FloatingContactWidget';
 import { Footer } from './components/Footer';
@@ -104,15 +103,7 @@ export default function App() {
   const [showDeliveryModal, setShowDeliveryModal] = useState<boolean>(false);
   const [showCookieModal, setShowCookieModal] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
-  const [selectedPaymentPlan, setSelectedPaymentPlan] = useState<IpsPaymentPlan | null>(null);
-  const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
-
-  const handleSelectPlan = (plan: IpsPaymentPlan) => {
-    playClickSound();
-    setSelectedPaymentPlan(plan);
-    setShowPaymentModal(true);
-  };
 
   // Deep-link / pathname checking for bank audits (e.g. /uslovi-koriscenja, /reklamacije-i-povracaj)
   useEffect(() => {
@@ -354,6 +345,7 @@ export default function App() {
         calc_freight_val: "780 RSD (~6.65 €)",
         modal_badge: "Passwordless Token Verifikacija",
         nav_btn_register: "Registracija (25 Kredita)",
+        nav_btn_dashboard: "Merchant Dashboard",
         hero_btn_activate: "Aktiviraj 25 besplatnih verifikacija",
         scen2_ignored_notice: "Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.",
         calc_orders_unit: "narudžbina",
@@ -362,7 +354,10 @@ export default function App() {
         faq_title: "Sve što treba da znate o Potvrdio COD verifikaciji",
         faq_sub: "Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.",
         floor_word: "Sprat",
-        apt_word: "Stan"
+        apt_word: "Stan",
+        pricing_existing_title: "Već imate nalog ili instaliran Potvrdio dodatak?",
+        pricing_existing_desc: "Prijavite se na vaš Merchant Dashboard za uvid u potrošnju, preuzimanje faktura i dopunu kredita po zvaničnom predračunu.",
+        pricing_existing_btn: "Otvori Merchant Dashboard"
       },
       mk: {
         top_networks: "Post Express, D Express, Cargo Express, Via Courier",
@@ -543,6 +538,7 @@ export default function App() {
         calc_freight_val: "390 MKD (~6.35 €)",
         modal_badge: "Passwordless Token Верификација",
         nav_btn_register: "Регистрација (25 Кредити)",
+        nav_btn_dashboard: "Трговски Панел",
         hero_btn_activate: "Активирај 25 бесплатни верификации",
         scen2_ignored_notice: "Купувачот не одговори 24ч. Нарачката е откажана пред пакување.",
         calc_orders_unit: "нарачки",
@@ -551,7 +547,10 @@ export default function App() {
         faq_title: "Сè што треба да знаете за Potvrdio COD верификацијата",
         faq_sub: "Одговори на клучните технички и правни прашања.",
         floor_word: "Кат",
-        apt_word: "Стан"
+        apt_word: "Стан",
+        pricing_existing_title: "Веќе имате регистрирана продавница или инсталиран додаток?",
+        pricing_existing_desc: "Најавете се на вашиот Трговски Панел за преглед на состојбата, извештаи и надополнување на кредити по профактура.",
+        pricing_existing_btn: "Отвори Трговски Панел"
       },
       en: {
         top_networks: "Post Express, D Express, Bex, City Express (Balkans)",
@@ -732,6 +731,7 @@ export default function App() {
         calc_freight_val: "~€6.65 (780 RSD)",
         modal_badge: "Passwordless Token Verification",
         nav_btn_register: "Register Store (25 Free)",
+        nav_btn_dashboard: "Merchant Dashboard",
         hero_btn_activate: "Activate 25 free credits",
         scen2_ignored_notice: "Customer ignored for 24h. Order cancelled before packing.",
         calc_orders_unit: "orders",
@@ -740,7 +740,10 @@ export default function App() {
         faq_title: "Everything you need to know about Potvrdio COD verification",
         faq_sub: "Answers to key technical, legal, and operational questions.",
         floor_word: "Floor",
-        apt_word: "Apt"
+        apt_word: "Apt",
+        pricing_existing_title: "Already have a registered store or active plugin?",
+        pricing_existing_desc: "Log in to your Merchant Dashboard to monitor balance, download invoices, and top up credits instantly via NBS IPS or wire transfer.",
+        pricing_existing_btn: "Open Merchant Dashboard"
       }
     };
 
@@ -911,6 +914,18 @@ export default function App() {
               </button>
             </div>
 
+            {/* Merchant Dashboard Direct Link */}
+            <a
+              href="http://localhost:5173"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-surface border border-theme text-theme-secondary hover:text-theme-primary text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+              title={t('nav_btn_dashboard')}
+            >
+              <LayoutDashboard className="w-3.5 h-3.5 text-teal-500 shrink-0" />
+              <span>{t('nav_btn_dashboard')}</span>
+            </a>
+
             <button 
               onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
               className="hidden sm:inline-flex btn-brand-cta text-white font-bold text-xs px-3 sm:px-3.5 py-2 rounded transition-all items-center gap-1.5 shadow-sm min-h-[36px] cursor-pointer"
@@ -968,6 +983,20 @@ export default function App() {
             >
               <span>04. {t('nav_integration')}</span>
               <ChevronRight className="w-4 h-4 text-theme-muted" />
+            </a>
+
+            <a 
+              href="http://localhost:5173"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="py-2.5 text-teal-600 dark:text-teal-400 font-bold hover:underline flex items-center justify-between border-b border-theme-subtle"
+            >
+              <span className="flex items-center gap-2">
+                <LayoutDashboard className="w-4 h-4 text-teal-500" />
+                <span>{t('nav_btn_dashboard')}</span>
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 text-theme-muted" />
             </a>
 
             <div className="pt-2">
@@ -1984,7 +2013,7 @@ export default function App() {
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
-                        onClick={() => handleSelectPlan({ id: 'starter', name: 'Starter Paket', euroPrice: 15, credits: 600, type: 'ONE_TIME' })} 
+                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
                         className="btn-select-wave px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[10px] sm:text-[11px] font-semibold transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
@@ -2013,7 +2042,7 @@ export default function App() {
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
-                        onClick={() => handleSelectPlan({ id: 'growth', name: 'Growth Paket', euroPrice: 45, credits: 1875, type: 'ONE_TIME' })} 
+                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
                         className="btn-brand-cta px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-white font-bold text-[10px] sm:text-[11px] transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
@@ -2037,7 +2066,7 @@ export default function App() {
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
-                        onClick={() => handleSelectPlan({ id: 'pro', name: 'Scale Paket', euroPrice: 120, credits: 6000, type: 'ONE_TIME' })} 
+                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
                         className="btn-select-wave px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[10px] sm:text-[11px] font-semibold transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
@@ -2097,12 +2126,39 @@ export default function App() {
             </ul>
 
             <button 
-              onClick={() => handleSelectPlan({ id: 'reserve', name: 'Pro Reserve Pretplata', euroPrice: 29, credits: 1800, type: 'MONTHLY' })}
+              onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
               className="w-full btn-brand-cta text-white font-bold py-3 rounded text-xs transition shadow-sm cursor-pointer min-h-[44px]"
             >
               {t('btn_act_pro')}
             </button>
           </div>
+        </div>
+
+        {/* Existing Merchants Direct Dashboard Callout */}
+        <div className="mt-8 p-4 sm:p-5 rounded-2xl bg-teal-500/5 border border-teal-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-left">
+            <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 shrink-0">
+              <Coins className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="text-xs sm:text-sm font-bold text-theme-primary">
+                {t('pricing_existing_title')}
+              </h4>
+              <p className="text-[11px] sm:text-xs text-theme-muted mt-0.5 leading-relaxed">
+                {t('pricing_existing_desc')}
+              </p>
+            </div>
+          </div>
+          <a
+            href="http://localhost:5173"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-xs font-bold transition shadow-sm hover:border-teal-500/50 cursor-pointer shrink-0"
+          >
+            <LayoutDashboard className="w-4 h-4 text-teal-500" />
+            <span>{t('pricing_existing_btn')}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </div>
       </section>
 
@@ -2418,17 +2474,6 @@ export default function App() {
         onClose={() => setShowOnboardingModal(false)}
         lang={lang}
         playSuccessSound={playScannerBeep}
-      />
-
-      {/* Official B2B Predračun & NBS IPS QR Code Payment Modal */}
-      <IpsPaymentModal
-        isOpen={showPaymentModal}
-        onClose={() => setShowPaymentModal(false)}
-        plan={selectedPaymentPlan}
-        lang={lang}
-        onPaymentSuccess={() => {
-          playScannerBeep();
-        }}
       />
 
       {/* Floating Quick Contact Widget (WhatsApp & Viber) */}
