@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/dashboard",
+      "destination": "https://dashboard.potvrdio.online",
+      "permanent": true
+    },
+    {
+      "source": "/dashboard/:path*",
+      "destination": "https://dashboard.potvrdio.online/:path*",
+      "permanent": true
+    }
+  ]
+}

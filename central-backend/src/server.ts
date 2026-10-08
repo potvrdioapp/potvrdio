@@ -572,7 +572,7 @@ app.post('/api/v1/merchant/register', async (req: Request, res: Response) => {
     console.log(`[MERCHANT REGISTERED] ${cleanDomain} - ${email} | Key: ${apiKey} | Secret: ${apiSecret} | Pilot: 25 Order Verifications | Courier: ${courier}`);
 
     // Determine dashboard URL (local dev or production)
-    const dashboardBase = process.env.DASHBOARD_URL || 'http://localhost:3002';
+    const dashboardBase = process.env.DASHBOARD_URL || (process.env.NODE_ENV === 'production' ? 'https://dashboard.potvrdio.online' : 'http://localhost:3002');
 
     // Generate a secure 7-day Welcome Magic Token for instant one-click login from email
     const magicToken = merchantAuthService.createMagicToken(
@@ -639,7 +639,7 @@ app.post('/api/v1/merchant/magic-link/request', async (req: Request, res: Respon
 
     // Create 15-minute magic login token
     const token = merchantAuthService.createMagicToken(cleanEmail, 15 * 60 * 1000, 'login');
-    const dashboardBase = process.env.DASHBOARD_URL || 'http://localhost:3002';
+    const dashboardBase = process.env.DASHBOARD_URL || (process.env.NODE_ENV === 'production' ? 'https://dashboard.potvrdio.online' : 'http://localhost:3002');
     const firstStore = account.stores[0];
     const magicUrl = `${dashboardBase}?magic_token=${token}&email=${encodeURIComponent(cleanEmail)}&store=${encodeURIComponent(firstStore?.storeDomain || '')}&api_key=${encodeURIComponent(firstStore?.apiKey || '')}`;
 

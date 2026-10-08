@@ -456,7 +456,7 @@ Vaš ${storeDisplay} tim`;
     const verificationsCount = params.verifications || params.credits || 25;
     const storeDisplay = this.getStoreDisplayName(undefined, params.storeUrl);
     const subject = `Dobrodošli u Potvrdio! Vaš API ključ i ${verificationsCount} besplatnih verifikacija (${storeDisplay})`;
-    const dashUrl = params.dashboardUrl || 'https://potvrdio.online/dashboard';
+    const dashUrl = params.dashboardUrl || (process.env.DASHBOARD_URL || 'https://dashboard.potvrdio.online');
     const secretDisplay = params.apiSecret || (params.apiKey.startsWith('pk_live_') ? params.apiKey.replace('pk_live_', 'sec_live_') : 'demo_secret_456');
 
     const htmlContent = `<!DOCTYPE html>
