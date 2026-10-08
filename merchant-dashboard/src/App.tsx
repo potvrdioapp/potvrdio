@@ -1305,12 +1305,12 @@ export default function App() {
                             <div className="p-2.5 rounded-xl bg-surface border border-theme flex items-center justify-between gap-2 shadow-xs">
                               <div className="min-w-0 flex-1">
                                 <div className="text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wide">1. Central API Endpoint</div>
-                                <div className="font-mono text-xs text-theme-primary font-semibold truncate" title="https://api.potvrdio.online/api/v1">
-                                  https://api.potvrdio.online/api/v1
+                                <div className="font-mono text-xs text-theme-primary font-semibold truncate" title="https://potvrdio.online/api/v1">
+                                  https://potvrdio.online/api/v1
                                 </div>
                               </div>
                               <button
-                                onClick={() => handleCopy('https://api.potvrdio.online/api/v1', 'onboardingEndpoint')}
+                                onClick={() => handleCopy('https://potvrdio.online/api/v1', 'onboardingEndpoint')}
                                 className="p-1.5 rounded-lg hover:bg-surface-subtle text-theme-muted hover:text-teal-600 transition cursor-pointer shrink-0"
                                 title="Copy API Endpoint"
                               >
@@ -2095,11 +2095,11 @@ export default function App() {
                         <input
                           type="text"
                           readOnly
-                          value="https://api.potvrdio.online/api/v1"
+                          value="https://potvrdio.online/api/v1"
                           className="w-full bg-surface-subtle border border-theme rounded-xl px-3.5 py-2.5 pr-24 text-xs text-teal-600 dark:text-teal-400 font-mono select-all focus:outline-none focus:border-teal-500"
                         />
                         <button
-                          onClick={() => handleCopy('https://api.potvrdio.online/api/v1', 'endpoint')}
+                          onClick={() => handleCopy('https://potvrdio.online/api/v1', 'endpoint')}
                           className="absolute right-2 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/25 text-teal-600 dark:text-teal-400 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer border border-teal-500/20"
                         >
                           <Copy className="w-3 h-3" />
@@ -2625,7 +2625,7 @@ export default function App() {
                                 type="text"
                                 readOnly
                                 tabIndex={-1}
-                                value="https://api.potvrdio.online/api/v1"
+                                value="https://potvrdio.online/api/v1"
                                 className={`w-full rounded px-3 py-1.5 text-xs font-mono transition-all select-none cursor-default pointer-events-none ${
                                   activeStepHighlight === 2
                                     ? 'border-2 border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-300/60 text-slate-900 font-bold'

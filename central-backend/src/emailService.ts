@@ -496,7 +496,7 @@ Vaš ${storeDisplay} tim`;
 
       <div class="key-box">
         <div class="key-label">1. Central Backend API Endpoint:</div>
-        <div class="key-value">https://api.potvrdio.online/api/v1</div>
+        <div class="key-value">https://potvrdio.online/api/v1</div>
 
         <div class="key-label">2. Vaš API Key (Store ID):</div>
         <div class="key-value">${params.apiKey}</div>

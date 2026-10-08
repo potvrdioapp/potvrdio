@@ -1131,7 +1131,7 @@ class Potvrdio_Viber_COD {
     }
 
     public function ping_central_backend() {
-        $endpoint = rtrim(get_option('potvrdio_api_endpoint', 'https://api.potvrdio.online/api/v1'), '/');
+        $endpoint = rtrim(get_option('potvrdio_api_endpoint', 'https://potvrdio.online/api/v1'), '/');
         $api_key  = get_option('potvrdio_api_key', '');
 
         if (empty($api_key)) {
@@ -1185,7 +1185,7 @@ class Potvrdio_Viber_COD {
                 <table class="form-table">
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('Central Backend API Endpoint', 'potvrdio-viber-cod'); ?></th>
-                        <td><input type="url" name="potvrdio_api_endpoint" value="<?php echo esc_attr(get_option('potvrdio_api_endpoint', 'https://api.potvrdio.online/api/v1')); ?>" class="regular-text" /></td>
+                        <td><input type="url" name="potvrdio_api_endpoint" value="<?php echo esc_attr(get_option('potvrdio_api_endpoint', 'https://potvrdio.online/api/v1')); ?>" class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('API Key', 'potvrdio-viber-cod'); ?></th>
