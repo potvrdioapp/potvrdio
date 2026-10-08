@@ -3,7 +3,7 @@ import {
   Check, Download, AlertTriangle, ArrowDown, ChevronRight, 
   RotateCcw, ShieldCheck, Terminal, MapPin, CheckCircle2, XCircle,
   X, Lock, Menu, HelpCircle, ChevronDown, Rocket, Sun, Moon,
-  Package, Key, Send, Clock, Sparkles, Info, LayoutDashboard, ExternalLink, Coins, ArrowRight
+  Package, Key, Send, Clock, Sparkles, Info, LayoutDashboard, ExternalLink, Coins, ArrowRight, LogIn
 } from 'lucide-react';
 import { PrivacyPolicyModal } from './components/PrivacyPolicyModal';
 import { TermsConditionsModal } from './components/TermsConditionsModal';
@@ -14,6 +14,8 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { FloatingContactWidget } from './components/FloatingContactWidget';
 import { Footer } from './components/Footer';
+
+const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || 'http://localhost:3002';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;
@@ -207,12 +209,12 @@ export default function App() {
         viber_order_received: "Primili smo tvoju porudžbinu",
         viber_shipping_address: "ADRESA ZA DOSTAVU:",
         viber_confirm_prompt: "Molimo te da potvrdiš tačnost pre nego što paket predamo kuriru:",
-        scen1_warning: "⚠️ Upozorenje: Nedostaje broj stana i sprat (Rizik neuručenja)",
-        scen2_warning: "⏱️ Poruka ignorisana. Nema odgovora 24h. Paket zadržan u skladištu!",
+        scen1_warning: "Upozorenje: Nedostaje broj stana i sprat (Rizik neuručenja)",
+        scen2_warning: "Poruka ignorisana. Nema odgovora 24h. Paket zadržan u skladištu!",
         viber_btn_yes: "DA, ADRESA JE TAČNA",
         viber_btn_edit: "IZMENI ADRESU",
-        scen1_btn_badge: "👉 Kliknite ovde: Dopunite sprat i stan",
-        scen3_btn_badge: "⚡ Kliknite ovde: Potvrdite u 1 klik",
+        scen1_btn_badge: "Kliknite ovde: Dopunite sprat i stan",
+        scen3_btn_badge: "Kliknite ovde: Potvrdite u 1 klik",
         scen1_wrong_click_hint: "Adresa je nepotpuna (nedostaje stan). Kliknite na „IZMENI ADRESU” ispod da vidite automatsku dopunu!",
         scen_btn_not_recommended: "Nije preporučeno (fali stan)",
         scen_btn_force_confirm: "Ipak potvrdi bez stana",
@@ -308,7 +310,7 @@ export default function App() {
         leg_item2_desc: "Brojevi telefona i jednokratni verifikacioni tokeni se automatski anonimizuju i trajno brišu sa procesnih servera 30 dana nakon uručenja. Nema profilisanja niti deljenja trećim licima.",
         leg_item3_title: "3. Enkripcija & Jednokratni Passwordless Tokeni",
         leg_item3_desc: "Korekcija adrese se vrši preko jedinstvenog HMAC-SHA256 tokena preko TLS 1.3 enkripcije. Potvrdio nema pristup privatnim Viber porukama kupca niti platnim karticama.",
-        modal_legal_notice: "🔒 Kriptografski HMAC Token · Usklađeno sa Čl. 12 ZZPL RS & GDPR Art. 6",
+        modal_legal_notice: "Kriptografski HMAC Token · Usklađeno sa Čl. 12 ZZPL RS & GDPR Art. 6",
         footer_privacy: "Politika Privatnosti",
         footer_terms: "Uslovi Korišćenja",
         dev_code_comment: "// 1. Presretanje porudžbine u functions.php ili pluginu",
@@ -344,12 +346,12 @@ export default function App() {
         man_good_city: "11000 BEOGRAD",
         calc_freight_val: "780 RSD (~6.65 €)",
         modal_badge: "Passwordless Token Verifikacija",
-        nav_btn_register: "Registracija (25 Kredita)",
-        nav_btn_dashboard: "Merchant Dashboard",
+        nav_btn_register: "Registracija (25 Besplatno)",
+        nav_btn_dashboard: "Prijava (Dashboard)",
         hero_btn_activate: "Aktiviraj 25 besplatnih verifikacija",
         scen2_ignored_notice: "Kupac nije odgovorio 24h. Porudžbina stornirana pre pakovanja.",
         calc_orders_unit: "narudžbina",
-        modal_alert_tip: "⚡ Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.",
+        modal_alert_tip: "Popunite sprat i stan kako bi kurir bez zastoja pronašao vaš ulaz.",
         faq_tag: "05 / Često Postavljana Pitanja",
         faq_title: "Sve što treba da znate o Potvrdio COD verifikaciji",
         faq_sub: "Odgovori na ključna tehnička, pravna i operativna pitanja trgovaca.",
@@ -400,12 +402,12 @@ export default function App() {
         viber_order_received: "Ја примивме твојата нарачка",
         viber_shipping_address: "АДРЕСА ЗА ДОСТАВА:",
         viber_confirm_prompt: "Те молиме потврди ја точноста пред да го предадеме пакетот на курир:",
-        scen1_warning: "⚠️ Предупредување: Недостасува број на стан и кат (Ризик од неиспорака)",
-        scen2_warning: "⏱️ Пораката е игнорирана. Нема одговор 24ч. Пакетот е задржан!",
+        scen1_warning: "Предупредување: Недостасува број на стан и кат (Ризик од неиспорака)",
+        scen2_warning: "Пораката е игнорирана. Нема одговор 24ч. Пакетот е задржан!",
         viber_btn_yes: "ДА, АДРЕСАТА Е ТОЧНА",
         viber_btn_edit: "ИЗМЕНИ ЈА АДРЕСАТА",
-        scen1_btn_badge: "👉 Кликнете тука: Дополнете кат и стан",
-        scen3_btn_badge: "⚡ Кликнете тука: Потврдете со 1 клик",
+        scen1_btn_badge: "Кликнете тука: Дополнете кат и стан",
+        scen3_btn_badge: "Кликнете тука: Потврдете со 1 клик",
         scen1_wrong_click_hint: "Адресата е нецелосна (недостасува стан). Кликнете на „ИЗМЕНИ ЈА АДРЕСАТА“ подолу за автоматска исправка!",
         scen_btn_not_recommended: "Не се препорачува (недостасува стан)",
         scen_btn_force_confirm: "Сепак потврди без стан",
@@ -501,7 +503,7 @@ export default function App() {
         leg_item2_desc: "Телефонските броеви и токени автоматски се анонимизираат и трајно се бришат од серверите 30 дена по доставата. Без профилирање или споделување со трети лица.",
         leg_item3_title: "3. Енкрипција & Еднократни Passwordless Токени",
         leg_item3_desc: "Корекцијата на адреса се врши преку единствен HMAC-SHA256 токен со TLS 1.3 енкрипција. Potvrdio нема пристап до приватни Viber пораки ниту картички.",
-        modal_legal_notice: "🔒 Криптографски HMAC Токен · Усогласено со Чл. 10 ZZLP MK & GDPR Art. 6",
+        modal_legal_notice: "Криптографски HMAC Токен · Усогласено со Чл. 10 ZZLP MK & GDPR Art. 6",
         footer_privacy: "Политика за Приватност",
         footer_terms: "Услови за Користење",
         dev_code_comment: "// 1. Интерцепција во functions.php или приклучок",
@@ -537,12 +539,12 @@ export default function App() {
         man_good_city: "1000 СКОПЈЕ",
         calc_freight_val: "390 MKD (~6.35 €)",
         modal_badge: "Passwordless Token Верификација",
-        nav_btn_register: "Регистрација (25 Кредити)",
-        nav_btn_dashboard: "Трговски Панел",
+        nav_btn_register: "Регистрација (25 Бесплатно)",
+        nav_btn_dashboard: "Најава (Панел)",
         hero_btn_activate: "Активирај 25 бесплатни верификации",
         scen2_ignored_notice: "Купувачот не одговори 24ч. Нарачката е откажана пред пакување.",
         calc_orders_unit: "нарачки",
-        modal_alert_tip: "⚡ Пополнете кат и стан за курирот без застој да го најде вашиот влез.",
+        modal_alert_tip: "Пополнете кат и стан за курирот без застој да го најде вашиот влез.",
         faq_tag: "05 / Често Поставувани Прашања",
         faq_title: "Сè што треба да знаете за Potvrdio COD верификацијата",
         faq_sub: "Одговори на клучните технички и правни прашања.",
@@ -593,12 +595,12 @@ export default function App() {
         viber_order_received: "We have received your order",
         viber_shipping_address: "SHIPPING ADDRESS:",
         viber_confirm_prompt: "Please confirm details before we hand over the parcel to the courier:",
-        scen1_warning: "⚠️ Warning: Missing apartment & floor number (Delivery Failure Risk)",
-        scen2_warning: "⏱️ Customer ignored message. 24h expired. Parcel safely held in warehouse!",
+        scen1_warning: "Warning: Missing apartment & floor number (Delivery Failure Risk)",
+        scen2_warning: "Customer ignored message. 24h expired. Parcel safely held in warehouse!",
         viber_btn_yes: "YES, ADDRESS IS ACCURATE",
         viber_btn_edit: "EDIT ADDRESS",
-        scen1_btn_badge: "👉 Click here: Add missing floor & apt",
-        scen3_btn_badge: "⚡ Click here: 1-tap instant confirm",
+        scen1_btn_badge: "Click here: Add missing floor & apt",
+        scen3_btn_badge: "Click here: 1-tap instant confirm",
         scen1_wrong_click_hint: "Address is incomplete (missing apartment). Click \"EDIT ADDRESS\" below to test automated address completion!",
         scen_btn_not_recommended: "Not recommended (missing apt)",
         scen_btn_force_confirm: "Confirm anyway without apartment",
@@ -694,7 +696,7 @@ export default function App() {
         leg_item2_desc: "Phone numbers and single-use verification tokens are automatically anonymized and permanently purged from gateway servers 30 days post-delivery. Zero cross-store profiling or data sharing.",
         leg_item3_title: "3. Cryptographic Token & TLS 1.3 Security",
         leg_item3_desc: "Address edits use single-use HMAC-SHA256 tokens over TLS 1.3. Potvrdio has zero access to private Viber chat messages or financial payment cards.",
-        modal_legal_notice: "🔒 Cryptographic HMAC Token · Compliant with Art. 12 ZZPL & EU GDPR Art. 6",
+        modal_legal_notice: "Cryptographic HMAC Token · Compliant with Art. 12 ZZPL & EU GDPR Art. 6",
         footer_privacy: "Privacy Policy",
         footer_terms: "Terms & Conditions",
         dev_code_comment: "// 1. Intercept order inside functions.php or custom plugin",
@@ -731,11 +733,11 @@ export default function App() {
         calc_freight_val: "~€6.65 (780 RSD)",
         modal_badge: "Passwordless Token Verification",
         nav_btn_register: "Register Store (25 Free)",
-        nav_btn_dashboard: "Merchant Dashboard",
+        nav_btn_dashboard: "Sign In (Dashboard)",
         hero_btn_activate: "Activate 25 free credits",
         scen2_ignored_notice: "Customer ignored for 24h. Order cancelled before packing.",
         calc_orders_unit: "orders",
-        modal_alert_tip: "⚡ Fill floor and apartment so the courier can find your entrance without delay.",
+        modal_alert_tip: "Fill floor and apartment so the courier can find your entrance without delay.",
         faq_tag: "05 / Frequently Asked Questions",
         faq_title: "Everything you need to know about Potvrdio COD verification",
         faq_sub: "Answers to key technical, legal, and operational questions.",
@@ -916,13 +918,13 @@ export default function App() {
 
             {/* Merchant Dashboard Direct Link */}
             <a
-              href="http://localhost:5173"
+              href={DASHBOARD_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-subtle hover:bg-surface border border-theme text-theme-secondary hover:text-theme-primary text-xs font-semibold transition-all cursor-pointer shadow-2xs"
               title={t('nav_btn_dashboard')}
             >
-              <LayoutDashboard className="w-3.5 h-3.5 text-teal-500 shrink-0" />
+              <LogIn className="w-3.5 h-3.5 text-teal-500 shrink-0" />
               <span>{t('nav_btn_dashboard')}</span>
             </a>
 
@@ -986,7 +988,7 @@ export default function App() {
             </a>
 
             <a 
-              href="http://localhost:5173"
+              href={DASHBOARD_URL}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
@@ -1432,8 +1434,9 @@ export default function App() {
                                   {simState === 'edited' ? (
                                     <span>
                                       {currentScenConfig.address[lang]}
-                                      <span className="ml-1 text-emerald-600 font-bold block">
-                                        {lang === 'sr' ? `✓ Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `✓ Кат ${floorInput}, Стан ${aptInput}` : `✓ Floor ${floorInput}, Apt ${aptInput}`}
+                                      <span className="ml-1 text-emerald-600 font-bold flex items-center gap-1 mt-0.5">
+                                        <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                                        <span>{lang === 'sr' ? `Sprat ${floorInput}, Stan ${aptInput}` : lang === 'mk' ? `Кат ${floorInput}, Стан ${aptInput}` : `Floor ${floorInput}, Apt ${aptInput}`}</span>
                                       </span>
                                     </span>
                                   ) : (
@@ -1617,12 +1620,13 @@ export default function App() {
                           onClick={handleSaveModalAddress}
                           className="w-full bg-[#7360F2] hover:bg-[#6250E0] active:scale-[0.99] text-white font-bold py-2.5 rounded-xl text-[11.5px] transition-all cursor-pointer shadow-md shadow-[#7360F2]/30 flex items-center justify-center gap-1.5 mt-1"
                         >
-                          <span>✅</span>
+                          <CheckCircle2 className="w-4 h-4 shrink-0 text-white" />
                           <span>{lang === 'sr' ? 'Sačuvaj i Potvrdi Pošiljku' : lang === 'mk' ? 'Зачувај и Потврди Нарачка' : 'Save & Confirm Delivery'}</span>
                         </button>
 
-                        <p className="text-[8px] text-center text-gray-400">
-                          {lang === 'sr' ? '🔒 Jednokratni token • Podaci zaštićeni (ZZPL / GDPR)' : lang === 'mk' ? '🔒 Еднократен токен • Податоците се заштитени' : '🔒 Single-use token • Protected by GDPR'}
+                        <p className="text-[8px] text-center text-gray-400 flex items-center justify-center gap-1">
+                          <Lock className="w-2.5 h-2.5 text-gray-400 shrink-0" />
+                          <span>{lang === 'sr' ? 'Jednokratni token • Podaci zaštićeni (ZZPL / GDPR)' : lang === 'mk' ? 'Еднократен токен • Податоците се заштитени' : 'Single-use token • Protected by GDPR'}</span>
                         </p>
                       </div>
                     </div>
@@ -2150,7 +2154,7 @@ export default function App() {
             </div>
           </div>
           <a
-            href="http://localhost:5173"
+            href={DASHBOARD_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-xs font-bold transition shadow-sm hover:border-teal-500/50 cursor-pointer shrink-0"

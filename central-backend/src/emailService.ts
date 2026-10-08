@@ -434,5 +434,264 @@ Vaš ${storeDisplay} tim`;
       return { success: false, error: message };
     }
   }
+
+  /**
+   * Dispatches official onboarding welcome email with API key and 25 pilot order verifications.
+   */
+  public async sendMerchantWelcomeEmail(params: {
+    recipientEmail: string;
+    recipientName: string;
+    storeUrl: string;
+    apiKey: string;
+    apiSecret?: string;
+    verifications?: number;
+    credits?: number;
+    dashboardUrl?: string;
+  }): Promise<SendEmailResult> {
+    if (!this.apiKey) {
+      console.warn('[WELCOME EMAIL] Brevo API key not configured.');
+      return { success: false, error: 'Brevo API key not configured' };
+    }
+
+    const verificationsCount = params.verifications || params.credits || 25;
+    const storeDisplay = this.getStoreDisplayName(undefined, params.storeUrl);
+    const subject = `Dobrodošli u Potvrdio! Vaš API ključ i ${verificationsCount} besplatnih verifikacija (${storeDisplay})`;
+    const dashUrl = params.dashboardUrl || 'https://potvrdio.online/dashboard';
+    const secretDisplay = params.apiSecret || (params.apiKey.startsWith('pk_live_') ? params.apiKey.replace('pk_live_', 'sec_live_') : 'demo_secret_456');
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8">
+  <title>Dobrodošli u Potvrdio</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #0f172a; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .header { background: #042f2e; padding: 32px 24px; text-align: center; color: #ffffff; }
+    .header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+    .header p { margin: 6px 0 0 0; color: #14b8a6; font-size: 13px; font-weight: 500; }
+    .badge { display: inline-block; background: rgba(20, 184, 166, 0.2); border: 1px solid #14b8a6; color: #5eead4; font-size: 11px; font-weight: bold; padding: 4px 12px; rounded: 9999px; border-radius: 9999px; margin-top: 10px; }
+    .content { padding: 32px 24px; font-size: 14px; line-height: 1.6; }
+    .key-box { background: #0f172a; color: #14b8a6; padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid #1e293b; text-align: left; }
+    .key-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 4px; font-weight: bold; }
+    .key-value { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 14px; font-weight: bold; color: #2dd4bf; word-break: break-all; margin-bottom: 14px; }
+    .steps { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin: 24px 0; }
+    .step-item { margin-bottom: 14px; }
+    .step-item:last-child { margin-bottom: 0; }
+    .step-num { font-weight: 800; color: #0d9488; }
+    .btn { display: inline-block; background: #0d9488; color: #ffffff !important; font-weight: 700; font-size: 13px; text-decoration: none; padding: 12px 24px; border-radius: 10px; margin: 12px 0; text-align: center; }
+    .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center; font-size: 11px; color: #64748b; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Dobrodošli u Potvrdio</h1>
+      <p>Logistička optimizacija COD isporuke i zaštita od nepreuzetih paketa</p>
+      <div class="badge">${verificationsCount} BESPLATNIH VERIFIKACIJA PORUDŽBINA AKTIVIRANO</div>
+    </div>
+    <div class="content">
+      <p>Poštovani <strong>${params.recipientName || 'trgovče'}</strong>,</p>
+      <p>Uspešno ste aktivirali pilot period za vašu WooCommerce prodavnicu <strong>${storeDisplay}</strong>. Na vaš nalog je dodeljeno <strong>${verificationsCount} besplatnih verifikacija porudžbina</strong> (bez obzira na SMS ili Viber kanal) kako biste se uverili u efikasnost sprečavanja lažnih i pogrešnih narudžbina.</p>
+
+      <div class="key-box">
+        <div class="key-label">1. Central Backend API Endpoint:</div>
+        <div class="key-value">https://api.potvrdio.online/api/v1</div>
+
+        <div class="key-label">2. Vaš API Key (Store ID):</div>
+        <div class="key-value">${params.apiKey}</div>
+
+        <div class="key-label">3. Vaš API Secret (HMAC Signature Key):</div>
+        <div class="key-value" style="color: #38bdf8; margin-bottom: 0;">${secretDisplay}</div>
+      </div>
+
+      <div class="steps">
+        <h4 style="margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: #334155;">Uputstvo za brzu aktivaciju u 3 koraka:</h4>
+        <div class="step-item">
+          <span class="step-num">1.</span> <strong>Preuzmite dodatak:</strong> Preuzmite najnoviju verziju WooCommerce dodatka (<a href="https://potvrdio.online/potvrdio-viber-cod.zip" style="color: #0d9488; font-weight: bold;">potvrdio-viber-cod.zip</a>) i instalirajte je u WordPress administraciji (<em>Dodaci &rarr; Dodaj novi &rarr; Otpremi dodatak</em>).
+        </div>
+        <div class="step-item">
+          <span class="step-num">2.</span> <strong>Povežite sva 3 parametra:</strong> Otvorite <em>Podešavanja &rarr; Potvrdio Viber COD</em> u WordPressu i nalepite gornji API Endpoint, API Ključ i API Secret.
+        </div>
+        <div class="step-item">
+          <span class="step-num">3.</span> <strong>Pratite rezultate:</strong> Svaka narudžbina sa pouzećem biće automatski verifikovana, a detaljne izveštaje o pilot periodu možete pratiti u vašem trgovačkom panelu.
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 24px;">
+        <a href="${dashUrl}" class="btn">Prijavite se na Merchant Dashboard &rarr;</a>
+      </div>
+
+      <p style="font-size: 12px; color: #64748b; margin-top: 24px;">
+        Ukoliko vam je potrebna besplatna tehnička pomoć oko instalacije ili podešavanja kurirskih pravila, naš tim vam stoji na raspolaganju na <a href="mailto:podrska@potvrdio.online" style="color: #0d9488;">podrska@potvrdio.online</a>.
+      </p>
+    </div>
+    <div class="footer">
+      <strong>GIZEM ORUM PR Konsultantske aktivnosti Lilanova</strong> &bull; Bulevar Patrijarha Pavla 91, Novi Sad<br>
+      PIB: 115512104 &bull; Matični broj: 68423937 &bull; Usklađeno sa ZZPL i GDPR regulativom<br>
+      &copy; 2026 Potvrdio. Sva prava zadržana.
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const textContent = `DOBRODOŠLI U POTVRDIO!\n\nPoštovani ${params.recipientName},\n\nUspešno ste aktivirali Potvrdio za prodavnicu ${storeDisplay} sa ${verificationsCount} besplatnih verifikacija porudžbina.\n\nVAŠ API KLJUČ: ${params.apiKey}\n\n1. Preuzmite WordPress dodatak: https://potvrdio.online/potvrdio-viber-cod.zip\n2. U WordPressu (Podešavanja -> Potvrdio) unesite vaš API ključ.\n3. Merchant Dashboard: ${dashUrl}\n\nTehnička podrška: podrska@potvrdio.online`;
+
+    const payload = {
+      sender: {
+        name: 'Potvrdio Podrška',
+        email: this.senderEmail,
+      },
+      to: [
+        {
+          email: params.recipientEmail,
+          name: params.recipientName,
+        },
+      ],
+      bcc: [
+        {
+          email: 'potvrdioapp@gmail.com',
+          name: 'Potvrdio Admin',
+        },
+      ],
+      subject,
+      htmlContent,
+      textContent,
+    };
+
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          'api-key': this.apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok || data.message || data.code) {
+        const errorMsg = String(data.message || data.code || `HTTP ${response.status}`);
+        console.warn(`[WELCOME EMAIL WARNING] Failed: ${errorMsg}`);
+        return { success: false, error: errorMsg };
+      }
+
+      const messageId = String(data.messageId || `wel_${Date.now()}`);
+      console.log(`[WELCOME EMAIL SUCCESS] Sent to ${params.recipientEmail}, MessageId: ${messageId}`);
+      return { success: true, messageId };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[WELCOME EMAIL NETWORK ERROR] Non-blocking: ${message}`);
+      return { success: false, error: message };
+    }
+  }
+
+  /**
+   * Dispatches time-limited magic login email with single-use authentication URL.
+   */
+  public async sendMerchantMagicLoginEmail(params: {
+    recipientEmail: string;
+    recipientName?: string;
+    magicUrl: string;
+    expiresInMinutes?: number;
+  }): Promise<SendEmailResult> {
+    if (!this.apiKey) {
+      console.warn('[MAGIC LINK EMAIL] Brevo API key not configured.');
+      return { success: false, error: 'Brevo API key not configured' };
+    }
+
+    const minutes = params.expiresInMinutes || 15;
+    const subject = `Prijavni link za Potvrdio Dashboard (${minutes} min)`;
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8">
+  <title>Prijavni link za Potvrdio</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px; color: #0f172a; }
+    .container { max-width: 580px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .header { background: #042f2e; padding: 28px 24px; text-align: center; color: #ffffff; }
+    .header h1 { margin: 0; font-size: 20px; font-weight: 800; }
+    .header p { margin: 6px 0 0 0; color: #14b8a6; font-size: 13px; }
+    .content { padding: 32px 24px; font-size: 14px; line-height: 1.6; }
+    .btn-wrap { text-align: center; margin: 28px 0; }
+    .btn { display: inline-block; background: #0d9488; color: #ffffff !important; font-weight: 700; font-size: 14px; text-decoration: none; padding: 14px 30px; border-radius: 10px; box-shadow: 0 4px 12px rgba(13,148,136,0.25); }
+    .notice { background: #f0fdfa; border: 1px solid #ccfbf1; border-radius: 10px; padding: 14px; font-size: 12px; color: #0f766e; margin-top: 20px; }
+    .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 20px; text-align: center; font-size: 11px; color: #64748b; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Sigurna prijava na Potvrdio</h1>
+      <p>Autentifikacija bez lozinke (Magic Link)</p>
+    </div>
+    <div class="content">
+      <p>Poštovani <strong>${params.recipientName || 'trgovče'}</strong>,</p>
+      <p>Primili smo zahtev za prijavu na vaš Potvrdio Merchant Dashboard. Kliknite na dugme ispod kako biste se trenutno i bezbedno prijavili bez unošenja lozinke:</p>
+
+      <div class="btn-wrap">
+        <a href="${params.magicUrl}" class="btn">Prijavite se na Dashboard &rarr;</a>
+      </div>
+
+      <div class="notice">
+        <strong>Napomena o bezbednosti:</strong> Ovaj prijavni link je jednokratan i važi narednih <strong>${minutes} minuta</strong>. Ako niste zatražili ovu prijavu, možete bezbedno ignorisati ovaj email.
+      </div>
+    </div>
+    <div class="footer">
+      <strong>GIZEM ORUM PR Konsultantske aktivnosti Lilanova</strong> &bull; Bulevar Patrijarha Pavla 91, Novi Sad<br>
+      &copy; 2026 Potvrdio &bull; Bezbednost i verifikacija porudžbina
+    </div>
+  </div>
+</body>
+</html>`;
+
+    const textContent = `SIGURNA PRIJAVA NA POTVRDIO\n\nKliknite na link ispod za prijavu na vaš nalog (važi ${minutes} minuta):\n\n${params.magicUrl}\n\nAko niste zatražili ovaj link, zanemarite ovu poruku.`;
+
+    const payload = {
+      sender: {
+        name: 'Potvrdio Sigurnost',
+        email: this.senderEmail,
+      },
+      to: [
+        {
+          email: params.recipientEmail,
+          name: params.recipientName || params.recipientEmail,
+        },
+      ],
+      subject,
+      htmlContent,
+      textContent,
+    };
+
+    try {
+      const response = await fetch(this.apiUrl, {
+        method: 'POST',
+        headers: {
+          'api-key': this.apiKey,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+      if (!response.ok || data.message || data.code) {
+        const errorMsg = String(data.message || data.code || `HTTP ${response.status}`);
+        console.warn(`[MAGIC LINK EMAIL WARNING] Failed: ${errorMsg}`);
+        return { success: false, error: errorMsg };
+      }
+
+      const messageId = String(data.messageId || `ml_${Date.now()}`);
+      console.log(`[MAGIC LINK EMAIL SUCCESS] Sent to ${params.recipientEmail}, MessageId: ${messageId}`);
+      return { success: true, messageId };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.warn(`[MAGIC LINK EMAIL NETWORK ERROR] Non-blocking: ${message}`);
+      return { success: false, error: message };
+    }
+  }
 }
 

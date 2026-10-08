@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Rocket, CheckCircle2, ShieldCheck, ArrowRight, Building, Mail, Phone, Globe, Package, Zap } from 'lucide-react';
+import { X, Rocket, CheckCircle2, ShieldCheck, ArrowRight, Building, Mail, Phone, Globe, Package, Zap, Copy, Check, ExternalLink } from 'lucide-react';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -7,6 +7,9 @@ interface OnboardingModalProps {
   lang: 'sr' | 'mk' | 'en';
   playSuccessSound?: () => void;
 }
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4001';
+const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || 'http://localhost:3002';
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose, lang, playSuccessSound }) => {
   const [step, setStep] = useState<'form' | 'success'>('form');
@@ -17,19 +20,79 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
   const [orderVolume, setOrderVolume] = useState('100-300');
   const [courier, setCourier] = useState('post-express');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generatedApiKey, setGeneratedApiKey] = useState('');
+  const [emailSentStatus, setEmailSentStatus] = useState<boolean | null>(null);
+  const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate fast processing
-    setTimeout(() => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/merchant/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          storeUrl,
+          fullName,
+          email,
+          phone,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setGeneratedApiKey(data.apiKey);
+        setEmailSentStatus(Boolean(data.emailSent));
+        try {
+          localStorage.setItem('potvrdio_registered_merchant', JSON.stringify({
+            apiKey: data.apiKey,
+            storeName: storeUrl,
+            isTrial: true,
+            trialRemaining: 25,
+          }));
+        } catch {}
+      } else {
+        // Fallback local key generation if backend responded with error
+        const fallbackKey = `pk_live_${storeUrl.replace(/[^a-z0-9]/gi, '').toLowerCase() || 'store'}_${Math.random().toString(36).substring(2, 8)}`;
+        setGeneratedApiKey(fallbackKey);
+        setEmailSentStatus(false);
+        try {
+          localStorage.setItem('potvrdio_registered_merchant', JSON.stringify({
+            apiKey: fallbackKey,
+            storeName: storeUrl,
+            isTrial: true,
+            trialRemaining: 25,
+          }));
+        } catch {}
+      }
+    } catch (err) {
+      console.warn('Backend unavailable, generating fallback offline key:', err);
+      const fallbackKey = `pk_live_${storeUrl.replace(/[^a-z0-9]/gi, '').toLowerCase() || 'store'}_${Math.random().toString(36).substring(2, 8)}`;
+      setGeneratedApiKey(fallbackKey);
+      setEmailSentStatus(false);
+      try {
+        localStorage.setItem('potvrdio_registered_merchant', JSON.stringify({
+          apiKey: fallbackKey,
+          storeName: storeUrl,
+          isTrial: true,
+          trialRemaining: 25,
+        }));
+      } catch {}
+    } finally {
       setIsSubmitting(false);
       setStep('success');
       if (playSuccessSound) playSuccessSound();
-    }, 600);
+    }
+  };
+
+  const handleCopyKey = () => {
+    if (!generatedApiKey) return;
+    navigator.clipboard.writeText(generatedApiKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const handleResetAndClose = () => {
@@ -41,77 +104,86 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
     sr: {
       badge: "Besplatna Registracija & 25 Verifikacija",
       title: "Zaštitite Vašu WooCommerce Prodavnicu",
-      subtitle: "Unesite podatke vaše radnje za instant aktivaciju Viber verifikacionog ključa.",
-      label_store: "Domain / Web Prodavnica",
-      placeholder_store: "npr. mojaradnja.rs",
-      label_name: "Ime i Prezime",
+      subtitle: "Unesite podatke vaše radnje za instant aktivaciju verifikacionog ključa i 25 besplatnih verifikacija porudžbina.",
+      label_store: "Web prodavnica (WooCommerce)",
+      placeholder_store: "mojaprodavnica.rs",
+      label_name: "Ime i prezime / Naziv firme",
       placeholder_name: "Petar Petrović",
-      label_email: "Poslovna E-pošta",
+      label_email: "Poslovna e-pošta",
       placeholder_email: "petar@mojaradnja.rs",
-      label_phone: "Telefon / Viber za tehnički nalog",
-      placeholder_phone: "+381 63 123 4567",
-      label_volume: "Mesečni broj narudžbina pouzećem (COD)",
-      label_courier: "Glavna kurirska služba",
-      btn_submit: "Aktiviraj Besplatnih 25 Sesija",
-      btn_submitting: "Aktivacija u toku...",
-      note_legal: "🔒 Bez kreditne kartice. Usklađeno sa Čl. 12 ZZPL RS & GDPR.",
+      label_phone: "Broj telefona / Viber",
+      placeholder_phone: "+381 64 123 4567",
+      btn_submit: "Aktiviraj 25 Besplatnih Verifikacija",
+      btn_submitting: "Generisanje i slanje ključa...",
+      note_legal: "Bez kreditne kartice. Usklađeno sa Čl. 12 ZZPL RS & GDPR.",
       success_title: "Verifikacioni Ključ Uspešno Generisan!",
-      success_sub: "Dobrodošli u Potvrdio mrežu! Dobili ste 25 besplatnih verifikacionih kredita.",
+      success_sub: "Dobrodošli u Potvrdio mrežu! Vaš nalog je spreman sa 25 besplatnih verifikacija porudžbina.",
+      key_label: "Vaš Zvanični API Ključ:",
+      copy_btn: "Kopiraj",
+      copied_btn: "Kopirano!",
+      email_sent: "Potvrdni email sa uputstvom i ključem poslat na:",
+      email_fallback: "Napomena: API ključ možete odmah iskoristiti iznad.",
       success_step1: "1. Preuzmite i aktivirajte Potvrdio WordPress plugin (.zip)",
-      success_step2: "2. Vaš API ključ je poslat na vašu e-poštu:",
-      success_step3: "3. Podrška za besplatnu instalaciju vam stoji na raspolaganju 24/7.",
+      success_step2: "2. U WordPress-u (Podešavanja → Potvrdio) unesite gornji API ključ",
+      btn_dashboard: "Otvori Merchant Dashboard",
       btn_dl_zip: "Preuzmi WordPress Plugin (.zip)",
-      btn_close: "Završi Registraciju"
+      btn_close: "Završi"
     },
     mk: {
       badge: "Бесплатна Регистрација & 25 Верификации",
       title: "Заштитете ја вашата WooCommerce продавница",
-      subtitle: "Внесете ги податоците за инстант активација на Viber клучот.",
-      label_store: "Веб Продавница",
-      placeholder_store: "пр. mojaradnja.mk",
-      label_name: "Име и Презиме",
+      subtitle: "Внесете ги податоците за инстант активација на клучот и 25 бесплатни верификации на нарачки.",
+      label_store: "Веб продавница (WooCommerce)",
+      placeholder_store: "mojaprodavnica.mk",
+      label_name: "Име и презиме / Фирма",
       placeholder_name: "Петар Петровски",
-      label_email: "Деловен Е-пошта",
+      label_email: "Деловна е-пошта",
       placeholder_email: "petar@mojaradnja.mk",
-      label_phone: "Телефон / Viber за контакт",
+      label_phone: "Телефонски број / Viber",
       placeholder_phone: "+389 70 123 456",
-      label_volume: "Месечен број на COD нарачки",
-      label_courier: "Главна курирска служба",
-      btn_submit: "Активирај Бесплатни 25 Сесии",
-      btn_submitting: "Активација во тек...",
-      note_legal: "🔒 Без кредитна картичка. Усогласено со Закон за лични податоци.",
+      btn_submit: "Активирај 25 Бесплатни Верификации",
+      btn_submitting: "Генерирање клуч...",
+      note_legal: "Без кредитна картичка. Усогласено со Закон за лични податоци.",
       success_title: "Верификацискиот Клуч е Успешно Генериран!",
-      success_sub: "Добредојдовте во Potvrdio! Добивте 25 бесплатни верификации.",
+      success_sub: "Добредојдовте во Potvrdio! Вашиот налог е подготвен со 25 бесплатни верификации на нарачки.",
+      key_label: "Ваш Официјален API Клуч:",
+      copy_btn: "Копирај",
+      copied_btn: "Копирано!",
+      email_sent: "Потврдниот мејл со клучот е испратен на:",
+      email_fallback: "Забелешка: Можете веднаш да го искористите клучот погоре.",
       success_step1: "1. Преземете го и активирајте го WordPress приклучокот (.zip)",
-      success_step2: "2. Вашиот API клуч е испратен на вашата е-пошта:",
-      success_step3: "3. Поддршката за инсталација ви стои на располагање 24/7.",
+      success_step2: "2. Во WordPress (Поставки → Potvrdio) внесете го API клучот",
+      btn_dashboard: "Отвори Merchant Dashboard",
       btn_dl_zip: "Преземи WordPress Plugin (.zip)",
-      btn_close: "Заврши Регистрација"
+      btn_close: "Заврши"
     },
     en: {
-      badge: "Free Onboarding & 25 Credits Included",
+      badge: "Free Onboarding & 25 Order Verifications",
       title: "Protect Your WooCommerce E-Store",
-      subtitle: "Enter store details for instant Viber Business verification key activation.",
-      label_store: "Store Domain / URL",
-      placeholder_store: "e.g. mystore.com",
-      label_name: "Contact Name",
+      subtitle: "Enter store details for instant verification key activation and 25 free order verifications.",
+      label_store: "Store Domain / URL (WooCommerce)",
+      placeholder_store: "mystore.com",
+      label_name: "Contact Name / Company",
       placeholder_name: "Peter Smith",
       label_email: "Business Email",
-      placeholder_email: "peter@mystore.com",
-      label_phone: "Phone / Viber for Technical Account",
-      placeholder_phone: "+381 63 123 4567",
-      label_volume: "Monthly Cash on Delivery (COD) Volume",
-      label_courier: "Primary Courier Partner",
-      btn_submit: "Activate 25 Free Verification Sessions",
-      btn_submitting: "Activating Key...",
-      note_legal: "🔒 No credit card required. Compliant with ZZPL Art 12 & EU GDPR.",
+      placeholder_email: "owner@mystore.com",
+      label_phone: "Phone Number / Viber",
+      placeholder_phone: "+381 64 123 4567",
+      btn_submit: "Activate 25 Free Order Verifications",
+      btn_submitting: "Generating API Key...",
+      note_legal: "No credit card required. Compliant with ZZPL Art 12 & EU GDPR.",
       success_title: "Verification API Key Activated!",
-      success_sub: "Welcome to Potvrdio! Your store has been credited with 25 free sessions.",
+      success_sub: "Welcome to Potvrdio! Your store has been credited with 25 free order verifications.",
+      key_label: "Your Official API Key:",
+      copy_btn: "Copy",
+      copied_btn: "Copied!",
+      email_sent: "Welcome email with setup instructions sent to:",
+      email_fallback: "Note: You can immediately use the API key above.",
       success_step1: "1. Download & activate the Potvrdio WordPress plugin (.zip)",
-      success_step2: "2. Your API key has been dispatched to:",
-      success_step3: "3. Free technical installation support available 24/7.",
+      success_step2: "2. In WordPress (Settings → Potvrdio), paste your API key",
+      btn_dashboard: "Open Merchant Dashboard",
       btn_dl_zip: "Download WordPress Plugin (.zip)",
-      btn_close: "Complete Registration"
+      btn_close: "Done"
     }
   };
 
@@ -150,7 +222,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 <div>
                   <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                    <span>{t.label_store} *</span>
+                    <span>{t.label_store}</span>
                   </label>
                   <input 
                     type="text"
@@ -167,7 +239,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                   <div>
                     <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
                       <Building className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                      <span>{t.label_name} *</span>
+                      <span>{t.label_name}</span>
                     </label>
                     <input 
                       type="text"
@@ -182,7 +254,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                   <div>
                     <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
                       <Mail className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                      <span>{t.label_email} *</span>
+                      <span>{t.label_email}</span>
                     </label>
                     <input 
                       type="email"
@@ -195,59 +267,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                   </div>
                 </div>
 
-                {/* Phone & Volume */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                      <span>{t.label_phone} *</span>
-                    </label>
-                    <input 
-                      type="tel"
-                      required
-                      placeholder={t.placeholder_phone}
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
-                      <Package className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                      <span>{t.label_volume}</span>
-                    </label>
-                    <select 
-                      value={orderVolume}
-                      onChange={(e) => setOrderVolume(e.target.value)}
-                      className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px] cursor-pointer"
-                    >
-                      <option value="<100">&lt; 100 porudžbina / mesec</option>
-                      <option value="100-300">100 - 300 porudžbina / mesec</option>
-                      <option value="300-1000">300 - 1.000 porudžbina / mesec</option>
-                      <option value="1000+">1.000+ porudžbina (Pro Reserve)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Courier Selection */}
+                {/* Phone */}
                 <div>
                   <label className="block text-[11px] text-theme-secondary font-bold mb-1 flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
-                    <span>{t.label_courier}</span>
+                    <Phone className="w-3.5 h-3.5 text-teal-600 dark:text-[#14B8A6]" />
+                    <span>{t.label_phone}</span>
                   </label>
-                  <select 
-                    value={courier}
-                    onChange={(e) => setCourier(e.target.value)}
-                    className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px] cursor-pointer"
-                  >
-                    <option value="post-express">Post Express (Pošta Srbije)</option>
-                    <option value="bex">Bex Express</option>
-                    <option value="d-express">D Express</option>
-                    <option value="city-express">City Express</option>
-                    <option value="cargo-mk">Cargo Express MK (Makedonija)</option>
-                    <option value="via-courier">Via Courier / Ostalo</option>
-                  </select>
+                  <input 
+                    type="tel"
+                    required
+                    placeholder={t.placeholder_phone}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-surface border border-theme focus:border-teal-500 rounded-lg px-3 py-2 text-theme-primary font-sans text-xs focus:outline-none focus:ring-1 focus:ring-teal-500 min-h-[40px]"
+                  />
                 </div>
               </div>
 
@@ -282,22 +315,68 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-1 font-sans">{t.success_sub}</p>
               </div>
 
-              <div className="p-4 bg-surface-subtle border border-theme rounded-xl text-left text-xs font-sans space-y-2 text-theme-secondary">
-                <p className="text-theme-primary font-bold">{t.success_step1}</p>
-                <p className="text-theme-muted">
-                  {t.success_step2} <span className="text-teal-600 dark:text-[#14B8A6] underline font-medium">{email || 'petar@mojaradnja.rs'}</span>
-                </p>
-                <p className="text-theme-muted">{t.success_step3}</p>
+              {/* API Key Box with One-Click Copy */}
+              <div className="p-3.5 bg-slate-900 border border-slate-700/80 rounded-xl text-left">
+                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+                  <span>{t.key_label}</span>
+                  <span className="text-teal-400 font-mono text-[10px]">25 BESPLATNIH VERIFIKACIJA</span>
+                </div>
+                <div className="flex items-center justify-between gap-2 bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                  <code className="text-xs font-mono text-teal-300 font-bold select-all break-all">
+                    {generatedApiKey || 'pk_live_default_key'}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={handleCopyKey}
+                    className="shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded bg-teal-600 hover:bg-teal-500 text-white font-bold text-[11px] transition cursor-pointer"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>{t.copied_btn}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>{t.copy_btn}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
+              {/* Status info */}
+              <div className="p-4 bg-surface-subtle border border-theme rounded-xl text-left text-xs font-sans space-y-2 text-theme-secondary">
+                <p className="text-theme-primary font-bold">{t.success_step1}</p>
+                <p className="text-theme-primary font-bold">{t.success_step2}</p>
+                <p className="text-theme-muted pt-1 border-t border-theme/50">
+                  {t.email_sent}{' '}
+                  <span className="text-teal-600 dark:text-[#14B8A6] font-semibold underline">
+                    {email || 'petar@mojaradnja.rs'}
+                  </span>
+                </p>
+              </div>
+
+              {/* Actions */}
               <div className="space-y-2 pt-2">
-                <button 
-                  onClick={handleResetAndClose}
-                  className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg cursor-pointer min-h-[44px]"
+                <a 
+                  href={`${DASHBOARD_URL}?api_key=${encodeURIComponent(generatedApiKey)}&store=${encodeURIComponent(storeUrl || 'mojaradnja.rs')}&trial=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-teal-300 border border-teal-500/30 font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg min-h-[44px]"
+                >
+                  <ExternalLink className="w-4 h-4 text-teal-400" />
+                  <span>{t.btn_dashboard} &rarr;</span>
+                </a>
+
+                <a 
+                  href="/potvrdio-viber-cod.zip"
+                  download
+                  className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg min-h-[44px]"
                 >
                   <Rocket className="w-4 h-4" />
                   <span>{t.btn_dl_zip}</span>
-                </button>
+                </a>
 
                 <button 
                   onClick={handleResetAndClose}

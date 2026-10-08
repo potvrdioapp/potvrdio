@@ -156,6 +156,104 @@ export interface TranslationSchema {
   pasteHereBadge: string;
   clickToLocate: string;
   stepActiveBadge: string;
+  guideInteractiveHint: string;
+  mockupStaticBadge: string;
+  step1Badge: string;
+  step2Badge: string;
+  step3Badge: string;
+  startHereBadge: string;
+  previewBadge: string;
+  selectStepPrompt: string;
+  breadcrumbMenuPath: string;
+
+  // Store Profile & Logistics Settings
+  logisticsTitle: string;
+  logisticsSub: string;
+  labelCourier: string;
+  labelVolume: string;
+  saveLogisticsBtn: string;
+  logisticsSavedToast: string;
+  courierPostExpress: string;
+  courierBex: string;
+  courierDExpress: string;
+  courierCityExpress: string;
+  courierCargoMk: string;
+  courierOther: string;
+  volUnder100: string;
+  vol100to300: string;
+  vol300to1000: string;
+  vol1000plus: string;
+  logisticsEstimateBadge: string;
+  onboardingLogisticsCardTitle: string;
+  onboardingLogisticsCardDesc: string;
+  onboardingLogisticsBadge: string;
+  onboardingLogisticsDoneBadge: string;
+
+  // Header & Badges
+  badgePilotAccount: string;
+  badgeDemoAccount: string;
+  yourStoresLabel: string;
+  addStoreBtn: string;
+  signInRealAccountBtn: string;
+  logoutBtn: string;
+  signInBtn: string;
+  demoStoreBtn: string;
+  pilotVerificationsLabel: string;
+  remainingLabel: string;
+
+  // Overview Header & Pilot Trial
+  overviewMetricsSubtitle: string;
+  pilotTrialBannerTitle: string;
+  pilotTrialRemainingText: (remaining: number) => string;
+  pilotTrialDesc: string;
+  demoBannerNotice: string;
+  demoBannerSignIn: string;
+  demoBannerRegister: string;
+
+  // Zero-State & Live Verification Stats
+  statZeroConfirmedBadge: string;
+  statZeroProcessedBadge: (count: number) => string;
+  statZeroWaitingOrder: string;
+  statZeroRemainingPilot: (remaining: number) => string;
+  statZeroDeliveryPending: string;
+  statZeroVerifiedAddresses: string;
+  statZeroPotentialSavings: string;
+  statZeroSavedCourier: string;
+  statZeroAwaitingFirst: string;
+  statZeroCustomerResponse: string;
+
+  // Simulation & Order Table Zero State
+  simulateOrderBtn: string;
+  simulatingBtn: string;
+  simulateOrderTitleTooltip: string;
+  orderCountUnit: string;
+  waitingFirstOrderTitle: string;
+  waitingFirstOrderDesc: (apiKey: string, remaining: number, storeDomain: string) => string;
+  simulateTestOrderBtn: string;
+  wpSetupGuideBtn: string;
+
+  // Store Connection & Onboarding
+  connPendingBadge: string;
+  connConnectedBadge: string;
+  connectStoreTitle: string;
+  connectStoreDesc: string;
+  stepDownloadPluginTitle: string;
+  stepDownloadPluginDesc: string;
+  downloadPluginBtn: string;
+  stepPasteKeysTitle: string;
+  stepPasteKeysDesc: string;
+  seeDetailsBtn: string;
+  stepVerifyTitle: string;
+  stepVerifyDesc: string;
+  verifyConnectionBtn: string;
+  verifyingConnectionBtn: string;
+  connectionSuccessBadge: string;
+  connectionFailedTitle: string;
+  connectionNoSignalError: string;
+  connectedAwaitingOrdersTitle: string;
+  connectedAwaitingOrdersDesc: (storeDomain: string, remaining: number) => string;
+  tryDemoSandboxPrompt: string;
+  tryDemoSandboxBtn: string;
 }
 
 export const translations: Record<Language, TranslationSchema> = {
@@ -176,7 +274,7 @@ export const translations: Record<Language, TranslationSchema> = {
     // Navigation
     navOverview: 'Pregled & Analitika',
     navCredits: 'Krediti & Dopuna',
-    navSettings: 'WooCommerce API Ključ',
+    navSettings: 'Podešavanja',
     
     // Timeframe Filter
     timeframe30d: 'Poslednjih 30 dana',
@@ -228,29 +326,29 @@ export const translations: Record<Language, TranslationSchema> = {
     starterTitle: 'Starter Paket',
     starterCredits: '600 Viber Kredita',
     starterDesc: '€0.025 / poruci. Idealno za manje prodavnice (do 50 porudžbina/mesec).',
-    starterBtn: 'Kupi sa Paddle MoR',
+    starterBtn: 'Dopuni Kredite (IPS QR)',
     
     growthBadge: 'NAJPOPULARNIJE',
     growthTitle: 'Growth Paket',
     growthCredits: '1,875 Viber Kredita',
     growthDesc: '€0.024 / poruci. Za srednje e-trgovce u Srbiji i regionu.',
-    growthBtn: 'Kupi sa Lemon Squeezy',
+    growthBtn: 'Dopuni Kredite (IPS QR)',
     
     proTitle: 'Pro Paket',
     proCredits: '6,000 Viber Kredita',
     proDesc: '€0.020 / poruci. Najniža cena poruke za visoki obim pošiljki.',
-    proBtn: 'Kupi sa Paddle MoR',
+    proBtn: 'Dopuni Kredite (IPS QR)',
     
     reserveTitle: 'Pro Reserve (MRR)',
     reservePerMonth: '/mesec',
     reserveCredits: '1,800 Kredita / Mesec',
     reserveDesc: 'Automatska mesečna rezervacija garancije sa popustom na poruke.',
-    reserveBtn: 'Aktiviraj Pretplatu',
+    reserveBtn: 'Aktiviraj Pretplatu (IPS QR)',
     loadingText: 'Učitavanje...',
-    successTopupAlert: (count: number, cost: number) => `[PADDLE / LEMON SQUEEZY] Uspešno ste dopunili ${count} kredita za €${cost}!`,
+    successTopupAlert: (count: number, cost: number) => `Uspešno ste dopunili ${count} kredita za €${cost} (IPS QR / Predračun)!`,
 
     // Credit Ledger & Usage History
-    ledgerHeading: 'Istorijat dopuna i potrošnje kredita (Kreditna kartica)',
+    ledgerHeading: 'Istorijat dopuna i potrošnje kredita (B2B Predračun / IPS QR)',
     ledgerSubheading: 'Pregled početnog stanja, utrošenih Viber i SMS poruka i preostalog stanja po odabranom periodu.',
     ledgerTimeframeSinceLast: 'Od poslednje kupovine',
     ledgerTimeframe7d: 'Poslednjih 7 dana',
@@ -301,17 +399,117 @@ export const translations: Record<Language, TranslationSchema> = {
     
     // Guide step cards
     step1Title: 'Otvorite Podešavanja',
-    step1Desc: 'Ulogujte se u WordPress admin panel (/wp-admin) i kliknite na Podešavanja ➔ Potvrdio Viber COD.',
-    step2Title: 'Nalepite Ključeve',
+    step1Desc: 'Ulogujte se u WordPress admin panel (/wp-admin) i kliknite na Podešavanja > Potvrdio Viber COD.',
+    step2Title: 'Kopirajte i Nalepite Ključeve',
     step2Desc: 'Kopirajte 3 polja sa vrha ovog ekrana i nalepite ih u odgovarajuća polja unutar WordPress forme.',
     step3Title: 'Sačuvajte i Gotovo!',
     step3Desc: 'Kliknite na plavo dugme Sačuvaj izmene. Vaša prodavnica je odmah zaštićena od lažnih COD porudžbina.',
     
     saveChangesBtn: 'Sačuvaj izmene (Save Changes)',
     finalStepBadge: 'Poslednji korak',
-    pasteHereBadge: '✓ Nalepiti ovde',
-    clickToLocate: 'Kliknite za prikaz ↓',
-    stepActiveBadge: '● Označeno dole ↓'
+    pasteHereBadge: 'Nalepiti ovde',
+    clickToLocate: 'Kliknite za prikaz na slici dole ↓',
+    stepActiveBadge: 'Aktivno označeno na slici dole ↓',
+    guideInteractiveHint: 'Interaktivni vodič: Kliknite na bilo koju karticu koraka (1, 2 ili 3) da biste videli tačnu poziciju označenu na WordPress slici ispod:',
+    mockupStaticBadge: 'Statički grafički prikaz (Ilustrativan snimak ekrana · Nije za kliktanje)',
+    step1Badge: 'Korak 1',
+    step2Badge: 'Korak 2',
+    step3Badge: 'Korak 3',
+    startHereBadge: 'Počnite ovde (Kliknite)',
+    previewBadge: 'Prikazano',
+    selectStepPrompt: 'Izaberite korak iznad za pregled',
+    breadcrumbMenuPath: 'Putanja menija',
+
+    // Store Profile & Logistics Settings
+    logisticsTitle: 'Logistički Profil Prodavnice & Kurirski Partner',
+    logisticsSub: 'Izaberite primarnu kurirsku službu i mesečni obim porudžbina za tačno prilagođavanje SMS/Viber šablona i kalkulaciju uštede.',
+    labelCourier: 'Glavna Kurirska Služba',
+    labelVolume: 'Mesečni Broj Narudžbina Pouzećem (COD)',
+    saveLogisticsBtn: 'Sačuvaj Logistički Profil',
+    logisticsSavedToast: 'Logistički profil uspešno ažuriran!',
+    courierPostExpress: 'Post Express (Pošta Srbije)',
+    courierBex: 'Bex Express',
+    courierDExpress: 'D Express',
+    courierCityExpress: 'City Express',
+    courierCargoMk: 'Cargo Express MK (Makedonija)',
+    courierOther: 'Via Courier / Ostalo',
+    volUnder100: '< 100 porudžbina / mesec',
+    vol100to300: '100 - 300 porudžbina / mesec',
+    vol300to1000: '300 - 1.000 porudžbina / mesec',
+    vol1000plus: '1.000+ porudžbina (Pro Reserve)',
+    logisticsEstimateBadge: 'Automatska optimizacija formata praćenja aktivna',
+    onboardingLogisticsCardTitle: 'Prilagodite vašu kurirsku službu i COD obim',
+    onboardingLogisticsCardDesc: 'Definišite primarnog kurira kako bismo prilagodili SMS/Viber linkove praćenja i procenili mesečnu uštedu na sprečenim povratima.',
+    onboardingLogisticsBadge: 'ONBOARDING KORAK',
+    onboardingLogisticsDoneBadge: 'PROFIL PODEŠEN',
+
+    // Header & Badges
+    badgePilotAccount: 'PILOT PERIOD',
+    badgeDemoAccount: 'DEMO PODACI',
+    yourStoresLabel: 'Vaše WooCommerce Prodavnice',
+    addStoreBtn: '+ Dodaj novu prodavnicu',
+    signInRealAccountBtn: 'Prijavi se na pravi nalog',
+    logoutBtn: 'Odjavi se sa naloga',
+    signInBtn: 'Prijavi se na nalog',
+    demoStoreBtn: 'Idi na Demo',
+    pilotVerificationsLabel: 'Pilot Verifikacije',
+    remainingLabel: 'Preostalo',
+
+    // Overview Header & Pilot Trial
+    overviewMetricsSubtitle: 'Ključni pokazatelji COD poslovanja i operativne verifikacije',
+    pilotTrialBannerTitle: 'Besplatan Pilot Period',
+    pilotTrialRemainingText: (remaining: number) => `${remaining} / 25 besplatnih verifikacija preostalo`,
+    pilotTrialDesc: 'Vaš nalog koristi 25 garantovanih besplatnih verifikacija za vaše prve porudžbine (bez obzira na SMS ili Viber kanal). Nema automatske naplate niti skrivenih troškova.',
+    demoBannerNotice: 'Gledate primer demo prodavnice (Balkan Style Shop) sa simuliranim podacima. Da povežete vaš WooCommerce i dobijete 25 besplatnih verifikacija:',
+    demoBannerSignIn: 'Prijavite se',
+    demoBannerRegister: 'Registrujte se (25 Besplatno)',
+
+    // Zero-State & Live Verification Stats
+    statZeroConfirmedBadge: 'Početak pilot perioda',
+    statZeroProcessedBadge: (count: number) => `+${count} obrađeno`,
+    statZeroWaitingOrder: 'Čeka prvu COD porudžbinu',
+    statZeroRemainingPilot: (remaining: number) => `${remaining} preostalo u pilotu`,
+    statZeroDeliveryPending: 'Biće izračunato nakon isporuke',
+    statZeroVerifiedAddresses: '100% verifikovanih adresa',
+    statZeroPotentialSavings: 'Potencijalna ušteda u toku',
+    statZeroSavedCourier: 'Sačuvano na kurirskim troškovima',
+    statZeroAwaitingFirst: 'Čeka se prva porudžbina',
+    statZeroCustomerResponse: 'Trenutni odziv kupaca',
+
+    // Simulation & Order Table Zero State
+    simulateOrderBtn: 'Simuliraj porudžbinu',
+    simulatingBtn: 'Simuliram...',
+    simulateOrderTitleTooltip: 'Simuliraj novu WooCommerce porudžbinu',
+    orderCountUnit: 'naloga',
+    waitingFirstOrderTitle: 'Čekamo vašu prvu WooCommerce porudžbinu',
+    waitingFirstOrderDesc: (apiKey: string, remaining: number, storeDomain: string) =>
+      `Vaš API ključ (${apiKey}) je aktivan sa ${remaining} besplatnih verifikacija. Čim kupac napravi COD porudžbinu na ${storeDomain}, pojaviće se ovde u realnom vremenu.`,
+    simulateTestOrderBtn: 'Simuliraj Test Porudžbinu',
+    wpSetupGuideBtn: 'Uputstvo za WordPress Povezivanje',
+
+    // Store Connection & Onboarding
+    connPendingBadge: 'ČEKA POVEZIVANJE',
+    connConnectedBadge: 'POVEZANO I AKTIVNO',
+    connectStoreTitle: 'Povežite vašu WooCommerce prodavnicu',
+    connectStoreDesc: 'Pre nego što kupci počnu da naručuju pouzećem, instalirajte Potvrdio eklentiju kako bi SMS/Viber verifikacioni linkovi automatski radili.',
+    stepDownloadPluginTitle: '1. Preuzmite Potvrdio WordPress eklentiju',
+    stepDownloadPluginDesc: 'Instalirajte .zip arhivu kroz WordPress administraciju (Plugins > Add New > Upload Plugin).',
+    downloadPluginBtn: 'Preuzmi potvrdio-woocommerce.zip',
+    stepPasteKeysTitle: '2. Unesite sva 3 ključa u WordPress (Podešavanja > Potvrdio)',
+    stepPasteKeysDesc: 'U WordPress adminu (Podešavanja > Potvrdio Viber COD) unesite ova 3 bezbednosna parametra:',
+    seeDetailsBtn: 'Pogledaj detalje (See details)',
+    stepVerifyTitle: '3. Verifikujte dvosmernu vezu',
+    stepVerifyDesc: 'Kada sačuvate podešavanja u WordPress-u, kliknite ispod ili sačekajte automatski sinhronizacioni signal.',
+    verifyConnectionBtn: 'Proveri i verifikuj vezu',
+    verifyingConnectionBtn: 'Proveravam komunikaciju sa prodavnicom...',
+    connectionSuccessBadge: '200 OK · Uspešno povezano sa WooCommerce!',
+    connectionFailedTitle: 'Nije Detektovan Signal Prodavnice',
+    connectionNoSignalError: 'Još uvek nismo primili signal sa vašeg WordPress sajta. Molimo proverite da li ste instalirali eklentiju i da su podešavanja uneta kako je navedeno, pa pokušajte ponovo.',
+    connectedAwaitingOrdersTitle: 'WooCommerce je uspešno povezan i sluša',
+    connectedAwaitingOrdersDesc: (storeDomain: string, remaining: number) =>
+      `Vaša prodavnica (${storeDomain}) je aktivna sa ${remaining} besplatnih verifikacija. Čim kupac izabere plaćanje pouzećem (COD), Potvrdio će poslati verifikacioni link i ovde prikazati status.`,
+    tryDemoSandboxPrompt: 'Želite prvo da isprobate kako Viber verifikacija radi pre povezivanja vašeg WordPress-a?',
+    tryDemoSandboxBtn: 'Otvori Demo Nalog (Balkan Style Shop)',
   },
   mk: {
     langCode: 'mk-MK',
@@ -330,7 +528,7 @@ export const translations: Record<Language, TranslationSchema> = {
     // Navigation
     navOverview: 'Преглед и Аналитика',
     navCredits: 'Кредити и Дополнување',
-    navSettings: 'WooCommerce API Клуч',
+    navSettings: 'Поставки',
     
     // Timeframe Filter
     timeframe30d: 'Последните 30 дена',
@@ -382,29 +580,29 @@ export const translations: Record<Language, TranslationSchema> = {
     starterTitle: 'Starter Пакет',
     starterCredits: '600 Viber Кредити',
     starterDesc: '€0.025 / порака. Идеално за помали продавници (до 50 нарачки/месец).',
-    starterBtn: 'Купи со Paddle MoR',
+    starterBtn: 'Надополни Кредити (IPS QR)',
     
     growthBadge: 'НАЈПОПУЛАРНО',
     growthTitle: 'Growth Пакет',
     growthCredits: '1,875 Viber Кредити',
     growthDesc: '€0.024 / порака. За средни е-трговци во Македонија и регионот.',
-    growthBtn: 'Купи со Lemon Squeezy',
+    growthBtn: 'Надополни Кредити (IPS QR)',
     
     proTitle: 'Pro Пакет',
     proCredits: '6,000 Viber Кредити',
     proDesc: '€0.020 / порака. Најниска цена по порака за голем обем на пратки.',
-    proBtn: 'Купи со Paddle MoR',
+    proBtn: 'Надополни Кредити (IPS QR)',
     
     reserveTitle: 'Pro Reserve (MRR)',
     reservePerMonth: '/месец',
     reserveCredits: '1,800 Кредити / Месец',
     reserveDesc: 'Автоматска месечна резервација на гаранција со попуст на пораки.',
-    reserveBtn: 'Активирај Претплата',
+    reserveBtn: 'Активирај Претплата (IPS QR)',
     loadingText: 'Вчитување...',
-    successTopupAlert: (count: number, cost: number) => `[PADDLE / LEMON SQUEEZY] Успешно надополнивте ${count} кредити за €${cost}!`,
+    successTopupAlert: (count: number, cost: number) => `Успешно надополнивте ${count} кредити за €${cost} (IPS QR / Фактура)!`,
 
     // Credit Ledger & Usage History
-    ledgerHeading: 'Историја на надополнување и потрошувачка на кредити',
+    ledgerHeading: 'Историја на надополнување и потрошувачка на кредити (Фактура / IPS QR)',
     ledgerSubheading: 'Преглед на почетно салдо, потрошени Viber и SMS пораки и преостанато салдо за избраниот период.',
     ledgerTimeframeSinceLast: 'Од последно купување',
     ledgerTimeframe7d: 'Последни 7 дена',
@@ -455,17 +653,117 @@ export const translations: Record<Language, TranslationSchema> = {
     
     // Guide step cards
     step1Title: 'Отворете Поставки',
-    step1Desc: 'Најавете се во WordPress администрацијата (/wp-admin) и кликнете на Поставки (Settings) ➔ Potvrdio Viber COD.',
-    step2Title: 'Вметнете ги Клучевите',
+    step1Desc: 'Најавете се во WordPress администрацијата (/wp-admin) и кликнете на Поставки (Settings) > Potvrdio Viber COD.',
+    step2Title: 'Копирајте и Вметнете Клучеви',
     step2Desc: 'Копирајте ги 3-те полиња од врвот на овој екран и залепете ги во соодветните полиња во WordPress формата.',
     step3Title: 'Зачувајте и Готово!',
     step3Desc: 'Кликнете на синото копче Зачувај измени. Вашата продавница е веднаш заштитена од лажни COD нарачки.',
     
     saveChangesBtn: 'Зачувај измени (Save Changes)',
     finalStepBadge: 'Последен чекор',
-    pasteHereBadge: '✓ Вметнете овде',
-    clickToLocate: 'Кликнете за приказ ↓',
-    stepActiveBadge: '● Означено долу ↓'
+    pasteHereBadge: 'Вметнете овде',
+    clickToLocate: 'Кликнете за приказ на сликата долу ↓',
+    stepActiveBadge: 'Активно означено на сликата долу ↓',
+    guideInteractiveHint: 'Интерактивен водич: Кликнете на било која картичка за чекор (1, 2 или 3) за да ја видите точната локација на WordPress сликата подолу:',
+    mockupStaticBadge: 'Статички графички приказ (Илустративен приказ на екран · Не е за кликање)',
+    step1Badge: 'Чекор 1',
+    step2Badge: 'Чекор 2',
+    step3Badge: 'Чекор 3',
+    startHereBadge: 'Започнете овде (Кликнете)',
+    previewBadge: 'Прикажано',
+    selectStepPrompt: 'Изберете чекор погоре за приказ',
+    breadcrumbMenuPath: 'Патека на менито',
+
+    // Store Profile & Logistics Settings
+    logisticsTitle: 'Логистички Профил на Продавница & Курирски Партнер',
+    logisticsSub: 'Изберете примарна курирска служба и месечен обем на нарачки за прецизно прилагодување на SMS/Viber пораките и пресметка на заштеди.',
+    labelCourier: 'Главна Курирска Служба',
+    labelVolume: 'Месечен Број на Нарачки со Плаќање при Преземање (COD)',
+    saveLogisticsBtn: 'Зачувај Логистички Профил',
+    logisticsSavedToast: 'Логистичкиот профил е успешно зачуван!',
+    courierPostExpress: 'Post Express (Србија)',
+    courierBex: 'Bex Express',
+    courierDExpress: 'D Express',
+    courierCityExpress: 'City Express',
+    courierCargoMk: 'Cargo Express MK (Македонија)',
+    courierOther: 'Via Courier / Друго',
+    volUnder100: '< 100 нарачки / месец',
+    vol100to300: '100 - 300 нарачки / месец',
+    vol300to1000: '300 - 1.000 нарачки / месец',
+    vol1000plus: '1.000+ нарачки (Pro Reserve)',
+    logisticsEstimateBadge: 'Препорачана оптимизација на следење е активна',
+    onboardingLogisticsCardTitle: 'Прилагодете ја курирската служба и COD обемот',
+    onboardingLogisticsCardDesc: 'Дефинирајте го примарниот курир за соодветни SMS/Viber линкови и проценка на заштедите од спречени вратени пратки.',
+    onboardingLogisticsBadge: 'ONBOARDING ЧЕКОР',
+    onboardingLogisticsDoneBadge: 'ПРОФИЛОТ Е ПОДГОТВЕН',
+
+    // Header & Badges
+    badgePilotAccount: 'ПИЛОТ ПЕРИОД',
+    badgeDemoAccount: 'ДЕМО ПОДАТОЦИ',
+    yourStoresLabel: 'Вашите WooCommerce Продавници',
+    addStoreBtn: '+ Додај нова продавница',
+    signInRealAccountBtn: 'Најави се на вистински налог',
+    logoutBtn: 'Одјави се од налогот',
+    signInBtn: 'Најави се на налог',
+    demoStoreBtn: 'Оди на Демо',
+    pilotVerificationsLabel: 'Пилот Верификации',
+    remainingLabel: 'Преостанато',
+
+    // Overview Header & Pilot Trial
+    overviewMetricsSubtitle: 'Клучни показатели за COD работење и оперативна верификација',
+    pilotTrialBannerTitle: 'Бесплатен Пилот Период',
+    pilotTrialRemainingText: (remaining: number) => `${remaining} / 25 бесплатни верификации преостанати`,
+    pilotTrialDesc: 'Вашиот налог користи 25 загарантирани бесплатни верификации за вашите први нарачки без скриени трошоци.',
+    demoBannerNotice: 'Гледате пример на демо продавница (Balkan Style Shop) со симулирани податоци. За да го поврзете вашиот WooCommerce и да добиете 25 бесплатни верификации:',
+    demoBannerSignIn: 'Најавете се',
+    demoBannerRegister: 'Регистрирајте се (25 Бесплатно)',
+
+    // Zero-State & Live Verification Stats
+    statZeroConfirmedBadge: 'Почеток на пилот период',
+    statZeroProcessedBadge: (count: number) => `+${count} обработено`,
+    statZeroWaitingOrder: 'Се чека прва COD нарачка',
+    statZeroRemainingPilot: (remaining: number) => `${remaining} преостанати во пилот`,
+    statZeroDeliveryPending: 'Ќе биде пресметано по испорака',
+    statZeroVerifiedAddresses: '100% верификувани адреси',
+    statZeroPotentialSavings: 'Потенцијална заштеда во тек',
+    statZeroSavedCourier: 'Заштедено на курирски трошоци',
+    statZeroAwaitingFirst: 'Се чека прва нарачка',
+    statZeroCustomerResponse: 'Моментален одѕив на купувачи',
+
+    // Simulation & Order Table Zero State
+    simulateOrderBtn: 'Симулирај нарачка',
+    simulatingBtn: 'Се симулира...',
+    simulateOrderTitleTooltip: 'Симулирај нова WooCommerce нарачка',
+    orderCountUnit: 'нарачки',
+    waitingFirstOrderTitle: 'Ја чекаме вашата прва WooCommerce нарачка',
+    waitingFirstOrderDesc: (apiKey: string, remaining: number, storeDomain: string) =>
+      `Вашиот API клуч (${apiKey}) е активен со ${remaining} бесплатни верификации. Штом купувач направи COD нарачка на ${storeDomain}, таа ќе се појави тука во реално време.`,
+    simulateTestOrderBtn: 'Симулирај Тест Нарачка',
+    wpSetupGuideBtn: 'Упатство за WordPress',
+
+    // Store Connection & Onboarding
+    connPendingBadge: 'СЕ ЧЕКА ПОВРЗУВАЊЕ',
+    connConnectedBadge: 'ПОВРЗАНО И АКТИВНО',
+    connectStoreTitle: 'Поврзете ја вашата WooCommerce веб продавница',
+    connectStoreDesc: 'Пред купувачите да нарачуваат со плаќање при преземање (COD), инсталирајте го Potvrdio плугинот за автоматска Viber/SMS верификација.',
+    stepDownloadPluginTitle: '1. Преземете го Potvrdio WordPress плугинот',
+    stepDownloadPluginDesc: 'Инсталирајте ја .zip архивата преку WordPress (Plugins > Add New > Upload Plugin).',
+    downloadPluginBtn: 'Преземи potvrdio-woocommerce.zip',
+    stepPasteKeysTitle: '2. Внесете ги сите 3 клучеви во WordPress (Settings > Potvrdio)',
+    stepPasteKeysDesc: 'Во WordPress админ (Подесувања > Potvrdio Viber COD) внесете ги овие 3 безбедносни параметри:',
+    seeDetailsBtn: 'Погледни детали (See details)',
+    stepVerifyTitle: '3. Верификувајте ја врската',
+    stepVerifyDesc: 'По зачувување на поставките во WordPress, кликнете подолу или почекајте автоматски сигнал.',
+    verifyConnectionBtn: 'Провери и потврди поврзување',
+    verifyingConnectionBtn: 'Се проверува комуникацијата со продавницата...',
+    connectionSuccessBadge: '200 OK · Успешно поврзано со WooCommerce!',
+    connectionFailedTitle: 'Не е Детектиран Сигнал',
+    connectionNoSignalError: 'Сѐ уште не е примен сигнал од вашата WordPress веб-страница. Проверете дали го инсталиравте плугинот и поставките се внесени според упатството, па обидете се повторно.',
+    connectedAwaitingOrdersTitle: 'WooCommerce е успешно поврзан и слуша',
+    connectedAwaitingOrdersDesc: (storeDomain: string, remaining: number) =>
+      `Вашиот налог за (${storeDomain}) е активен со ${remaining} бесплатни верификации. Штом купувач направи COD нарачка, Potvrdio ќе испрати верификациски линк и ќе го прикаже тука во реално време.`,
+    tryDemoSandboxPrompt: 'Сакате прво да видите како работи пред да го поврзете вашиот WordPress?',
+    tryDemoSandboxBtn: 'Отвори Демо Налог (Balkan Style Shop)',
   },
   en: {
     langCode: 'en-US',
@@ -484,7 +782,7 @@ export const translations: Record<Language, TranslationSchema> = {
     // Navigation
     navOverview: 'Overview & Analytics',
     navCredits: 'Credits & Top-up',
-    navSettings: 'WooCommerce API Key',
+    navSettings: 'Settings',
     
     // Timeframe Filter
     timeframe30d: 'Last 30 Days',
@@ -536,29 +834,29 @@ export const translations: Record<Language, TranslationSchema> = {
     starterTitle: 'Starter Plan',
     starterCredits: '600 Viber Credits',
     starterDesc: '€0.025 / message. Perfect for small shops (up to 50 orders/mo).',
-    starterBtn: 'Purchase with Paddle MoR',
+    starterBtn: 'Top Up Credits (IPS QR)',
     
     growthBadge: 'MOST POPULAR',
     growthTitle: 'Growth Plan',
     growthCredits: '1,875 Viber Credits',
     growthDesc: '€0.024 / message. Tailored for high-growth merchants across Balkan region.',
-    growthBtn: 'Purchase with Lemon Squeezy',
+    growthBtn: 'Top Up Credits (IPS QR)',
     
     proTitle: 'Pro Plan',
     proCredits: '6,000 Viber Credits',
     proDesc: '€0.020 / message. Lowest rate per verification message for high volume.',
-    proBtn: 'Purchase with Paddle MoR',
+    proBtn: 'Top Up Credits (IPS QR)',
     
     reserveTitle: 'Pro Reserve (MRR)',
     reservePerMonth: '/month',
     reserveCredits: '1,800 Credits / Month',
     reserveDesc: 'Automated monthly credit warranty replenishment with priority volume discount.',
-    reserveBtn: 'Activate Subscription',
+    reserveBtn: 'Activate Subscription (IPS QR)',
     loadingText: 'Loading...',
-    successTopupAlert: (count: number, cost: number) => `[PADDLE / LEMON SQUEEZY] Successfully topped up ${count} credits for €${cost}!`,
+    successTopupAlert: (count: number, cost: number) => `Successfully topped up ${count} credits for €${cost} (IPS QR / Invoice)!`,
 
     // Credit Ledger & Usage History
-    ledgerHeading: 'Credit Top-Up and Usage History (Credit Ledger)',
+    ledgerHeading: 'Credit Top-Up and Usage History (B2B Invoice / IPS QR)',
     ledgerSubheading: 'Audit breakdown of starting balance, Viber & SMS dispatches, and remaining balance for the selected period.',
     ledgerTimeframeSinceLast: 'Since last purchase',
     ledgerTimeframe7d: 'Last 7 days',
@@ -609,16 +907,116 @@ export const translations: Record<Language, TranslationSchema> = {
     
     // Guide step cards
     step1Title: 'Open Settings',
-    step1Desc: 'Log in to your WordPress admin panel (/wp-admin) and navigate to Settings ➔ Potvrdio Viber COD.',
-    step2Title: 'Paste Credentials',
+    step1Desc: 'Log in to your WordPress admin panel (/wp-admin) and navigate to Settings > Potvrdio Viber COD.',
+    step2Title: 'Copy & Paste Credentials',
     step2Desc: 'Copy the 3 parameters from the top card and paste them into the corresponding fields in WordPress.',
     step3Title: 'Save & Protect!',
     step3Desc: 'Click the blue Save Changes button. Your store is now immediately guarded against fake COD returns.',
     
     saveChangesBtn: 'Save Changes',
     finalStepBadge: 'Final Step',
-    pasteHereBadge: '✓ Paste here',
-    clickToLocate: 'Click to locate ↓',
-    stepActiveBadge: '● Active below ↓'
+    pasteHereBadge: 'Paste here',
+    clickToLocate: 'Click to preview on mockup below ↓',
+    stepActiveBadge: 'Active on mockup preview below ↓',
+    guideInteractiveHint: 'Interactive Visual Guide: Click any step card (1, 2, or 3) to illuminate its exact position on the WordPress screenshot reference below:',
+    mockupStaticBadge: 'Static Visual Reference (Screenshot Mockup · Non-interactive)',
+    step1Badge: 'Step 1',
+    step2Badge: 'Step 2',
+    step3Badge: 'Step 3',
+    startHereBadge: 'Start here (Click)',
+    previewBadge: 'Highlighted',
+    selectStepPrompt: 'Select a step above to preview',
+    breadcrumbMenuPath: 'Menu Path',
+
+    // Store Profile & Logistics Settings
+    logisticsTitle: 'Store Logistics & Primary Courier Profile',
+    logisticsSub: 'Select your primary parcel courier and monthly COD order volume to calibrate SMS/Viber tracking templates and ROI projection.',
+    labelCourier: 'Primary Courier Partner',
+    labelVolume: 'Monthly Cash on Delivery (COD) Volume',
+    saveLogisticsBtn: 'Save Logistics Profile',
+    logisticsSavedToast: 'Logistics profile updated successfully!',
+    courierPostExpress: 'Post Express (Serbia)',
+    courierBex: 'Bex Express',
+    courierDExpress: 'D Express',
+    courierCityExpress: 'City Express',
+    courierCargoMk: 'Cargo Express MK (Macedonia)',
+    courierOther: 'Via Courier / Other',
+    volUnder100: '< 100 orders / month',
+    vol100to300: '100 - 300 orders / month',
+    vol300to1000: '300 - 1,000 orders / month',
+    vol1000plus: '1,000+ orders (Pro Reserve)',
+    logisticsEstimateBadge: 'Automated carrier tracking format enabled',
+    onboardingLogisticsCardTitle: 'Configure Courier Partner & COD Volume',
+    onboardingLogisticsCardDesc: 'Define your primary delivery carrier to tailor SMS/Viber tracking links and estimate monthly savings from prevented courier returns.',
+    onboardingLogisticsBadge: 'ONBOARDING STEP',
+    onboardingLogisticsDoneBadge: 'PROFILE CONFIGURED',
+
+    // Header & Badges
+    badgePilotAccount: 'PILOT PERIOD',
+    badgeDemoAccount: 'DEMO DATA',
+    yourStoresLabel: 'Your WooCommerce Stores',
+    addStoreBtn: '+ Add new store',
+    signInRealAccountBtn: 'Sign in to real account',
+    logoutBtn: 'Sign out of account',
+    signInBtn: 'Sign in to account',
+    demoStoreBtn: 'Go to Demo',
+    pilotVerificationsLabel: 'Pilot Verifications',
+    remainingLabel: 'Remaining',
+
+    // Overview Header & Pilot Trial
+    overviewMetricsSubtitle: 'Key COD performance indicators and operational verification',
+    pilotTrialBannerTitle: 'Free Pilot Period',
+    pilotTrialRemainingText: (remaining: number) => `${remaining} / 25 free verifications remaining`,
+    pilotTrialDesc: 'Your account uses 25 guaranteed free verifications for your first orders (regardless of SMS or Viber channel). No automatic billing or hidden fees.',
+    demoBannerNotice: 'You are viewing a demo store example (Balkan Style Shop) with simulated data. To connect your WooCommerce and get 25 free verifications:',
+    demoBannerSignIn: 'Sign In',
+    demoBannerRegister: 'Register (25 Free)',
+
+    // Zero-State & Live Verification Stats
+    statZeroConfirmedBadge: 'Pilot period started',
+    statZeroProcessedBadge: (count: number) => `+${count} processed`,
+    statZeroWaitingOrder: 'Awaiting first COD order',
+    statZeroRemainingPilot: (remaining: number) => `${remaining} remaining in pilot`,
+    statZeroDeliveryPending: 'Calculated upon delivery',
+    statZeroVerifiedAddresses: '100% verified addresses',
+    statZeroPotentialSavings: 'Potential savings in progress',
+    statZeroSavedCourier: 'Saved on courier return fees',
+    statZeroAwaitingFirst: 'Awaiting first order',
+    statZeroCustomerResponse: 'Current customer response',
+
+    // Simulation & Order Table Zero State
+    simulateOrderBtn: 'Simulate Order',
+    simulatingBtn: 'Simulating...',
+    simulateOrderTitleTooltip: 'Simulate a new WooCommerce order',
+    orderCountUnit: 'orders',
+    waitingFirstOrderTitle: 'Awaiting your first WooCommerce order',
+    waitingFirstOrderDesc: (apiKey: string, remaining: number, storeDomain: string) =>
+      `Your API key (${apiKey}) is active with ${remaining} free verifications. As soon as a customer places a COD order on ${storeDomain}, it will appear here in real time.`,
+    simulateTestOrderBtn: 'Simulate Test Order',
+    wpSetupGuideBtn: 'WordPress Setup Guide',
+
+    // Store Connection & Onboarding
+    connPendingBadge: 'CONNECTION PENDING',
+    connConnectedBadge: 'CONNECTED & ACTIVE',
+    connectStoreTitle: 'Connect Your WooCommerce Store',
+    connectStoreDesc: 'Before customers place COD orders, install the Potvrdio plugin so automated Viber/SMS verification links trigger in real time.',
+    stepDownloadPluginTitle: '1. Download the Potvrdio WordPress Plugin',
+    stepDownloadPluginDesc: 'Upload and activate the .zip package in WordPress (Plugins > Add New > Upload Plugin).',
+    downloadPluginBtn: 'Download potvrdio-woocommerce.zip',
+    stepPasteKeysTitle: '2. Paste All 3 Credentials in WordPress (Settings > Potvrdio)',
+    stepPasteKeysDesc: 'In WordPress Admin (Settings > Potvrdio Viber COD) paste these 3 security parameters:',
+    seeDetailsBtn: 'See details',
+    stepVerifyTitle: '3. Verify Bi-directional Connection',
+    stepVerifyDesc: 'After saving settings in WordPress, click below to verify or wait for the automatic ping.',
+    verifyConnectionBtn: 'Verify Store Connection',
+    verifyingConnectionBtn: 'Testing communication with WooCommerce...',
+    connectionSuccessBadge: '200 OK · Successfully connected to WooCommerce!',
+    connectionFailedTitle: 'No Signal Detected Yet',
+    connectionNoSignalError: 'No signal has been received from your WordPress site yet. Please make sure you installed the plugin, configured the settings as instructed, and try again.',
+    connectedAwaitingOrdersTitle: 'WooCommerce Store Connected & Listening',
+    connectedAwaitingOrdersDesc: (storeDomain: string, remaining: number) =>
+      `Your store (${storeDomain}) is active with ${remaining} free verifications. As soon as a customer places a cash on delivery (COD) order, Potvrdio will intercept it and display it here in real time.`,
+    tryDemoSandboxPrompt: 'Want to see how customer Viber/SMS verification works before connecting your live WordPress?',
+    tryDemoSandboxBtn: 'Open Interactive Demo (Balkan Style Shop)',
   }
 };

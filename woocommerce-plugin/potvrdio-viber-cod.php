@@ -126,6 +126,8 @@ class Potvrdio_Viber_COD {
         // Admin Menu Settings
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
+        add_action('update_option_potvrdio_api_key', array($this, 'ping_central_backend'));
+        add_action('update_option_potvrdio_api_endpoint', array($this, 'ping_central_backend'));
     }
 
     /**
@@ -563,7 +565,7 @@ class Potvrdio_Viber_COD {
 
             echo '<div style="background:#ECFDF5; border:2px solid #10B981; border-radius:12px; padding:18px 22px; margin:24px 0; color:#065F46; font-family:inherit;">';
             echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
-            echo '<span style="color:#059669; font-size:20px;">✓</span> <span>' . esc_html($title) . '</span>';
+            echo '<svg style="width:20px; height:20px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> <span>' . esc_html($title) . '</span>';
             echo '</div>';
             echo '<p style="margin:0; font-size:14px; line-height:1.5; color:#047857;">';
             echo wp_kses_post($body);
@@ -1050,7 +1052,7 @@ class Potvrdio_Viber_COD {
 
         if ($verified) {
             echo '<div style="background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:10px; margin-bottom:10px; color:#065F46;">';
-            echo '<strong>' . esc_html__('✓ ADRESA JE VERIFIKOVANA', 'potvrdio-viber-cod') . '</strong><br>';
+            echo '<div style="display:flex; align-items:center; gap:6px; font-weight:bold; margin-bottom:4px;"><svg style="width:16px; height:16px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' . esc_html__('ADRESA JE VERIFIKOVANA', 'potvrdio-viber-cod') . '</div>';
             echo '<small>' . esc_html__('Vreme potvrde:', 'potvrdio-viber-cod') . ' ' . esc_html($verified_at) . '</small><br>';
             if ($order->get_meta('_potvrdio_smart_bypass')) {
                 echo '<small style="color:#047857; font-weight:600;">(' . esc_html__('Smart Bypass: Prethodno potvrđena adresa', 'potvrdio-viber-cod') . ')</small><br>';
@@ -1061,14 +1063,14 @@ class Potvrdio_Viber_COD {
             echo '</div>';
         } else {
             echo '<div style="background:#FFFBEB; border:1px solid #F59E0B; border-radius:8px; padding:10px; margin-bottom:10px; color:#92400E;">';
-            echo '<strong>' . esc_html__('⏳ ČEKA SE VERIFIKACIJA ADRESE', 'potvrdio-viber-cod') . '</strong><br>';
+            echo '<div style="display:flex; align-items:center; gap:6px; font-weight:bold; margin-bottom:4px;"><svg style="width:16px; height:16px; stroke:#D97706; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ' . esc_html__('ČEKA SE VERIFIKACIJA ADRESE', 'potvrdio-viber-cod') . '</div>';
             echo '<small>' . esc_html__('Porudžbina je privremeno na čekanju (On-Hold).', 'potvrdio-viber-cod') . '</small><br>';
             echo '<small>' . esc_html__('Ne predavati kurirskoj službi pre potvrde kupca.', 'potvrdio-viber-cod') . '</small>';
             echo '</div>';
 
             // Edge Case 9: Manual Verify Button for Store Manager
             $verify_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_manual_verify&order_id=' . $order->get_id()), 'potvrdio_manual_verify_action');
-            echo '<p style="margin-top:10px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center;">' . esc_html__('✓ Ručno odobri (Bypass)', 'potvrdio-viber-cod') . '</a></p>';
+            echo '<p style="margin-top:10px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center;">' . esc_html__('Ručno odobri (Bypass)', 'potvrdio-viber-cod') . '</a></p>';
         }
 
         echo '<p style="margin:6px 0;"><strong>' . esc_html__('Verifikovani telefon:', 'potvrdio-viber-cod') . '</strong> ' . esc_html($phone) . '</p>';
@@ -1128,7 +1130,49 @@ class Potvrdio_Viber_COD {
         register_setting('potvrdio_settings_group', 'potvrdio_auto_approve_returning');
     }
 
+    public function ping_central_backend() {
+        $endpoint = rtrim(get_option('potvrdio_api_endpoint', 'https://api.potvrdio.online/api/v1'), '/');
+        $api_key  = get_option('potvrdio_api_key', '');
+
+        if (empty($api_key)) {
+            return false;
+        }
+
+        $url = $endpoint . '/merchant/store/ping';
+        $body = wp_json_encode(array(
+            'apiKey'      => $api_key,
+            'storeDomain' => home_url(),
+            'version'     => '1.0.0',
+            'timestamp'   => current_time('mysql'),
+        ));
+
+        $res = wp_remote_post($url, array(
+            'method'      => 'POST',
+            'timeout'     => 10,
+            'headers'     => array(
+                'Content-Type'       => 'application/json',
+                'X-Potvrdio-Api-Key' => $api_key,
+            ),
+            'body'        => $body,
+        ));
+
+        if (is_wp_error($res)) {
+            error_log('[Potvrdio] Ping failed: ' . $res->get_error_message());
+            return false;
+        }
+        $code = wp_remote_retrieve_response_code($res);
+        return ($code >= 200 && $code < 300);
+    }
+
     public function render_admin_settings_page() {
+        if (isset($_GET['settings-updated']) && $_GET['settings-updated']) {
+            $ping_ok = $this->ping_central_backend();
+            if ($ping_ok) {
+                echo '<div class="notice notice-success is-dismissible"><p><strong>Potvrdio:</strong> ' . esc_html__('Uspešno poslat sinhronizacioni signal ka Potvrdio serveru. Vaša prodavnica je aktivna i povezana!', 'potvrdio-viber-cod') . '</p></div>';
+            } else {
+                echo '<div class="notice notice-warning is-dismissible"><p><strong>Potvrdio Upozorenje:</strong> ' . esc_html__('Podešavanja su sačuvana, ali signal ka Potvrdio serveru nije uspeo. Proverite Central Backend API Endpoint i API Key.', 'potvrdio-viber-cod') . '</p></div>';
+            }
+        }
         ?>
         <div class="wrap">
             <h1><?php esc_html_e('Potvrdio - Podešavanja za Viber COD verifikaciju', 'potvrdio-viber-cod'); ?></h1>

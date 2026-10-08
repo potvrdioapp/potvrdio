@@ -1,26 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage -->
   <url>
     <loc>https://potvrdio.online/</loc>
-    <lastmod>2026-09-17</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link 
-      rel="alternate"
-      hreflang="sr"
-      href="https://potvrdio.online/?lang=sr" />
-    <xhtml:link 
-      rel="alternate"
-      hreflang="mk"
-      href="https://potvrdio.online/?lang=mk" />
-    <xhtml:link 
-      rel="alternate"
-      hreflang="en"
-      href="https://potvrdio.online/?lang=en" />
-    <xhtml:link 
-      rel="alternate"
-      hreflang="x-default"
-      href="https://potvrdio.online/" />
+    <xhtml:link rel="alternate" hreflang="sr" href="https://potvrdio.online/?lang=sr" />
+    <xhtml:link rel="alternate" hreflang="sr-RS" href="https://potvrdio.online/?lang=sr" />
+    <xhtml:link rel="alternate" hreflang="mk" href="https://potvrdio.online/?lang=mk" />
+    <xhtml:link rel="alternate" hreflang="mk-MK" href="https://potvrdio.online/?lang=mk" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://potvrdio.online/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://potvrdio.online/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://potvrdio.online/" />
+  </url>
+
+  <!-- Legal & Operational Compliance Subpages -->
+  <url>
+    <loc>https://potvrdio.online/reklamacije-i-povracaj/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://potvrdio.online/politika-privatnosti/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://potvrdio.online/uslovi-koriscenja/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://potvrdio.online/politika-kolacica/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://potvrdio.online/isporuka-usluga/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

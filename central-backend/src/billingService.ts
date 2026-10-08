@@ -1,4 +1,4 @@
-export type PlanType = 'STARTER' | 'GROWTH' | 'PRO_SCALE' | 'PRO_RESERVE' | 'PAYG';
+export type PlanType = 'TRIAL' | 'STARTER' | 'GROWTH' | 'PRO_SCALE' | 'PRO_RESERVE' | 'PAYG';
 
 export interface MerchantAccount {
   apiKey: string;
@@ -6,6 +6,8 @@ export interface MerchantAccount {
   creditBalance: number; // In Euros (€)
   messageCreditsRemaining: number;
   planType: PlanType;
+  isTrial?: boolean;
+  trialVerificationsRemaining?: number;
 }
 
 export interface DeductCreditResult {
@@ -14,6 +16,8 @@ export interface DeductCreditResult {
   creditsRemaining: number;
   exhausted: boolean;
   creditsDeducted: number;
+  isTrialDeduction?: boolean;
+  trialVerificationsRemaining?: number;
 }
 
 export class BillingService {
@@ -45,6 +49,10 @@ export class BillingService {
 
   public getMerchant(apiKey: string): MerchantAccount | undefined {
     return this.merchants.get(apiKey);
+  }
+
+  public registerMerchant(account: MerchantAccount): void {
+    this.merchants.set(account.apiKey, account);
   }
 
   /**
@@ -86,6 +94,29 @@ export class BillingService {
       return { allowed: false, inGraceBuffer: false, creditsRemaining: 0, exhausted: true, creditsDeducted: 0 };
     }
 
+    // 1. Check if merchant is in Free Trial / Pilot mode (25 guaranteed order verifications)
+    if (merchant.isTrial && (merchant.trialVerificationsRemaining ?? 0) > 0) {
+      merchant.trialVerificationsRemaining = (merchant.trialVerificationsRemaining ?? 0) - 1;
+      const remaining = merchant.trialVerificationsRemaining;
+      console.log(`[PILOT VERIFICATION] Merchant ${apiKey} used 1 verification (Channel: ${channel}). Remaining pilot verifications: ${remaining}/25`);
+
+      if (remaining === 0) {
+        merchant.isTrial = false;
+        console.log(`[PILOT COMPLETED] Merchant ${apiKey} has completed all 25 free pilot verifications.`);
+      }
+
+      return {
+        allowed: true,
+        inGraceBuffer: false,
+        creditsRemaining: remaining,
+        exhausted: false,
+        creditsDeducted: 1,
+        isTrialDeduction: true,
+        trialVerificationsRemaining: remaining,
+      };
+    }
+
+    // 2. Standard commercial credit pool calculation
     const creditsToDeduct = this.getRequiredCredits(merchant.planType, channel);
 
     // Check if within normal credits
@@ -126,6 +157,7 @@ export class BillingService {
   public processWebhookTopUp(merchantApiKey: string, amountEuro: number, creditsToAdd: number) {
     const merchant = this.merchants.get(merchantApiKey);
     if (merchant) {
+      merchant.isTrial = false;
       merchant.creditBalance += amountEuro;
       merchant.messageCreditsRemaining += creditsToAdd;
       console.log(`[PADDLE/LEMON BILLING WEBHOOK] Added €${amountEuro} (+${creditsToAdd} credits) to ${merchant.storeName}`);

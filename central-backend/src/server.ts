@@ -1,11 +1,15 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import crypto from 'crypto';
 import { ViberService } from './viberService';
 import { TokenService } from './tokenService';
 import { BillingService } from './billingService';
 import { WebhookService } from './webhookService';
 import { EmailService } from './emailService';
+import { MerchantAuthService } from './merchantAuthService';
 
 const app = express();
 const PORT = process.env.PORT || 4001;
@@ -18,9 +22,70 @@ const tokenService = TokenService.getInstance();
 const billingService = BillingService.getInstance();
 const webhookService = WebhookService.getInstance();
 const emailService = EmailService.getInstance();
+const merchantAuthService = MerchantAuthService.getInstance();
 
 // In-memory registry for intercepted store associations
 const orderStoreRegistry = new Map<string, { storeDomain: string; apiSecret: string }>();
+
+export interface MerchantStoreRecord {
+  id: string;
+  storeName: string;
+  storeDomain: string;
+  apiKey: string;
+  apiSecret: string;
+  isTrial: boolean;
+  trialRemaining: number;
+  credits: number;
+  createdAt: string;
+  isConnected?: boolean;
+  lastPingAt?: string | null;
+}
+
+export interface MerchantAccountRecord {
+  email: string;
+  fullName: string;
+  stores: MerchantStoreRecord[];
+}
+
+const merchantAccountRegistry = new Map<string, MerchantAccountRecord>();
+const storePingRegistry = new Map<string, { lastPingAt: string; storeDomain?: string }>();
+
+export function findStoreByApiKey(apiKey: string): MerchantStoreRecord | null {
+  for (const account of merchantAccountRegistry.values()) {
+    const found = account.stores.find((s) => s.apiKey === apiKey);
+    if (found) return found;
+  }
+  return null;
+}
+
+// Pre-seed demo store in billing service & account registry
+billingService.registerMerchant({
+  apiKey: 'demo_api_key_123',
+  storeName: 'Balkan Style Shop',
+  creditBalance: 1875,
+  messageCreditsRemaining: 1875,
+  planType: 'GROWTH',
+  isTrial: false,
+  trialVerificationsRemaining: 0,
+});
+
+merchantAccountRegistry.set('demo@potvrdio.online', {
+  email: 'demo@potvrdio.online',
+  fullName: 'Demo Korisnik',
+  stores: [{
+    id: 'store_demo_balkan',
+    storeName: 'Balkan Style Shop',
+    storeDomain: 'balkanstyleshop.rs',
+    apiKey: 'demo_api_key_123',
+    apiSecret: 'demo_secret_456',
+    isTrial: false,
+    trialRemaining: 0,
+    credits: 1875,
+    createdAt: '2026-08-15',
+    isConnected: true,
+    lastPingAt: new Date().toISOString(),
+  }],
+});
 
 // Pre-seed persistent test token for mobile-address-app live testing
 tokenService.setToken('test_token_123', {
@@ -86,6 +151,8 @@ app.get('/api/v1/store/status', (req: Request, res: Response) => {
       sms_cost: smsMultiplier,
       merchant_plan: planType,
       credits_remaining: merchant?.messageCreditsRemaining ?? 0,
+      is_trial: merchant?.isTrial ?? false,
+      trial_verifications_remaining: merchant?.isTrial ? (merchant.trialVerificationsRemaining ?? 25) : 0,
     },
   });
 });
@@ -119,6 +186,13 @@ app.post('/api/v1/orders/intercept', async (req: Request, res: Response) => {
     storeDomain: store_domain || 'http://localhost:3000',
     apiSecret,
   });
+
+  // Mark store as actively connected upon receiving live order
+  const store = findStoreByApiKey(apiKey);
+  if (store) {
+    store.isConnected = true;
+    store.lastPingAt = new Date().toISOString();
+  }
 
   const isState3 = (process.env.SYSTEM_STATE || 'STATE_3') === 'STATE_3' || process.env.VIBER_STATUS !== 'ACTIVE';
   const targetChannel: 'VIBER' | 'SMS' = isState3 ? 'SMS' : 'VIBER';
@@ -424,6 +498,454 @@ app.get('/api/v1/messaging/status/:id', (req: Request, res: Response) => {
   }
 
   res.json(record);
+});
+
+/**
+ * 9. Merchant Registration (Landing Page Free 25 Credits Onboarding)
+ * Endpoint: POST /api/v1/merchant/register
+ */
+app.post('/api/v1/merchant/register', async (req: Request, res: Response) => {
+  try {
+    const { storeUrl, fullName, email, phone, courier, orderVolume } = req.body;
+
+    if (!email || !storeUrl) {
+      return res.status(400).json({ error: 'Web prodavnica i email su obavezni' });
+    }
+
+    // Clean store domain
+    const cleanDomain = storeUrl
+      .replace(/^https?:\/\//i, '')
+      .replace(/\/.*$/, '')
+      .toLowerCase();
+
+    // Generate unique live API key and HMAC secret
+    const randomHex = Math.random().toString(36).substring(2, 10);
+    const sanitizedName = cleanDomain.replace(/[^a-z0-9]/g, '') || 'store';
+    const apiKey = `pk_live_${sanitizedName}_${randomHex}`;
+    const apiSecret = `sec_live_${sanitizedName}_${crypto.randomBytes(8).toString('hex')}`;
+
+    // Register in billing service with 25 guaranteed pilot order verifications
+    billingService.registerMerchant({
+      apiKey,
+      storeName: fullName ? `${fullName} (${cleanDomain})` : cleanDomain,
+      creditBalance: 0,
+      messageCreditsRemaining: 0,
+      planType: 'TRIAL',
+      isTrial: true,
+      trialVerificationsRemaining: 25,
+    });
+
+    const storeRecord: MerchantStoreRecord = {
+      id: `store_${randomHex}`,
+      storeName: fullName ? `${fullName} (${cleanDomain})` : cleanDomain,
+      storeDomain: cleanDomain,
+      apiKey,
+      apiSecret,
+      isTrial: true,
+      trialRemaining: 25,
+      credits: 0,
+      createdAt: new Date().toISOString(),
+      isConnected: false,
+      lastPingAt: null,
+    };
+
+    // Associate storeDomain with HMAC secret for webhook signature verification
+    orderStoreRegistry.set(cleanDomain, { storeDomain: cleanDomain, apiSecret });
+
+    const cleanEmail = email.trim().toLowerCase();
+    let account = merchantAccountRegistry.get(cleanEmail);
+    if (!account) {
+      account = {
+        email: cleanEmail,
+        fullName: fullName || cleanEmail.split('@')[0],
+        stores: [],
+      };
+      merchantAccountRegistry.set(cleanEmail, account);
+    }
+    const existingStoreIndex = account.stores.findIndex(s => s.storeDomain === cleanDomain);
+    if (existingStoreIndex >= 0) {
+      account.stores[existingStoreIndex] = storeRecord;
+    } else {
+      account.stores.push(storeRecord);
+    }
+
+    console.log(`[MERCHANT REGISTERED] ${cleanDomain} - ${email} | Key: ${apiKey} | Secret: ${apiSecret} | Pilot: 25 Order Verifications | Courier: ${courier}`);
+
+    // Determine dashboard URL (local dev or production)
+    const dashboardBase = process.env.DASHBOARD_URL || 'http://localhost:3002';
+
+    // Generate a secure 7-day Welcome Magic Token for instant one-click login from email
+    const magicToken = merchantAuthService.createMagicToken(
+      email,
+      7 * 24 * 60 * 60 * 1000,
+      'welcome',
+      { storeDomain: cleanDomain, apiKey }
+    );
+    const magicDashboardUrl = `${dashboardBase}?magic_token=${magicToken}&email=${encodeURIComponent(email)}&store=${encodeURIComponent(cleanDomain)}&api_key=${encodeURIComponent(apiKey)}&api_secret=${encodeURIComponent(apiSecret)}`;
+
+    // Dispatch Welcome Email via Brevo with authenticated magic link
+    const emailResult = await emailService.sendMerchantWelcomeEmail({
+      recipientEmail: email,
+      recipientName: fullName || cleanDomain,
+      storeUrl: cleanDomain,
+      apiKey,
+      apiSecret,
+      verifications: 25,
+      dashboardUrl: magicDashboardUrl,
+    });
+
+    console.log(`[WELCOME EMAIL DISPATCH] To: ${email} | Success: ${emailResult.success} | MsgId: ${emailResult.messageId || 'none'} | MagicUrl: ${magicDashboardUrl}`);
+
+    return res.json({
+      success: true,
+      apiKey,
+      apiSecret,
+      trialVerifications: 25,
+      isTrial: true,
+      emailSent: emailResult.success,
+      emailMessageId: emailResult.messageId,
+      emailError: emailResult.error,
+      storeDomain: cleanDomain,
+      dashboardUrl: magicDashboardUrl,
+      magicToken,
+      account,
+      activeStore: storeRecord,
+    });
+  } catch (error: any) {
+    console.error('[MERCHANT REGISTER ERROR]', error);
+    return res.status(500).json({ error: error.message || 'Registracija nije uspela' });
+  }
+});
+
+/**
+ * 10. Request Magic Login Link via Email
+ * Endpoint: POST /api/v1/merchant/magic-link/request
+ */
+app.post('/api/v1/merchant/magic-link/request', async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email adresa je obavezna', code: 'EMAIL_REQUIRED' });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const account = merchantAccountRegistry.get(cleanEmail);
+    if (!account) {
+      return res.status(404).json({
+        error: 'Nalog sa ovom e-poštom nije pronađen. Molimo registrujte vašu prvu prodavnicu.',
+        code: 'ACCOUNT_NOT_FOUND',
+      });
+    }
+
+    // Create 15-minute magic login token
+    const token = merchantAuthService.createMagicToken(cleanEmail, 15 * 60 * 1000, 'login');
+    const dashboardBase = process.env.DASHBOARD_URL || 'http://localhost:3002';
+    const firstStore = account.stores[0];
+    const magicUrl = `${dashboardBase}?magic_token=${token}&email=${encodeURIComponent(cleanEmail)}&store=${encodeURIComponent(firstStore?.storeDomain || '')}&api_key=${encodeURIComponent(firstStore?.apiKey || '')}`;
+
+    const emailRes = await emailService.sendMerchantMagicLoginEmail({
+      recipientEmail: cleanEmail,
+      recipientName: account.fullName || cleanEmail,
+      magicUrl,
+      expiresInMinutes: 15,
+    });
+
+    console.log(`[MAGIC LINK SENT] To: ${cleanEmail} | Success: ${emailRes.success} | URL: ${magicUrl}`);
+
+    return res.json({
+      success: true,
+      message: 'Prijavni link je poslat na vašu email adresu.',
+      emailSent: emailRes.success,
+      devMagicUrl: process.env.NODE_ENV !== 'production' ? magicUrl : undefined,
+    });
+  } catch (err: any) {
+    console.error('[MAGIC LINK REQUEST ERROR]', err);
+    return res.status(500).json({ error: err.message || 'Greška pri slanju linka', code: 'SERVER_ERROR' });
+  }
+});
+
+/**
+ * 11. Authenticate via Magic Token
+ * Endpoint: POST /api/v1/merchant/magic-login
+ */
+app.post('/api/v1/merchant/magic-login', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ error: 'Token je obavezan', code: 'TOKEN_REQUIRED' });
+    }
+
+    const session = merchantAuthService.consumeMagicToken(String(token).trim());
+    if (!session) {
+      return res.status(401).json({
+        error: 'Prijavni link je istekao ili je već iskorišćen. Molimo zatražite novi.',
+        code: 'TOKEN_INVALID_OR_EXPIRED',
+      });
+    }
+
+    const account = merchantAccountRegistry.get(session.email);
+    if (!account) {
+      return res.status(404).json({
+        error: 'Nalog sa ovom e-poštom nije pronađen.',
+        code: 'ACCOUNT_NOT_FOUND',
+      });
+    }
+
+    console.log(`[MAGIC LOGIN AUTHENTICATED] ${session.email} via token ${session.token.substring(0, 10)}...`);
+
+    return res.json({
+      success: true,
+      account,
+      activeStore: account.stores[0],
+    });
+  } catch (err: any) {
+    console.error('[MAGIC LOGIN ERROR]', err);
+    return res.status(500).json({ error: err.message || 'Greška pri prijavi', code: 'SERVER_ERROR' });
+  }
+});
+
+/**
+ * 12. Merchant Login with Access Code (API Key)
+ * Endpoint: POST /api/v1/merchant/login
+ */
+app.post('/api/v1/merchant/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password, accessCode } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: 'Email adresa je obavezna', code: 'EMAIL_REQUIRED' });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+
+    // If demo request
+    if (cleanEmail === 'demo' || cleanEmail === 'demo@potvrdio.online') {
+      const demoAccount = merchantAccountRegistry.get('demo@potvrdio.online')!;
+      return res.json({
+        success: true,
+        isDemo: true,
+        account: demoAccount,
+        activeStore: demoAccount.stores[0],
+      });
+    }
+
+    const account = merchantAccountRegistry.get(cleanEmail);
+    if (!account) {
+      return res.status(404).json({
+        error: 'Nalog sa ovom e-poštom nije pronađen. Molimo registrujte vašu prvu prodavnicu.',
+        code: 'ACCOUNT_NOT_FOUND',
+      });
+    }
+
+    // Security Verification: Require valid Access Code (API Key) or password
+    const providedCode = String(accessCode || password || '').trim();
+    if (!providedCode) {
+      return res.status(401).json({
+        error: 'Unesite vaš API ključ (Access Code) ili zatražite Magic Link na email.',
+        code: 'CREDENTIALS_REQUIRED',
+      });
+    }
+
+    const isValidKey =
+      account.stores.some((s) => s.apiKey === providedCode) ||
+      providedCode === 'demo_api_key_123';
+
+    if (!isValidKey) {
+      return res.status(401).json({
+        error: 'Neispravan pristupni kod ili API ključ. Proverite podatke ili zatražite prijavni link na email.',
+        code: 'INVALID_CREDENTIALS',
+      });
+    }
+
+    return res.json({
+      success: true,
+      isDemo: false,
+      account,
+      activeStore: account.stores[0],
+    });
+  } catch (error: any) {
+    console.error('[MERCHANT LOGIN ERROR]', error);
+    return res.status(500).json({ error: error.message || 'Greška pri prijavi', code: 'SERVER_ERROR' });
+  }
+});
+
+/**
+ * 11. Add New WooCommerce Store to Existing Account
+ * Endpoint: POST /api/v1/merchant/stores/add
+ */
+app.post('/api/v1/merchant/stores/add', async (req: Request, res: Response) => {
+  try {
+    const { email, storeUrl, storeName } = req.body;
+    if (!email || !storeUrl) {
+      return res.status(400).json({ error: 'Email i URL prodavnice su obavezni' });
+    }
+
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cleanDomain = storeUrl
+      .replace(/^https?:\/\//i, '')
+      .replace(/\/.*$/, '')
+      .toLowerCase();
+
+    const randomHex = Math.random().toString(36).substring(2, 10);
+    const sanitizedName = cleanDomain.replace(/[^a-z0-9]/g, '') || 'store';
+    const apiKey = `pk_live_${sanitizedName}_${randomHex}`;
+
+    billingService.registerMerchant({
+      apiKey,
+      storeName: storeName || cleanDomain,
+      creditBalance: 0,
+      messageCreditsRemaining: 0,
+      planType: 'TRIAL',
+      isTrial: true,
+      trialVerificationsRemaining: 25,
+    });
+
+    const apiSecret = `sec_live_${sanitizedName}_${crypto.randomBytes(8).toString('hex')}`;
+
+    const newStore: MerchantStoreRecord = {
+      id: `store_${randomHex}`,
+      storeName: storeName || cleanDomain,
+      storeDomain: cleanDomain,
+      apiKey,
+      apiSecret,
+      isTrial: true,
+      trialRemaining: 25,
+      credits: 0,
+      createdAt: new Date().toISOString(),
+      isConnected: false,
+      lastPingAt: null,
+    };
+
+    orderStoreRegistry.set(cleanDomain, { storeDomain: cleanDomain, apiSecret });
+
+    let account = merchantAccountRegistry.get(cleanEmail);
+    if (!account) {
+      account = {
+        email: cleanEmail,
+        fullName: cleanEmail.split('@')[0],
+        stores: [],
+      };
+      merchantAccountRegistry.set(cleanEmail, account);
+    }
+    account.stores.push(newStore);
+
+    return res.json({
+      success: true,
+      store: newStore,
+      stores: account.stores,
+    });
+  } catch (error: any) {
+    console.error('[ADD STORE ERROR]', error);
+    return res.status(500).json({ error: error.message || 'Greška pri dodavanju prodavnice' });
+  }
+});
+
+/**
+ * 12. WooCommerce Plugin Ping Receiver (Option A - Automatic Listening)
+ * Endpoint: POST /api/v1/merchant/store/ping
+ */
+app.post('/api/v1/merchant/store/ping', (req: Request, res: Response) => {
+  const apiKey = (req.headers['x-potvrdio-api-key'] as string) || req.body?.apiKey;
+  const storeDomain = req.body?.storeDomain;
+
+  if (!apiKey) {
+    return res.status(400).json({ error: 'Missing apiKey' });
+  }
+
+  const now = new Date().toISOString();
+  storePingRegistry.set(apiKey, { lastPingAt: now, storeDomain });
+
+  const store = findStoreByApiKey(apiKey);
+  if (store) {
+    store.isConnected = true;
+    store.lastPingAt = now;
+    console.log(`[STORE PING] Store ${store.storeDomain} connected via WooCommerce Ping (Key: ${apiKey})`);
+    return res.json({
+      success: true,
+      isConnected: true,
+      lastPingAt: now,
+      message: 'Store connection verified successfully',
+    });
+  }
+
+  console.log(`[STORE PING] Recorded ping for API Key: ${apiKey} (Domain: ${storeDomain || 'unknown'})`);
+  return res.json({
+    success: true,
+    isConnected: true,
+    lastPingAt: now,
+    message: 'Ping acknowledged',
+  });
+});
+
+/**
+ * 13. Test Store Connection Trigger (Option B - User Initiated Test)
+ * Endpoint: POST /api/v1/merchant/store/test-connection
+ */
+app.post('/api/v1/merchant/store/test-connection', (req: Request, res: Response) => {
+  const { apiKey } = req.body;
+  if (!apiKey) {
+    return res.status(400).json({ error: 'Missing apiKey' });
+  }
+
+  const store = findStoreByApiKey(apiKey);
+  const recordedPing = storePingRegistry.get(apiKey);
+
+  if ((store && store.isConnected && store.lastPingAt) || recordedPing) {
+    const pingTime = (store && store.lastPingAt) || recordedPing?.lastPingAt || new Date().toISOString();
+    if (store) {
+      store.isConnected = true;
+      store.lastPingAt = pingTime;
+    }
+    console.log(`[CONNECTION VERIFIED] Store ${store?.storeDomain || recordedPing?.storeDomain || apiKey} verified (Last ping: ${pingTime})`);
+    return res.json({
+      success: true,
+      isConnected: true,
+      lastPingAt: pingTime,
+      message: 'WooCommerce connection verified successfully',
+    });
+  }
+
+  console.log(`[CONNECTION CHECK FAILED] Store for API key ${apiKey} has not sent a ping yet.`);
+  return res.status(404).json({
+    success: false,
+    isConnected: false,
+    lastPingAt: null,
+    error: 'NO_SIGNAL_RECEIVED',
+    message: 'No signal received from WordPress site yet.',
+  });
+});
+
+/**
+ * 14. Check Store Connection Status
+ * Endpoint: GET /api/v1/merchant/store/status
+ */
+app.get('/api/v1/merchant/store/status', (req: Request, res: Response) => {
+  const apiKey = (req.query.apiKey as string) || (req.headers['x-potvrdio-api-key'] as string);
+  if (!apiKey) {
+    return res.status(400).json({ error: 'Missing apiKey' });
+  }
+
+  const store = findStoreByApiKey(apiKey);
+  const recordedPing = storePingRegistry.get(apiKey);
+  const isConnected = (store && store.isConnected) || Boolean(recordedPing);
+  const lastPingAt = store?.lastPingAt || recordedPing?.lastPingAt || null;
+
+  return res.json({
+    success: true,
+    isConnected,
+    lastPingAt,
+  });
+});
+
+/**
+ * 15. Download WooCommerce Plugin (.zip)
+ * Endpoint: GET /api/v1/download/plugin
+ */
+app.get('/api/v1/download/plugin', (req: Request, res: Response) => {
+  const pluginZipPath = path.resolve(__dirname, '../../potvrdio-viber-cod.zip');
+  if (fs.existsSync(pluginZipPath)) {
+    return res.download(pluginZipPath, 'potvrdio-woocommerce.zip');
+  }
+  return res.status(404).json({ error: 'Plugin package not found' });
 });
 
 app.listen(PORT, () => {

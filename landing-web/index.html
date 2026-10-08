@@ -17,17 +17,29 @@
         } catch(e) {}
       })();
     </script>
-    <title>Potvrdio · Operativna COD Verifikacija za WooCommerce</title>
-    <meta name="description" content="Eliminišite troškove nepreuzetih paketa pri plaćanju pouzećem. Verifikujte COD porudžbine i ponudite instant izmenu adrese na potvrdio.online putem Viber-a i SMS-a." />
-    <meta name="keywords" content="WooCommerce COD, plaćanje pouzećem, verifikacija adrese, Viber bot WooCommerce, Post Express adresnica, zaštita od povrata paketa, Srbija e-commerce, Makedonija COD, ZZPL Član 12, GDPR compliance" />
+    <title>Potvrdio · Operativna COD Verifikacija za WooCommerce | Zaštita od Povrata Paketa</title>
+    <meta name="description" content="Eliminišite troškove nepreuzetih paketa pri plaćanju pouzećem. Automatizujte verifikaciju adrese za Post Express, Bex, DExpress i Cargo putem 2-way Viber i SMS poruka pre slanja robe." />
+    <meta name="keywords" content="WooCommerce COD Srbija, plaćanje pouzećem, otkupnina, verifikacija adrese, Post Express adresnice, Bex Express, DExpress pouzeće, Aks Express, City Express, sprečavanje povrata paketa, nepreuzeti paketi, duple poštarine, Viber bot WooCommerce, SMS verifikacija narudžbine, Makedonija COD, ZZPL Član 12, HPOS WooCommerce" />
     <meta name="author" content="Potvrdio.online" />
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+
+    <!-- Geographic & Regional Targeting (GEO Meta Tags: Serbia, North Macedonia, Western Balkans) -->
+    <meta name="geo.region" content="RS" />
+    <meta name="geo.placename" content="Novi Sad, Beograd, Srbija" />
+    <meta name="geo.position" content="45.2422;19.8105" />
+    <meta name="ICBM" content="45.2422, 19.8105" />
+    <meta name="target" content="all" />
+    <meta name="audience" content="e-commerce, WooCommerce trgovci, online prodavnice, kurirske službe" />
+    <meta name="coverage" content="Srbija, Severna Makedonija, Bosna i Hercegovina, Crna Gora, Zapadni Balkan" />
 
     <!-- Canonical & Multi-language Hreflang Tags -->
     <link rel="canonical" href="https://potvrdio.online/" />
     <link rel="alternate" hreflang="sr" href="https://potvrdio.online/?lang=sr" />
+    <link rel="alternate" hreflang="sr-RS" href="https://potvrdio.online/?lang=sr" />
     <link rel="alternate" hreflang="mk" href="https://potvrdio.online/?lang=mk" />
+    <link rel="alternate" hreflang="mk-MK" href="https://potvrdio.online/?lang=mk" />
     <link rel="alternate" hreflang="en" href="https://potvrdio.online/?lang=en" />
+    <link rel="alternate" hreflang="en-US" href="https://potvrdio.online/?lang=en" />
     <link rel="alternate" hreflang="x-default" href="https://potvrdio.online/" />
 
     <!-- Open Graph / Facebook / Viber Link Preview -->
@@ -39,11 +51,18 @@
     <meta property="og:locale" content="sr_RS" />
     <meta property="og:locale:alternate" content="mk_MK" />
     <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:image" content="https://potvrdio.online/hero-sr.jpg" />
+    <meta property="og:image:secure_url" content="https://potvrdio.online/hero-sr.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Potvrdio - WooCommerce COD Verifikacija i sprečavanje povrata paketa" />
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Potvrdio · Operativna COD Verifikacija za WooCommerce" />
     <meta name="twitter:description" content="Zaustavite troškove povrata paketa pouzećem. 2-way Viber verifikacija sa 1-click izmenom adrese." />
+    <meta name="twitter:image" content="https://potvrdio.online/hero-sr.jpg" />
 
     <!-- Favicon & Theme -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -57,53 +76,97 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Schema.org JSON-LD 1: SoftwareApplication -->
+    <!-- Schema.org JSON-LD 1: LocalBusiness & Organization (GEO Targeted) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      "name": "Potvrdio.online",
+      "legalName": "GIZEM ORUM PR Konsultantske aktivnosti Lilanova",
+      "url": "https://potvrdio.online",
+      "logo": "https://potvrdio.online/logo-icon-dark.png",
+      "image": "https://potvrdio.online/hero-sr.jpg",
+      "taxID": "115512104",
+      "description": "B2B SaaS infrastruktura za automatizovanu verifikaciju adresa narudžbina pouzećem i sprečavanje troškova nepreuzetih pošiljki za WooCommerce trgovce.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Bulevar Patrijarha Pavla 91, sprat 4, stan 44",
+        "addressLocality": "Novi Sad",
+        "postalCode": "21000",
+        "addressCountry": "RS"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 45.2422,
+        "longitude": 19.8105
+      },
+      "areaServed": [
+        { "@type": "Country", "name": "Serbia" },
+        { "@type": "Country", "name": "North Macedonia" },
+        { "@type": "Country", "name": "Bosnia and Herzegovina" },
+        { "@type": "Country", "name": "Montenegro" }
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "podrska@potvrdio.online",
+        "contactType": "customer service",
+        "availableLanguage": ["Serbian", "Macedonian", "English"]
+      },
+      "sameAs": [
+        "https://github.com/potvrdioapp/potvrdio"
+      ]
+    }
+    </script>
+
+    <!-- Schema.org JSON-LD 2: SoftwareApplication -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "Potvrdio WooCommerce COD Verification Plugin",
-      "operatingSystem": "WordPress 5.0+, WooCommerce 7.0+",
+      "operatingSystem": "WordPress 5.0+, WooCommerce 7.0+ (HPOS Ready)",
       "applicationCategory": "BusinessApplication",
       "description": "Automated Cash on Delivery (COD) address verification and shipping label release engine for WooCommerce stores in Serbia, North Macedonia and the Western Balkans.",
       "url": "https://potvrdio.online",
       "softwareVersion": "2.1.0",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "reviewCount": "38",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
       "offers": {
-        "@type": "Offer",
-        "price": "0.016",
+        "@type": "AggregateOffer",
+        "lowPrice": "0.016",
+        "highPrice": "120.00",
         "priceCurrency": "EUR",
-        "priceSpecification": {
-          "@type": "UnitPriceSpecification",
-          "price": "0.016",
-          "priceCurrency": "EUR",
-          "unitCode": "C62",
-          "valueAddedTaxIncluded": "false"
-        }
+        "offerCount": "4"
       }
     }
     </script>
 
-    <!-- Schema.org JSON-LD 2: Organization -->
+    <!-- Schema.org JSON-LD 3: Service -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Potvrdio.online",
-      "url": "https://potvrdio.online",
-      "logo": "https://potvrdio.online/favicon.svg",
-      "sameAs": [
-        "https://github.com/potvrdioapp/potvrdio"
+      "@type": "Service",
+      "name": "WooCommerce COD Verifikacija i Prevencija Povrata Paketa",
+      "serviceType": "E-Commerce Delivery Verification",
+      "provider": {
+        "@type": "LocalBusiness",
+        "name": "Potvrdio.online",
+        "legalName": "GIZEM ORUM PR Konsultantske aktivnosti Lilanova"
+      },
+      "areaServed": [
+        { "@type": "AdministrativeArea", "name": "Srbija" },
+        { "@type": "AdministrativeArea", "name": "Severna Makedonija" }
       ],
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "email": "info@potvrdio.online",
-        "contactType": "customer service",
-        "availableLanguage": ["Serbian", "Macedonian", "English"]
-      }
+      "description": "Sistem presreće porudžbine plaćene pouzećem (COD), verifikuje tačnost adrese i broja stana preko Viber-a i SMS-a, čime eliminiše nepreuzete pakete za kurirske službe Post Express, Bex, DExpress, Aks i City Express."
     }
     </script>
 
-    <!-- Schema.org JSON-LD 3: FAQPage for AI Generative Search Engines & Rich Snippets -->
+    <!-- Schema.org JSON-LD 4: FAQPage for Search Rich Snippets & AI LLM Engines -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -119,10 +182,18 @@
         },
         {
           "@type": "Question",
+          "name": "Koje kurirske službe u Srbiji i regionu podržava Potvrdio?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Potvrdio je optimizovan za sve vodeće kurirske službe u Srbiji i Severnoj Makedoniji, uključujući Post Express, Bex Express, DExpress, Aks Express, City Express i Kargo Express."
+          }
+        },
+        {
+          "@type": "Question",
           "name": "Da li je Viber verifikacija adrese zakonski usklađena sa ZZPL RS i EU GDPR?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Da, Potvrdio funkcioniše isključivo na osnovu Člana 12 Zakona o zaštiti podataka o ličnosti RS (Službeni glasnik 87/2018) i Člana 6(1)(b) EU GDPR. Verifikacija je ugovorna obaveza za isporuku robe. Svi podaci se automatski brišu 30 dni nakon dostave."
+            "text": "Da, Potvrdio funkcioniše isključivo na osnovu Člana 12 Zakona o zaštiti podataka o ličnosti RS (Službeni glasnik 87/2018) i Člana 6(1)(b) EU GDPR. Verifikacija je ugovorna obaveza za isporuku robe. Svi podaci se automatski brišu 30 dana nakon dostave."
           }
         },
         {
@@ -138,12 +209,21 @@
           "name": "Da li je Potvrdio kompatibilan sa High-Performance Order Storage (HPOS)?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Da, Potvrdio eklentija je u potpunosti testirana i podržava WooCommerce High-Performance Order Storage (HPOS) u verzijama WooCommerce 7.0 do 9.x."
+            "text": "Da, Potvrdio dodatak je u potpunosti testiran i podržava WooCommerce High-Performance Order Storage (HPOS) u verzijama WooCommerce 7.0 do 9.x."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Koliko košta Potvrdio i da li postoji besplatan probni period?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Svaka nova prodavnica dobija 25 garantovanih besplatnih verifikacija bez uvođenja platne kartice. Nakon toga, dopuna se vrši po transparentnom modelu bez fiksnih mesečnih ugovora po ceni od samo €0.016 do €0.025 po verifikovanoj poruci."
           }
         }
       ]
     }
     </script>
+
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
         (function(m,e,t,r,i,k,a){

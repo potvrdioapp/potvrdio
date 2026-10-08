@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import QRCode from 'qrcode';
 import { 
   X, 
@@ -9,7 +9,8 @@ import {
   Printer, 
   RefreshCw, 
   ShieldCheck, 
-  Building2
+  Building2,
+  ChevronDown
 } from 'lucide-react';
 
 export interface IpsPaymentPlan {
@@ -26,6 +27,7 @@ interface IpsPaymentModalProps {
   plan: IpsPaymentPlan | null;
   lang: 'sr' | 'mk' | 'en';
   onPaymentSuccess?: (credits: number, planId: string) => void;
+  onSelectPlan?: (plan: IpsPaymentPlan) => void;
 }
 
 export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
@@ -34,7 +36,9 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
   plan,
   lang,
   onPaymentSuccess,
+  onSelectPlan,
 }) => {
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(plan?.id || 'growth');
   const [exchangeRate, setExchangeRate] = useState<number>(117.20);
   const [rateLoading, setRateLoading] = useState<boolean>(true);
   const [rateDate, setRateDate] = useState<string>('');
@@ -44,6 +48,13 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
   const [predracunNumber, setPredracunNumber] = useState<string>('');
   const [isNotifying, setIsNotifying] = useState<boolean>(false);
   const [notified, setNotified] = useState<boolean>(false);
+
+  // Sync internal selection when external plan changes
+  useEffect(() => {
+    if (plan?.id) {
+      setSelectedPlanId(plan.id);
+    }
+  }, [plan?.id]);
 
   // Official Legal Entity Details (Activity Code 7022 compliant)
   const LEGAL = {
@@ -60,9 +71,229 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
     vatStatus: 'Preduzetnik nije u sistemu PDV-a (prema čl. 33 Zakona o PDV-u RS)',
   };
 
+  const strings = {
+    sr: {
+      title: 'Dopuna Kredita – Zvanični Predračun i IPS QR Plaćanje',
+      subtitle: 'Bezbedno B2B plaćanje direktno sa vašeg e-banking / m-banking računa bez provizije',
+      badge7022: 'Usklađeno sa šifrom delatnosti 7022',
+      creditsSuffix: 'kredita',
+      perMonthSuffix: '/mesec',
+      selectedPackageLabel: 'Osnovni Paket',
+      changePackageLabel: 'Promeni paket',
+      priceEurLabel: 'Cena u EUR',
+      priceEurSub: 'Fakturisana osnovica',
+      totalRsdLabel: 'Ukupno za uplatu (RSD)',
+      totalRsdSub: 'Tačan iznos za nalog / QR',
+      liveRate: 'Zvanični srednji kurs NBS:',
+      rateNotice: 'Obračun se vrši u RSD prema članu 34. Zakona o deviznom poslovanju RS.',
+      tabQr: 'IPS QR Kod (m-banking)',
+      tabSlip: 'Podaci za Nalog / Virman (e-banking)',
+      qrStandardBadge: 'NBS IPS STANDARDIZOVANI QR KOD',
+      qrGenerating: 'Generisanje QR koda...',
+      qrRefPrefix: 'Poziv:',
+      howToPayTitle: 'Kako platiti u 2 sekunde?',
+      qrInstructions: 'Otvorite mobilnu aplikaciju bilo koje banke u Srbiji (Intesa Mobi, Raiffeisen, OTP, UniCredit, NLB Komercijalna itd.), izaberite opciju „IPS Skeniraj” i usmerite kameru ka QR kodu ispod.',
+      qrNote: 'Nalog se popunjava automatski sa tačnim iznosom i pozivom na broj.',
+      receiverLabel: 'Primalac:',
+      accountLabel: 'Broj računa:',
+      amountLabel: 'Iznos za uplatu:',
+      paymentCodeLabel: 'Šifra plaćanja:',
+      paymentCodeInline: (code: string) => `(Šifra ${code})`,
+      purposeLabel: 'Svrha uplate:',
+      referenceLabel: 'Poziv na broj:',
+      bankLabel: 'Banka:',
+      pibLabel: 'PIB primaoca:',
+      mbLabel: 'MB primaoca:',
+      proformaTitle: 'Predračun (Proforma račun)',
+      proformaNo: 'Broj predračuna:',
+      issueDate: 'Datum izdavanja:',
+      dueDate: 'Rok za uplatu:',
+      vatExemptText: 'Preduzetnik nije u sistemu PDV-a prema čl. 33 Zakona o PDV-u. PDV nije obračunat.',
+      eInvoiceNoticeTitle: 'Elektronska Faktura (SEF / e-Faktura):',
+      eInvoiceNoticeText: 'Nakon evidentirane uplate u bankarskom izvodu, zvanična elektronska faktura (konačni račun) se automatski izdaje kroz SEF na PIB vaše firme u zakonskom roku.',
+      confirmPaymentBtn: 'Poslao/la sam uplatu',
+      checkingPayment: 'Provera uplate...',
+      notifiedSuccess: 'Prijava uplate zabeležena! Krediti se aktiviraju odmah po proknjiženju na računu.',
+      printBtn: 'Štampaj / Sačuvaj Predračun',
+      closeBtn: 'Zatvori',
+      copyBtn: 'Kopiraj',
+      copiedBtn: 'Kopirano',
+      planStarter: 'Starter Paket',
+      planGrowth: 'Growth Paket',
+      planPro: 'Pro Scale Paket',
+      planReserve: 'Pro Reserve Pretplata',
+    },
+    mk: {
+      title: 'Дополнување Кредити – Официјална Профактура и IPS QR Плаќање',
+      subtitle: 'Безбедно B2B плаќање директно од вашата e-banking / m-banking сметка без провизија',
+      badge7022: 'Усогласено со дејност 7022 (Консалтинг)',
+      creditsSuffix: 'кредити',
+      perMonthSuffix: '/месец',
+      selectedPackageLabel: 'Избран Пакет',
+      changePackageLabel: 'Промени пакет',
+      priceEurLabel: 'Цена во EUR',
+      priceEurSub: 'Фактурирана основа',
+      totalRsdLabel: 'Вкупно за уплата (RSD)',
+      totalRsdSub: 'Точен износ за налог / QR',
+      liveRate: 'Официјален курс на централна банка:',
+      rateNotice: 'Пресметката се врши според важечките прописи за платен промет.',
+      tabQr: 'IPS QR Код (Србија m-banking)',
+      tabSlip: 'Податоци за Вирман (e-banking)',
+      qrStandardBadge: 'NBS IPS СТАНДАРДИЗИРАН QR КОД',
+      qrGenerating: 'Генерирање QR код...',
+      qrRefPrefix: 'Повик:',
+      howToPayTitle: 'Како да платите за 2 секунди?',
+      qrInstructions: 'Скенирајте го кодот преку вашата мобилна банкарска апликација со опцијата за инстант плаќање („IPS Скенирај”).',
+      qrNote: 'Сите податоци се пополнуваат автоматски со точниот износ и повикувачки број.',
+      receiverLabel: 'Примач:',
+      accountLabel: 'Број на сметка:',
+      amountLabel: 'Износ за уплата:',
+      paymentCodeLabel: 'Шифра на плаќање:',
+      paymentCodeInline: (code: string) => `(Шифра ${code})`,
+      purposeLabel: 'Цел на дознака:',
+      referenceLabel: 'Повикувачки број:',
+      bankLabel: 'Банка:',
+      pibLabel: 'ПИБ:',
+      mbLabel: 'МБ:',
+      proformaTitle: 'Профактура (Предрачун)',
+      proformaNo: 'Број на профактура:',
+      issueDate: 'Датум на издавање:',
+      dueDate: 'Рок на плаќање:',
+      vatExemptText: 'Субјектот не е во систем на ДДВ според важечкиот закон. ДДВ не е пресметан.',
+      eInvoiceNoticeTitle: 'Електронска фактура:',
+      eInvoiceNoticeText: 'По евидентирање на уплатата на изводот, официјалната e-фактура автоматски се доставува.',
+      confirmPaymentBtn: 'Испратив уплата',
+      checkingPayment: 'Проверка на уплата...',
+      notifiedSuccess: 'Пријавата е евидентирана! Кредитите се активираат веднаш по приемот на уплатата.',
+      printBtn: 'Печати Профактура',
+      closeBtn: 'Затвори',
+      copyBtn: 'Копирај',
+      copiedBtn: 'Копирано',
+      planStarter: 'Starter Пакет',
+      planGrowth: 'Growth Пакет',
+      planPro: 'Pro Scale Пакет',
+      planReserve: 'Pro Reserve Претплата',
+    },
+    en: {
+      title: 'Top-Up Credits – Proforma Invoice & Instant NBS IPS Payment',
+      subtitle: 'Secure B2B payment directly via your corporate e-banking / m-banking account without processor fees',
+      badge7022: 'Compliant with business activity 7022',
+      creditsSuffix: 'credits',
+      perMonthSuffix: '/mo',
+      selectedPackageLabel: 'Selected Package',
+      changePackageLabel: 'Change package',
+      priceEurLabel: 'Price in EUR',
+      priceEurSub: 'Invoiced subtotal',
+      totalRsdLabel: 'Total Payable (RSD)',
+      totalRsdSub: 'Exact amount for slip / QR',
+      liveRate: 'Official NBS Middle Exchange Rate:',
+      rateNotice: 'Calculated in RSD according to the Serbian Foreign Exchange Act (Art. 34).',
+      tabQr: 'Instant IPS QR Code (m-banking)',
+      tabSlip: 'Wire Transfer Details (e-banking)',
+      qrStandardBadge: 'NBS IPS STANDARDIZED QR CODE',
+      qrGenerating: 'Generating QR code...',
+      qrRefPrefix: 'Ref:',
+      howToPayTitle: 'How to pay in 2 seconds?',
+      qrInstructions: 'Open your Serbian mobile banking app (Raiffeisen, Intesa, OTP, UniCredit, etc.), select „IPS Scan” and scan the code below.',
+      qrNote: 'The transfer slip is populated automatically with exact amount and reference ID.',
+      receiverLabel: 'Beneficiary:',
+      accountLabel: 'Bank Account:',
+      amountLabel: 'Total Amount:',
+      paymentCodeLabel: 'Payment Code:',
+      paymentCodeInline: (code: string) => `(Code ${code})`,
+      purposeLabel: 'Payment Purpose:',
+      referenceLabel: 'Reference / Invoice No:',
+      bankLabel: 'Bank:',
+      pibLabel: 'Tax ID (PIB):',
+      mbLabel: 'Company Reg. (MB):',
+      proformaTitle: 'Proforma Invoice (Predračun)',
+      proformaNo: 'Proforma No:',
+      issueDate: 'Issue Date:',
+      dueDate: 'Payment Due:',
+      vatExemptText: 'Sole proprietorship exempt from VAT (Art. 33 of Serbian VAT Law). VAT 0%.',
+      eInvoiceNoticeTitle: 'Electronic Invoice (e-Faktura / SEF):',
+      eInvoiceNoticeText: 'Upon bank statement verification, the final electronic invoice is registered directly to your corporate Tax ID via the official SEF portal.',
+      confirmPaymentBtn: 'I have transferred funds',
+      checkingPayment: 'Checking payment...',
+      notifiedSuccess: 'Payment notice submitted! Credits will be active as soon as booked on the bank statement.',
+      printBtn: 'Print / Save Proforma PDF',
+      closeBtn: 'Close',
+      copyBtn: 'Copy',
+      copiedBtn: 'Copied',
+      planStarter: 'Starter Plan',
+      planGrowth: 'Growth Plan',
+      planPro: 'Pro Scale Plan',
+      planReserve: 'Pro Reserve Subscription',
+    },
+  };
+
+  const t = strings[lang] || strings.sr;
+
+  // Available packages list with localized titles
+  const availablePlans = useMemo<IpsPaymentPlan[]>(() => [
+    {
+      id: 'starter',
+      name: t.planStarter,
+      euroPrice: 15,
+      credits: 600,
+      type: 'ONE_TIME',
+    },
+    {
+      id: 'growth',
+      name: t.planGrowth,
+      euroPrice: 45,
+      credits: 1875,
+      type: 'ONE_TIME',
+    },
+    {
+      id: 'pro',
+      name: t.planPro,
+      euroPrice: 120,
+      credits: 6000,
+      type: 'ONE_TIME',
+    },
+    {
+      id: 'reserve',
+      name: t.planReserve,
+      euroPrice: 29,
+      credits: 1800,
+      type: 'MONTHLY',
+    },
+  ], [t]);
+
+  // Active plan derived from user selection
+  const activePlan = useMemo<IpsPaymentPlan>(() => {
+    const found = availablePlans.find((p) => p.id === selectedPlanId);
+    if (found) return found;
+    if (plan) {
+      return {
+        ...plan,
+        name:
+          plan.id === 'starter'
+            ? t.planStarter
+            : plan.id === 'growth'
+            ? t.planGrowth
+            : plan.id === 'pro'
+            ? t.planPro
+            : plan.id === 'reserve'
+            ? t.planReserve
+            : plan.name,
+      };
+    }
+    return availablePlans[1]; // default to growth
+  }, [availablePlans, selectedPlanId, plan, t]);
+
+  const handlePlanChange = (newPlanId: string) => {
+    setSelectedPlanId(newPlanId);
+    const chosen = availablePlans.find((p) => p.id === newPlanId);
+    if (chosen && onSelectPlan) {
+      onSelectPlan(chosen);
+    }
+  };
+
   // Generate persistent proforma invoice reference upon opening
   useEffect(() => {
-    if (isOpen && plan) {
+    if (isOpen) {
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
       const currentYear = new Date().getFullYear().toString().slice(-2);
       const invoiceNo = `POT-${currentYear}-${randomSuffix}`;
@@ -70,7 +301,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
       setNotified(false);
       setIsNotifying(false);
     }
-  }, [isOpen, plan]);
+  }, [isOpen, selectedPlanId]);
 
   // Fetch real-time exchange rate with fallback to NBS official middle rate (117.20)
   useEffect(() => {
@@ -107,12 +338,12 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
   }, [isOpen]);
 
   // Calculate RSD amount
-  const rsdAmount = plan ? Math.round(plan.euroPrice * exchangeRate) : 0;
+  const rsdAmount = activePlan ? Math.round(activePlan.euroPrice * exchangeRate) : 0;
   const formattedRsd = rsdAmount.toLocaleString('sr-RS');
 
   // Generate NBS IPS QR Code string according to NBS Specification (K:PR format)
   useEffect(() => {
-    if (!isOpen || !plan || !predracunNumber) return;
+    if (!isOpen || !activePlan || !predracunNumber) return;
 
     // NBS IPS String specification:
     // Svrha plaćanja max 35 chars
@@ -151,9 +382,9 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
       .catch((err) => {
         console.error('Failed to generate NBS IPS QR code:', err);
       });
-  }, [isOpen, plan, predracunNumber, rsdAmount, exchangeRate]);
+  }, [isOpen, activePlan, predracunNumber, rsdAmount, exchangeRate]);
 
-  if (!isOpen || !plan) return null;
+  if (!isOpen || !activePlan) return null;
 
   const copyToClipboard = (text: string, fieldId: string) => {
     navigator.clipboard.writeText(text);
@@ -166,109 +397,12 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
     setTimeout(() => {
       setIsNotifying(false);
       setNotified(true);
-      if (onPaymentSuccess) {
-        onPaymentSuccess(plan.credits, plan.id);
+      if (onPaymentSuccess && activePlan) {
+        onPaymentSuccess(activePlan.credits, activePlan.id);
       }
     }, 1200);
   };
 
-  const strings = {
-    sr: {
-      title: 'Dopuna Kredita – Zvanični Predračun i IPS QR Plaćanje',
-      subtitle: 'Bezbedno B2B plaćanje direktno sa vašeg e-banking / m-banking računa bez provizije',
-      badge7022: 'Usklađeno sa šifrom delatnosti 7022',
-      liveRate: 'Zvanični srednji kurs NBS:',
-      rateNotice: 'Obračun se vrši u RSD prema članu 34. Zakona o deviznom poslovanju RS.',
-      tabQr: 'IPS QR Kod (m-banking)',
-      tabSlip: 'Podaci za Nalog / Virman (e-banking)',
-      qrInstructions: 'Otvorite mobilnu aplikaciju bilo koje banke u Srbiji (Intesa Mobi, Raiffeisen, OTP, UniCredit, NLB Komercijalna itd.), izaberite opciju „IPS Skeniraj” i usmerite kameru ka QR kodu ispod.',
-      qrNote: 'Nalog se popunjava automatski sa tačnim iznosom i pozivom na broj.',
-      receiverLabel: 'Primalac:',
-      accountLabel: 'Broj računa:',
-      amountLabel: 'Iznos za uplatu:',
-      paymentCodeLabel: 'Šifra plaćanja:',
-      purposeLabel: 'Svrha uplate:',
-      referenceLabel: 'Poziv na broj:',
-      bankLabel: 'Banka:',
-      pibLabel: 'PIB primaoca:',
-      mbLabel: 'MB primaoca:',
-      proformaTitle: 'Predračun (Proforma račun)',
-      proformaNo: 'Broj predračuna:',
-      issueDate: 'Datum izdavanja:',
-      dueDate: 'Rok za uplatu:',
-      vatExemptText: 'Preduzetnik nije u sistemu PDV-a prema čl. 33 Zakona o PDV-u. PDV nije obračunat.',
-      eInvoiceNoticeTitle: 'Elektronska Faktura (SEF / e-Faktura):',
-      eInvoiceNoticeText: 'Nakon evidentirane uplate u bankarskom izvodu, zvanična elektronska faktura (konačni račun) se automatski izdaje kroz SEF na PIB vaše firme u zakonskom roku.',
-      confirmPaymentBtn: 'Poslao/la sam uplatu',
-      notifiedSuccess: 'Prijava uplate zabeležena! Krediti se aktiviraju odmah po proknjiženju na računu.',
-      printBtn: 'Štampaj / Sačuvaj Predračun',
-      closeBtn: 'Zatvori',
-    },
-    mk: {
-      title: 'Дополнување Кредити – Официјална Профактура и Банкарски Налог',
-      subtitle: 'Безбедно B2B плаќање директно од вашата e-banking / m-banking сметка',
-      badge7022: 'Усогласено со дејност 7022 (Консалтинг)',
-      liveRate: 'Официјален курс на централна банка:',
-      rateNotice: 'Пресметката се врши според важечките прописи за платен промет.',
-      tabQr: 'IPS QR Код (Србија m-banking)',
-      tabSlip: 'Податоци за Вирман (e-banking)',
-      qrInstructions: 'Скенирајте го кодот преку вашата мобилна банкарска апликација со опцијата за инстант плаќање.',
-      qrNote: 'Сите податоци се пополнуваат автоматски.',
-      receiverLabel: 'Примач:',
-      accountLabel: 'Број на сметка:',
-      amountLabel: 'Износ за уплата:',
-      paymentCodeLabel: 'Шифра на плаќање:',
-      purposeLabel: 'Цел на дознака:',
-      referenceLabel: 'Повикувачки број:',
-      bankLabel: 'Банка:',
-      pibLabel: 'ПИБ:',
-      mbLabel: 'МБ:',
-      proformaTitle: 'Профактура (Предрачун)',
-      proformaNo: 'Број на профактура:',
-      issueDate: 'Датум на издавање:',
-      dueDate: 'Рок на плаќање:',
-      vatExemptText: 'Субјектот не е во систем на ДДВ според важечкиот закон. ДДВ не е пресметан.',
-      eInvoiceNoticeTitle: 'Електронска фактура:',
-      eInvoiceNoticeText: 'По евидентирање на уплатата на изводот, официјалната e-фактура автоматски се доставува.',
-      confirmPaymentBtn: 'Испратив уплата',
-      notifiedSuccess: 'Пријавата е евидентирана! Кредитите се активираат веднаш по приемот на уплатата.',
-      printBtn: 'Печати Профактура',
-      closeBtn: 'Затвори',
-    },
-    en: {
-      title: 'Top-Up Credits – Proforma Invoice & Instant NBS IPS Payment',
-      subtitle: 'Secure B2B payment directly via your corporate e-banking / m-banking account without processor fees',
-      badge7022: 'Compliant with business activity 7022',
-      liveRate: 'Official NBS Middle Exchange Rate:',
-      rateNotice: 'Calculated in RSD according to the Serbian Foreign Exchange Act (Art. 34).',
-      tabQr: 'Instant IPS QR Code (m-banking)',
-      tabSlip: 'Wire Transfer Details (e-banking)',
-      qrInstructions: 'Open your Serbian mobile banking app (Raiffeisen, Intesa, OTP, UniCredit, etc.), select „IPS Scan” and scan the code below.',
-      qrNote: 'The transfer slip is populated automatically with exact amount and reference ID.',
-      receiverLabel: 'Beneficiary:',
-      accountLabel: 'Bank Account:',
-      amountLabel: 'Total Amount:',
-      paymentCodeLabel: 'Payment Code:',
-      purposeLabel: 'Payment Purpose:',
-      referenceLabel: 'Reference / Invoice No:',
-      bankLabel: 'Bank:',
-      pibLabel: 'Tax ID (PIB):',
-      mbLabel: 'Company Reg. (MB):',
-      proformaTitle: 'Proforma Invoice (Predračun)',
-      proformaNo: 'Proforma No:',
-      issueDate: 'Issue Date:',
-      dueDate: 'Payment Due:',
-      vatExemptText: 'Sole proprietorship exempt from VAT (Art. 33 of Serbian VAT Law). VAT 0%.',
-      eInvoiceNoticeTitle: 'Electronic Invoice (e-Faktura / SEF):',
-      eInvoiceNoticeText: 'Upon bank statement verification, the final electronic invoice is registered directly to your corporate Tax ID via the official SEF portal.',
-      confirmPaymentBtn: 'I have transferred funds',
-      notifiedSuccess: 'Payment notice submitted! Credits will be active as soon as booked on the bank statement.',
-      printBtn: 'Print / Save Proforma PDF',
-      closeBtn: 'Close',
-    },
-  };
-
-  const t = strings[lang] || strings.sr;
   const svrhaText = `Konsultantske usluge i digitalna optimizacija COD isporuke po predračunu ${predracunNumber}`;
 
   return (
@@ -283,7 +417,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                 {t.badge7022}
               </span>
               <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                {plan.name} (+{plan.credits.toLocaleString()} kredita)
+                {activePlan.name} (+{activePlan.credits.toLocaleString()} {t.creditsSuffix})
               </span>
             </div>
             <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
@@ -318,22 +452,64 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
           </div>
         </div>
 
-        {/* Amount Summary Cards */}
+        {/* Amount Summary Cards (Interactive Package Selector) */}
         <div className="p-6 pb-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div className="p-3.5 rounded-xl bg-surface border border-theme">
-            <span className="block text-[11px] text-theme-muted uppercase font-semibold">Osnovni Paket</span>
-            <span className="text-lg font-bold text-slate-900 dark:text-white">{plan.name}</span>
-            <span className="block text-xs text-teal-600 dark:text-teal-400 font-medium">+{plan.credits.toLocaleString()} kredita</span>
+          
+          {/* Package Selector Card */}
+          <div className="p-3.5 rounded-xl bg-surface border border-theme flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="modal-package-select" className="block text-[11px] text-theme-muted uppercase font-semibold">
+                  {t.selectedPackageLabel}
+                </label>
+              </div>
+              <div className="relative">
+                <select
+                  id="modal-package-select"
+                  value={activePlan.id}
+                  onChange={(e) => handlePlanChange(e.target.value)}
+                  className="w-full bg-surface-subtle hover:bg-surface border border-theme rounded-lg pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-900 dark:text-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all appearance-none shadow-2xs"
+                >
+                  {availablePlans.map((p) => (
+                    <option key={p.id} value={p.id} className="bg-surface text-theme-primary py-1">
+                      {p.name} ({p.type === 'MONTHLY' ? `€${p.euroPrice}${t.perMonthSuffix}` : `€${p.euroPrice}`} • {p.credits.toLocaleString()} {t.creditsSuffix})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-theme-muted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              </div>
+            </div>
+            <div className="mt-2.5 flex items-center justify-between text-xs text-teal-600 dark:text-teal-400 font-medium">
+              <span>+{activePlan.credits.toLocaleString()} {t.creditsSuffix}</span>
+              {activePlan.type === 'MONTHLY' && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-teal-500/10 text-teal-700 dark:text-teal-300 font-bold uppercase">
+                  {t.perMonthSuffix}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="p-3.5 rounded-xl bg-surface border border-theme">
-            <span className="block text-[11px] text-theme-muted uppercase font-semibold">Cena u EUR</span>
-            <span className="text-xl font-bold font-mono text-slate-900 dark:text-white">€{plan.euroPrice.toFixed(2)}</span>
-            <span className="block text-[11px] text-theme-muted">Fakturisana osnovica</span>
+
+          {/* EUR Price Card */}
+          <div className="p-3.5 rounded-xl bg-surface border border-theme flex flex-col justify-between">
+            <div>
+              <span className="block text-[11px] text-theme-muted uppercase font-semibold">{t.priceEurLabel}</span>
+              <div className="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">
+                €{activePlan.euroPrice.toFixed(2)}
+                {activePlan.type === 'MONTHLY' && (
+                  <span className="text-xs font-normal text-theme-muted"> {t.perMonthSuffix}</span>
+                )}
+              </div>
+            </div>
+            <span className="block text-[11px] text-theme-muted mt-2">{t.priceEurSub}</span>
           </div>
-          <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/30">
-            <span className="block text-[11px] text-teal-700 dark:text-teal-300 uppercase font-semibold">Ukupno za uplatu (RSD)</span>
-            <span className="text-2xl font-black font-mono text-teal-600 dark:text-teal-400">{formattedRsd} RSD</span>
-            <span className="block text-[10px] text-teal-600/80 dark:text-teal-400/80">Tačan iznos za nalog / QR</span>
+
+          {/* RSD Total Card */}
+          <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/30 flex flex-col justify-between">
+            <div>
+              <span className="block text-[11px] text-teal-700 dark:text-teal-300 uppercase font-semibold">{t.totalRsdLabel}</span>
+              <span className="text-2xl font-black font-mono text-teal-600 dark:text-teal-400 mt-1 block">{formattedRsd} RSD</span>
+            </div>
+            <span className="block text-[10px] text-teal-600/80 dark:text-teal-400/80 mt-2">{t.totalRsdSub}</span>
           </div>
         </div>
 
@@ -370,7 +546,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
               {/* QR Code Presentation */}
               <div className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-slate-200 shadow-inner text-center">
                 <div className="mb-2 flex items-center justify-center gap-1.5 text-[11px] font-bold text-slate-700 tracking-wider uppercase">
-                  <span>NBS IPS STANDARDIZOVANI QR KOD</span>
+                  <span>{t.qrStandardBadge}</span>
                 </div>
                 {qrCodeDataUrl ? (
                   <div className="p-2 bg-white rounded-xl border-2 border-slate-900 shadow-sm">
@@ -382,13 +558,13 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                   </div>
                 ) : (
                   <div className="w-56 h-56 flex items-center justify-center bg-slate-100 rounded-xl text-xs text-slate-500">
-                    Generisanje QR koda...
+                    {t.qrGenerating}
                   </div>
                 )}
                 <div className="mt-3 flex items-center gap-1 text-[11px] font-mono font-semibold text-slate-900">
                   <span>{formattedRsd} RSD</span>
                   <span className="text-slate-400">•</span>
-                  <span>Poziv: {predracunNumber}</span>
+                  <span>{t.qrRefPrefix} {predracunNumber}</span>
                 </div>
               </div>
 
@@ -397,13 +573,14 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                 <div className="p-3.5 rounded-xl bg-surface-subtle border border-theme space-y-2">
                   <h4 className="font-bold text-sm text-theme-primary flex items-center gap-2">
                     <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
-                    Kako platiti u 2 sekunde?
+                    {t.howToPayTitle}
                   </h4>
                   <p className="text-theme-muted leading-relaxed">
                     {t.qrInstructions}
                   </p>
-                  <p className="text-[11px] text-teal-600 dark:text-teal-400 font-medium">
-                    ✓ {t.qrNote}
+                  <p className="text-[11px] text-teal-600 dark:text-teal-400 font-medium flex items-center gap-1.5">
+                    <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>{t.qrNote}</span>
                   </p>
                 </div>
 
@@ -419,7 +596,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                       <button 
                         onClick={() => copyToClipboard(LEGAL.bankAccount, 'acc')}
                         className="p-1 hover:text-teal-500 transition-colors cursor-pointer"
-                        title="Kopiraj"
+                        title={t.copyBtn}
                       >
                         {copiedField === 'acc' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
@@ -432,7 +609,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                       <button 
                         onClick={() => copyToClipboard(predracunNumber, 'ref')}
                         className="p-1 hover:text-teal-500 transition-colors cursor-pointer"
-                        title="Kopiraj"
+                        title={t.copyBtn}
                       >
                         {copiedField === 'ref' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
@@ -496,7 +673,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                         className="text-[10px] text-teal-600 dark:text-teal-400 flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         {copiedField === 'acc2' ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                        {copiedField === 'acc2' ? 'Kopirano' : 'Kopiraj'}
+                        {copiedField === 'acc2' ? t.copiedBtn : t.copyBtn}
                       </button>
                     </div>
                     <div className="font-mono text-sm font-bold text-teal-600 dark:text-teal-400">{LEGAL.bankAccount}</div>
@@ -511,11 +688,11 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                         className="text-[10px] text-teal-600 dark:text-teal-400 flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         {copiedField === 'amount' ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                        {copiedField === 'amount' ? 'Kopirano' : 'Kopiraj'}
+                        {copiedField === 'amount' ? t.copiedBtn : t.copyBtn}
                       </button>
                     </div>
                     <div className="font-mono text-base font-black text-slate-900 dark:text-white">
-                      {formattedRsd} RSD <span className="text-xs text-theme-muted font-normal">(€{plan.euroPrice.toFixed(2)})</span>
+                      {formattedRsd} RSD <span className="text-xs text-theme-muted font-normal">(€{activePlan.euroPrice.toFixed(2)})</span>
                     </div>
                   </div>
 
@@ -528,7 +705,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                         className="text-[10px] text-teal-600 dark:text-teal-400 flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         {copiedField === 'ref2' ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                        {copiedField === 'ref2' ? 'Kopirano' : 'Kopiraj'}
+                        {copiedField === 'ref2' ? t.copiedBtn : t.copyBtn}
                       </button>
                     </div>
                     <div className="font-mono text-sm font-bold text-slate-800 dark:text-slate-200">
@@ -539,13 +716,13 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
                   {/* Svrha uplate (Full width) */}
                   <div className="sm:col-span-2 p-3 bg-surface border border-theme rounded-xl space-y-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-theme-muted uppercase font-semibold">{t.purposeLabel} (Šifra {LEGAL.paymentCode})</span>
+                      <span className="text-[10px] text-theme-muted uppercase font-semibold">{t.purposeLabel} {t.paymentCodeInline(LEGAL.paymentCode)}</span>
                       <button 
                         onClick={() => copyToClipboard(svrhaText, 'svrha')}
                         className="text-[10px] text-teal-600 dark:text-teal-400 flex items-center gap-1 hover:underline cursor-pointer"
                       >
                         {copiedField === 'svrha' ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                        {copiedField === 'svrha' ? 'Kopirano' : 'Kopiraj'}
+                        {copiedField === 'svrha' ? t.copiedBtn : t.copyBtn}
                       </button>
                     </div>
                     <div className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-relaxed">
@@ -605,7 +782,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
               {isNotifying ? (
                 <>
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Provera uplate...</span>
+                  <span>{t.checkingPayment}</span>
                 </>
               ) : notified ? (
                 <>
