@@ -213,12 +213,6 @@ export default async function handler(req: any, res: any) {
             name: customer_name || 'Kupac',
           },
         ],
-        bcc: [
-          {
-            email: 'potvrdioapp@gmail.com',
-            name: 'Potvrdio Admin Audit',
-          },
-        ],
         subject,
         htmlContent: verificationHtml,
         textContent: `Poštovani ${customer_name || 'Kupac'},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}!\n\nVaša porudžbina #${order_id} je uspešno primljena. Kako bi kurir paket isporučio bez greške, molimo Vas da potvrdite adresu na sledećem linku:\n${editUrl}\n\nIznos pouzećem: ${formattedAmount}\nAdresa: ${addressDisplay}\n\nVaš ${storeDisplay} tim`,
@@ -245,29 +239,22 @@ export default async function handler(req: any, res: any) {
         emailErr = err.message || 'Fetch error to Brevo';
       }
 
-      // Also send simulation review email to potvrdioapp@gmail.com
+      // Simulation review email goes STRICTLY to fixed admin test address (never to customer)
       const viberText = `Poštovani ${customer_name || 'Kupac'},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}.\n\nKako bi Vam kurir paket uručio bez zastoja i na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 Adresa: ${addressDisplay}\n💵 Iznos pouzećem: ${formattedAmount}\n\nPotvrdite ili izmenite adresu isporuke jednim klikom:\n👉 ${editUrl}`;
       const smsText = `${storeDisplay}: Poštovani, molimo proverite adresu isporuke za Vaš paket: ${editUrl}`;
 
-      const simRecipients = [
-        {
-          email: 'potvrdioapp@gmail.com',
-          name: 'Potvrdio Admin',
-        },
-      ];
-      if (customerEmail && customerEmail !== 'potvrdioapp@gmail.com') {
-        simRecipients.push({
-          email: customerEmail,
-          name: customer_name || 'Admin Tester',
-        });
-      }
-
+      const fixedAdminEmail = process.env.TEST_NOTIFICATION_EMAIL || 'potvrdioapp@gmail.com';
       const simPayload = {
         sender: {
           name: `${storeDisplay} (Test Poruke)`,
           email: 'info@potvrdio.online',
         },
-        to: simRecipients,
+        to: [
+          {
+            email: fixedAdminEmail,
+            name: 'Potvrdio Admin',
+          },
+        ],
         subject: `[SIMULACIJA PORUKA] Viber & SMS predlog za porudžbinu #${order_id} – ${storeDisplay}`,
         htmlContent: `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f8fafc;">
           <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0;">
