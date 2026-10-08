@@ -11,6 +11,7 @@ import { RefundPolicyModal } from './components/RefundPolicyModal';
 import { DeliveryPolicyModal } from './components/DeliveryPolicyModal';
 import { CookiePolicyModal } from './components/CookiePolicyModal';
 import { OnboardingModal } from './components/OnboardingModal';
+import { IpsPaymentModal, IpsPaymentPlan } from './components/IpsPaymentModal';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { FloatingContactWidget } from './components/FloatingContactWidget';
 import { Footer } from './components/Footer';
@@ -103,7 +104,15 @@ export default function App() {
   const [showDeliveryModal, setShowDeliveryModal] = useState<boolean>(false);
   const [showCookieModal, setShowCookieModal] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
+  const [selectedPaymentPlan, setSelectedPaymentPlan] = useState<IpsPaymentPlan | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState<boolean>(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const handleSelectPlan = (plan: IpsPaymentPlan) => {
+    playClickSound();
+    setSelectedPaymentPlan(plan);
+    setShowPaymentModal(true);
+  };
 
   // Deep-link / pathname checking for bank audits (e.g. /uslovi-koriscenja, /reklamacije-i-povracaj)
   useEffect(() => {
@@ -1975,7 +1984,7 @@ export default function App() {
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
-                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
+                        onClick={() => handleSelectPlan({ id: 'starter', name: 'Starter Paket', euroPrice: 15, credits: 600, type: 'ONE_TIME' })} 
                         className="btn-select-wave px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[10px] sm:text-[11px] font-semibold transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
@@ -2004,7 +2013,7 @@ export default function App() {
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
-                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
+                        onClick={() => handleSelectPlan({ id: 'growth', name: 'Growth Paket', euroPrice: 45, credits: 1875, type: 'ONE_TIME' })} 
                         className="btn-brand-cta px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg text-white font-bold text-[10px] sm:text-[11px] transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
@@ -2028,7 +2037,7 @@ export default function App() {
                     </td>
                     <td className="px-2.5 sm:px-4 py-2.5 sm:py-3.5 text-right whitespace-nowrap">
                       <button 
-                        onClick={() => { playClickSound(); setShowOnboardingModal(true); }} 
+                        onClick={() => handleSelectPlan({ id: 'pro', name: 'Scale Paket', euroPrice: 120, credits: 6000, type: 'ONE_TIME' })} 
                         className="btn-select-wave px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg bg-surface hover:bg-surface-subtle border border-theme text-theme-primary text-[10px] sm:text-[11px] font-semibold transition cursor-pointer min-h-[28px] sm:min-h-[32px] shadow-sm"
                       >
                         {t('price_btn_select')}
@@ -2088,7 +2097,7 @@ export default function App() {
             </ul>
 
             <button 
-              onClick={() => { playClickSound(); setShowOnboardingModal(true); }}
+              onClick={() => handleSelectPlan({ id: 'reserve', name: 'Pro Reserve Pretplata', euroPrice: 29, credits: 1800, type: 'MONTHLY' })}
               className="w-full btn-brand-cta text-white font-bold py-3 rounded text-xs transition shadow-sm cursor-pointer min-h-[44px]"
             >
               {t('btn_act_pro')}
@@ -2409,6 +2418,17 @@ export default function App() {
         onClose={() => setShowOnboardingModal(false)}
         lang={lang}
         playSuccessSound={playScannerBeep}
+      />
+
+      {/* Official B2B Predračun & NBS IPS QR Code Payment Modal */}
+      <IpsPaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        plan={selectedPaymentPlan}
+        lang={lang}
+        onPaymentSuccess={() => {
+          playScannerBeep();
+        }}
       />
 
       {/* Floating Quick Contact Widget (WhatsApp & Viber) */}
