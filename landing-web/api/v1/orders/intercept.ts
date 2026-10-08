@@ -249,42 +249,56 @@ export default async function handler(req: any, res: any) {
       const viberText = `Poštovani ${customer_name || 'Kupac'},\n\nHvala Vam na porudžbini u internet prodavnici ${storeDisplay}.\n\nKako bi Vam kurir paket uručio bez zastoja i na tačnu adresu, molimo Vas da pregledate navedene podatke:\n📍 Adresa: ${addressDisplay}\n💵 Iznos pouzećem: ${formattedAmount}\n\nPotvrdite ili izmenite adresu isporuke jednim klikom:\n👉 ${editUrl}`;
       const smsText = `${storeDisplay}: Poštovani, molimo proverite adresu isporuke za Vaš paket: ${editUrl}`;
 
+      const simRecipients = [
+        {
+          email: 'potvrdioapp@gmail.com',
+          name: 'Potvrdio Admin',
+        },
+      ];
+      if (customerEmail && customerEmail !== 'potvrdioapp@gmail.com') {
+        simRecipients.push({
+          email: customerEmail,
+          name: customer_name || 'Admin Tester',
+        });
+      }
+
       const simPayload = {
         sender: {
           name: `${storeDisplay} (Test Poruke)`,
           email: 'info@potvrdio.online',
         },
-        to: [
-          {
-            email: 'potvrdioapp@gmail.com',
-            name: 'Potvrdio Admin',
-          },
-        ],
+        to: simRecipients,
         subject: `[SIMULACIJA PORUKA] Viber & SMS predlog za porudžbinu #${order_id} – ${storeDisplay}`,
         htmlContent: `<!DOCTYPE html><html><body style="font-family:sans-serif;padding:20px;background:#f8fafc;">
           <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:24px;border:1px solid #e2e8f0;">
             <h2 style="margin:0 0 10px 0;font-size:18px;">Simulacija Poruka za Porudžbinu #${order_id}</h2>
             <p style="color:#64748b;font-size:13px;margin:0 0 20px 0;">Prodavnica: <strong>${storeDisplay}</strong> &bull; Kupac: ${customer_name} (${customer_phone})</p>
             <div style="background:#f1f5f9;padding:16px;border-radius:8px;margin-bottom:16px;">
-              <strong style="color:#7360f2;">📱 VIBER PORUKA:</strong>
-              <pre style="white-space:pre-wrap;font-family:sans-serif;font-size:13px;margin-top:8px;">${viberText}</pre>
+              <strong style="color:#7360f2;">📱 1. VIBER BUSINESS PORUKA:</strong>
+              <div style="font-size:11px;color:#64748b;margin:4px 0 8px 0;">Direktan link u tekstu:</div>
+              <pre style="white-space:pre-wrap;font-family:sans-serif;font-size:13px;margin:0;line-height:1.5;">${viberText}</pre>
             </div>
             <div style="background:#f1f5f9;padding:16px;border-radius:8px;">
-              <strong style="color:#0284c7;">💬 SMS PORUKA (${smsText.length} znakova):</strong>
-              <pre style="white-space:pre-wrap;font-family:sans-serif;font-size:13px;margin-top:8px;">${smsText}</pre>
+              <strong style="color:#0284c7;">💬 2. SMS PORUKA (${smsText.length} znakova - 1 SMS segment):</strong>
+              <div style="font-size:11px;color:#64748b;margin:4px 0 8px 0;">GSM 7-bit standard:</div>
+              <pre style="white-space:pre-wrap;font-family:sans-serif;font-size:13px;margin:0;line-height:1.5;">${smsText}</pre>
             </div>
           </div>
         </body></html>`,
       };
 
-      fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': brevoKey,
-        },
-        body: JSON.stringify(simPayload),
-      }).catch(() => {});
+      try {
+        await fetch('https://api.brevo.com/v3/smtp/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': brevoKey,
+          },
+          body: JSON.stringify(simPayload),
+        });
+      } catch (err: any) {
+        console.warn('Simulation email fetch error:', err?.message || err);
+      }
     }
 
     const now = new Date().toISOString();
