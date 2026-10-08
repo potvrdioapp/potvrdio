@@ -13,6 +13,7 @@ import { CreditTimeframe, getCreditLedgerData, CreditSummaryStats, CreditLedgerT
 import { IpsPaymentModal, IpsPaymentPlan } from './components/IpsPaymentModal';
 import { LoginView } from './components/LoginView';
 import { AddStoreModal } from './components/AddStoreModal';
+import { LANDING_URL, API_URL } from './config';
 
 type Theme = 'dark' | 'light';
 
@@ -197,7 +198,7 @@ export default function App() {
     if (!session || session.isDemo || activeMerchant.isDemo || activeMerchant.isConnected) return;
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:4001/api/v1/merchant/store/status?apiKey=${encodeURIComponent(activeMerchant.apiKey)}`);
+        const res = await fetch(`${API_URL}/api/v1/merchant/store/status?apiKey=${encodeURIComponent(activeMerchant.apiKey)}`);
         if (res.ok) {
           const data = await res.json();
           if (data.isConnected) {
@@ -220,7 +221,7 @@ export default function App() {
     setIsVerifyingConnection(true);
     setConnectionError(null);
     try {
-      const res = await fetch('http://localhost:4001/api/v1/merchant/store/test-connection', {
+      const res = await fetch(`${API_URL}/api/v1/merchant/store/test-connection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey: activeMerchant.apiKey }),
@@ -261,7 +262,7 @@ export default function App() {
     const params = new URLSearchParams(window.location.search);
     const magicToken = params.get('magic_token') || params.get('token');
     if (magicToken && !session) {
-      fetch('http://localhost:4001/api/v1/merchant/magic-login', {
+      fetch(`${API_URL}/api/v1/merchant/magic-login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: magicToken }),
@@ -393,7 +394,7 @@ export default function App() {
 
     // Call backend API if running
     try {
-      await fetch('http://localhost:4001/api/v1/orders/intercept', {
+      await fetch(`${API_URL}/api/v1/orders/intercept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1086,7 +1087,7 @@ export default function App() {
                     {t.demoBannerSignIn}
                   </button>
                   <a
-                    href="http://localhost:3000"
+                    href={LANDING_URL}
                     className="px-3.5 py-1.5 rounded-lg bg-white hover:bg-purple-50 text-purple-950 border border-purple-200 font-bold text-xs transition shadow-xs"
                   >
                     {t.demoBannerRegister}

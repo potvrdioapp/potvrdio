@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Store, Rocket, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Language } from '../i18n';
+import { API_URL } from '../config';
 
 interface AddStoreModalProps {
   isOpen: boolean;
@@ -40,7 +41,7 @@ export function AddStoreModal({
     setErrorMsg(null);
 
     try {
-      const response = await fetch('http://localhost:4001/api/v1/merchant/stores/add', {
+      const response = await fetch(`${API_URL}/api/v1/merchant/stores/add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

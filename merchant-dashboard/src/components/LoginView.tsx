@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { PotvrdioLogo } from './PotvrdioLogo';
 import { Language } from '../i18n';
+import { LANDING_URL, API_URL } from '../config';
 
 interface LoginViewProps {
   selectedLang: Language;
@@ -269,7 +270,7 @@ export function LoginView({
     }
 
     try {
-      const response = await fetch('http://localhost:4001/api/v1/merchant/login', {
+      const response = await fetch(`${API_URL}/api/v1/merchant/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), accessCode: password.trim() }),
@@ -354,7 +355,7 @@ export function LoginView({
     setDevMagicUrl(null);
 
     try {
-      const response = await fetch('http://localhost:4001/api/v1/merchant/magic-link/request', {
+      const response = await fetch(`${API_URL}/api/v1/merchant/magic-link/request`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim() }),
@@ -391,7 +392,7 @@ export function LoginView({
     setErrorMsg(null);
 
     try {
-      const response = await fetch('http://localhost:4001/api/v1/merchant/register', {
+      const response = await fetch(`${API_URL}/api/v1/merchant/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -462,7 +463,7 @@ export function LoginView({
 
           {/* Back to Homepage */}
           <a
-            href="http://localhost:3000"
+            href={LANDING_URL}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface-subtle hover:bg-surface border border-theme text-theme-secondary hover:text-theme-primary text-xs font-semibold transition shadow-xs"
           >
             <ArrowLeft className="w-3.5 h-3.5" />

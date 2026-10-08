@@ -14,8 +14,7 @@ import { OnboardingModal } from './components/OnboardingModal';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { FloatingContactWidget } from './components/FloatingContactWidget';
 import { Footer } from './components/Footer';
-
-const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || 'http://localhost:3002';
+import { DASHBOARD_URL } from './config';
 
 /* Web Audio API Micro Sound Effects */
 let audioCtx: AudioContext | null = null;

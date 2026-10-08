@@ -8,8 +8,8 @@ interface OnboardingModalProps {
   playSuccessSound?: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4001';
-const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || 'http://localhost:3002';
+import { DASHBOARD_URL } from '../config';
+import { registerMerchant } from '../services/merchantRegistration';
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose, lang, playSuccessSound }) => {
   const [step, setStep] = useState<'form' | 'success'>('form');
@@ -22,6 +22,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generatedApiKey, setGeneratedApiKey] = useState('');
   const [emailSentStatus, setEmailSentStatus] = useState<boolean | null>(null);
+  const [dashboardRedirectUrl, setDashboardRedirectUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -31,56 +32,22 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
     setIsSubmitting(true);
     
     try {
-      const res = await fetch(`${API_URL}/api/v1/merchant/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          storeUrl,
-          fullName,
-          email,
-          phone,
-        }),
+      const result = await registerMerchant({
+        storeUrl,
+        fullName,
+        email,
+        phone,
       });
 
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setGeneratedApiKey(data.apiKey);
-        setEmailSentStatus(Boolean(data.emailSent));
-        try {
-          localStorage.setItem('potvrdio_registered_merchant', JSON.stringify({
-            apiKey: data.apiKey,
-            storeName: storeUrl,
-            isTrial: true,
-            trialRemaining: 25,
-          }));
-        } catch {}
-      } else {
-        // Fallback local key generation if backend responded with error
-        const fallbackKey = `pk_live_${storeUrl.replace(/[^a-z0-9]/gi, '').toLowerCase() || 'store'}_${Math.random().toString(36).substring(2, 8)}`;
-        setGeneratedApiKey(fallbackKey);
-        setEmailSentStatus(false);
-        try {
-          localStorage.setItem('potvrdio_registered_merchant', JSON.stringify({
-            apiKey: fallbackKey,
-            storeName: storeUrl,
-            isTrial: true,
-            trialRemaining: 25,
-          }));
-        } catch {}
-      }
+      setGeneratedApiKey(result.apiKey);
+      setEmailSentStatus(result.emailSent);
+      setDashboardRedirectUrl(result.dashboardUrl);
     } catch (err) {
-      console.warn('Backend unavailable, generating fallback offline key:', err);
+      console.warn('Registration fallback:', err);
       const fallbackKey = `pk_live_${storeUrl.replace(/[^a-z0-9]/gi, '').toLowerCase() || 'store'}_${Math.random().toString(36).substring(2, 8)}`;
       setGeneratedApiKey(fallbackKey);
       setEmailSentStatus(false);
-      try {
-        localStorage.setItem('potvrdio_registered_merchant', JSON.stringify({
-          apiKey: fallbackKey,
-          storeName: storeUrl,
-          isTrial: true,
-          trialRemaining: 25,
-        }));
-      } catch {}
+      setDashboardRedirectUrl(`${DASHBOARD_URL}?api_key=${encodeURIComponent(fallbackKey)}&store=${encodeURIComponent(storeUrl || 'mojaradnja.rs')}&trial=true`);
     } finally {
       setIsSubmitting(false);
       setStep('success');
@@ -360,7 +327,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
               {/* Actions */}
               <div className="space-y-2 pt-2">
                 <a 
-                  href={`${DASHBOARD_URL}?api_key=${encodeURIComponent(generatedApiKey)}&store=${encodeURIComponent(storeUrl || 'mojaradnja.rs')}&trial=true`}
+                  href={dashboardRedirectUrl || `${DASHBOARD_URL}?api_key=${encodeURIComponent(generatedApiKey)}&store=${encodeURIComponent(storeUrl || 'mojaradnja.rs')}&trial=true`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full bg-slate-900 hover:bg-slate-800 text-teal-300 border border-teal-500/30 font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg min-h-[44px]"
