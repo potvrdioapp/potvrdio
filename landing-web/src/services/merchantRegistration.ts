@@ -197,11 +197,15 @@ export async function registerMerchant(params: RegistrationParams): Promise<Regi
   let returnedDashUrl = targetDashboardUrl;
 
   // 1. Attempt to register via backend or serverless route
-  const endpointsToTry = [
-    `${API_URL}/api/v1/merchant/register`,
-    '/api/v1/merchant/register',
-    '/api/register',
-  ];
+  const isLocal = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname.endsWith('.local')
+  );
+
+  const endpointsToTry = isLocal
+    ? ['http://localhost:4001/api/v1/merchant/register', '/api/v1/merchant/register', '/api/register']
+    : ['/api/v1/merchant/register', '/api/register'];
 
   for (const endpoint of endpointsToTry) {
     try {

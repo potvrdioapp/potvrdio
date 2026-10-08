@@ -9,5 +9,5 @@ export const DASHBOARD_URL = import.meta.env.VITE_DASHBOARD_URL || (
 );
 
 export const API_URL = import.meta.env.VITE_API_URL || (
-  isLocalhost ? 'http://localhost:4001' : 'https://potvrdio.online'
+  isLocalhost ? 'http://localhost:4001' : ''
 );
