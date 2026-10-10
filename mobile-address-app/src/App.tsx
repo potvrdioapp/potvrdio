@@ -214,6 +214,7 @@ const translations = {
 export default function App() {
   const [locale, setLocale] = useState<Locale>('sr');
   const [token, setToken] = useState<string>('');
+  const [isDemo, setIsDemo] = useState<boolean>(false);
   const [tokenStatus, setTokenStatus] = useState<'valid' | 'expired' | 'loading'>('loading');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -271,13 +272,42 @@ export default function App() {
       setOrder(prev => ({ ...prev, currency: currParam }));
     }
 
-    const pathToken = window.location.pathname.split('/edit/')[1] || '';
-    const queryToken = params.get('token') || pathToken;
+    // Direct preview controls for testing different screens without backend:
+    // e.g. ?status=approved or ?status=cancelled or ?status=expired
+    const statusParam = (params.get('status') || params.get('state') || '').toLowerCase();
+    if (statusParam === 'approved' || params.get('approved') === '1') {
+      setSubmitted(true);
+      setTokenStatus('valid');
+      return;
+    }
+    if (statusParam === 'cancelled' || params.get('cancelled') === '1') {
+      setCancelled(true);
+      setTokenStatus('valid');
+      return;
+    }
+    if (statusParam === 'expired' || params.get('expired') === '1') {
+      setTokenStatus('expired');
+      return;
+    }
 
-    if (queryToken) {
-      setToken(queryToken);
+    const pathToken = (window.location.pathname.split('/edit/')[1] || '')
+      .replace(/index\.html.*/i, '')
+      .replace(/\/$/, '')
+      .trim();
+    const rawToken = params.get('token') || pathToken;
+    const isExplicitDemo = params.get('demo') === '1' || params.get('demo') === 'true' || rawToken === 'demo' || rawToken === 'test' || !rawToken;
+
+    if (isExplicitDemo) {
+      setIsDemo(true);
+      setToken('');
+      setTokenStatus('valid');
+      return;
+    }
+
+    if (rawToken) {
+      setToken(rawToken);
       // Fetch live token data from backend
-      fetch(`${API_BASE_URL}/address-token/${queryToken}`)
+      fetch(`${API_BASE_URL}/address-token/${rawToken}`)
         .then(async (res) => {
           if (!res.ok) {
             setTokenStatus('expired');
@@ -306,11 +336,12 @@ export default function App() {
           setTokenStatus('valid');
         })
         .catch(() => {
-          // If server unreachable on initial load, fallback to default state but allow retry
+          // If server unreachable on initial load, fallback to default demo state
+          setIsDemo(true);
           setTokenStatus('valid');
         });
     } else {
-      // Demo / preview mode without token
+      setIsDemo(true);
       setTokenStatus('valid');
     }
   }, []);
@@ -341,12 +372,12 @@ export default function App() {
     setLoading(true);
     setNetworkError(null);
 
-    if (!token) {
-      // Standalone demo mode
+    if (!token || isDemo) {
+      // Standalone simulation mode
       setTimeout(() => {
         setLoading(false);
         setSubmitted(true);
-      }, 500);
+      }, 400);
       return;
     }
 
@@ -394,11 +425,11 @@ export default function App() {
     setLoading(true);
     setNetworkError(null);
 
-    if (!token) {
+    if (!token || isDemo) {
       setTimeout(() => {
         setLoading(false);
         setCancelled(true);
-      }, 500);
+      }, 400);
       return;
     }
 
