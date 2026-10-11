@@ -1,4 +1,21 @@
-import { createOrderToken } from '../_token';
+import crypto from 'crypto';
+
+const SIGNING_SECRET = process.env.POTVRDIO_SIGNING_SECRET || 'potvrdio_balkan_cod_secure_key_2026';
+
+function base64UrlEncode(str: string): string {
+  return Buffer.from(str, 'utf8')
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+function createOrderToken(payload: any): string {
+  const payloadStr = JSON.stringify(payload);
+  const data = base64UrlEncode(payloadStr);
+  const sig = crypto.createHmac('sha256', SIGNING_SECRET).update(data).digest('base64url');
+  return `${data}.${sig}`;
+}
 
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');

@@ -1,5 +1,45 @@
 import crypto from 'crypto';
-import { verifyOrderToken } from '../_token';
+
+const SIGNING_SECRET = process.env.POTVRDIO_SIGNING_SECRET || 'potvrdio_balkan_cod_secure_key_2026';
+
+function base64UrlDecode(str: string): string {
+  let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (base64.length % 4) {
+    base64 += '=';
+  }
+  return Buffer.from(base64, 'base64').toString('utf8');
+}
+
+function verifyOrderToken(token: string): any | null {
+  try {
+    if (!token || typeof token !== 'string') return null;
+    const parts = token.split('.');
+    if (parts.length !== 2) return null;
+
+    const [data, sig] = parts;
+    const expectedSig = crypto.createHmac('sha256', SIGNING_SECRET).update(data).digest('base64url');
+
+    const sigBuf = Buffer.from(sig);
+    const expectedSigBuf = Buffer.from(expectedSig);
+
+    if (sigBuf.length !== expectedSigBuf.length) {
+      return null;
+    }
+
+    if (!crypto.timingSafeEqual(sigBuf, expectedSigBuf)) {
+      return null;
+    }
+
+    const payload = JSON.parse(base64UrlDecode(data));
+    if (payload.exp && Date.now() > payload.exp) {
+      return null;
+    }
+
+    return payload;
+  } catch {
+    return null;
+  }
+}
 
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
