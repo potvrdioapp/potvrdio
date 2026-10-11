@@ -1,3 +1,5 @@
+import { createOrderToken } from '../_token';
+
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -61,8 +63,24 @@ export default async function handler(req: any, res: any) {
     const addressDisplay = `${addr1}${addr2 ? ', ' + addr2 : ''}${city ? ', ' + city : ''}`;
 
     const formattedAmount = total_amount ? `${Number(total_amount).toLocaleString()} ${currency || 'RSD'}` : 'Plaćanje pouzećem';
-    const randomToken = Math.random().toString(36).substring(2, 12);
-    const editUrl = `https://potvrdio.online/edit/?order_id=${encodeURIComponent(order_id)}&token=${randomToken}&store=${encodeURIComponent(store_domain || '')}`;
+    const apiSecret = req.headers['x-potvrdio-api-secret'] || body.api_secret || '';
+    const orderToken = createOrderToken({
+      orderId: String(order_id),
+      storeName: storeDisplay,
+      storeDomain: store_domain || '',
+      customerName: customer_name || 'Kupac',
+      customerPhone: customer_phone || '',
+      address1: addr1,
+      address2: addr2,
+      city: city,
+      postcode: postcode,
+      totalAmount: Number(total_amount) || 0,
+      currency: currency || 'RSD',
+      apiSecret: typeof apiSecret === 'string' ? apiSecret : '',
+      apiKey: typeof apiKey === 'string' ? apiKey : '',
+      exp: Date.now() + 24 * 60 * 60 * 1000,
+    });
+    const editUrl = `https://potvrdio.online/edit/?token=${orderToken}`;
 
     // Format items list for email
     let itemsHtml = '';

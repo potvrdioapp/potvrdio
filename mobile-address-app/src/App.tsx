@@ -31,10 +31,43 @@ interface OrderData {
 type Locale = 'sr' | 'mk' | 'en' | 'tr';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || (
-  typeof window !== 'undefined' && !window.location.hostname.includes('localhost')
-    ? 'https://api.potvrdio.online/api/v1'
-    : 'http://localhost:4001/api/v1'
+  typeof window !== 'undefined'
+    ? (window.location.hostname.includes('localhost') ? 'http://localhost:3000/api/v1' : `${window.location.origin}/api/v1`)
+    : '/api/v1'
 );
+
+function parseSignedToken(rawToken: string): Partial<OrderData> | null {
+  try {
+    const parts = rawToken.split('.');
+    if (!parts[0]) return null;
+    let base64 = parts[0].replace(/-/g, '+').replace(/_/g, '/');
+    while (base64.length % 4) {
+      base64 += '=';
+    }
+    const binary = window.atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    const jsonStr = new TextDecoder('utf-8').decode(bytes);
+    const data = JSON.parse(jsonStr);
+    return {
+      orderId: String(data.orderId || data.order_id || ''),
+      customerName: data.customerName || data.customer_name || '',
+      customerPhone: data.customerPhone || data.customer_phone || '',
+      address1: data.address1 || data.address_1 || data.address || '',
+      address2: data.address2 || data.address_2 || '',
+      city: data.city || '',
+      postcode: data.postcode || '',
+      totalAmount: data.totalAmount || data.total_amount || 0,
+      currency: data.currency || 'RSD',
+      storeDomain: data.storeDomain || data.store_domain || 'prodavnica.rs',
+      expiresAt: data.exp || data.expiresAt,
+    };
+  } catch {
+    return null;
+  }
+}
 
 const translations = {
   sr: {
@@ -306,39 +339,75 @@ export default function App() {
 
     if (rawToken) {
       setToken(rawToken);
-      // Fetch live token data from backend
-      fetch(`${API_BASE_URL}/address-token/${rawToken}`)
+
+      // Instant pre-fill from signed token payload (0ms latency, eliminates any flash of demo data)
+      const instantData = parseSignedToken(rawToken);
+      if (instantData && instantData.orderId) {
+        setOrder(prev => ({
+          ...prev,
+          orderId: instantData.orderId || prev.orderId,
+          customerName: instantData.customerName || prev.customerName,
+          customerPhone: instantData.customerPhone || prev.customerPhone,
+          address1: instantData.address1 || prev.address1,
+          address2: instantData.address2 || prev.address2,
+          city: instantData.city || prev.city,
+          postcode: instantData.postcode || prev.postcode,
+          totalAmount: instantData.totalAmount || prev.totalAmount,
+          currency: instantData.currency || prev.currency,
+          storeDomain: instantData.storeDomain || prev.storeDomain,
+          expiresAt: instantData.expiresAt || prev.expiresAt,
+        }));
+        setForm(prev => ({
+          ...prev,
+          address1: instantData.address1 || prev.address1,
+          address2: instantData.address2 || prev.address2,
+          city: instantData.city || prev.city,
+        }));
+        setTokenStatus('valid');
+        setIsDemo(false);
+      }
+
+      // Fetch live token data or validate with backend
+      const validateUrl = `${API_BASE_URL}/address-token/validate?token=${encodeURIComponent(rawToken)}`;
+      fetch(validateUrl)
         .then(async (res) => {
           if (!res.ok) {
-            setTokenStatus('expired');
-            return;
+            return fetch(`${API_BASE_URL}/address-token/${rawToken}`).then(r => r.json());
           }
-          const data = await res.json();
-          setOrder({
-            orderId: String(data.orderId),
-            customerName: data.customerName || '',
-            customerPhone: data.customerPhone || '',
-            address1: data.address1 || '',
-            address2: data.address2 || '',
-            city: data.city || '',
-            postcode: data.postcode || '',
-            totalAmount: data.totalAmount || 0,
-            currency: data.currency || 'RSD',
-            storeDomain: data.storeDomain || 'prodavnica.rs',
-            expiresAt: data.expiresAt,
-          });
-          setForm({
-            address1: data.address1 || '',
-            address2: data.address2 || '',
-            city: data.city || '',
-            orderNote: '',
-          });
-          setTokenStatus('valid');
+          return res.json();
+        })
+        .then((data) => {
+          if (data && (data.orderId || data.valid)) {
+            setOrder(prev => ({
+              ...prev,
+              orderId: String(data.orderId || prev.orderId),
+              customerName: data.customerName || prev.customerName,
+              customerPhone: data.customerPhone || prev.customerPhone,
+              address1: data.address1 || prev.address1,
+              address2: data.address2 || prev.address2,
+              city: data.city || prev.city,
+              postcode: data.postcode || prev.postcode,
+              totalAmount: data.totalAmount || prev.totalAmount,
+              currency: data.currency || prev.currency,
+              storeDomain: data.storeDomain || prev.storeDomain,
+              expiresAt: data.expiresAt || prev.expiresAt,
+            }));
+            setForm(prev => ({
+              ...prev,
+              address1: data.address1 || prev.address1,
+              address2: data.address2 || prev.address2,
+              city: data.city || prev.city,
+            }));
+            setTokenStatus('valid');
+            setIsDemo(false);
+          }
         })
         .catch(() => {
-          // If server unreachable on initial load, fallback to default demo state
-          setIsDemo(true);
-          setTokenStatus('valid');
+          // If offline or fetch failed, but we already parsed token client-side, keep it valid!
+          if (!instantData || !instantData.orderId) {
+            setIsDemo(true);
+            setTokenStatus('valid');
+          }
         });
     } else {
       setIsDemo(true);
@@ -382,10 +451,11 @@ export default function App() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/address-token/${token}/submit`, {
+      let response = await fetch(`${API_BASE_URL}/address-token/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          token,
           address_1: customAddress1,
           address_2: customAddress2,
           city: customCity,
@@ -393,6 +463,21 @@ export default function App() {
           order_note: note,
         }),
       });
+
+      if (!response.ok) {
+        // Fallback to legacy path if needed
+        response = await fetch(`${API_BASE_URL}/address-token/${token}/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            address_1: customAddress1,
+            address_2: customAddress2,
+            city: customCity,
+            postcode: order.postcode,
+            order_note: note,
+          }),
+        });
+      }
 
       if (!response.ok) {
         const errJson = await response.json().catch(() => ({}));
@@ -434,10 +519,18 @@ export default function App() {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/address-token/${token}/cancel`, {
+      let response = await fetch(`${API_BASE_URL}/address-token/cancel`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token }),
       });
+
+      if (!response.ok) {
+        response = await fetch(`${API_BASE_URL}/address-token/${token}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
 
       if (!response.ok) {
         const errJson = await response.json().catch(() => ({}));

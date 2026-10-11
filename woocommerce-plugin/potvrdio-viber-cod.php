@@ -3,7 +3,7 @@
  * Plugin Name: Potvrdio - WooCommerce Viber COD Verification & Cart Recovery
  * Plugin URI: https://potvrdio.online
  * Description: Intercepts Cash on Delivery (COD) orders at the state machine level, holds shipping labels, normalizes Balkan phone formats, and releases orders via 2-way Viber verification.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Potvrdio SaaS Team
  * Author URI: https://potvrdio.online
  * Text Domain: potvrdio-viber-cod
@@ -167,7 +167,7 @@ class Potvrdio_Viber_COD {
                 }
 
                 $this->is_reverting_status = true;
-                $order->update_status('on-hold', __('Potvrdio Gatekeeper: Redirection to On-Hold. Shipping paused pending Viber address verification.', 'potvrdio-viber-cod'));
+                $order->update_status('on-hold', __('Potvrdio Gatekeeper: Redirection to On-Hold. Shipping paused pending address verification.', 'potvrdio-viber-cod'));
                 $this->is_reverting_status = false;
 
                 // Make sure central server has the intercept payload
@@ -203,7 +203,7 @@ class Potvrdio_Viber_COD {
 
         if (!$order->get_meta('_potvrdio_verified')) {
             if ('on-hold' !== $order->get_status()) {
-                $order->update_status('on-hold', __('Potvrdio: Order paused for Viber verification.', 'potvrdio-viber-cod'));
+                $order->update_status('on-hold', __('Potvrdio: Order paused for address verification.', 'potvrdio-viber-cod'));
             }
             $this->process_order_intercept($order);
         }
@@ -270,7 +270,7 @@ class Potvrdio_Viber_COD {
         // Set on-hold status and mark intercepted
         $order->update_meta_data('_potvrdio_intercepted', '1');
         if ('on-hold' !== $order->get_status()) {
-            $order->update_status('on-hold', __('Potvrdio: Order paused for Viber verification.', 'potvrdio-viber-cod'));
+            $order->update_status('on-hold', __('Potvrdio: Order paused for address verification.', 'potvrdio-viber-cod'));
         }
         $order->save();
 
@@ -491,14 +491,14 @@ class Potvrdio_Viber_COD {
 
         $dictionary = array(
             'phone_required' => array(
-                'sr' => __('Broj telefona je obavezan za plaćanje pouzećem (radi Viber verifikacije adrese pre slanja pošiljke). Molimo unesite vaš broj telefona.', 'potvrdio-viber-cod'),
-                'mk' => __('Телефонскиот број е задолжителен за плаќање при испорака (поради Viber верификација на адресата пред испраќање). Ве молиме внесете го вашиот телефонски број.', 'potvrdio-viber-cod'),
-                'en' => __('Phone number is required for Cash on Delivery (for Viber delivery address verification). Please enter your phone number.', 'potvrdio-viber-cod'),
+                'sr' => __('Broj telefona je obavezan za plaćanje pouzećem (radi verifikacije adrese pre slanja pošiljke). Molimo unesite vaš broj telefona.', 'potvrdio-viber-cod'),
+                'mk' => __('Телефонскиот број е задолжителен за плаќање при испорака (поради верификација на адресата пред испраќање). Ве молиме внесете го вашиот телефонски број.', 'potvrdio-viber-cod'),
+                'en' => __('Phone number is required for Cash on Delivery (for delivery address verification). Please enter your phone number.', 'potvrdio-viber-cod'),
             ),
             'phone_label' => array(
-                'sr' => __('Broj telefona (za Viber potvrdu pošiljke)', 'potvrdio-viber-cod'),
-                'mk' => __('Телефонски број (за Viber потврда на пратката)', 'potvrdio-viber-cod'),
-                'en' => __('Phone number (for Viber delivery verification)', 'potvrdio-viber-cod'),
+                'sr' => __('Broj telefona (za potvrdu pošiljke)', 'potvrdio-viber-cod'),
+                'mk' => __('Телефонски број (за потврда на пратката)', 'potvrdio-viber-cod'),
+                'en' => __('Phone number (for delivery verification)', 'potvrdio-viber-cod'),
             ),
             'phone_placeholder' => array(
                 'sr' => __('npr. 064 123 4567', 'potvrdio-viber-cod'),
@@ -511,34 +511,34 @@ class Potvrdio_Viber_COD {
                 'en' => __('Potvrdio: Order #{order_id} is On-Hold', 'potvrdio-viber-cod'),
             ),
             'thankyou_body' => array(
-                'sr' => __('Vaša pošiljka je privremeno zadržana kako bi se potvrdila tačnost adrese i sprečili pogrešni troškovi dostave.<br><strong>Poslat vam je Viber zahtev za verifikaciju.</strong> Čim potvrdite adresu u Viber poruci, porudžbina se automatski šalje u pripremu za kurira.', 'potvrdio-viber-cod'),
-                'mk' => __('Вашата пратка е привремено задржана за потврда на точноста на адресата и спречување грешки при испорака.<br><strong>Испратено ви е Viber барање за верификација.</strong> Штом ја потврдите адресата преку Viber порака, нарачката автоматски се испраќа во подготовка за курир.', 'potvrdio-viber-cod'),
-                'en' => __('Your shipment is temporarily on hold to verify address accuracy and prevent return fees.<br><strong>A Viber verification request has been sent to your phone.</strong> As soon as you confirm your address on Viber, your order will be dispatched.', 'potvrdio-viber-cod'),
+                'sr' => __('Vaša pošiljka je privremeno zadržana kako bi se potvrdila tačnost adrese i sprečili pogrešni troškovi dostave.<br><strong>Poslat vam je zahtev za verifikaciju.</strong> Čim potvrdite adresu putem primljene poruke, porudžbina se automatski šalje u pripremu za kurira.', 'potvrdio-viber-cod'),
+                'mk' => __('Вашата пратка е привремено задржана за потврда на точноста на адресата и спречување грешки при испорака.<br><strong>Испратено ви е барање за верификација.</strong> Штом ја потврдите адресата преку примената порака, нарачката автоматски се испраќа во подготовка за курир.', 'potvrdio-viber-cod'),
+                'en' => __('Your shipment is temporarily on hold to verify address accuracy and prevent return fees.<br><strong>A verification request has been sent to your phone.</strong> As soon as you confirm your address via the received message, your order will be dispatched.', 'potvrdio-viber-cod'),
             ),
             'thankyou_verified_title' => array(
-                'sr' => __('Potvrdio: Porudžbina #{order_id} je uspešno verifikovana! (Viber)', 'potvrdio-viber-cod'),
-                'mk' => __('Potvrdio: Нарачката #{order_id} е успешно верификувана! (Viber)', 'potvrdio-viber-cod'),
-                'en' => __('Potvrdio: Order #{order_id} is successfully verified! (Viber)', 'potvrdio-viber-cod'),
+                'sr' => __('Potvrdio: Porudžbina #{order_id} je uspešno verifikovana!', 'potvrdio-viber-cod'),
+                'mk' => __('Potvrdio: Нарачката #{order_id} е успешно верификувана!', 'potvrdio-viber-cod'),
+                'en' => __('Potvrdio: Order #{order_id} is successfully verified!', 'potvrdio-viber-cod'),
             ),
             'thankyou_verified_body' => array(
-                'sr' => __('Vaša adresa i porudžbina su potvrđeni putem Viber poruke. Porudžbina je prosleđena u magacin i priprema se za slanje kurirskom službom.', 'potvrdio-viber-cod'),
-                'mk' => __('Вашата адреса и нарачка се потврдени преку Viber порака. Нарачката е препратена во магацин и се подготвува за испраќање со курир.', 'potvrdio-viber-cod'),
-                'en' => __('Your delivery address and order have been verified via Viber. Your order has been released and is being prepared for courier dispatch.', 'potvrdio-viber-cod'),
+                'sr' => __('Vaša adresa i porudžbina su potvrđeni putem primljene poruke. Porudžbina je prosleđena u magacin i priprema se za slanje kurirskom službom.', 'potvrdio-viber-cod'),
+                'mk' => __('Вашата адреса и нарачка се потврдени преку примената порака. Нарачката е препратена во магацин и се подготвува за испраќање со курир.', 'potvrdio-viber-cod'),
+                'en' => __('Your delivery address and order have been verified via the received message. Your order has been released and is being prepared for courier dispatch.', 'potvrdio-viber-cod'),
             ),
             'privacy_consent' => array(
-                'sr' => __('Saglasan/na sam da primim poruku putem Viber-a/SMS-a radi verifikacije adrese i statusa pošiljke (Potvrdio.online).', 'potvrdio-viber-cod'),
-                'mk' => __('Се согласувам да примам порака преку Viber/SMS за верификација на адресата и статусот на пратката (Potvrdio.online).', 'potvrdio-viber-cod'),
-                'en' => __('I agree to receive a Viber/SMS message for address and shipment verification (Potvrdio.online).', 'potvrdio-viber-cod'),
+                'sr' => __('Saglasan/na sam da primim poruku radi verifikacije adrese i statusa pošiljke (Potvrdio.online).', 'potvrdio-viber-cod'),
+                'mk' => __('Се согласувам да примам порака за верификација на адресата и статусот на пратката (Potvrdio.online).', 'potvrdio-viber-cod'),
+                'en' => __('I agree to receive a message for address and shipment verification (Potvrdio.online).', 'potvrdio-viber-cod'),
             ),
             'privacy_consent_required' => array(
-                'sr' => __('Molimo vas da potvrdite saglasnost za verifikaciju pošiljke putem Viber poruke.', 'potvrdio-viber-cod'),
-                'mk' => __('Ве молиме потврдете ја согласноста за верификација на пратката преку Viber порака.', 'potvrdio-viber-cod'),
-                'en' => __('Please confirm consent for shipment verification via Viber message.', 'potvrdio-viber-cod'),
+                'sr' => __('Molimo vas da potvrdite saglasnost za verifikaciju pošiljke.', 'potvrdio-viber-cod'),
+                'mk' => __('Ве молиме потврдете ја согласноста за верификација на пратката.', 'potvrdio-viber-cod'),
+                'en' => __('Please confirm consent for shipment verification.', 'potvrdio-viber-cod'),
             ),
             'admin_missing_phone' => array(
-                'sr' => __('Potvrdio Upozorenje: Porudžbina je kreirana bez broja telefona (moguće kroz custom checkout / funnel)! Viber verifikacija se NE MOŽE poslati. Porudžbina ostaje blokirana na čekanju (On-Hold).', 'potvrdio-viber-cod'),
-                'mk' => __('Potvrdio Предупредување: Нарачката е креирана без телефонски број (можно преку custom checkout / funnel)! Viber верификацијата НЕ МОЖЕ да се испрати. Нарачката останува блокирана во мирување (On-Hold).', 'potvrdio-viber-cod'),
-                'en' => __('Potvrdio Warning: Order was placed without a phone number! Viber verification cannot be sent. Order remains locked On-Hold.', 'potvrdio-viber-cod'),
+                'sr' => __('Potvrdio Upozorenje: Porudžbina je kreirana bez broja telefona (moguće kroz custom checkout / funnel)! Verifikacija se NE MOŽE poslati. Porudžbina ostaje blokirana na čekanju (On-Hold).', 'potvrdio-viber-cod'),
+                'mk' => __('Potvrdio Предупредување: Нарачката е креирана без телефонски број (можно преку custom checkout / funnel)! Верификацијата НЕ МОЖЕ да се испрати. Нарачката останува блокирана во мирување (On-Hold).', 'potvrdio-viber-cod'),
+                'en' => __('Potvrdio Warning: Order was placed without a phone number! Verification cannot be sent. Order remains locked On-Hold.', 'potvrdio-viber-cod'),
             ),
         );
 
@@ -801,7 +801,7 @@ class Potvrdio_Viber_COD {
                     }
                 } else {
                     // Classic non-floating checkouts: safe to set placeholder
-                    if (isCod && (!input.placeholder || input.placeholder.indexOf('Viber') !== -1)) {
+                    if (isCod && (!input.placeholder || input.placeholder.indexOf('Viber') !== -1 || input.placeholder.indexOf('064') !== -1)) {
                         input.setAttribute('placeholder', potvrdioPlaceholder);
                     }
                 }
@@ -963,7 +963,7 @@ class Potvrdio_Viber_COD {
             }
 
             // 3. RELEASE TO PROCESSING: Gatekeeper will allow this because _potvrdio_verified = 1
-            $order->update_status('processing', __('Potvrdio: Address verified by customer via Viber/potvrdio.online. Order released for courier label generation.', 'potvrdio-viber-cod'));
+            $order->update_status('processing', __('Potvrdio: Address verified by customer via potvrdio.online. Order released for courier label generation.', 'potvrdio-viber-cod'));
             $order->save();
 
             // Unschedule timeout check if action scheduler is available
@@ -977,7 +977,7 @@ class Potvrdio_Viber_COD {
         if ('CANCELLED' === $action || 'REJECTED' === $action) {
             $order->update_meta_data('_potvrdio_cancelled', '1');
             $order->update_meta_data('_potvrdio_cancelled_at', current_time('mysql'));
-            $order->update_status('cancelled', __('Potvrdio: Kupac je otkazao porudžbinu putem Viber-a / potvrdio.online linka. Slanje paketa je obustavljeno, artikli su vraćeni na stanje.', 'potvrdio-viber-cod'));
+            $order->update_status('cancelled', __('Potvrdio: Kupac je otkazao porudžbinu putem potvrdio.online verifikacionog linka. Slanje paketa je obustavljeno, artikli su vraćeni na stanje.', 'potvrdio-viber-cod'));
             $order->save();
 
             if (function_exists('as_unschedule_action')) {
