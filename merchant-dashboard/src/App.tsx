@@ -216,6 +216,37 @@ export default function App() {
     return () => clearInterval(interval);
   }, [session, activeMerchant.apiKey, activeMerchant.isDemo, activeMerchant.isConnected]);
 
+  // Real-time synchronization of intercepted orders from backend
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const apiKey = activeMerchant.apiKey || 'demo_api_key_123';
+        const res = await fetch(`${API_URL}/api/v1/orders?apiKey=${encodeURIComponent(apiKey)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.orders) && data.orders.length > 0) {
+            setRegisteredOrders((prev) => {
+              const orderMap = new Map<string, VerificationLogItem>();
+              // Keep previous orders
+              prev.forEach((o) => orderMap.set(o.id, o));
+              // Merge/update with incoming orders from server
+              data.orders.forEach((o: VerificationLogItem) => orderMap.set(o.id, o));
+              const merged = Array.from(orderMap.values());
+              try {
+                localStorage.setItem('potvrdio_registered_orders', JSON.stringify(merged));
+              } catch {}
+              return merged;
+            });
+          }
+        }
+      } catch {}
+    };
+
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 4000);
+    return () => clearInterval(interval);
+  }, [activeMerchant.apiKey]);
+
   // Option B: User-initiated verify connection
   const handleVerifyStoreConnection = async () => {
     setIsVerifyingConnection(true);
@@ -603,8 +634,11 @@ export default function App() {
     viberOpen: registeredOrders.length === 0 ? '—' : '100%',
     viberSub: registeredOrders.length === 0 ? t.statZeroAwaitingFirst : t.statZeroCustomerResponse,
   };
-  const activeStats = activeMerchant.isDemo ? demoStats : zeroStateStats;
-  const displayLogs = activeMerchant.isDemo ? t.logs : registeredOrders;
+  const activeStats = activeMerchant.isDemo && registeredOrders.length === 0 ? demoStats : zeroStateStats;
+  const displayLogs = [
+    ...registeredOrders,
+    ...(activeMerchant.isDemo ? t.logs : []),
+  ];
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -1517,6 +1551,12 @@ export default function App() {
                               <td className="py-3.5 px-4 text-theme-secondary">{log.city}</td>
                               <td className="py-3.5 px-4 font-bold text-teal-600 dark:text-teal-400 font-mono">{log.amount}</td>
                               <td className="py-3.5 px-4">
+                                {log.status === 'PENDING' && (
+                                  <span className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                    <span>{selectedLang === 'sr' ? 'Čeka potvrdu' : selectedLang === 'mk' ? 'Чека потврда' : 'Pending'} ({log.channel || 'SMS'})</span>
+                                  </span>
+                                )}
                                 {log.status === 'APPROVED' && (
                                   <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
                                     <CheckCircle2 className="w-3 h-3" /> {t.statusApproved} ({log.channel})

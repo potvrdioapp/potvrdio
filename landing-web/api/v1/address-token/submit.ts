@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { updateOrderStatus } from '../_ordersStore';
 
 const SIGNING_SECRET = process.env.POTVRDIO_SIGNING_SECRET || 'potvrdio_balkan_cod_secure_key_2026';
 
@@ -143,6 +144,16 @@ export default async function handler(req: any, res: any) {
       }
     } else {
       wooSuccess = true; // Local simulation (cloud cannot reach local domain)
+    }
+
+    try {
+      const isEdited = Boolean(address_1 && payload.address1 && address_1.trim() !== payload.address1.trim());
+      updateOrderStatus(payload.orderId, isEdited ? 'EDITED_ADDRESS' : 'APPROVED', {
+        updatedAddress: address_1 ? `${address_1}, ${city || payload.city}` : undefined,
+        orderNote: order_note,
+      });
+    } catch (saveErr: any) {
+      console.warn('Could not update order status in store:', saveErr?.message);
     }
 
     return res.status(200).json({

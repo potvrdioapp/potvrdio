@@ -1,4 +1,4 @@
-export type VerificationStatus = 'APPROVED' | 'EDITED_ADDRESS' | 'SMS_FALLBACK' | 'CANCELLED';
+export type VerificationStatus = 'APPROVED' | 'EDITED_ADDRESS' | 'SMS_FALLBACK' | 'CANCELLED' | 'PENDING';
 
 export interface LogTimelineEvent {
   time: string;

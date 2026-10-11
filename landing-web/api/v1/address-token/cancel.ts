@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { updateOrderStatus } from '../_ordersStore';
 
 const SIGNING_SECRET = process.env.POTVRDIO_SIGNING_SECRET || 'potvrdio_balkan_cod_secure_key_2026';
 
@@ -111,6 +112,12 @@ export default async function handler(req: any, res: any) {
       }
     } else {
       wooSuccess = true; // Local simulation
+    }
+
+    try {
+      updateOrderStatus(payload.orderId, 'CANCELLED');
+    } catch (saveErr: any) {
+      console.warn('Could not update order status in store:', saveErr?.message);
     }
 
     return res.status(200).json({

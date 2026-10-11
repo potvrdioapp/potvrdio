@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { addOrUpdateOrder } from '../_ordersStore';
 
 const SIGNING_SECRET = process.env.POTVRDIO_SIGNING_SECRET || 'potvrdio_balkan_cod_secure_key_2026';
 
@@ -324,6 +325,46 @@ export default async function handler(req: any, res: any) {
     }
 
     const now = new Date().toISOString();
+    const nowTime = new Date().toLocaleTimeString('sr-RS', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
+    try {
+      addOrUpdateOrder({
+        id: `#${order_id}`,
+        customer: customer_name || 'Kupac',
+        phone: customer_phone || '',
+        status: 'PENDING',
+        channel: 'SMS',
+        city: city || 'Beograd',
+        amount: formattedAmount,
+        time: 'Upravo sada',
+        responseTime: 'Čeka se potvrda kupca...',
+        warehouseAction: 'Na čekanju (On-Hold) · Porudžbina zadržana do verifikacije',
+        apiKey: typeof apiKey === 'string' ? apiKey : '',
+        storeDomain: store_domain || '',
+        history: [
+          {
+            time: nowTime,
+            type: 'order',
+            badge: `WooCommerce #${order_id}`,
+            title: 'Porudžbina kreirana (COD)',
+            desc: `Kupac je izabrao plaćanje pouzećem. Iznos: ${formattedAmount}. Porudžbina je privremeno zadržana na čekanju (On-Hold).`,
+          },
+          {
+            time: nowTime,
+            type: 'dispatch',
+            badge: emailSent ? 'Email & SMS' : 'SMS Servis',
+            title: 'Verifikaciona poruka poslata',
+            desc: `Verifikacioni link poslat na ${customer_phone || customerEmail || 'telefon kupca'}.`,
+          },
+        ],
+      });
+    } catch (saveErr: any) {
+      console.warn('Could not store order in store:', saveErr?.message);
+    }
 
     return res.status(200).json({
       success: true,
