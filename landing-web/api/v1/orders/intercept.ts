@@ -20,7 +20,7 @@ function createOrderToken(payload: any): string {
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, X-Potvrdio-Api-Key, X-Potvrdio-Api-Secret, X-Potvrdio-Signature'
@@ -28,6 +28,15 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  if (req.method === 'GET') {
+    const orders = (global as any).__potvrdio_orders || [];
+    return res.status(200).json({
+      success: true,
+      count: orders.length,
+      orders,
+    });
   }
 
   try {
@@ -324,6 +333,50 @@ export default async function handler(req: any, res: any) {
     }
 
     const now = new Date().toISOString();
+    const nowTime = new Date().toLocaleTimeString('sr-RS', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
+    const newOrderLog = {
+      id: `#${order_id}`,
+      customer: customer_name || 'Kupac',
+      phone: customer_phone || '',
+      status: 'SMS_FALLBACK',
+      channel: 'SMS Link',
+      city: city || 'Beograd',
+      amount: formattedAmount,
+      time: 'Upravo sada',
+      responseTime: 'Čeka se potvrda kupca...',
+      warehouseAction: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
+      apiKey: typeof apiKey === 'string' ? apiKey : '',
+      history: [
+        {
+          time: nowTime,
+          type: 'order',
+          badge: `WooCommerce #${order_id}`,
+          title: 'Porudžbina kreirana (COD)',
+          desc: `Kupac je izabrao plaćanje pouzećem. Iznos: ${formattedAmount}. Porudžbina je zadržana na čekanju (On-Hold).`,
+        },
+        {
+          time: nowTime,
+          type: 'dispatch',
+          badge: emailSent ? 'Email & SMS' : 'SMS Servis',
+          title: 'Verifikaciona poruka poslata',
+          desc: `Verifikacioni link poslat kupcu na ${customer_phone || customerEmail || 'telefon'}.`,
+        },
+      ],
+    };
+
+    if (!(global as any).__potvrdio_orders) {
+      (global as any).__potvrdio_orders = [];
+    }
+    (global as any).__potvrdio_orders = (global as any).__potvrdio_orders.filter((o: any) => o.id !== newOrderLog.id);
+    (global as any).__potvrdio_orders.unshift(newOrderLog);
+    if ((global as any).__potvrdio_orders.length > 50) {
+      (global as any).__potvrdio_orders.length = 50;
+    }
 
     return res.status(200).json({
       success: true,

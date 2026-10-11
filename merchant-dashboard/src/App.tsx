@@ -221,7 +221,7 @@ export default function App() {
     const fetchOrders = async () => {
       try {
         const apiKey = activeMerchant.apiKey || 'demo_api_key_123';
-        const res = await fetch(`${API_URL}/api/v1/orders?apiKey=${encodeURIComponent(apiKey)}`);
+        const res = await fetch(`${API_URL}/api/v1/orders/intercept?apiKey=${encodeURIComponent(apiKey)}`);
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.orders) && data.orders.length > 0) {
