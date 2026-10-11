@@ -3,7 +3,7 @@
  * Plugin Name: Potvrdio - WooCommerce Viber COD Verification & Cart Recovery
  * Plugin URI: https://potvrdio.online
  * Description: Intercepts Cash on Delivery (COD) orders at the state machine level, holds shipping labels, normalizes Balkan phone formats, and releases orders via 2-way Viber verification.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Potvrdio SaaS Team
  * Author URI: https://potvrdio.online
  * Text Domain: potvrdio-viber-cod
@@ -122,6 +122,16 @@ class Potvrdio_Viber_COD {
 
         // Edge Case 9: Admin Manual Order Verification Action
         add_action('admin_post_potvrdio_manual_verify', array($this, 'handle_admin_manual_verify'));
+
+        // Live polling endpoints for Thank You screen (ultra-lightweight status check)
+        add_action('wc_ajax_potvrdio_check_order_status', array($this, 'ajax_check_order_status'));
+        add_action('wp_ajax_potvrdio_check_order_status', array($this, 'ajax_check_order_status'));
+        add_action('wp_ajax_nopriv_potvrdio_check_order_status', array($this, 'ajax_check_order_status'));
+
+        // Local development test helper for .local / localhost test stores
+        add_action('wc_ajax_potvrdio_dev_simulate_verify', array($this, 'ajax_dev_simulate_verify'));
+        add_action('wp_ajax_potvrdio_dev_simulate_verify', array($this, 'ajax_dev_simulate_verify'));
+        add_action('wp_ajax_nopriv_potvrdio_dev_simulate_verify', array($this, 'ajax_dev_simulate_verify'));
 
         // Admin Menu Settings
         add_action('admin_menu', array($this, 'add_admin_menu'));
@@ -566,7 +576,7 @@ class Potvrdio_Viber_COD {
             $title = $this->get_message('thankyou_verified_title', $order, array('order_id' => $order_id));
             $body  = $this->get_message('thankyou_verified_body', $order);
 
-            echo '<div style="background:#ECFDF5; border:2px solid #10B981; border-radius:12px; padding:18px 22px; margin:24px 0; color:#065F46; font-family:inherit;">';
+            echo '<div id="potvrdio-thankyou-banner" class="potvrdio-banner-verified" style="background:#ECFDF5; border:2px solid #10B981; border-radius:12px; padding:18px 22px; margin:24px 0; color:#065F46; font-family:inherit; transition: all 0.3s ease;">';
             echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
             echo '<svg style="width:20px; height:20px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> <span>' . esc_html($title) . '</span>';
             echo '</div>';
@@ -577,15 +587,33 @@ class Potvrdio_Viber_COD {
         } else {
             $title = $this->get_message('thankyou_title', $order, array('order_id' => $order_id));
             $body  = $this->get_message('thankyou_body', $order);
+            $order_key = $order->get_order_key();
 
-            echo '<div style="background:#FFFBEB; border:2px solid #F59E0B; border-radius:12px; padding:18px 22px; margin:24px 0; color:#92400E; font-family:inherit;">';
+            $is_local_dev = false;
+            $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+            if (strpos($host, '.local') !== false || strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false || (is_user_logged_in() && current_user_can('manage_woocommerce'))) {
+                $is_local_dev = true;
+            }
+
+            echo '<div id="potvrdio-thankyou-banner" class="potvrdio-banner-pending" data-order-id="' . esc_attr($order_id) . '" data-order-key="' . esc_attr($order_key) . '" style="background:#FFFBEB; border:2px solid #F59E0B; border-radius:12px; padding:18px 22px; margin:24px 0; color:#92400E; font-family:inherit; transition: all 0.3s ease;">';
             echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
-            echo '<span>' . esc_html($title) . '</span>';
+            echo '<span class="potvrdio-pulse-dot" style="display:inline-block; width:10px; height:10px; background:#F59E0B; border-radius:50%; margin-right:4px; animation: potvrdioPulse 1.8s infinite;"></span>';
+            echo '<span id="potvrdio-banner-title">' . esc_html($title) . '</span>';
             echo '</div>';
-            echo '<p style="margin:0; font-size:14px; line-height:1.5; color:#78350F;">';
+            echo '<p id="potvrdio-banner-body" style="margin:0; font-size:14px; line-height:1.5; color:#78350F;">';
             echo wp_kses_post($body);
             echo '</p>';
+
+            if ($is_local_dev) {
+                echo '<div style="margin-top:12px; padding-top:10px; border-top:1px dashed rgba(245, 158, 11, 0.4); font-size:12px; color:#B45309; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">';
+                echo '<span>🛠️ <strong>Lokalni Test Modu:</strong> Vercel doğrudan <code>' . esc_html($host) . '</code> adresine webhook atamaz (canlı domain/ngrok gerekir).</span>';
+                echo '<button type="button" id="potvrdio-dev-simulate-btn" style="background:#F59E0B; color:#FFF; border:none; border-radius:6px; padding:5px 12px; font-size:11px; font-weight:700; cursor:pointer;">[Test: Onaylandı Say & Canlı Geçişi Gör]</button>';
+                echo '</div>';
+            }
+
             echo '</div>';
+
+            $this->render_live_polling_script($order_id, $order_key);
         }
     }
 
@@ -996,6 +1024,169 @@ class Potvrdio_Viber_COD {
         }
 
         return new WP_REST_Response(array('status' => 'ignored', 'message' => 'Action not handled'), 200);
+    }
+
+    /**
+     * Ultra-lightweight Live Polling Script for Thank You Page
+     */
+    public function render_live_polling_script($order_id, $order_key) {
+        $ajax_url = home_url('/?wc-ajax=potvrdio_check_order_status');
+        ?>
+        <style>
+        @keyframes potvrdioPulse {
+            0% { transform: scale(0.95); opacity: 0.6; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.6; }
+        }
+        </style>
+        <script type="text/javascript">
+        (function() {
+            var banner = document.getElementById('potvrdio-thankyou-banner');
+            if (!banner || !banner.classList.contains('potvrdio-banner-pending')) return;
+
+            var orderId = <?php echo intval($order_id); ?>;
+            var orderKey = <?php echo wp_json_encode($order_key); ?>;
+            var pollUrl = <?php echo wp_json_encode($ajax_url); ?>;
+
+            var maxPolls = 30; // 30 attempts * 3s = 90 seconds max
+            var pollCount = 0;
+            var timer = null;
+
+            function setBannerVerified(title, body) {
+                if (!banner) return;
+                if (timer) clearInterval(timer);
+
+                banner.style.opacity = '0';
+                setTimeout(function() {
+                    banner.className = 'potvrdio-banner-verified';
+                    banner.style.background = '#ECFDF5';
+                    banner.style.borderColor = '#10B981';
+                    banner.style.color = '#065F46';
+                    
+                    banner.innerHTML = '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">' +
+                        '<svg style="width:20px; height:20px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' +
+                        '<span>' + (title || 'Adresa je uspešno potvrđena!') + '</span>' +
+                        '</div>' +
+                        '<p style="margin:0; font-size:14px; line-height:1.5; color:#047857;">' +
+                        (body || '') +
+                        '</p>';
+                    
+                    banner.style.opacity = '1';
+                }, 200);
+            }
+
+            function checkStatus() {
+                if (document.hidden) return; // Tab in background, pause to save battery/server
+                pollCount++;
+                if (pollCount > maxPolls) {
+                    if (timer) clearInterval(timer);
+                    return;
+                }
+
+                var xhr = new XMLHttpRequest();
+                var sep = pollUrl.indexOf('?') !== -1 ? '&' : '?';
+                xhr.open('GET', pollUrl + sep + 'order_id=' + encodeURIComponent(orderId) + '&order_key=' + encodeURIComponent(orderKey), true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        try {
+                            var res = JSON.parse(xhr.responseText);
+                            if (res && res.success && res.data && res.data.verified) {
+                                setBannerVerified(res.data.title, res.data.body);
+                            }
+                        } catch (e) {}
+                    }
+                };
+                xhr.send();
+            }
+
+            // Start polling every 3 seconds
+            timer = setInterval(checkStatus, 3000);
+
+            // Local development simulation button
+            var devBtn = document.getElementById('potvrdio-dev-simulate-btn');
+            if (devBtn) {
+                devBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    devBtn.disabled = true;
+                    devBtn.innerText = 'Potvrđujem...';
+                    var devXhr = new XMLHttpRequest();
+                    devXhr.open('POST', '/?wc-ajax=potvrdio_dev_simulate_verify', true);
+                    devXhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    devXhr.onload = function() {
+                        if (devXhr.status === 200) {
+                            checkStatus();
+                        }
+                    };
+                    devXhr.send('order_id=' + encodeURIComponent(orderId) + '&order_key=' + encodeURIComponent(orderKey));
+                });
+            }
+        })();
+        </script>
+        <?php
+    }
+
+    /**
+     * Ultra-lightweight AJAX order status endpoint for Thank You live polling
+     */
+    public function ajax_check_order_status() {
+        $order_id  = isset($_REQUEST['order_id']) ? intval($_REQUEST['order_id']) : 0;
+        $order_key = isset($_REQUEST['order_key']) ? sanitize_text_field($_REQUEST['order_key']) : '';
+
+        if (!$order_id || empty($order_key)) {
+            wp_send_json_error(array('message' => 'Missing parameters'), 400);
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order || $order->get_order_key() !== $order_key) {
+            wp_send_json_error(array('message' => 'Unauthorized'), 403);
+        }
+
+        $is_verified = (bool) $order->get_meta('_potvrdio_verified');
+
+        if ($is_verified) {
+            $title = $this->get_message('thankyou_verified_title', $order, array('order_id' => $order_id));
+            $body  = $this->get_message('thankyou_verified_body', $order);
+            wp_send_json_success(array(
+                'verified' => true,
+                'status'   => $order->get_status(),
+                'title'    => $title,
+                'body'     => $body,
+            ));
+        } else {
+            wp_send_json_success(array(
+                'verified' => false,
+                'status'   => $order->get_status(),
+            ));
+        }
+    }
+
+    /**
+     * Local Dev Simulation Action (Available on .local / localhost / admin)
+     */
+    public function ajax_dev_simulate_verify() {
+        $order_id  = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        $order_key = isset($_POST['order_key']) ? sanitize_text_field($_POST['order_key']) : '';
+
+        if (!$order_id || empty($order_key)) {
+            wp_send_json_error(array('message' => 'Missing parameters'), 400);
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order || $order->get_order_key() !== $order_key) {
+            wp_send_json_error(array('message' => 'Unauthorized'), 403);
+        }
+
+        $order->update_meta_data('_potvrdio_verified', '1');
+        $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+        $order->update_status('processing', __('Potvrdio: Lokalni test potvrde izvršen sa Thank You ekrana.', 'potvrdio-viber-cod'));
+        $order->save();
+
+        if (function_exists('as_unschedule_action')) {
+            as_unschedule_action('potvrdio_order_timeout_check', array('order_id' => $order_id));
+        }
+
+        wp_send_json_success(array('verified' => true));
     }
 
     /**

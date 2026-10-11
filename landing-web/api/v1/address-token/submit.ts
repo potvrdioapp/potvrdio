@@ -89,13 +89,22 @@ export default async function handler(req: any, res: any) {
     let wooSuccess = false;
     let wooError = null;
 
-    if (storeDomain && !storeDomain.includes('localhost') && !storeDomain.includes('127.0.0.1')) {
+    const isLocalDomain =
+      !storeDomain ||
+      storeDomain.includes('localhost') ||
+      storeDomain.includes('127.0.0.1') ||
+      storeDomain.includes('.local') ||
+      storeDomain.includes('.test') ||
+      storeDomain.includes('.example') ||
+      storeDomain.includes('.invalid');
+
+    if (storeDomain && !isLocalDomain) {
       const webhookUrl = `${storeDomain}/wp-json/potvrdio/v1/webhook`;
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        const wooRes = await fetch(webhookUrl, {
+        let wooRes = await fetch(webhookUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -105,6 +114,22 @@ export default async function handler(req: any, res: any) {
           body: bodyStr,
           signal: controller.signal,
         });
+
+        // Fallback for WordPress sites using default plain permalinks
+        if (wooRes.status === 404) {
+          const fallbackUrl = `${storeDomain}/?rest_route=/potvrdio/v1/webhook`;
+          wooRes = await fetch(fallbackUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Potvrdio-Api-Key': payload.apiKey || '',
+              'X-Potvrdio-Signature': signature,
+            },
+            body: bodyStr,
+            signal: controller.signal,
+          });
+        }
+
         clearTimeout(timeoutId);
 
         if (wooRes.ok) {
@@ -117,7 +142,7 @@ export default async function handler(req: any, res: any) {
         console.warn('[WOOCOMMERCE WEBHOOK DISPATCH ERROR]', wooError);
       }
     } else {
-      wooSuccess = true; // Local simulation
+      wooSuccess = true; // Local simulation (cloud cannot reach local domain)
     }
 
     return res.status(200).json({
