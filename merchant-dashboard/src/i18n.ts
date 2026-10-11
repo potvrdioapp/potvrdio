@@ -50,11 +50,17 @@ export interface TranslationSchema {
   colCity: string;
   colAmount: string;
   colStatus: string;
+  colChannel: string;
   colTime: string;
   statusApproved: string;
+  statusPending: string;
   statusAddressEdited: string;
   statusSmsFallback: string;
   statusCancelled: string;
+  tableSearchPlaceholder: string;
+  filterAll: string;
+  noFilterResults: string;
+  resetFilters: string;
   tableExpandHint: string;
   timelineHeading: string;
   timelineSummaryTitle: string;
@@ -303,12 +309,18 @@ export const translations: Record<Language, TranslationSchema> = {
     colCustomer: 'Kupac & Telefon',
     colCity: 'Grad / Mesto',
     colAmount: 'Iznos',
-    colStatus: 'Status & Kanal',
+    colStatus: 'Status',
+    colChannel: 'Kanal',
     colTime: 'Vreme',
     statusApproved: 'Potvrđeno',
+    statusPending: 'Čeka potvrdu',
     statusAddressEdited: 'Izmenjena Adresa',
-    statusSmsFallback: 'SMS Fallback',
+    statusSmsFallback: 'SMS',
     statusCancelled: 'Otkazano (Kupac)',
+    tableSearchPlaceholder: 'Pretraga po broju, kupcu, statusu, kanalu...',
+    filterAll: 'Sve',
+    noFilterResults: 'Nema pronađenih rezultata',
+    resetFilters: 'Poništi filtere',
     tableExpandHint: 'Kliknite na red za detaljnu istoriju i hronologiju verifikacije',
     timelineHeading: 'Hronologija Verifikacije Paketa',
     timelineSummaryTitle: 'Operativni Detalji',
@@ -557,12 +569,18 @@ export const translations: Record<Language, TranslationSchema> = {
     colCustomer: 'Купувач & Телефон',
     colCity: 'Град / Место',
     colAmount: 'Износ',
-    colStatus: 'Статус & Канал',
+    colStatus: 'Статус',
+    colChannel: 'Канал',
     colTime: 'Време',
     statusApproved: 'Потврдено',
+    statusPending: 'Чека потврда',
     statusAddressEdited: 'Изменета Адреса',
-    statusSmsFallback: 'SMS Алтернатива',
+    statusSmsFallback: 'SMS',
     statusCancelled: 'Откажано (Купувач)',
+    tableSearchPlaceholder: 'Пребарај по број, купувач, статус, канал...',
+    filterAll: 'Сите',
+    noFilterResults: 'Нема пронајдено резултати',
+    resetFilters: 'Ресетирај филтри',
     tableExpandHint: 'Кликнете на редот за детална историја и хронологија на верификација',
     timelineHeading: 'Хронологија на Верификација на Пратката',
     timelineSummaryTitle: 'Оперативни Детали',
@@ -811,12 +829,18 @@ export const translations: Record<Language, TranslationSchema> = {
     colCustomer: 'Customer & Phone',
     colCity: 'City / Location',
     colAmount: 'Amount',
-    colStatus: 'Status & Channel',
+    colStatus: 'Status',
+    colChannel: 'Channel',
     colTime: 'Time',
     statusApproved: 'Approved',
+    statusPending: 'Pending',
     statusAddressEdited: 'Address Updated',
-    statusSmsFallback: 'SMS Fallback',
+    statusSmsFallback: 'SMS',
     statusCancelled: 'Cancelled by Buyer',
+    tableSearchPlaceholder: 'Search by order #, customer, status, channel...',
+    filterAll: 'All',
+    noFilterResults: 'No results found',
+    resetFilters: 'Reset filters',
     tableExpandHint: 'Click any row to view full verification history and timeline',
     timelineHeading: 'Parcel Verification Lifecycle',
     timelineSummaryTitle: 'Operational Summary',

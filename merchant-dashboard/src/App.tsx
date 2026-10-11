@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { 
   Sparkles, CreditCard, CheckCircle2, TrendingUp, AlertTriangle, 
-  MessageSquare, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
+  MessageSquare, MessageCircle, RefreshCw, Key, ShieldCheck, Zap, Settings, BarChart2, Layers, Sun, Moon,
   Copy, Check, ChevronRight, Monitor, Store, LifeBuoy, Mail, XCircle, Calendar,
   Clock, MapPin, Eye, EyeOff, Download, ArrowDownRight, ArrowUpRight, ArrowDown, ArrowRight, History, FileText, Send, Coins, Rocket,
-  Package, ExternalLink, ChevronDown, LogOut, Plus, User, LogIn, Lightbulb, Camera
+  Package, ExternalLink, ChevronDown, LogOut, Plus, User, LogIn, Lightbulb, Camera, Search, X
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { DateRangePicker, PeriodType, DateRange, formatDateRange } from './components/DateRangePicker';
@@ -14,6 +14,15 @@ import { IpsPaymentModal, IpsPaymentPlan } from './components/IpsPaymentModal';
 import { LoginView } from './components/LoginView';
 import { AddStoreModal } from './components/AddStoreModal';
 import { LANDING_URL, API_URL } from './config';
+
+export function normalizeChannel(channel?: string): string {
+  if (!channel) return 'SMS';
+  const lower = channel.toLowerCase();
+  if (lower.includes('sms')) return 'SMS';
+  if (lower.includes('viber')) return 'Viber';
+  if (lower.includes('potvrdio')) return 'Web Link';
+  return channel;
+}
 
 type Theme = 'dark' | 'light';
 
@@ -170,7 +179,7 @@ export default function App() {
         customer: 'Kupac #54 (Test Porudžbina)',
         phone: '+381 61 603 ****',
         status: 'APPROVED',
-        channel: 'SMS Link',
+        channel: 'SMS',
         city: 'Novi Sad',
         amount: '3.490 RSD',
         time: 'Pre nekoliko min',
@@ -218,6 +227,9 @@ export default function App() {
   const [activeStepHighlight, setActiveStepHighlight] = useState<number | null>(null);
   const walkthroughPreviewRef = useRef<HTMLDivElement>(null);
   const [expandedRowId, setExpandedRowId] = useState<string | null>('#7482');
+  const [tableSearchQuery, setTableSearchQuery] = useState('');
+  const [tableChannelFilter, setTableChannelFilter] = useState<'ALL' | 'SMS' | 'VIBER'>('ALL');
+  const [tableStatusFilter, setTableStatusFilter] = useState<'ALL' | 'APPROVED' | 'PENDING' | 'EDITED_ADDRESS' | 'CANCELLED'>('ALL');
   const [creditTimeframe, setCreditTimeframe] = useState<CreditTimeframe>('since_last_purchase');
   const [downloadingReceiptId, setDownloadingReceiptId] = useState<string | null>(null);
   const [isVerifyingConnection, setIsVerifyingConnection] = useState<boolean>(false);
@@ -683,6 +695,56 @@ export default function App() {
     ...registeredOrders,
     ...(activeMerchant.isDemo ? t.logs : []),
   ];
+
+  const filteredLogs = useMemo(() => {
+    return displayLogs.filter((log) => {
+      const channelNorm = normalizeChannel(log.channel);
+
+      // Channel quick filter
+      if (tableChannelFilter !== 'ALL') {
+        if (tableChannelFilter === 'SMS' && channelNorm !== 'SMS') return false;
+        if (tableChannelFilter === 'VIBER' && channelNorm !== 'Viber') return false;
+      }
+
+      // Status quick filter
+      if (tableStatusFilter !== 'ALL') {
+        if (tableStatusFilter === 'APPROVED' && log.status !== 'APPROVED') return false;
+        if (tableStatusFilter === 'PENDING' && log.status !== 'PENDING' && log.status !== 'SMS_FALLBACK') return false;
+        if (tableStatusFilter === 'EDITED_ADDRESS' && log.status !== 'EDITED_ADDRESS') return false;
+        if (tableStatusFilter === 'CANCELLED' && log.status !== 'CANCELLED') return false;
+      }
+
+      // Search query filter
+      if (tableSearchQuery.trim()) {
+        const q = tableSearchQuery.trim().toLowerCase();
+        const idMatch = log.id.toLowerCase().includes(q);
+        const customerMatch = log.customer.toLowerCase().includes(q);
+        const phoneMatch = log.phone.toLowerCase().includes(q);
+        const cityMatch = log.city.toLowerCase().includes(q);
+        const amountMatch = log.amount.toLowerCase().includes(q);
+        const channelMatch = channelNorm.toLowerCase().includes(q) || (log.channel || '').toLowerCase().includes(q);
+
+        const statusKeywords: string[] = [log.status.toLowerCase()];
+        if (log.status === 'APPROVED') {
+          statusKeywords.push('approved', 'potvrđeno', 'potvrdjeno', 'потврдено', 'odobreno');
+        } else if (log.status === 'PENDING' || log.status === 'SMS_FALLBACK') {
+          statusKeywords.push('pending', 'čeka', 'ceka', 'na čekanju', 'na cekanju', 'чека', 'sms fallback', 'sms');
+        } else if (log.status === 'EDITED_ADDRESS') {
+          statusKeywords.push('edited', 'izmenjena', 'promenjena', 'изменета', 'adresa', 'address');
+        } else if (log.status === 'CANCELLED') {
+          statusKeywords.push('cancelled', 'canceled', 'otkazano', 'откажано');
+        }
+
+        const statusMatch = statusKeywords.some((kw) => kw.includes(q));
+
+        if (!idMatch && !customerMatch && !phoneMatch && !cityMatch && !amountMatch && !channelMatch && !statusMatch) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [displayLogs, tableSearchQuery, tableChannelFilter, tableStatusFilter]);
 
   const handleCopy = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text);
@@ -1312,10 +1374,124 @@ export default function App() {
                     )}
                     <span className="text-xs font-semibold text-teal-600 dark:text-teal-400 bg-teal-500/10 border border-teal-500/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-2xs">
                       <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
-                      {t.tableBadge} · {displayLogs.length} {t.orderCountUnit}
+                      {t.tableBadge} · {tableSearchQuery || tableChannelFilter !== 'ALL' || tableStatusFilter !== 'ALL' ? `${filteredLogs.length}/${displayLogs.length}` : displayLogs.length} {t.orderCountUnit}
                     </span>
                   </div>
                 </div>
+
+                {/* Search & Filter Toolbar */}
+                {displayLogs.length > 0 && (
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1 pb-1">
+                    {/* Search Input */}
+                    <div className="relative flex-1 min-w-[240px]">
+                      <Search className="w-4 h-4 text-theme-muted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={tableSearchQuery}
+                        onChange={(e) => setTableSearchQuery(e.target.value)}
+                        placeholder={t.tableSearchPlaceholder}
+                        className="w-full pl-9 pr-9 py-2 rounded-xl bg-surface-subtle border border-theme text-theme-primary placeholder:text-theme-muted text-xs focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all shadow-2xs"
+                      />
+                      {tableSearchQuery && (
+                        <button
+                          onClick={() => setTableSearchQuery('')}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-surface text-theme-muted hover:text-theme-primary transition cursor-pointer"
+                          title={t.resetFilters}
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Filter Pills */}
+                    <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-wrap">
+                      {/* Channel Filter Group */}
+                      <div className="flex items-center bg-surface-subtle p-0.5 rounded-lg border border-theme shrink-0">
+                        <button
+                          onClick={() => setTableChannelFilter('ALL')}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${
+                            tableChannelFilter === 'ALL'
+                              ? 'bg-surface text-theme-primary shadow-2xs'
+                              : 'text-theme-muted hover:text-theme-primary'
+                          }`}
+                        >
+                          {t.filterAll}
+                        </button>
+                        <button
+                          onClick={() => setTableChannelFilter('SMS')}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 ${
+                            tableChannelFilter === 'SMS'
+                              ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold shadow-2xs'
+                              : 'text-theme-muted hover:text-theme-primary'
+                          }`}
+                        >
+                          <MessageSquare className="w-3 h-3" />
+                          <span>SMS</span>
+                        </button>
+                        <button
+                          onClick={() => setTableChannelFilter('VIBER')}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 ${
+                            tableChannelFilter === 'VIBER'
+                              ? 'bg-purple-500/15 text-purple-600 dark:text-purple-400 font-bold shadow-2xs'
+                              : 'text-theme-muted hover:text-theme-primary'
+                          }`}
+                        >
+                          <MessageCircle className="w-3 h-3" />
+                          <span>Viber</span>
+                        </button>
+                      </div>
+
+                      {/* Status Filter Group */}
+                      <div className="flex items-center bg-surface-subtle p-0.5 rounded-lg border border-theme shrink-0">
+                        <button
+                          onClick={() => setTableStatusFilter('ALL')}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer ${
+                            tableStatusFilter === 'ALL'
+                              ? 'bg-surface text-theme-primary shadow-2xs'
+                              : 'text-theme-muted hover:text-theme-primary'
+                          }`}
+                        >
+                          {t.filterAll}
+                        </button>
+                        <button
+                          onClick={() => setTableStatusFilter('APPROVED')}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 ${
+                            tableStatusFilter === 'APPROVED'
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold shadow-2xs'
+                              : 'text-theme-muted hover:text-theme-primary'
+                          }`}
+                        >
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>{t.statusApproved}</span>
+                        </button>
+                        <button
+                          onClick={() => setTableStatusFilter('PENDING')}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition cursor-pointer flex items-center gap-1 ${
+                            tableStatusFilter === 'PENDING'
+                              ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 font-bold shadow-2xs'
+                              : 'text-theme-muted hover:text-theme-primary'
+                          }`}
+                        >
+                          <Clock className="w-3 h-3" />
+                          <span>{t.statusPending}</span>
+                        </button>
+                      </div>
+
+                      {(tableSearchQuery || tableChannelFilter !== 'ALL' || tableStatusFilter !== 'ALL') && (
+                        <button
+                          onClick={() => {
+                            setTableSearchQuery('');
+                            setTableChannelFilter('ALL');
+                            setTableStatusFilter('ALL');
+                          }}
+                          className="text-[11px] font-medium text-teal-600 dark:text-teal-400 hover:underline px-1.5 py-1 shrink-0 cursor-pointer"
+                        >
+                          {t.resetFilters}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {displayLogs.length === 0 ? (
                   !activeMerchant.isConnected ? (
@@ -1552,12 +1728,34 @@ export default function App() {
                           <th className="py-3 px-4">{t.colCity}</th>
                           <th className="py-3 px-4">{t.colAmount}</th>
                           <th className="py-3 px-4">{t.colStatus}</th>
+                          <th className="py-3 px-4">{t.colChannel}</th>
                           <th className="py-3 px-4 rounded-r-xl">{t.colTime}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-theme">
-                        {displayLogs.map((log) => {
-                        const isExpanded = expandedRowId === log.id;
+                        {filteredLogs.length === 0 ? (
+                          <tr>
+                            <td colSpan={7} className="py-12 text-center text-theme-muted">
+                              <div className="flex flex-col items-center justify-center gap-2">
+                                <Search className="w-7 h-7 text-theme-muted/40" />
+                                <p className="text-xs font-semibold text-theme-primary">{t.noFilterResults}</p>
+                                <button
+                                  onClick={() => {
+                                    setTableSearchQuery('');
+                                    setTableChannelFilter('ALL');
+                                    setTableStatusFilter('ALL');
+                                  }}
+                                  className="text-xs text-teal-600 dark:text-teal-400 font-bold hover:underline cursor-pointer"
+                                >
+                                  {t.resetFilters}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : (
+                          filteredLogs.map((log) => {
+                          const isExpanded = expandedRowId === log.id;
+                          const channelNorm = normalizeChannel(log.channel);
                         return (
                           <React.Fragment key={log.id}>
                             <tr 
@@ -1594,26 +1792,31 @@ export default function App() {
                               </td>
                               <td className="py-3.5 px-4 text-theme-secondary">{log.city}</td>
                               <td className="py-3.5 px-4 font-bold text-teal-600 dark:text-teal-400 font-mono">{log.amount}</td>
+                              
+                              {/* Status Column */}
                               <td className="py-3.5 px-4">
                                 {log.status === 'PENDING' && (
                                   <span className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
                                     <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                    <span>{selectedLang === 'sr' ? 'Čeka potvrdu' : selectedLang === 'mk' ? 'Чека потврда' : 'Pending'} ({log.channel || 'SMS'})</span>
+                                    <span>{t.statusPending}</span>
                                   </span>
                                 )}
                                 {log.status === 'APPROVED' && (
                                   <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                    <CheckCircle2 className="w-3 h-3" /> {t.statusApproved} ({log.channel})
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>{t.statusApproved}</span>
                                   </span>
                                 )}
                                 {log.status === 'EDITED_ADDRESS' && (
                                   <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                    <Sparkles className="w-3 h-3" /> {t.statusAddressEdited}
+                                    <Sparkles className="w-3 h-3" />
+                                    <span>{t.statusAddressEdited}</span>
                                   </span>
                                 )}
                                 {log.status === 'SMS_FALLBACK' && (
                                   <span className="inline-flex items-center gap-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-semibold">
-                                    <AlertTriangle className="w-3 h-3" /> {t.statusSmsFallback}
+                                    <Clock className="w-3 h-3" />
+                                    <span>{t.statusPending}</span>
                                   </span>
                                 )}
                                 {log.status === 'CANCELLED' && (
@@ -1621,17 +1824,39 @@ export default function App() {
                                     className="inline-flex items-center gap-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 px-2.5 py-1 rounded-full font-semibold"
                                     title={selectedLang === 'sr' ? 'Kupac otkazao pre slanja — sprečen trošak povrata paketa!' : selectedLang === 'mk' ? 'Купувачот откажа пред праќање — спречен трошок за поврат!' : 'Buyer cancelled before shipping — prevented return courier fee!'}
                                   >
-                                    <XCircle className="w-3 h-3" /> {t.statusCancelled} ({log.channel})
+                                    <XCircle className="w-3 h-3" />
+                                    <span>{t.statusCancelled}</span>
                                   </span>
                                 )}
                               </td>
+
+                              {/* Channel Column */}
+                              <td className="py-3.5 px-4">
+                                {channelNorm === 'SMS' ? (
+                                  <span className="inline-flex items-center gap-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded-full font-bold text-[11px]">
+                                    <MessageSquare className="w-3 h-3" />
+                                    <span>SMS</span>
+                                  </span>
+                                ) : channelNorm === 'Viber' ? (
+                                  <span className="inline-flex items-center gap-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 px-2.5 py-1 rounded-full font-bold text-[11px]">
+                                    <MessageCircle className="w-3 h-3" />
+                                    <span>Viber</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 bg-surface-subtle text-theme-secondary border border-theme px-2.5 py-1 rounded-full font-semibold text-[11px]">
+                                    <ExternalLink className="w-3 h-3" />
+                                    <span>{channelNorm}</span>
+                                  </span>
+                                )}
+                              </td>
+
                               <td className="py-3.5 px-4 text-theme-muted font-medium">{log.time}</td>
                             </tr>
 
                             {/* Expandable History Drawer */}
                             {isExpanded && (
                               <tr className="bg-surface-subtle/30 border-b border-theme">
-                                <td colSpan={6} className="p-0">
+                                <td colSpan={7} className="p-0">
                                   <div className="p-4 sm:p-6 border-l-4 border-l-teal-500 bg-surface/70 dark:bg-surface-subtle/40 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                     {/* Drawer Header */}
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-theme/60">
@@ -1659,7 +1884,7 @@ export default function App() {
                                         </div>
                                         <div className="flex items-center gap-1.5 bg-surface px-2.5 py-1 rounded-xl border border-theme shadow-2xs">
                                           <span className="text-[10px] font-semibold text-theme-muted">{t.timelineChannelLabel}:</span>
-                                          <span className="font-bold text-[11px] text-teal-600 dark:text-teal-400">{log.channel}</span>
+                                          <span className="font-bold text-[11px] text-teal-600 dark:text-teal-400">{normalizeChannel(log.channel)}</span>
                                         </div>
                                       </div>
                                     </div>
@@ -1758,7 +1983,7 @@ export default function App() {
                             )}
                           </React.Fragment>
                         );
-                      })}
+                      }))}
                     </tbody>
                   </table>
                 </div>
@@ -1886,7 +2111,7 @@ export default function App() {
                         type: 'SMS' as const,
                         title: selectedLang === 'sr' ? 'Verifikacija porudžbine' : selectedLang === 'mk' ? 'Верификација на нарачка' : 'Order verification',
                         description: `${ro.id} · ${ro.customer} (${ro.city})`,
-                        channel: 'SMS Fallback',
+                        channel: 'SMS',
                         creditsChange: -1,
                         balanceAfter: trialRemaining,
                         receiptNumber: `ORD-${ro.id.replace('#', '')}`,
@@ -2068,9 +2293,9 @@ export default function App() {
                                         </span>
                                       )}
                                       {isSms && (
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                          <ArrowDownRight className="w-3 h-3" />
-                                          SMS Fallback
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                                          <MessageSquare className="w-3 h-3" />
+                                          SMS
                                         </span>
                                       )}
                                     </td>

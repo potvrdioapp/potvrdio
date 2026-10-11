@@ -344,7 +344,7 @@ export default async function handler(req: any, res: any) {
       customer: customer_name || 'Kupac',
       phone: customer_phone || '',
       status: 'SMS_FALLBACK',
-      channel: 'SMS Link',
+      channel: 'SMS',
       city: city || 'Beograd',
       amount: formattedAmount,
       time: 'Upravo sada',
@@ -362,7 +362,7 @@ export default async function handler(req: any, res: any) {
         {
           time: nowTime,
           type: 'dispatch',
-          badge: emailSent ? 'Email & SMS' : 'SMS Servis',
+          badge: emailSent ? 'Email & SMS' : 'SMS',
           title: 'Verifikaciona poruka poslata',
           desc: `Verifikacioni link poslat kupcu na ${customer_phone || customerEmail || 'telefon'}.`,
         },
