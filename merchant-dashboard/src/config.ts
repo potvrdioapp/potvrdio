@@ -4,10 +4,7 @@ export const isLocalhost = typeof window !== 'undefined' && (
   window.location.hostname.endsWith('.local')
 );
 
-export const LANDING_URL = import.meta.env.VITE_LANDING_URL || (
-  isLocalhost ? 'http://localhost:3000' : 'https://potvrdio.online'
-);
+export const LANDING_URL = import.meta.env.VITE_LANDING_URL || 'https://potvrdio.online';
 
-export const API_URL = import.meta.env.VITE_API_URL || (
-  isLocalhost ? 'http://localhost:4001' : 'https://potvrdio.online'
-);
+export const API_URL = import.meta.env.VITE_API_URL || 'https://potvrdio.online';
+

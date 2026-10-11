@@ -53,7 +53,7 @@ const normalizeDate = (d: Date) => {
 
 export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   selectedPeriod,
-  customRange = { start: new Date(2026, 8, 10), end: new Date(2026, 8, 20) },
+  customRange = { start: new Date(Date.now() - 7 * 86400000), end: new Date() },
   onApply,
   lang,
   mode = 'analytics',
@@ -67,9 +67,9 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const [isPickingEnd, setIsPickingEnd] = useState(false);
   const [hoverDate, setHoverDate] = useState<Date | null>(null);
 
-  // Month navigation (default to September 2026)
-  const [calMonth, setCalMonth] = useState(8); // 8 = September
-  const [calYear, setCalYear] = useState(2026);
+  // Month navigation (defaults to current month and year)
+  const [calMonth, setCalMonth] = useState(() => new Date().getMonth());
+  const [calYear, setCalYear] = useState(() => new Date().getFullYear());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Month names for header
@@ -85,44 +85,49 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     en: ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'],
   };
 
-  // Fixed anchor date for 2026 mock data
-  const refEnd = new Date(2026, 8, 20);
-  const sincePurchaseStart = new Date(2026, 8, 18);
+  // Real-time anchor date based on actual current date
+  const refEnd = new Date();
+  const d7Start = new Date(refEnd.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const d30Start = new Date(refEnd.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const d90Start = new Date(refEnd.getTime() - 90 * 24 * 60 * 60 * 1000);
+  const ytdStart = new Date(refEnd.getFullYear(), 0, 1);
+  const lifetimeStart = new Date(refEnd.getFullYear() - 1, refEnd.getMonth(), 1);
+  const sincePurchaseStart = new Date(refEnd.getTime() - 3 * 24 * 60 * 60 * 1000);
 
   const creditsPresets: Record<'sr' | 'mk' | 'en', PresetOption[]> = {
     sr: [
-      { id: 'since_last_purchase', label: 'Od poslednje kupovine', sub: '18. sep 2026 – 20. sep 2026', start: sincePurchaseStart, end: refEnd },
-      { id: '7d', label: 'Poslednjih 7 dana', sub: '13. sep 2026 – 20. sep 2026', start: new Date(2026, 8, 13), end: refEnd },
-      { id: '30d', label: 'Poslednjih 30 dana', sub: '21. avg 2026 – 20. sep 2026', start: new Date(2026, 7, 21), end: refEnd },
-      { id: '90d', label: 'Poslednjih 90 dana', sub: '22. jun 2026 – 20. sep 2026', start: new Date(2026, 5, 22), end: refEnd },
-      { id: 'ytd', label: 'Od početka godine (YTD)', sub: '1. jan 2026 – 20. sep 2026', start: new Date(2026, 0, 1), end: refEnd },
-      { id: 'lifetime', label: 'Sve vreme (Lifetime)', sub: '1. sep 2025 – 20. sep 2026', start: new Date(2025, 8, 1), end: refEnd },
+      { id: 'since_last_purchase', label: 'Od poslednje kupovine', sub: formatDateRange(sincePurchaseStart, refEnd, 'sr'), start: sincePurchaseStart, end: refEnd },
+      { id: '7d', label: 'Poslednjih 7 dana', sub: formatDateRange(d7Start, refEnd, 'sr'), start: d7Start, end: refEnd },
+      { id: '30d', label: 'Poslednjih 30 dana', sub: formatDateRange(d30Start, refEnd, 'sr'), start: d30Start, end: refEnd },
+      { id: '90d', label: 'Poslednjih 90 dana', sub: formatDateRange(d90Start, refEnd, 'sr'), start: d90Start, end: refEnd },
+      { id: 'ytd', label: 'Od početka godine (YTD)', sub: formatDateRange(ytdStart, refEnd, 'sr'), start: ytdStart, end: refEnd },
+      { id: 'lifetime', label: 'Sve vreme (Lifetime)', sub: formatDateRange(lifetimeStart, refEnd, 'sr'), start: lifetimeStart, end: refEnd },
     ],
     mk: [
-      { id: 'since_last_purchase', label: 'Од последно купување', sub: '18 сеп 2026 – 20 сеп 2026', start: sincePurchaseStart, end: refEnd },
-      { id: '7d', label: 'Последните 7 дена', sub: '13 сеп 2026 – 20 сеп 2026', start: new Date(2026, 8, 13), end: refEnd },
-      { id: '30d', label: 'Последните 30 дена', sub: '21 авг 2026 – 20 сеп 2026', start: new Date(2026, 7, 21), end: refEnd },
-      { id: '90d', label: 'Последните 90 дена', sub: '22 јун 2026 – 20 сеп 2026', start: new Date(2026, 5, 22), end: refEnd },
-      { id: 'ytd', label: 'Од почетокот на годината', sub: '1 јан 2026 – 20 сеп 2026', start: new Date(2026, 0, 1), end: refEnd },
-      { id: 'lifetime', label: 'Вкупно (Lifetime)', sub: '1 сеп 2025 – 20 сеп 2026', start: new Date(2025, 8, 1), end: refEnd },
+      { id: 'since_last_purchase', label: 'Од последно купување', sub: formatDateRange(sincePurchaseStart, refEnd, 'mk'), start: sincePurchaseStart, end: refEnd },
+      { id: '7d', label: 'Последните 7 дена', sub: formatDateRange(d7Start, refEnd, 'mk'), start: d7Start, end: refEnd },
+      { id: '30d', label: 'Последните 30 дена', sub: formatDateRange(d30Start, refEnd, 'mk'), start: d30Start, end: refEnd },
+      { id: '90d', label: 'Последните 90 дена', sub: formatDateRange(d90Start, refEnd, 'mk'), start: d90Start, end: refEnd },
+      { id: 'ytd', label: 'Од почетокот на годината', sub: formatDateRange(ytdStart, refEnd, 'mk'), start: ytdStart, end: refEnd },
+      { id: 'lifetime', label: 'Вкупно (Lifetime)', sub: formatDateRange(lifetimeStart, refEnd, 'mk'), start: lifetimeStart, end: refEnd },
     ],
     en: [
-      { id: 'since_last_purchase', label: 'Since last purchase', sub: 'Sep 18, 2026 – Sep 20, 2026', start: sincePurchaseStart, end: refEnd },
-      { id: '7d', label: 'Last 7 days', sub: 'Sep 13, 2026 – Sep 20, 2026', start: new Date(2026, 8, 13), end: refEnd },
-      { id: '30d', label: 'Last 30 days', sub: 'Aug 21, 2026 – Sep 20, 2026', start: new Date(2026, 7, 21), end: refEnd },
-      { id: '90d', label: 'Last 90 days', sub: 'Jun 22, 2026 – Sep 20, 2026', start: new Date(2026, 5, 22), end: refEnd },
-      { id: 'ytd', label: 'Year-to-date (YTD)', sub: 'Jan 1, 2026 – Sep 20, 2026', start: new Date(2026, 0, 1), end: refEnd },
-      { id: 'lifetime', label: 'All-time (Lifetime)', sub: 'Sep 1, 2025 – Sep 20, 2026', start: new Date(2025, 8, 1), end: refEnd },
+      { id: 'since_last_purchase', label: 'Since last purchase', sub: formatDateRange(sincePurchaseStart, refEnd, 'en'), start: sincePurchaseStart, end: refEnd },
+      { id: '7d', label: 'Last 7 days', sub: formatDateRange(d7Start, refEnd, 'en'), start: d7Start, end: refEnd },
+      { id: '30d', label: 'Last 30 days', sub: formatDateRange(d30Start, refEnd, 'en'), start: d30Start, end: refEnd },
+      { id: '90d', label: 'Last 90 days', sub: formatDateRange(d90Start, refEnd, 'en'), start: d90Start, end: refEnd },
+      { id: 'ytd', label: 'Year-to-date (YTD)', sub: formatDateRange(ytdStart, refEnd, 'en'), start: ytdStart, end: refEnd },
+      { id: 'lifetime', label: 'All-time (Lifetime)', sub: formatDateRange(lifetimeStart, refEnd, 'en'), start: lifetimeStart, end: refEnd },
     ],
   };
 
   const analyticsPresets: Record<'sr' | 'mk' | 'en', PresetOption[]> = {
     sr: [
-      { id: '7d', label: 'Poslednjih 7 dana', sub: '13. sep 2026 – 20. sep 2026', start: new Date(2026, 8, 13), end: refEnd },
-      { id: '30d', label: 'Poslednjih 30 dana', sub: '21. avg 2026 – 20. sep 2026', start: new Date(2026, 7, 21), end: refEnd },
-      { id: '90d', label: 'Poslednjih 90 dana', sub: '22. jun 2026 – 20. sep 2026', start: new Date(2026, 5, 22), end: refEnd },
-      { id: 'ytd', label: 'Od početka godine (YTD)', sub: '1. jan 2026 – 20. sep 2026', start: new Date(2026, 0, 1), end: refEnd },
-      { id: 'lifetime', label: 'Ukupno (Lifetime)', sub: '1. sep 2025 – 20. sep 2026', start: new Date(2025, 8, 1), end: refEnd },
+      { id: '7d', label: 'Poslednjih 7 dana', sub: formatDateRange(d7Start, refEnd, 'sr'), start: d7Start, end: refEnd },
+      { id: '30d', label: 'Poslednjih 30 dana', sub: formatDateRange(d30Start, refEnd, 'sr'), start: d30Start, end: refEnd },
+      { id: '90d', label: 'Poslednjih 90 dana', sub: formatDateRange(d90Start, refEnd, 'sr'), start: d90Start, end: refEnd },
+      { id: 'ytd', label: 'Od početka godine (YTD)', sub: formatDateRange(ytdStart, refEnd, 'sr'), start: ytdStart, end: refEnd },
+      { id: 'lifetime', label: 'Ukupno (Lifetime)', sub: formatDateRange(lifetimeStart, refEnd, 'sr'), start: lifetimeStart, end: refEnd },
       {
         id: 'custom',
         label: 'Prilagođeni opseg',
@@ -136,11 +141,11 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
       },
     ],
     mk: [
-      { id: '7d', label: 'Последните 7 дена', sub: '13 сеп 2026 – 20 сеп 2026', start: new Date(2026, 8, 13), end: refEnd },
-      { id: '30d', label: 'Последните 30 дена', sub: '21 авг 2026 – 20 сеп 2026', start: new Date(2026, 7, 21), end: refEnd },
-      { id: '90d', label: 'Последните 90 дена', sub: '22 јун 2026 – 20 сеп 2026', start: new Date(2026, 5, 22), end: refEnd },
-      { id: 'ytd', label: 'Од почетокот на годината', sub: '1 јан 2026 – 20 сеп 2026', start: new Date(2026, 0, 1), end: refEnd },
-      { id: 'lifetime', label: 'Вкупно (Lifetime)', sub: '1 сеп 2025 – 20 сеп 2026', start: new Date(2025, 8, 1), end: refEnd },
+      { id: '7d', label: 'Последните 7 дена', sub: formatDateRange(d7Start, refEnd, 'mk'), start: d7Start, end: refEnd },
+      { id: '30d', label: 'Последните 30 дена', sub: formatDateRange(d30Start, refEnd, 'mk'), start: d30Start, end: refEnd },
+      { id: '90d', label: 'Последните 90 дена', sub: formatDateRange(d90Start, refEnd, 'mk'), start: d90Start, end: refEnd },
+      { id: 'ytd', label: 'Од почетокот на годината', sub: formatDateRange(ytdStart, refEnd, 'mk'), start: ytdStart, end: refEnd },
+      { id: 'lifetime', label: 'Вкупно (Lifetime)', sub: formatDateRange(lifetimeStart, refEnd, 'mk'), start: lifetimeStart, end: refEnd },
       {
         id: 'custom',
         label: 'Прилагоден опсег',
@@ -154,11 +159,11 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
       },
     ],
     en: [
-      { id: '7d', label: 'Last 7 days', sub: 'Sep 13, 2026 – Sep 20, 2026', start: new Date(2026, 8, 13), end: refEnd },
-      { id: '30d', label: 'Last 30 days', sub: 'Aug 21, 2026 – Sep 20, 2026', start: new Date(2026, 7, 21), end: refEnd },
-      { id: '90d', label: 'Last 90 days', sub: 'Jun 22, 2026 – Sep 20, 2026', start: new Date(2026, 5, 22), end: refEnd },
-      { id: 'ytd', label: 'Year-to-date', sub: 'Jan 1, 2026 – Sep 20, 2026', start: new Date(2026, 0, 1), end: refEnd },
-      { id: 'lifetime', label: 'All-time (Lifetime)', sub: 'Sep 1, 2025 – Sep 20, 2026', start: new Date(2025, 8, 1), end: refEnd },
+      { id: '7d', label: 'Last 7 days', sub: formatDateRange(d7Start, refEnd, 'en'), start: d7Start, end: refEnd },
+      { id: '30d', label: 'Last 30 days', sub: formatDateRange(d30Start, refEnd, 'en'), start: d30Start, end: refEnd },
+      { id: '90d', label: 'Last 90 days', sub: formatDateRange(d90Start, refEnd, 'en'), start: d90Start, end: refEnd },
+      { id: 'ytd', label: 'Year-to-date', sub: formatDateRange(ytdStart, refEnd, 'en'), start: ytdStart, end: refEnd },
+      { id: 'lifetime', label: 'All-time (Lifetime)', sub: formatDateRange(lifetimeStart, refEnd, 'en'), start: lifetimeStart, end: refEnd },
       {
         id: 'custom',
         label: 'Custom range',

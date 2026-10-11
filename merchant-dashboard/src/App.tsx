@@ -156,13 +156,53 @@ export default function App() {
   const [isSecretVisible, setIsSecretVisible] = useState(false);
   const merchantSecret = activeMerchant.apiSecret || (activeMerchant.apiKey.startsWith('pk_live_') ? activeMerchant.apiKey.replace(/^pk_live_/, 'sec_live_') : 'demo_secret_456');
 
-  // Zero-state registered orders list
+  // Zero-state registered orders list (seeded with #54 if empty)
   const [registeredOrders, setRegisteredOrders] = useState<VerificationLogItem[]>(() => {
     const saved = localStorage.getItem('potvrdio_registered_orders');
     if (saved) {
-      try { return JSON.parse(saved); } catch {}
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
     }
-    return [];
+    return [
+      {
+        id: '#54',
+        customer: 'Kupac #54 (Test Porudžbina)',
+        phone: '+381 61 603 ****',
+        status: 'APPROVED',
+        channel: 'SMS Link',
+        city: 'Novi Sad',
+        amount: '3.490 RSD',
+        time: 'Pre nekoliko min',
+        responseTime: '35 sek',
+        warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
+        costSaved: '€3.50',
+        history: [
+          {
+            time: '18:32:10',
+            type: 'order',
+            badge: 'WooCommerce #54',
+            title: 'Porudžbina kreirana (COD)',
+            desc: 'Kupac je završio poručivanje pouzećem u prodavnici. Paket privremeno zadržan do verifikacije.'
+          },
+          {
+            time: '18:32:15',
+            type: 'dispatch',
+            badge: 'SMS Servis',
+            title: 'Verifikacioni SMS link poslat',
+            desc: 'Potvrdio poslao SMS poruku sa 1-klik linkom za proveru adrese.'
+          },
+          {
+            time: '18:32:50',
+            type: 'action',
+            badge: '1-Klik Potvrda',
+            title: 'Adresa potvrđena od strane kupca',
+            desc: 'Kupac je otvorio link na mobilnom uređaju i potvrdio tačnost adrese bez izmena.'
+          }
+        ]
+      }
+    ];
   });
 
   const [, setBalance] = useState(45.00);
@@ -520,9 +560,10 @@ export default function App() {
   });
 
   const [timeframe, setTimeframe] = useState<PeriodType>('30d');
-  const [customRange, setCustomRange] = useState<DateRange>({
-    start: new Date(2026, 8, 10),
-    end: new Date(2026, 8, 20),
+  const [customRange, setCustomRange] = useState<DateRange>(() => {
+    const end = new Date();
+    const start = new Date(end.getTime() - 7 * 86400000);
+    return { start, end };
   });
 
   const customDays = Math.max(1, Math.round((customRange.end.getTime() - customRange.start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
@@ -613,7 +654,7 @@ export default function App() {
     'since_last_purchase': {
       confirmed: '28',
       confirmedBadge: selectedLang === 'sr' ? 'Od zadnje dopune' : selectedLang === 'mk' ? 'Од последно надополнување' : 'Since last top-up',
-      confirmedSub: selectedLang === 'sr' ? '18. sep 2026 – danas' : selectedLang === 'mk' ? '18 сеп 2026 – денес' : 'Sep 18, 2026 – today',
+      confirmedSub: formatDateRange(new Date(Date.now() - 3 * 86400000), new Date(), selectedLang),
       deliveryRate: '96.8%',
       deliverySub: selectedLang === 'sr' ? 'Stopa isporuke u tekućem ciklusu' : selectedLang === 'mk' ? 'Стапка на испорака во тековниот циклус' : 'Delivery rate in current cycle',
       saved: '€84',
