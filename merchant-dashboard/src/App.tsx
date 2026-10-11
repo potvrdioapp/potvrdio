@@ -150,7 +150,6 @@ export default function App() {
     ? (session.stores.find((s) => s.id === session.activeStoreId) || session.stores[0] || DEMO_MERCHANT)
     : DEMO_MERCHANT;
 
-  const trialRemaining = activeMerchant.trialRemaining;
   const credits = activeMerchant.credits;
   const isTrial = activeMerchant.isTrial;
   const [isSecretVisible, setIsSecretVisible] = useState(false);
@@ -204,6 +203,10 @@ export default function App() {
       }
     ];
   });
+
+  const trialRemaining = isTrial
+    ? Math.max(0, 25 - registeredOrders.length)
+    : activeMerchant.trialRemaining;
 
   const [, setBalance] = useState(45.00);
   const [isSimulating, setIsSimulating] = useState(false);
