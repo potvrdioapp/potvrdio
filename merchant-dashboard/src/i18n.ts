@@ -1044,3 +1044,260 @@ export const translations: Record<Language, TranslationSchema> = {
     tryDemoSandboxBtn: 'Open Interactive Demo (Balkan Style Shop)',
   }
 };
+
+/**
+ * Dynamic localization for timeline events in verification logs
+ */
+export function localizeTimelineEvent(
+  event: LogTimelineEvent,
+  lang: Language,
+  orderId?: string
+): { title: string; desc: string; badge?: string } {
+  const type = event.type;
+  const rawTitle = (event.title || '').toLowerCase();
+  const rawDesc = (event.desc || '').toLowerCase();
+  const rawBadge = event.badge || '';
+
+  // 1. ORDER CREATED
+  if (type === 'order') {
+    const isAddressIncomplete = rawTitle.includes('nepotpun') || rawTitle.includes('incomplete') || rawDesc.includes('bb');
+    const badgeText = rawBadge.includes('WooCommerce') ? rawBadge : `WooCommerce ${orderId || ''}`.trim();
+    if (isAddressIncomplete) {
+      return {
+        badge: badgeText,
+        title: lang === 'sr' ? 'Porudžbina kreirana (Nepotpuna adresa)' : lang === 'mk' ? 'Нарачка креирана (Нецелосна адреса)' : 'Order created (Incomplete address)',
+        desc: lang === 'sr'
+          ? 'Detektovan nedostatak u adresi kupca. Potvrdio algoritam aktivirao dopunu podataka za kurira.'
+          : lang === 'mk'
+          ? 'Детектиран недостаток во адресата. Potvrdio алгоритмот активираше дополнување податоци за курирот.'
+          : 'Incomplete delivery address detected. Potvrdio automated data completion for courier dispatch.',
+      };
+    }
+    return {
+      badge: badgeText,
+      title: lang === 'sr' ? 'Porudžbina kreirana (COD)' : lang === 'mk' ? 'Нарачка креирана (COD)' : 'Order created (COD)',
+      desc: lang === 'sr'
+        ? 'Kupac je završio poručivanje pouzećem u prodavnici. Paket privremeno zadržan do verifikacije.'
+        : lang === 'mk'
+        ? 'Купувачот го заврши плаќањето при достава (COD). Пратката е задржана за верификација.'
+        : 'Customer completed Cash on Delivery (COD) order. Parcel held on-hold pending verification.',
+    };
+  }
+
+  // 2. DISPATCH VERIFICATION MESSAGE
+  if (type === 'dispatch') {
+    const isViber = rawBadge.toLowerCase().includes('viber') || rawTitle.includes('viber');
+    const badgeText = isViber
+      ? 'Viber Business API'
+      : rawBadge.toLowerCase().includes('email')
+      ? 'Email & SMS'
+      : lang === 'mk'
+      ? 'SMS Сервис'
+      : lang === 'en'
+      ? 'SMS Gateway'
+      : 'SMS Servis';
+
+    if (isViber) {
+      return {
+        badge: badgeText,
+        title: lang === 'sr' ? 'Viber verifikacija poslata' : lang === 'mk' ? 'Viber верификација испратена' : 'Viber verification sent',
+        desc: lang === 'sr'
+          ? 'Potvrdio automatski poslao interaktivnu poruku sa 1-klik dugmetom za potvrdu.'
+          : lang === 'mk'
+          ? 'Potvrdio автоматски испрати интерактивна порака со 1-клик копче за потврда.'
+          : 'Potvrdio automatically dispatched interactive message with 1-click confirmation button.',
+      };
+    }
+    return {
+      badge: badgeText,
+      title: lang === 'sr' ? 'Verifikacioni SMS link poslat' : lang === 'mk' ? 'Испратен верификациски SMS линк' : 'Verification SMS link sent',
+      desc: lang === 'sr'
+        ? 'Potvrdio poslao SMS poruku sa 1-klik linkom za proveru adrese.'
+        : lang === 'mk'
+        ? 'Potvrdio испрати SMS порака со 1-клик линк за проверка на адресата.'
+        : 'Potvrdio dispatched SMS with 1-click delivery address verification link.',
+    };
+  }
+
+  // 3. READ / SEEN
+  if (type === 'read') {
+    return {
+      badge: lang === 'sr' ? 'Isporučeno i viđeno' : lang === 'mk' ? 'Испорачано и видено' : 'Delivered & Seen',
+      title: lang === 'sr' ? 'Poruka isporučena i pročitana' : lang === 'mk' ? 'Пораката е испорачана и прочитана' : 'Message delivered and opened',
+      desc: lang === 'sr'
+        ? 'Kupac je otvorio notifikaciju na mobilnom uređaju.'
+        : lang === 'mk'
+        ? 'Купувачот ја отвори нотификацијата на мобилниот уред.'
+        : 'Customer opened notification on mobile device.',
+    };
+  }
+
+  // 4. ACTION (CONFIRMED / EDITED)
+  if (type === 'action') {
+    const isEdited = rawTitle.includes('izmen') || rawTitle.includes('ažur') || rawTitle.includes('azur') || rawTitle.includes('промен') || rawTitle.includes('ажур') || rawTitle.includes('edit') || rawTitle.includes('updat');
+    if (isEdited) {
+      return {
+        badge: lang === 'sr' ? 'Izmenjeno i Potvrđeno' : lang === 'mk' ? 'Изменето и Потврдено' : 'Edited & Confirmed',
+        title: lang === 'sr' ? 'Adresa izmenjena od strane kupca' : lang === 'mk' ? 'Адресата е променета од купувачот' : 'Address updated by customer',
+        desc: lang === 'sr'
+          ? 'Kupac je ažurirao podatke adrese na telefonu. WooCommerce status prebačen u "Processing".'
+          : lang === 'mk'
+          ? 'Купувачот ги ажурираше податоците за адресата. WooCommerce статус префрлен во "Processing".'
+          : 'Customer updated shipping address details on mobile. WooCommerce status released to "Processing".',
+      };
+    }
+    return {
+      badge: lang === 'sr' ? 'Potvrđeno 1-Klik' : lang === 'mk' ? 'Потврдено 1-Клик' : 'Confirmed 1-Click',
+      title: lang === 'sr' ? 'Adresa potvrđena od strane kupca' : lang === 'mk' ? 'Адресата е потврдена од купувачот' : 'Address confirmed by customer',
+      desc: lang === 'sr'
+        ? 'Kupac je otvorio link na mobilnom uređaju i potvrdio tačnost adrese bez izmena.'
+        : lang === 'mk'
+        ? 'Купувачот го отвори линкот на мобилниот уред и ја потврди точноста на адресата без измени.'
+        : 'Customer opened link on mobile and confirmed address accuracy without changes.',
+    };
+  }
+
+  // 5. SMS FALLBACK
+  if (type === 'fallback') {
+    return {
+      badge: lang === 'sr' ? 'SMS Fallback' : lang === 'mk' ? 'SMS Резерва' : 'SMS Fallback',
+      title: lang === 'sr' ? 'SMS Fallback ruta aktivirana' : lang === 'mk' ? 'SMS резервна рута активирана' : 'SMS fallback route activated',
+      desc: lang === 'sr'
+        ? 'Viber poruka nije pročitana u roku od 5 min. Automatski poslat rezervni SMS sa 1-klik linkom.'
+        : lang === 'mk'
+        ? 'Viber пораката не беше прочитана во рок од 5 мин. Автоматски испратен резервен SMS со 1-клик линк.'
+        : 'Viber message unread after 5 mins. Automated fallback SMS dispatched with 1-click link.',
+    };
+  }
+
+  // 6. CANCEL
+  if (type === 'cancel') {
+    return {
+      badge: lang === 'sr' ? 'Otkazano 1-Klik' : lang === 'mk' ? 'Откажано 1-Клик' : 'Cancelled 1-Click',
+      title: lang === 'sr' ? 'Porudžbina otkazana od strane kupca' : lang === 'mk' ? 'Нарачката е откажана од купувачот' : 'Order cancelled by customer',
+      desc: lang === 'sr'
+        ? 'Kupac je izabrao otkazivanje porudžbine pre slanja. Paket neće biti poslat i sprečen je trošak povrata.'
+        : lang === 'mk'
+        ? 'Купувачот ја откажа нарачката пред испраќање. Пакетот нема да биде испратен и спречен е трошок за поврат.'
+        : 'Customer cancelled order prior to dispatch. Parcel will not ship and return fee is prevented.',
+    };
+  }
+
+  // 7. SAVED
+  if (type === 'saved') {
+    return {
+      badge: lang === 'sr' ? 'Sačuvana Poštarina' : lang === 'mk' ? 'Заштедена Поштарина' : 'Saved Courier Fee',
+      title: lang === 'sr' ? 'Sprečen povratni kurirski trošak' : lang === 'mk' ? 'Спречен повратен курирски трошок' : 'Prevented return courier cost',
+      desc: lang === 'sr'
+        ? 'Nalog automatski storniran u prodavnici. Ušteđeno €3.50 troškova povratne pošiljke.'
+        : lang === 'mk'
+        ? 'Нарачката е автоматски сторнирана во продавницата. Заштедено €3.50 трошоци за поврат.'
+        : 'Order automatically cancelled in store. Prevented €3.50 return courier expenses.',
+    };
+  }
+
+  return {
+    badge: rawBadge,
+    title: event.title,
+    desc: event.desc,
+  };
+}
+
+/**
+ * Dynamic localization for warehouse outcome action
+ */
+export function localizeWarehouseAction(action: string | undefined, lang: Language): string {
+  if (!action) return '—';
+  const raw = action.toLowerCase();
+  if (raw.includes('processing') || raw.includes('spremno') || raw.includes('подготвено') || raw.includes('ready')) {
+    return lang === 'sr'
+      ? 'Spremno za slanje · WooCommerce status "Processing"'
+      : lang === 'mk'
+      ? 'Подготвено за испраќање · WooCommerce статус "Processing"'
+      : 'Ready for dispatch · WooCommerce status "Processing"';
+  }
+  if (raw.includes('on-hold') || raw.includes('čekanju') || raw.includes('чекање') || raw.includes('poslat')) {
+    return lang === 'sr'
+      ? 'Na čekanju (On-Hold) · Poslat verifikacioni link'
+      : lang === 'mk'
+      ? 'На чекање (On-Hold) · Испратен верификациски линк'
+      : 'On-Hold · Verification link dispatched';
+  }
+  if (raw.includes('otkazano') || raw.includes('откажано') || raw.includes('cancel')) {
+    return lang === 'sr'
+      ? 'Otkazano od strane kupca · Slanje obustavljeno'
+      : lang === 'mk'
+      ? 'Откажано од купувачот · Испраќањето е прекинато'
+      : 'Cancelled by customer · Dispatch aborted';
+  }
+  if (raw.includes('ažuriran') || raw.includes('azuriran') || raw.includes('ажуриран') || raw.includes('updated')) {
+    return lang === 'sr'
+      ? 'Adresa ažurirana u bazi · Kurirski nalog generisan sa tačnim podacima'
+      : lang === 'mk'
+      ? 'Адресата е ажурирана во базата · Курирски налог генериран со точни податоци'
+      : 'Address updated in database · Courier label generated with corrected details';
+  }
+  return action;
+}
+
+/**
+ * Dynamic localization for response time
+ */
+export function localizeResponseTime(time: string | undefined, lang: Language): string {
+  if (!time) return '—';
+  const raw = time.toLowerCase();
+  if (raw.includes('čeka se') || raw.includes('се чека') || raw.includes('awaiting')) {
+    return lang === 'sr'
+      ? 'Čeka se potvrda kupca...'
+      : lang === 'mk'
+      ? 'Се чека потврда од купувачот...'
+      : 'Awaiting customer response...';
+  }
+  const secMatch = time.match(/(\d+[\.,]?\d*)\s*(sek|сек|sec|s)/i);
+  if (secMatch) {
+    return `${secMatch[1]} ${lang === 'mk' ? 'сек' : lang === 'en' ? 'sec' : 'sek'}`;
+  }
+  const minMatch = time.match(/(\d+[\.,]?\d*)\s*(min|мин|m)/i);
+  if (minMatch) {
+    return `${minMatch[1]} ${lang === 'mk' ? 'мин' : lang === 'en' ? 'min' : 'min'}`;
+  }
+  return time;
+}
+
+/**
+ * Dynamic localization for relative time ago
+ */
+export function localizeTimeAgo(time: string | undefined, lang: Language): string {
+  if (!time) return '—';
+  const raw = time.toLowerCase();
+  if (raw === 'upravo sada' || raw === 'штотуку' || raw === 'just now') {
+    return lang === 'sr' ? 'Upravo sada' : lang === 'mk' ? 'Штотуку' : 'Just now';
+  }
+  if (raw === 'pre nekoliko min' || raw === 'пред неколку мин' || raw === 'a few mins ago' || raw.includes('nekoliko min')) {
+    return lang === 'sr' ? 'Pre nekoliko min' : lang === 'mk' ? 'Пред неколку мин' : 'A few mins ago';
+  }
+  const secMatch = time.match(/(\d+)\s*(sek|сек|sec)/i);
+  if (secMatch) {
+    return lang === 'sr' ? `Pre ${secMatch[1]} sek` : lang === 'mk' ? `Пред ${secMatch[1]} сек` : `${secMatch[1]} sec ago`;
+  }
+  const minMatch = time.match(/(\d+)\s*(min|мин)/i);
+  if (minMatch) {
+    return lang === 'sr' ? `Pre ${minMatch[1]} min` : lang === 'mk' ? `Пред ${minMatch[1]} мин` : `${minMatch[1]} min ago`;
+  }
+  return time;
+}
+
+/**
+ * Dynamic localization for test customer names like 'Kupac #54 (Test Porudžbina)'
+ */
+export function localizeCustomerName(customer: string | undefined, lang: Language): string {
+  if (!customer) return '—';
+  if (customer.includes('#54') && (customer.includes('Test') || customer.includes('Тест'))) {
+    return lang === 'sr'
+      ? 'Kupac #54 (Test Porudžbina)'
+      : lang === 'mk'
+      ? 'Купувач #54 (Тест Нарачка)'
+      : 'Customer #54 (Test Order)';
+  }
+  return customer;
+}

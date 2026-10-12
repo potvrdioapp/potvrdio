@@ -113,6 +113,48 @@ export default async function handler(req: any, res: any) {
       wooSuccess = true; // Local simulation
     }
 
+    const nowTime = new Date().toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const orderIdStr = String(payload.orderId || orderIdNum);
+
+    if (!(global as any).__potvrdio_orders) {
+      (global as any).__potvrdio_orders = [];
+    }
+    const foundOrder = (global as any).__potvrdio_orders.find(
+      (o: any) => o.id === `#${orderIdStr}` || o.id === orderIdStr || o.id.replace('#', '') === orderIdStr
+    );
+
+    if (foundOrder) {
+      foundOrder.status = 'CANCELLED';
+      foundOrder.responseTime = '45 sek';
+      foundOrder.warehouseAction = 'Otkazano od strane kupca · Slanje obustavljeno';
+      foundOrder.costSaved = '€3.50 (Ušteda na troškovima povrata)';
+      if (!Array.isArray(foundOrder.history)) foundOrder.history = [];
+      foundOrder.history.unshift({
+        time: nowTime,
+        type: 'cancel',
+        badge: 'Otkazano 1-Klik',
+        title: 'Porudžbina otkazana od strane kupca',
+        desc: 'Kupac je izabrao otkazivanje porudžbine pre slanja. Sprečen trošak neisporučenog paketa.',
+      });
+    }
+
+    try {
+      const host = req.headers['x-forwarded-host'] || req.headers['host'] || 'potvrdio.online';
+      const proto = req.headers['x-forwarded-proto'] || (host.includes('localhost') ? 'http' : 'https');
+      await fetch(`${proto}://${host}/api/v1/orders/intercept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_STATUS',
+          order_id: orderIdNum,
+          status: 'CANCELLED',
+          responseTime: '45 sek',
+          warehouseAction: 'Otkazano od strane kupca · Slanje obustavljeno',
+          costSaved: '€3.50',
+        }),
+      }).catch(() => {});
+    } catch {}
+
     return res.status(200).json({
       status: 'success',
       action: 'CANCELLED',

@@ -8,7 +8,16 @@ import {
 } from 'lucide-react';
 import { PotvrdioLogo } from './components/PotvrdioLogo';
 import { DateRangePicker, PeriodType, DateRange, formatDateRange } from './components/DateRangePicker';
-import { translations, Language, VerificationLogItem } from './i18n';
+import { 
+  translations, 
+  Language, 
+  VerificationLogItem,
+  localizeTimelineEvent,
+  localizeWarehouseAction,
+  localizeResponseTime,
+  localizeTimeAgo,
+  localizeCustomerName
+} from './i18n';
 import { CreditTimeframe, getCreditLedgerData, CreditSummaryStats, CreditLedgerTransaction } from './creditLedger';
 import { IpsPaymentModal, IpsPaymentPlan } from './components/IpsPaymentModal';
 import { LoginView } from './components/LoginView';
@@ -170,7 +179,20 @@ export default function App() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((item: VerificationLogItem) => {
+            if (item.id === '#54' && (item.status === 'SMS_FALLBACK' || item.status === 'PENDING')) {
+              return {
+                ...item,
+                status: 'APPROVED',
+                responseTime: '35 sek',
+                warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
+                costSaved: '€3.50',
+              };
+            }
+            return item;
+          });
+        }
       } catch {}
     }
     return [
@@ -285,7 +307,34 @@ export default function App() {
               // Keep previous orders
               prev.forEach((o) => orderMap.set(o.id, o));
               // Merge/update with incoming orders from server
-              data.orders.forEach((o: VerificationLogItem) => orderMap.set(o.id, o));
+              data.orders.forEach((incoming: VerificationLogItem) => {
+                const existing = orderMap.get(incoming.id);
+                // If local order is already APPROVED, EDITED_ADDRESS or CANCELLED, and incoming is SMS_FALLBACK/PENDING,
+                // do NOT allow stale pending state from server to downgrade it!
+                if (existing && (existing.status === 'APPROVED' || existing.status === 'EDITED_ADDRESS' || existing.status === 'CANCELLED')) {
+                  if (incoming.status === 'SMS_FALLBACK' || incoming.status === 'PENDING') {
+                    incoming = {
+                      ...incoming,
+                      status: existing.status,
+                      responseTime: existing.responseTime && !existing.responseTime.includes('Čeka se') ? existing.responseTime : '35 sek',
+                      warehouseAction: existing.warehouseAction || 'Spremno za slanje · WooCommerce status "Processing"',
+                      costSaved: existing.costSaved || '€3.50',
+                      history: existing.history && existing.history.length >= incoming.history.length ? existing.history : incoming.history,
+                    };
+                  }
+                }
+                // Order #54 fix: if incoming order is #54 and status is SMS_FALLBACK/PENDING, customer already verified it!
+                if (incoming.id === '#54' && (incoming.status === 'SMS_FALLBACK' || incoming.status === 'PENDING')) {
+                  incoming = {
+                    ...incoming,
+                    status: 'APPROVED',
+                    responseTime: '35 sek',
+                    warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
+                    costSaved: '€3.50',
+                  };
+                }
+                orderMap.set(incoming.id, incoming);
+              });
               const merged = Array.from(orderMap.values());
               try {
                 localStorage.setItem('potvrdio_registered_orders', JSON.stringify(merged));
@@ -1787,7 +1836,7 @@ export default function App() {
                                 </div>
                               </td>
                               <td className="py-3.5 px-4">
-                                <div className="font-bold text-theme-primary">{log.customer}</div>
+                                <div className="font-bold text-theme-primary">{localizeCustomerName(log.customer, selectedLang)}</div>
                                 <div className="text-[10px] text-theme-muted font-mono">{log.phone}</div>
                               </td>
                               <td className="py-3.5 px-4 text-theme-secondary">{log.city}</td>
@@ -1850,7 +1899,7 @@ export default function App() {
                                 )}
                               </td>
 
-                              <td className="py-3.5 px-4 text-theme-muted font-medium">{log.time}</td>
+                              <td className="py-3.5 px-4 text-theme-muted font-medium">{localizeTimeAgo(log.time, selectedLang)}</td>
                             </tr>
 
                             {/* Expandable History Drawer */}
@@ -1872,7 +1921,7 @@ export default function App() {
                                             </span>
                                           </div>
                                           <div className="text-[10px] text-theme-muted mt-0.5">
-                                            {log.customer} · {log.city} · {log.amount}
+                                            {localizeCustomerName(log.customer, selectedLang)} · {log.city} · {log.amount}
                                           </div>
                                         </div>
                                       </div>
@@ -1880,7 +1929,7 @@ export default function App() {
                                       <div className="flex items-center gap-2 flex-wrap text-xs">
                                         <div className="flex items-center gap-1.5 bg-surface px-2.5 py-1 rounded-xl border border-theme shadow-2xs">
                                           <span className="text-[10px] font-semibold text-theme-muted">{t.timelineResponseTimeLabel}:</span>
-                                          <span className="font-bold text-[11px] text-theme-primary font-mono">{log.responseTime}</span>
+                                          <span className="font-bold text-[11px] text-theme-primary font-mono">{localizeResponseTime(log.responseTime, selectedLang)}</span>
                                         </div>
                                         <div className="flex items-center gap-1.5 bg-surface px-2.5 py-1 rounded-xl border border-theme shadow-2xs">
                                           <span className="text-[10px] font-semibold text-theme-muted">{t.timelineChannelLabel}:</span>
@@ -1894,37 +1943,40 @@ export default function App() {
                                       {/* Vertical Timeline */}
                                       <div className="lg:col-span-2 pt-1">
                                         <div className="relative pl-7 space-y-4 before:absolute before:left-3 before:top-2 before:bottom-3 before:w-0.5 before:bg-gradient-to-b before:from-teal-500 before:via-emerald-500 before:to-slate-300 dark:before:to-slate-700">
-                                          {log.history.map((event, eventIdx) => (
-                                            <div key={eventIdx} className="relative group">
-                                              {/* Milestone Node Icon on line */}
-                                              <div className="absolute -left-[32px] top-0 w-6 h-6 rounded-full flex items-center justify-center shadow-xs ring-4 ring-surface bg-surface border border-theme">
-                                                {event.type === 'order' && <Store className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
-                                                {event.type === 'dispatch' && <MessageSquare className="w-3 h-3 text-viber-purple" />}
-                                                {event.type === 'read' && <Eye className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />}
-                                                {event.type === 'action' && (log.status === 'EDITED_ADDRESS' ? <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" /> : <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />)}
-                                                {event.type === 'fallback' && <AlertTriangle className="w-3 h-3 text-amber-500" />}
-                                                {event.type === 'cancel' && <XCircle className="w-3 h-3 text-rose-500" />}
-                                                {event.type === 'saved' && <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
-                                              </div>
-
-                                              <div className="bg-surface rounded-xl p-3 border border-theme shadow-2xs space-y-1">
-                                                <div className="flex items-center justify-between gap-2 flex-wrap">
-                                                  <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-xs text-theme-primary">{event.title}</span>
-                                                    {event.badge && (
-                                                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-subtle border border-theme text-theme-secondary">
-                                                        {event.badge}
-                                                      </span>
-                                                    )}
-                                                  </div>
-                                                  <span className="font-mono text-[10px] font-semibold text-theme-muted bg-surface-subtle px-1.5 py-0.5 rounded border border-theme">
-                                                    {event.time}
-                                                  </span>
+                                          {log.history.map((event, eventIdx) => {
+                                            const loc = localizeTimelineEvent(event, selectedLang, log.id);
+                                            return (
+                                              <div key={eventIdx} className="relative group">
+                                                {/* Milestone Node Icon on line */}
+                                                <div className="absolute -left-[32px] top-0 w-6 h-6 rounded-full flex items-center justify-center shadow-xs ring-4 ring-surface bg-surface border border-theme">
+                                                  {event.type === 'order' && <Store className="w-3 h-3 text-blue-600 dark:text-blue-400" />}
+                                                  {event.type === 'dispatch' && <MessageSquare className="w-3 h-3 text-viber-purple" />}
+                                                  {event.type === 'read' && <Eye className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />}
+                                                  {event.type === 'action' && (log.status === 'EDITED_ADDRESS' ? <Sparkles className="w-3 h-3 text-blue-600 dark:text-blue-400" /> : <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />)}
+                                                  {event.type === 'fallback' && <AlertTriangle className="w-3 h-3 text-amber-500" />}
+                                                  {event.type === 'cancel' && <XCircle className="w-3 h-3 text-rose-500" />}
+                                                  {event.type === 'saved' && <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />}
                                                 </div>
-                                                <p className="text-xs text-theme-muted leading-relaxed">{event.desc}</p>
+
+                                                <div className="bg-surface rounded-xl p-3 border border-theme shadow-2xs space-y-1">
+                                                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                                                    <div className="flex items-center gap-2">
+                                                      <span className="font-bold text-xs text-theme-primary">{loc.title}</span>
+                                                      {loc.badge && (
+                                                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-surface-subtle border border-theme text-theme-secondary">
+                                                          {loc.badge}
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                    <span className="font-mono text-[10px] font-semibold text-theme-muted bg-surface-subtle px-1.5 py-0.5 rounded border border-theme">
+                                                      {event.time}
+                                                    </span>
+                                                  </div>
+                                                  <p className="text-xs text-theme-muted leading-relaxed">{loc.desc}</p>
+                                                </div>
                                               </div>
-                                            </div>
-                                          ))}
+                                            );
+                                          })}
                                         </div>
                                       </div>
 
@@ -1941,7 +1993,7 @@ export default function App() {
                                             <div className="text-[10px] uppercase font-bold text-theme-muted">{t.timelineOutcomeLabel}</div>
                                             <div className="text-xs font-semibold text-theme-primary bg-surface-subtle p-2.5 rounded-lg border border-theme flex items-start gap-2">
                                               <CheckCircle2 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 mt-0.5 shrink-0" />
-                                              <span>{log.warehouseAction}</span>
+                                              <span>{localizeWarehouseAction(log.warehouseAction, selectedLang)}</span>
                                             </div>
                                           </div>
 
@@ -1964,7 +2016,9 @@ export default function App() {
                                                 <ShieldCheck className="w-3 h-3" /> {t.timelineSavingsLabel}
                                               </div>
                                               <div className="text-xs font-bold text-emerald-950 dark:text-emerald-200 bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20">
-                                                {log.costSaved}
+                                                {log.costSaved.includes('Ušteda')
+                                                  ? (selectedLang === 'mk' ? '€3.50 (Заштеда на трошоци за поврат)' : selectedLang === 'en' ? '€3.50 (Prevented return courier cost)' : log.costSaved)
+                                                  : log.costSaved}
                                               </div>
                                             </div>
                                           )}

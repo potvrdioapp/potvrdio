@@ -145,9 +145,65 @@ export default async function handler(req: any, res: any) {
       wooSuccess = true; // Local simulation (cloud cannot reach local domain)
     }
 
+    const isAddressEdited = Boolean(
+      (address_1 && payload.address1 && address_1.trim() !== payload.address1.trim()) ||
+      (city && payload.city && city.trim() !== payload.city.trim()) ||
+      (postcode && payload.postcode && postcode.trim() !== payload.postcode.trim())
+    );
+    const actionStatus = isAddressEdited ? 'EDITED_ADDRESS' : 'APPROVED';
+
+    const nowTime = new Date().toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const orderIdStr = String(payload.orderId || orderIdNum);
+    const updatedAddrStr = `${address_1 || payload.address1 || ''}${city || payload.city ? ', ' + (city || payload.city) : ''}`;
+
+    if (!(global as any).__potvrdio_orders) {
+      (global as any).__potvrdio_orders = [];
+    }
+    const foundOrder = (global as any).__potvrdio_orders.find(
+      (o: any) => o.id === `#${orderIdStr}` || o.id === orderIdStr || o.id.replace('#', '') === orderIdStr
+    );
+
+    if (foundOrder) {
+      foundOrder.status = actionStatus;
+      foundOrder.responseTime = '35 sek';
+      foundOrder.warehouseAction = 'Spremno za slanje · WooCommerce status "Processing"';
+      foundOrder.costSaved = '€3.50';
+      if (isAddressEdited && updatedAddrStr) {
+        foundOrder.updatedAddress = updatedAddrStr;
+      }
+      if (!Array.isArray(foundOrder.history)) foundOrder.history = [];
+      foundOrder.history.unshift({
+        time: nowTime,
+        type: 'action',
+        badge: isAddressEdited ? 'Izmenjeno i Potvrđeno' : 'Potvrđeno 1-Klik',
+        title: isAddressEdited ? 'Adresa izmenjena od strane kupca' : 'Adresa potvrđena od strane kupca',
+        desc: isAddressEdited
+          ? 'Kupac je ažurirao podatke adrese na telefonu. WooCommerce status prebačen u "Processing".'
+          : 'Kupac je otvorio link na telefonu i potvrdio tačnost adrese bez izmena. WooCommerce status prebačen u "Processing".',
+      });
+    }
+
+    try {
+      const host = req.headers['x-forwarded-host'] || req.headers['host'] || 'potvrdio.online';
+      const proto = req.headers['x-forwarded-proto'] || (host.includes('localhost') ? 'http' : 'https');
+      await fetch(`${proto}://${host}/api/v1/orders/intercept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_STATUS',
+          order_id: orderIdNum,
+          status: actionStatus,
+          updated_address: updatedAddrStr,
+          responseTime: '35 sek',
+          warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
+          costSaved: '€3.50',
+        }),
+      }).catch(() => {});
+    } catch {}
+
     return res.status(200).json({
       status: 'success',
-      action: 'APPROVED',
+      action: actionStatus,
       order_id: payload.orderId,
       woo_notified: wooSuccess,
       woo_error: wooError,
