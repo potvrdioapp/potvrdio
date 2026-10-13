@@ -3,8 +3,14 @@
 -- Multi-Tenant WooCommerce COD Verification Engine
 -- ==============================================================================
 
--- 1. Enable UUID Extension
+-- 1. Enable UUID Extension & Create ENUM Types
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+DO $$ BEGIN
+    CREATE TYPE public.notification_channel_type AS ENUM ('EMAIL_ONLY', 'SMS_AND_EMAIL', 'VIBER_SMS_EMAIL');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- 2. Merchants Table (Stores, Accounts & Credit Quotas)
 CREATE TABLE IF NOT EXISTS public.merchants (
@@ -16,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.merchants (
     api_key TEXT NOT NULL UNIQUE,
     api_secret TEXT NOT NULL,
     plan_type TEXT NOT NULL DEFAULT 'PILOT',
-    notification_channel TEXT NOT NULL DEFAULT 'EMAIL_ONLY', -- 'EMAIL_ONLY', 'SMS_AND_EMAIL', 'VIBER_SMS_EMAIL'
+    notification_channel public.notification_channel_type NOT NULL DEFAULT 'EMAIL_ONLY',
     trial_verifications_remaining INTEGER NOT NULL DEFAULT 25,
     message_credits_remaining INTEGER NOT NULL DEFAULT 0,
     is_connected BOOLEAN NOT NULL DEFAULT false,
@@ -211,6 +217,19 @@ BEGIN
 END;
 $$;
 
--- 9. Add notification_channel column if table already exists
-ALTER TABLE public.merchants ADD COLUMN IF NOT EXISTS notification_channel TEXT NOT NULL DEFAULT 'EMAIL_ONLY';
+-- 9. Migration: Convert notification_channel to ENUM Dropdown in Supabase Studio
+DO $$ BEGIN
+    CREATE TYPE public.notification_channel_type AS ENUM ('EMAIL_ONLY', 'SMS_AND_EMAIL', 'VIBER_SMS_EMAIL');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
+
+ALTER TABLE public.merchants ADD COLUMN IF NOT EXISTS notification_channel public.notification_channel_type NOT NULL DEFAULT 'EMAIL_ONLY';
+
+ALTER TABLE public.merchants 
+    ALTER COLUMN notification_channel DROP DEFAULT,
+    ALTER COLUMN notification_channel TYPE public.notification_channel_type 
+        USING notification_channel::public.notification_channel_type,
+    ALTER COLUMN notification_channel SET DEFAULT 'EMAIL_ONLY'::public.notification_channel_type;
+
 
