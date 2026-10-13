@@ -98,26 +98,31 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+  const supabaseUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/+$/, '');
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
 
   if (req.method === 'GET') {
     const queryApiKey = String(req.query?.apiKey || req.query?.api_key || req.headers['x-potvrdio-api-key'] || '').trim();
+    const queryOrderId = String(req.query?.order_id || req.query?.orderId || '').replace(/\D/g, '');
 
     // Query Supabase orders table if configured
     if (supabaseUrl && supabaseKey && queryApiKey && queryApiKey !== 'demo' && queryApiKey !== 'demo_api_key_123') {
       try {
-        const res = await fetch(
-          `${supabaseUrl}/rest/v1/orders?merchant_api_key=eq.${encodeURIComponent(queryApiKey)}&order=created_at.desc&limit=50`,
-          {
-            method: 'GET',
-            headers: {
-              'apikey': supabaseKey,
-              'Authorization': `Bearer ${supabaseKey}`,
-              'Accept': 'application/json',
-            },
-          }
-        );
+        let endpoint = `${supabaseUrl}/rest/v1/orders?merchant_api_key=eq.${encodeURIComponent(queryApiKey)}`;
+        if (queryOrderId) {
+          endpoint += `&order_id=eq.${encodeURIComponent(queryOrderId)}&limit=1`;
+        } else {
+          endpoint += `&order=created_at.desc&limit=50`;
+        }
+
+        const res = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Accept': 'application/json',
+          },
+        });
 
         if (res.ok) {
           const dbRows = await res.json();
@@ -137,6 +142,22 @@ export default async function handler(req: any, res: any) {
               history: Array.isArray(r.history) ? r.history : [],
             }));
 
+            if (queryOrderId) {
+              const single = dbRows[0];
+              const isVerified = single.status === 'APPROVED' || single.status === 'EDITED_ADDRESS';
+              const isCancelled = single.status === 'CANCELLED';
+              return res.status(200).json({
+                success: true,
+                order_id: Number(single.order_id),
+                verified: isVerified,
+                cancelled: isCancelled,
+                status: single.status,
+                address: single.address,
+                shipping_address: single.shipping_address,
+                orders: mappedOrders,
+              });
+            }
+
             return res.status(200).json({
               success: true,
               count: mappedOrders.length,
@@ -155,6 +176,18 @@ export default async function handler(req: any, res: any) {
       filteredOrders = allOrders.filter((o: any) => o.apiKey === queryApiKey);
     } else if (queryApiKey === 'demo' || queryApiKey === 'demo_api_key_123') {
       filteredOrders = allOrders.filter((o: any) => !o.apiKey || o.apiKey === 'demo_api_key_123' || o.apiKey === 'demo');
+    }
+
+    if (queryOrderId) {
+      const found = filteredOrders.find((o: any) => o.id === `#${queryOrderId}` || o.id === queryOrderId);
+      const isVerified = found ? (found.status === 'APPROVED' || found.status === 'EDITED_ADDRESS') : false;
+      return res.status(200).json({
+        success: true,
+        order_id: Number(queryOrderId),
+        verified: isVerified,
+        status: found?.status || 'SMS_FALLBACK',
+        orders: found ? [found] : [],
+      });
     }
 
     return res.status(200).json({

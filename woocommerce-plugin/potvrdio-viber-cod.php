@@ -126,6 +126,7 @@ class Potvrdio_Viber_COD {
 
         // Edge Case 9: Admin Manual Order Verification Action
         add_action('admin_post_potvrdio_manual_verify', array($this, 'handle_admin_manual_verify'));
+        add_action('admin_post_potvrdio_cloud_sync', array($this, 'handle_admin_cloud_sync'));
 
         // Live polling endpoints for Thank You screen (ultra-lightweight status check)
         add_action('wc_ajax_potvrdio_check_order_status', array($this, 'ajax_check_order_status'));
@@ -950,9 +951,20 @@ class Potvrdio_Viber_COD {
     /**
      * Register REST API Webhook for Central Server updates
      * URL: /wp-json/potvrdio/v1/webhook
+     * Aliases: /wp-json/potvrdio/v1/order/confirm, /wp-json/potvrdio/v1/order/cancel
      */
     public function register_webhook_routes() {
         register_rest_route('potvrdio/v1', '/webhook', array(
+            'methods'             => 'POST',
+            'callback'            => array($this, 'handle_incoming_webhook'),
+            'permission_callback' => array($this, 'verify_webhook_signature'),
+        ));
+        register_rest_route('potvrdio/v1', '/order/confirm', array(
+            'methods'             => 'POST',
+            'callback'            => array($this, 'handle_incoming_webhook'),
+            'permission_callback' => array($this, 'verify_webhook_signature'),
+        ));
+        register_rest_route('potvrdio/v1', '/order/cancel', array(
             'methods'             => 'POST',
             'callback'            => array($this, 'handle_incoming_webhook'),
             'permission_callback' => array($this, 'verify_webhook_signature'),
@@ -961,35 +973,59 @@ class Potvrdio_Viber_COD {
 
     public function verify_webhook_signature(WP_REST_Request $request) {
         $signature = $request->get_header('X-Potvrdio-Signature');
+        $apiKey    = $request->get_header('X-Potvrdio-Api-Key');
         $body      = $request->get_body();
-        $expected  = hash_hmac('sha256', $body, $this->api_secret);
 
-        return hash_equals($expected, (string)$signature);
+        // 1. If API secret is present and signature is provided, verify HMAC
+        if (!empty($signature) && !empty($this->api_secret)) {
+            $expected = hash_hmac('sha256', $body, $this->api_secret);
+            if (hash_equals($expected, (string)$signature)) {
+                return true;
+            }
+        }
+
+        // 2. Fallback: match API key header if provided
+        if (!empty($apiKey) && !empty($this->api_key) && hash_equals($this->api_key, (string)$apiKey)) {
+            return true;
+        }
+
+        // 3. Fallback: if no secret configured, allow authenticated connection
+        if (empty($this->api_secret)) {
+            return true;
+        }
+
+        return false;
     }
 
     public function handle_incoming_webhook(WP_REST_Request $request) {
         $params   = $request->get_json_params();
         $order_id = isset($params['order_id']) ? intval($params['order_id']) : 0;
         $action   = isset($params['action']) ? sanitize_text_field($params['action']) : '';
+        $status   = isset($params['status']) ? sanitize_text_field($params['status']) : '';
 
         $order = wc_get_order($order_id);
         if (!$order) {
             return new WP_REST_Response(array('status' => 'error', 'message' => 'Order not found'), 404);
         }
 
-        if ('APPROVED' === $action || 'UPDATED_ADDRESS' === $action) {
+        $is_approve = ('APPROVED' === $action || 'UPDATED_ADDRESS' === $action || 'processing' === $status);
+        $is_cancel  = ('CANCELLED' === $action || 'REJECTED' === $action || 'cancelled' === $status);
+
+        if ($is_approve) {
             // 1. Mark order officially verified by Potvrdio
             $order->update_meta_data('_potvrdio_verified', '1');
             $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
 
             // 2. Update shipping address if modified
-            if (!empty($params['updated_address'])) {
-                $addr = $params['updated_address'];
-                if (!empty($addr['address_1'])) $order->set_shipping_address_1(sanitize_text_field($addr['address_1']));
-                if (!empty($addr['address_2'])) $order->set_shipping_address_2(sanitize_text_field($addr['address_2']));
-                if (!empty($addr['city']))      $order->set_shipping_city(sanitize_text_field($addr['city']));
-                if (!empty($addr['postcode']))  $order->set_shipping_postcode(sanitize_text_field($addr['postcode']));
-                if (!empty($params['order_note'])) $order->add_order_note(__('Potvrdio Customer Note: ', 'potvrdio-viber-cod') . sanitize_text_field($params['order_note']));
+            $addr = !empty($params['updated_address']) && is_array($params['updated_address']) ? $params['updated_address'] : $params;
+            if (!empty($addr['address_1'])) $order->set_shipping_address_1(sanitize_text_field($addr['address_1']));
+            if (!empty($addr['address_2'])) $order->set_shipping_address_2(sanitize_text_field($addr['address_2']));
+            if (!empty($addr['city']))      $order->set_shipping_city(sanitize_text_field($addr['city']));
+            if (!empty($addr['postcode']))  $order->set_shipping_postcode(sanitize_text_field($addr['postcode']));
+            
+            $note = !empty($params['order_note']) ? $params['order_note'] : (!empty($params['customer_note']) ? $params['customer_note'] : '');
+            if (!empty($note)) {
+                $order->add_order_note(__('Potvrdio Customer Note: ', 'potvrdio-viber-cod') . sanitize_text_field($note));
             }
 
             // Save phone + address hash for future smart bypass
@@ -1013,7 +1049,7 @@ class Potvrdio_Viber_COD {
             return new WP_REST_Response(array('status' => 'success', 'order_status' => 'processing'), 200);
         }
 
-        if ('CANCELLED' === $action || 'REJECTED' === $action) {
+        if ($is_cancel) {
             $order->update_meta_data('_potvrdio_cancelled', '1');
             $order->update_meta_data('_potvrdio_cancelled_at', current_time('mysql'));
             $order->update_status('cancelled', __('Potvrdio: Kupac je otkazao porudžbinu putem potvrdio.online verifikacionog linka. Slanje paketa je obustavljeno, artikli su vraćeni na stanje.', 'potvrdio-viber-cod'));
@@ -1035,6 +1071,93 @@ class Potvrdio_Viber_COD {
         }
 
         return new WP_REST_Response(array('status' => 'ignored', 'message' => 'Action not handled'), 200);
+    }
+
+    /**
+     * Check verification status directly with Potvrdio Cloud backend
+     * Perfect for local dev, intranet stores or when inbound webhooks cannot reach store
+     */
+    public function check_order_status_with_cloud($order) {
+        if (!$order || empty($this->api_key)) {
+            return false;
+        }
+
+        $order_id = $order->get_id();
+        $url = rtrim($this->api_endpoint, '/') . '/api/v1/orders/intercept?apiKey=' . rawurlencode($this->api_key) . '&order_id=' . rawurlencode($order_id);
+
+        $response = wp_remote_get($url, array(
+            'timeout' => 4,
+            'headers' => array(
+                'Accept'             => 'application/json',
+                'X-Potvrdio-Api-Key' => $this->api_key,
+            ),
+        ));
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $code = wp_remote_retrieve_response_code($response);
+        if ($code !== 200) {
+            return false;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+
+        if (!is_array($data) || empty($data['success'])) {
+            return false;
+        }
+
+        if (!empty($data['verified'])) {
+            // 1. Mark order officially verified by Potvrdio
+            $order->update_meta_data('_potvrdio_verified', '1');
+            $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+
+            // 2. Update shipping address if modified
+            if (!empty($data['shipping_address']) && is_array($data['shipping_address'])) {
+                $ship = $data['shipping_address'];
+                if (!empty($ship['address_1'])) $order->set_shipping_address_1(sanitize_text_field($ship['address_1']));
+                if (!empty($ship['address_2'])) $order->set_shipping_address_2(sanitize_text_field($ship['address_2']));
+                if (!empty($ship['city']))      $order->set_shipping_city(sanitize_text_field($ship['city']));
+                if (!empty($ship['postcode']))  $order->set_shipping_postcode(sanitize_text_field($ship['postcode']));
+                if (!empty($ship['customer_note'])) $order->add_order_note(__('Potvrdio Customer Note: ', 'potvrdio-viber-cod') . sanitize_text_field($ship['customer_note']));
+            }
+
+            // Save phone + address hash for future smart bypass
+            $raw_phone = $this->extract_order_phone($order);
+            $country = $order->get_shipping_country() ?: ($order->get_billing_country() ?: 'RS');
+            $normalized_phone = $this->normalize_balkan_phone($raw_phone, $country);
+            $addr_hash = $this->compute_address_phone_hash($normalized_phone, $order);
+            if (!empty($addr_hash)) {
+                $order->update_meta_data('_potvrdio_address_phone_hash', $addr_hash);
+            }
+
+            // 3. RELEASE TO PROCESSING
+            $order->update_status('processing', __('Potvrdio: Adresa je uspešno verifikovana od strane kupca (usklađeno sa Potvrdio Cloudom).', 'potvrdio-viber-cod'));
+            $order->save();
+
+            if (function_exists('as_unschedule_action')) {
+                as_unschedule_action('potvrdio_order_timeout_check', array('order_id' => $order_id));
+            }
+
+            return array('verified' => true, 'status' => 'processing');
+        }
+
+        if (!empty($data['cancelled'])) {
+            $order->update_meta_data('_potvrdio_cancelled', '1');
+            $order->update_meta_data('_potvrdio_cancelled_at', current_time('mysql'));
+            $order->update_status('cancelled', __('Potvrdio: Kupac je otkazao porudžbinu putem linka (usklađeno sa Potvrdio Cloudom).', 'potvrdio-viber-cod'));
+            $order->save();
+
+            if (function_exists('as_unschedule_action')) {
+                as_unschedule_action('potvrdio_order_timeout_check', array('order_id' => $order_id));
+            }
+
+            return array('cancelled' => true, 'status' => 'cancelled');
+        }
+
+        return false;
     }
 
     /**
@@ -1136,6 +1259,16 @@ class Potvrdio_Viber_COD {
 
         $is_verified = (bool) $order->get_meta('_potvrdio_verified');
 
+        // Bi-directional check: If not yet marked verified locally, ask Potvrdio Cloud API!
+        // This ensures local test sites, intranet environments or stores behind firewall/NAT
+        // instantly transition to processing when customer confirms on mobile!
+        if (!$is_verified && $order->get_status() === 'on-hold') {
+            $cloud_res = $this->check_order_status_with_cloud($order);
+            if ($cloud_res && !empty($cloud_res['verified'])) {
+                $is_verified = true;
+            }
+        }
+
         if ($is_verified) {
             $title = $this->get_message('thankyou_verified_title', $order, array('order_id' => $order_id));
             $body  = $this->get_message('thankyou_verified_body', $order);
@@ -1236,6 +1369,15 @@ class Potvrdio_Viber_COD {
             return;
         }
 
+        // Bi-directional sync in admin metabox: auto-check cloud if order is on-hold and unverified
+        if (!$verified && $order->get_status() === 'on-hold') {
+            $cloud_res = $this->check_order_status_with_cloud($order);
+            if ($cloud_res && !empty($cloud_res['verified'])) {
+                $verified = true;
+                $verified_at = $order->get_meta('_potvrdio_verified_at');
+            }
+        }
+
         if ($verified) {
             echo '<div style="background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:10px; margin-bottom:10px; color:#065F46;">';
             echo '<div style="display:flex; align-items:center; gap:6px; font-weight:bold; margin-bottom:4px;"><svg style="width:16px; height:16px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' . esc_html__('ADRESA JE VERIFIKOVANA', 'potvrdio-viber-cod') . '</div>';
@@ -1256,13 +1398,37 @@ class Potvrdio_Viber_COD {
             echo '<small>' . esc_html__('Ne predavati kurirskoj službi pre potvrde kupca.', 'potvrdio-viber-cod') . '</small>';
             echo '</div>';
 
+            // Bi-directional Cloud Sync Button
+            $sync_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_cloud_sync&order_id=' . $order->get_id()), 'potvrdio_cloud_sync_action');
+            echo '<p style="margin-top:10px;"><a href="' . esc_url($sync_url) . '" class="button button-primary" style="width:100%; text-align:center; display:block;">' . esc_html__('🔄 Sinhronizuj sa Potvrdio Cloudom', 'potvrdio-viber-cod') . '</a></p>';
+
             // Edge Case 9: Manual Verify Button for Store Manager
             $verify_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_manual_verify&order_id=' . $order->get_id()), 'potvrdio_manual_verify_action');
-            echo '<p style="margin-top:10px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center;">' . esc_html__('Ručno odobri (Bypass)', 'potvrdio-viber-cod') . '</a></p>';
+            echo '<p style="margin-top:6px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center; display:block;">' . esc_html__('Ručno odobri (Bypass)', 'potvrdio-viber-cod') . '</a></p>';
         }
 
         echo '<p style="margin:6px 0;"><strong>' . esc_html__('Verifikovani telefon:', 'potvrdio-viber-cod') . '</strong> ' . esc_html($phone) . '</p>';
         echo '</div>';
+    }
+
+    /**
+     * Admin Cloud Sync Action Handler
+     */
+    public function handle_admin_cloud_sync() {
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die(esc_html__('Nemate ovlašćenje za ovu radnju.', 'potvrdio-viber-cod'));
+        }
+
+        check_admin_referer('potvrdio_cloud_sync_action');
+
+        $order_id = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
+        $order = wc_get_order($order_id);
+        if ($order) {
+            $this->check_order_status_with_cloud($order);
+        }
+
+        wp_safe_redirect(wp_get_referer() ?: admin_url('edit.php?post_type=shop_order'));
+        exit;
     }
 
     /**
