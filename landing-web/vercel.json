@@ -14,7 +14,31 @@
   "rewrites": [
     {
       "source": "/api/register",
+      "destination": "/api/register"
+    },
+    {
+      "source": "/api/v1/merchant/register",
       "destination": "/api/v1/merchant/register"
+    },
+    {
+      "source": "/api/v1/merchant/magic-link/:path*",
+      "destination": "/api/v1/merchant/login?action=magic-link"
+    },
+    {
+      "source": "/api/v1/merchant/store/:path*",
+      "destination": "/api/v1/merchant/store?action=:path*"
+    },
+    {
+      "source": "/api/v1/merchant/stores/:path*",
+      "destination": "/api/v1/merchant/store?action=stores-add"
+    },
+    {
+      "source": "/api/v1/merchant/payments/:path*",
+      "destination": "/api/v1/merchant/payments"
+    },
+    {
+      "source": "/api/v1/address-token/:path*",
+      "destination": "/api/v1/address-token?action=:path*"
     }
   ]
 }
