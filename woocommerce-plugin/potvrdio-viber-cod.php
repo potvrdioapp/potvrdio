@@ -42,10 +42,14 @@ class Potvrdio_Viber_COD {
         $this->api_endpoint = !empty($endpoint) ? $endpoint : 'https://potvrdio.online/api/v1';
 
         $key = get_option('potvrdio_api_key');
-        $this->api_key      = !empty($key) ? $key : 'demo_api_key_123';
+        $this->api_key      = !empty($key) ? trim($key) : '';
 
         $secret = get_option('potvrdio_api_secret');
-        $this->api_secret   = !empty($secret) ? $secret : 'demo_secret_456';
+        $this->api_secret   = !empty($secret) ? trim($secret) : '';
+
+        if (is_admin()) {
+            add_action('admin_notices', array($this, 'render_missing_api_key_notice'));
+        }
 
         // =========================================================================
         // A. IRONCLAD ORDER INTERCEPTION (Multiple redundant hooks to prevent bypass)
@@ -878,6 +882,10 @@ class Potvrdio_Viber_COD {
      * Send HTTP POST to Potvrdio Central Server
      */
     private function send_to_central_backend($endpoint, $payload) {
+        if (empty($this->api_key) || empty($this->api_secret)) {
+            return false;
+        }
+
         $url = rtrim($this->api_endpoint, '/') . $endpoint;
         $body = wp_json_encode($payload);
 
@@ -1383,11 +1391,11 @@ class Potvrdio_Viber_COD {
                     </tr>
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('API Key', 'potvrdio-viber-cod'); ?></th>
-                        <td><input type="text" name="potvrdio_api_key" value="<?php echo esc_attr(get_option('potvrdio_api_key', 'demo_api_key_123')); ?>" class="regular-text" /></td>
+                        <td><input type="text" name="potvrdio_api_key" value="<?php echo esc_attr(get_option('potvrdio_api_key', '')); ?>" placeholder="pk_live_..." class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('API Secret', 'potvrdio-viber-cod'); ?></th>
-                        <td><input type="password" name="potvrdio_api_secret" value="<?php echo esc_attr(get_option('potvrdio_api_secret', 'demo_secret_456')); ?>" class="regular-text" /></td>
+                        <td><input type="password" name="potvrdio_api_secret" value="<?php echo esc_attr(get_option('potvrdio_api_secret', '')); ?>" placeholder="sec_live_..." class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
                         <th scope="row"><?php esc_html_e('Pametno automatsko odobrenje (Smart Bypass)', 'potvrdio-viber-cod'); ?></th>
@@ -1404,6 +1412,21 @@ class Potvrdio_Viber_COD {
             </form>
         </div>
         <?php
+    }
+
+    /**
+     * Admin Notice when API Key is missing
+     */
+    public function render_missing_api_key_notice() {
+        if (!empty($this->api_key)) {
+            return;
+        }
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if ($screen && strpos($screen->id, 'potvrdio') !== false) {
+            return;
+        }
+        $settings_url = admin_url('options-general.php?page=potvrdio-settings');
+        echo '<div class="notice notice-warning is-dismissible"><p><strong>Potvrdio COD Verifikacija:</strong> ' . sprintf(__('Molimo unesite vaš <a href="%s">Potvrdio API ključ i Secret</a> kako bi automatska verifikacija porudžbina bila aktivna.', 'potvrdio-viber-cod'), esc_url($settings_url)) . '</p></div>';
     }
 }
 

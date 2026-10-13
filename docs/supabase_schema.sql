@@ -152,3 +152,60 @@ FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 CREATE OR REPLACE TRIGGER trg_orders_updated_at
 BEFORE UPDATE ON public.orders
 FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- 7. Payment Requests & Proforma Tracking (B2B Wire / NBS IPS QR Top-Ups)
+CREATE TABLE IF NOT EXISTS public.payment_requests (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    merchant_api_key TEXT NOT NULL,
+    store_domain TEXT NOT NULL,
+    merchant_email TEXT NOT NULL,
+    proforma_number TEXT NOT NULL UNIQUE,
+    plan_id TEXT NOT NULL,
+    plan_name TEXT NOT NULL,
+    credits INTEGER NOT NULL,
+    amount_eur NUMERIC(10, 2) NOT NULL,
+    amount_rsd NUMERIC(12, 2) NOT NULL,
+    status TEXT NOT NULL DEFAULT 'PENDING', -- 'PENDING', 'APPROVED', 'REJECTED'
+    approved_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_payment_requests_proforma ON public.payment_requests(proforma_number);
+CREATE INDEX IF NOT EXISTS idx_payment_requests_api_key ON public.payment_requests(merchant_api_key);
+
+-- 8. Atomic Payment Approval Function (Admin Credit Top-Up)
+CREATE OR REPLACE FUNCTION public.approve_merchant_payment(p_proforma TEXT)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_req RECORD;
+BEGIN
+    SELECT * INTO v_req FROM public.payment_requests WHERE proforma_number = p_proforma FOR UPDATE;
+    IF NOT FOUND THEN
+        RETURN jsonb_build_object('success', false, 'error', 'PROFORMA_NOT_FOUND');
+    END IF;
+    IF v_req.status = 'APPROVED' THEN
+        RETURN jsonb_build_object('success', true, 'already_approved', true, 'credits', v_req.credits);
+    END IF;
+
+    UPDATE public.merchants 
+    SET message_credits_remaining = message_credits_remaining + v_req.credits,
+        plan_type = 'PAID',
+        updated_at = NOW()
+    WHERE api_key = v_req.merchant_api_key;
+
+    UPDATE public.payment_requests
+    SET status = 'APPROVED',
+        approved_at = NOW()
+    WHERE id = v_req.id;
+
+    RETURN jsonb_build_object(
+        'success', true, 
+        'credits_added', v_req.credits, 
+        'merchant_api_key', v_req.merchant_api_key,
+        'store_domain', v_req.store_domain,
+        'merchant_email', v_req.merchant_email
+    );
+END;
+$$;

@@ -3198,6 +3198,10 @@ export default function App() {
         onClose={() => setIsPaymentModalOpen(false)}
         plan={selectedPaymentPlan}
         lang={selectedLang}
+        apiKey={activeMerchant.apiKey}
+        storeDomain={activeMerchant.storeDomain}
+        email={session?.email}
+        isDemo={activeMerchant.isDemo}
         onPaymentSuccess={handlePaymentSuccess}
         onSelectPlan={(newPlan) => setSelectedPaymentPlan(newPlan)}
       />

@@ -13,6 +13,8 @@ import {
   ChevronDown
 } from 'lucide-react';
 
+import { API_URL } from '../config';
+
 export interface IpsPaymentPlan {
   id: string;
   name: string;
@@ -26,6 +28,10 @@ interface IpsPaymentModalProps {
   onClose: () => void;
   plan: IpsPaymentPlan | null;
   lang: 'sr' | 'mk' | 'en';
+  apiKey?: string;
+  storeDomain?: string;
+  email?: string;
+  isDemo?: boolean;
   onPaymentSuccess?: (credits: number, planId: string) => void;
   onSelectPlan?: (plan: IpsPaymentPlan) => void;
 }
@@ -35,6 +41,10 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
   onClose,
   plan,
   lang,
+  apiKey,
+  storeDomain,
+  email,
+  isDemo = false,
   onPaymentSuccess,
   onSelectPlan,
 }) => {
@@ -392,15 +402,42 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleSimulatePaymentNotice = () => {
+  const handleNotifyPayment = async () => {
     setIsNotifying(true);
-    setTimeout(() => {
+    try {
+      if (isDemo) {
+        setTimeout(() => {
+          setIsNotifying(false);
+          setNotified(true);
+          if (onPaymentSuccess && activePlan) {
+            onPaymentSuccess(activePlan.credits, activePlan.id);
+          }
+        }, 1200);
+        return;
+      }
+
+      await fetch(`${API_URL}/api/v1/merchant/payments/notice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          apiKey,
+          storeDomain,
+          email,
+          planId: activePlan.id,
+          planName: activePlan.name,
+          credits: activePlan.credits,
+          euroPrice: activePlan.euroPrice,
+          rsdAmount,
+          proformaNumber: predracunNumber,
+        }),
+      });
+
       setIsNotifying(false);
       setNotified(true);
-      if (onPaymentSuccess && activePlan) {
-        onPaymentSuccess(activePlan.credits, activePlan.id);
-      }
-    }, 1200);
+    } catch {
+      setIsNotifying(false);
+      setNotified(true);
+    }
   };
 
   const svrhaText = `Konsultantske usluge i digitalna optimizacija COD isporuke po predračunu ${predracunNumber}`;
@@ -771,7 +808,7 @@ export const IpsPaymentModal: React.FC<IpsPaymentModalProps> = ({
             </button>
 
             <button
-              onClick={handleSimulatePaymentNotice}
+              onClick={handleNotifyPayment}
               disabled={isNotifying || notified}
               className={`flex items-center gap-2 px-5 py-2 text-xs font-bold rounded-xl transition-all shadow-md cursor-pointer ${
                 notified
