@@ -17,6 +17,16 @@ function createOrderToken(payload: any): string {
   return `${data}.${sig}`;
 }
 
+function generateShortCode(): string {
+  const chars = '23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = '';
+  const bytes = crypto.randomBytes(6);
+  for (let i = 0; i < 6; i++) {
+    code += chars[bytes[i] % chars.length];
+  }
+  return code;
+}
+
 function normalizeBalkanPhone(phone: string, defaultCountry = '381'): string {
   if (!phone) return '';
   let clean = phone.replace(/[^\d+]/g, '');
@@ -405,7 +415,10 @@ export default async function handler(req: any, res: any) {
       apiKey: typeof apiKey === 'string' ? apiKey : '',
       exp: Date.now() + 24 * 60 * 60 * 1000,
     });
-    const editUrl = `https://potvrdio.online/edit/?token=${orderToken}`;
+    const shortCode = generateShortCode();
+    const shortUrl = `https://potvrdio.online/v/${shortCode}`;
+    const editUrl = shortUrl;
+    const longEditUrl = `https://potvrdio.online/edit/?token=${orderToken}`;
 
     // Format items list for email
     let itemsHtml = '';
@@ -694,6 +707,11 @@ export default async function handler(req: any, res: any) {
       responseTime: 'Čeka se potvrda kupca...',
       warehouseAction: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
       apiKey: typeof apiKey === 'string' ? apiKey : '',
+      shortCode,
+      short_code: shortCode,
+      shortUrl,
+      orderToken,
+      editUrl: shortUrl,
       history: [
         {
           time: nowTime,
@@ -735,7 +753,10 @@ export default async function handler(req: any, res: any) {
           customer_email: customerEmail || null,
           city: city || 'Beograd',
           address: addressDisplay,
-          shipping_address: shipping_address || {},
+          shipping_address: {
+            ...(typeof shipping_address === 'object' && shipping_address ? shipping_address : {}),
+            _short_code: shortCode,
+          },
           billing_address: billing_address || {},
           total_amount: Number(total_amount) || 0,
           currency: currency || 'RSD',
@@ -744,6 +765,8 @@ export default async function handler(req: any, res: any) {
           response_time: 'Čeka se potvrda kupca...',
           warehouse_action: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
           history: newOrderLog.history,
+          short_code: shortCode,
+          order_token: orderToken,
         };
 
         const upsertRes = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_api_key,order_id`, {
@@ -760,14 +783,16 @@ export default async function handler(req: any, res: any) {
         if (!upsertRes.ok) {
           const errBody = await upsertRes.text().catch(() => '');
           console.warn('[SUPABASE UPSERT FAILED]:', upsertRes.status, errBody);
-          // Fallback to regular POST insert
-          await fetch(`${supabaseUrl}/rest/v1/orders`, {
+          // If schema error (e.g. short_code column not yet migrated), strip optional columns
+          delete (orderData as any).short_code;
+          delete (orderData as any).order_token;
+          await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_api_key,order_id`, {
             method: 'POST',
             headers: {
               'apikey': supabaseKey,
               'Authorization': `Bearer ${supabaseKey}`,
               'Content-Type': 'application/json',
-              'Prefer': 'return=minimal',
+              'Prefer': 'resolution=merge-duplicates,return=minimal',
             },
             body: JSON.stringify(orderData),
           }).catch((err) => {
@@ -802,7 +827,9 @@ export default async function handler(req: any, res: any) {
       email_error: emailErr || null,
       sms_sent: smsSent,
       sms_error: smsErr || null,
-      edit_url: editUrl,
+      edit_url: shortUrl,
+      short_url: shortUrl,
+      short_code: shortCode,
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || 'Internal server error' });

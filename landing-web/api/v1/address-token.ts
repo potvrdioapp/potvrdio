@@ -61,6 +61,98 @@ export default async function handler(req: any, res: any) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
   const token = req.query?.token || body.token || (rawAction.length > 20 ? rawAction : '');
 
+  // Branch 0: Shortlink Resolver (/v/:code)
+  if (rawAction === 'shortlink' || req.query?.code) {
+    const code = String(req.query?.code || '').trim();
+    if (!code) {
+      return res.redirect(302, '/edit/?expired=1');
+    }
+
+    // 1. Try Supabase lookup by short_code
+    if (supabaseUrl && supabaseKey) {
+      try {
+        let lookupRes = await fetch(
+          `${supabaseUrl}/rest/v1/orders?short_code=eq.${encodeURIComponent(code)}&limit=1`,
+          {
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Accept': 'application/json',
+            },
+          }
+        );
+
+        let rows = lookupRes.ok ? await lookupRes.json() : [];
+        if (!Array.isArray(rows) || rows.length === 0) {
+          // Fallback check inside shipping_address JSONB: shipping_address->>_short_code
+          const jsonbRes = await fetch(
+            `${supabaseUrl}/rest/v1/orders?shipping_address->>_short_code=eq.${encodeURIComponent(code)}&limit=1`,
+            {
+              headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Accept': 'application/json',
+              },
+            }
+          );
+          if (jsonbRes.ok) {
+            rows = await jsonbRes.json();
+          }
+        }
+
+        if (Array.isArray(rows) && rows.length > 0) {
+          const r = rows[0];
+          let targetToken = r.order_token;
+          if (!targetToken) {
+            const shipAddr = typeof r.shipping_address === 'object' && r.shipping_address ? r.shipping_address : {};
+            const payload = {
+              orderId: String(r.order_id),
+              customerName: r.customer_name || 'Kupac',
+              customerPhone: r.customer_phone || '',
+              address1: shipAddr.address_1 || r.address || '',
+              address2: shipAddr.address_2 || '',
+              city: r.city || shipAddr.city || 'Beograd',
+              postcode: shipAddr.postcode || '',
+              totalAmount: Number(r.total_amount) || 0,
+              currency: r.currency || 'RSD',
+              apiKey: r.merchant_api_key,
+              exp: Date.now() + 48 * 60 * 60 * 1000,
+            };
+            const payloadStr = JSON.stringify(payload);
+            const data = Buffer.from(payloadStr, 'utf8')
+              .toString('base64')
+              .replace(/\+/g, '-')
+              .replace(/\//g, '_')
+              .replace(/=+$/, '');
+            const sig = crypto.createHmac('sha256', SIGNING_SECRET).update(data).digest('base64url');
+            targetToken = `${data}.${sig}`;
+          }
+
+          if (req.headers['accept']?.includes('application/json')) {
+            return res.status(200).json({ success: true, redirect_url: `/edit/?token=${encodeURIComponent(targetToken)}`, token: targetToken });
+          }
+          return res.redirect(302, `/edit/?token=${encodeURIComponent(targetToken)}`);
+        }
+      } catch (err: any) {
+        console.warn('[SHORTLINK LOOKUP ERROR]:', err?.message || err);
+      }
+    }
+
+    // 2. In-memory fallback
+    const allOrders = (global as any).__potvrdio_orders || [];
+    const foundMem = allOrders.find((o: any) => o.shortCode === code || o.short_code === code);
+    if (foundMem && (foundMem.orderToken || foundMem.token)) {
+      const targetToken = foundMem.orderToken || foundMem.token;
+      if (req.headers['accept']?.includes('application/json')) {
+        return res.status(200).json({ success: true, redirect_url: `/edit/?token=${encodeURIComponent(targetToken)}`, token: targetToken });
+      }
+      return res.redirect(302, `/edit/?token=${encodeURIComponent(targetToken)}`);
+    }
+
+    // 3. Fallback: redirect to edit with code
+    return res.redirect(302, `/edit/?code=${encodeURIComponent(code)}`);
+  }
+
   // Branch 1: Validate / Status Check
   if (req.method === 'GET' || rawAction === 'validate' || rawAction === 'check' || (!rawAction && req.method === 'POST' && !body.address_1 && !body.is_cancellation)) {
     if (!token) return res.status(400).json({ error: 'Missing token' });

@@ -232,4 +232,9 @@ ALTER TABLE public.merchants
         USING notification_channel::public.notification_channel_type,
     ALTER COLUMN notification_channel SET DEFAULT 'EMAIL_ONLY'::public.notification_channel_type;
 
+-- 10. Migration: Dedicated URL Shortener columns for lightweight 1-SMS verification links
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS short_code TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS order_token TEXT;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_short_code ON public.orders(short_code);
+
 

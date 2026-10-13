@@ -47,6 +47,14 @@
     {
       "source": "/api/v1/address-token/:path*",
       "destination": "/api/v1/address-token?action=:path*"
+    },
+    {
+      "source": "/v/:code",
+      "destination": "/api/v1/address-token?action=shortlink&code=:code"
+    },
+    {
+      "source": "/v/:code/",
+      "destination": "/api/v1/address-token?action=shortlink&code=:code"
     }
   ]
 }
