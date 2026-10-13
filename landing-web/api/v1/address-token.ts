@@ -183,10 +183,11 @@ export default async function handler(req: any, res: any) {
       desc: body.reason ? `Razlog: ${body.reason}. Slanje paketa je obustavljeno.` : 'Kupac je otkazao narudžbinu putem linka. Paket je obustavljen pre predaje kuriru.',
     };
 
-    // Persist status change to Supabase database
+    // 1. Persist status change to Supabase database FIRST (Immediate & Reliable)
     if (supabaseUrl && supabaseKey) {
       try {
         let existingHistory: any[] = [];
+        let rowFound = false;
         const filterQuery = payload.apiKey
           ? `merchant_api_key=eq.${encodeURIComponent(payload.apiKey)}&order_id=eq.${encodeURIComponent(String(orderIdNum))}`
           : `order_id=eq.${encodeURIComponent(String(orderIdNum))}`;
@@ -202,35 +203,67 @@ export default async function handler(req: any, res: any) {
         if (getRes.ok) {
           const rows = await getRes.json();
           if (Array.isArray(rows) && rows[0]) {
+            rowFound = true;
             existingHistory = Array.isArray(rows[0].history) ? rows[0].history : [];
           }
         }
 
         const mergedHistory = [...existingHistory, newCancelHistory];
 
-        await fetch(`${supabaseUrl}/rest/v1/orders?${filterQuery}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-          },
-          body: JSON.stringify({
-            status: 'CANCELLED',
-            response_time: '35 sek',
-            warehouse_action: 'Otkazano od strane kupca · Slanje obustavljeno',
-            cost_saved: '€3.50',
-            history: mergedHistory,
-            updated_at: new Date().toISOString(),
-          }),
-        });
+        if (rowFound) {
+          await fetch(`${supabaseUrl}/rest/v1/orders?${filterQuery}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({
+              status: 'CANCELLED',
+              response_time: '35 sek',
+              warehouse_action: 'Otkazano od strane kupca · Slanje obustavljeno',
+              cost_saved: '€3.50',
+              history: mergedHistory,
+              updated_at: new Date().toISOString(),
+            }),
+          });
+        } else {
+          // If the order wasn't previously in database, insert it directly
+          await fetch(`${supabaseUrl}/rest/v1/orders`, {
+            method: 'POST',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({
+              merchant_api_key: payload.apiKey || '',
+              order_id: String(orderIdNum),
+              customer_name: payload.customerName || 'Kupac',
+              customer_phone: payload.customerPhone || '',
+              city: payload.city || 'Beograd',
+              address: payload.address1 || '',
+              total_amount: Number(payload.totalAmount) || 0,
+              currency: payload.currency || 'RSD',
+              status: 'CANCELLED',
+              channel: 'SMS',
+              response_time: '35 sek',
+              warehouse_action: 'Otkazano od strane kupca · Slanje obustavljeno',
+              cost_saved: '€3.50',
+              history: mergedHistory,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }),
+          });
+        }
       } catch (dbErr: any) {
         console.warn('[SUPABASE CANCEL UPDATE ERROR]:', dbErr?.message || dbErr);
       }
     }
 
-    // Update in-memory fallback
+    // 2. Update in-memory fallback & notify intercept container
     const centralOrders = (global as any).__potvrdio_orders || [];
     const foundOrder = centralOrders.find((o: any) => o.id === `#${payload.orderId}` || o.id === payload.orderId);
     if (foundOrder) {
@@ -240,6 +273,72 @@ export default async function handler(req: any, res: any) {
       foundOrder.costSaved = '€3.50';
       if (Array.isArray(foundOrder.history)) {
         foundOrder.history.push(newCancelHistory);
+      }
+    }
+
+    try {
+      fetch('https://potvrdio.online/api/v1/orders/intercept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_STATUS',
+          order_id: orderIdNum,
+          status: 'CANCELLED',
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    // 3. Attempt direct outbound webhook to merchant store (with strict 2.5s timeout)
+    if (storeDomain && orderIdNum && apiSecret) {
+      try {
+        const cancelWebhookPayload = JSON.stringify({
+          order_id: orderIdNum,
+          action: 'CANCELLED',
+          status: 'cancelled',
+          customer_note: body.reason || 'Porudžbina otkazana od strane kupca putem Potvrdio SMS/Viber linka.',
+          timestamp: Math.floor(Date.now() / 1000),
+        });
+
+        const signature = crypto.createHmac('sha256', apiSecret).update(cancelWebhookPayload).digest('hex');
+        
+        let wooRes = await fetch(`${storeDomain}/wp-json/potvrdio/v1/webhook`, {
+          method: 'POST',
+          signal: AbortSignal.timeout(2500),
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Potvrdio-Signature': signature,
+            'X-Potvrdio-Api-Key': payload.apiKey || '',
+          },
+          body: cancelWebhookPayload,
+        }).catch((err) => {
+          wooError = err?.message;
+          return null;
+        });
+
+        if (!wooRes || wooRes.status === 404) {
+          wooRes = await fetch(`${storeDomain}/wp-json/potvrdio/v1/order/cancel`, {
+            method: 'POST',
+            signal: AbortSignal.timeout(2500),
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Potvrdio-Signature': signature,
+              'X-Potvrdio-Api-Key': payload.apiKey || '',
+            },
+            body: cancelWebhookPayload,
+          }).catch((err) => {
+            wooError = err?.message;
+            return null;
+          });
+        }
+
+        if (wooRes && wooRes.ok) {
+          wooSuccess = true;
+          wooError = null;
+        } else if (wooRes && !wooRes.ok) {
+          wooError = await wooRes.text().catch(() => 'WooCommerce rejection');
+        }
+      } catch (err: any) {
+        wooError = err?.message;
       }
     }
 
@@ -274,7 +373,160 @@ export default async function handler(req: any, res: any) {
     const finalCity = body.city || payload.city || 'Beograd';
     const finalPostcode = body.postcode || payload.postcode || '';
     const newAddressDisplay = `${finalAddr1}${finalAddr2 ? ', ' + finalAddr2 : ''}${finalCity ? ', ' + finalCity : ''}`;
+    const finalStatus = addressChanged ? 'EDITED_ADDRESS' : 'APPROVED';
 
+    const nowTime = new Date().toLocaleTimeString('sr-RS', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
+    const newHistoryEntry = {
+      time: nowTime,
+      type: 'verified',
+      badge: addressChanged ? 'Izmenjena Adresa' : 'Verifikovano',
+      title: addressChanged ? 'Kupac ažurirao podatke i potvrdio' : 'Kupac je potvrdio adresu',
+      desc: addressChanged
+        ? `Kupac je uneo izmene: ${newAddressDisplay}${body.order_note ? ' · Napomena: ' + body.order_note : ''}. Spremno za slanje.`
+        : 'Podaci su tačni. Porudžbina je potvrđena i spremna za prelazak u Processing.',
+    };
+
+    // 1. Persist approval and updated address directly into Supabase database FIRST (Immediate & Reliable)
+    if (supabaseUrl && supabaseKey) {
+      try {
+        let existingHistory: any[] = [];
+        let existingShipping: any = {};
+        let rowFound = false;
+        const filterQuery = payload.apiKey
+          ? `merchant_api_key=eq.${encodeURIComponent(payload.apiKey)}&order_id=eq.${encodeURIComponent(String(orderIdNum))}`
+          : `order_id=eq.${encodeURIComponent(String(orderIdNum))}`;
+
+        const getRes = await fetch(`${supabaseUrl}/rest/v1/orders?${filterQuery}&limit=1`, {
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Accept': 'application/json',
+          },
+        });
+
+        if (getRes.ok) {
+          const rows = await getRes.json();
+          if (Array.isArray(rows) && rows[0]) {
+            rowFound = true;
+            existingHistory = Array.isArray(rows[0].history) ? rows[0].history : [];
+            existingShipping = typeof rows[0].shipping_address === 'object' && rows[0].shipping_address ? rows[0].shipping_address : {};
+          }
+        }
+
+        const mergedHistory = [...existingHistory, newHistoryEntry];
+        const updatedShipping = {
+          ...existingShipping,
+          address_1: finalAddr1,
+          address_2: finalAddr2,
+          city: finalCity,
+          postcode: finalPostcode,
+          customer_note: body.order_note || undefined,
+        };
+
+        if (rowFound) {
+          const patchRes = await fetch(`${supabaseUrl}/rest/v1/orders?${filterQuery}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({
+              status: finalStatus,
+              address: newAddressDisplay,
+              city: finalCity,
+              shipping_address: updatedShipping,
+              response_time: '35 sek',
+              warehouse_action: addressChanged
+                ? 'Izmenjena adresa · Spremno za slanje · WooCommerce status "Processing"'
+                : 'Potvrđeno bez izmena · Spremno za slanje · WooCommerce status "Processing"',
+              history: mergedHistory,
+              updated_at: new Date().toISOString(),
+            }),
+          });
+          if (!patchRes.ok) {
+            console.warn('[SUPABASE PATCH ERROR]:', patchRes.status, await patchRes.text().catch(() => ''));
+          }
+        } else {
+          // If the order wasn't previously in database, insert it directly with verified status!
+          const insertRes = await fetch(`${supabaseUrl}/rest/v1/orders`, {
+            method: 'POST',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({
+              merchant_api_key: payload.apiKey || '',
+              order_id: String(orderIdNum),
+              customer_name: payload.customerName || 'Kupac',
+              customer_phone: payload.customerPhone || '',
+              city: finalCity,
+              address: newAddressDisplay,
+              shipping_address: updatedShipping,
+              total_amount: Number(payload.totalAmount) || 0,
+              currency: payload.currency || 'RSD',
+              status: finalStatus,
+              channel: 'SMS',
+              response_time: '35 sek',
+              warehouse_action: addressChanged
+                ? 'Izmenjena adresa · Spremno za slanje · WooCommerce status "Processing"'
+                : 'Potvrđeno bez izmena · Spremno za slanje · WooCommerce status "Processing"',
+              history: mergedHistory,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            }),
+          });
+          if (!insertRes.ok) {
+            console.warn('[SUPABASE INSERT APPROVED ERROR]:', insertRes.status, await insertRes.text().catch(() => ''));
+          }
+        }
+      } catch (dbErr: any) {
+        console.warn('[SUPABASE SUBMIT UPDATE ERROR]:', dbErr?.message || dbErr);
+      }
+    }
+
+    // 2. In-memory fallback & notify intercept container
+    const centralOrders = (global as any).__potvrdio_orders || [];
+    const foundOrder = centralOrders.find((o: any) => o.id === `#${payload.orderId}` || o.id === payload.orderId);
+    if (foundOrder) {
+      foundOrder.status = finalStatus;
+      foundOrder.responseTime = '35 sek';
+      foundOrder.warehouseAction = addressChanged
+        ? 'Izmenjena adresa · Spremno za slanje · WooCommerce status "Processing"'
+        : 'Potvrđeno bez izmena · Spremno za slanje · WooCommerce status "Processing"';
+      if (Array.isArray(foundOrder.history)) {
+        foundOrder.history.push(newHistoryEntry);
+      }
+    }
+
+    try {
+      fetch('https://potvrdio.online/api/v1/orders/intercept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_STATUS',
+          order_id: orderIdNum,
+          status: finalStatus,
+          updated_address: {
+            address_1: finalAddr1,
+            address_2: finalAddr2,
+            city: finalCity,
+            postcode: finalPostcode,
+            customer_note: body.order_note || undefined,
+          },
+        }),
+      }).catch(() => {});
+    } catch {}
+
+    // 3. Attempt direct outbound webhook to merchant store (with strict 2.5s timeout)
     let wooSuccess = false;
     let wooError = null;
 
@@ -301,9 +553,9 @@ export default async function handler(req: any, res: any) {
 
         const signature = crypto.createHmac('sha256', apiSecret).update(webhookPayload).digest('hex');
 
-        // 1. Try standard /wp-json/potvrdio/v1/webhook
         let wooRes = await fetch(`${storeDomain}/wp-json/potvrdio/v1/webhook`, {
           method: 'POST',
+          signal: AbortSignal.timeout(2500),
           headers: {
             'Content-Type': 'application/json',
             'X-Potvrdio-Signature': signature,
@@ -315,10 +567,10 @@ export default async function handler(req: any, res: any) {
           return null;
         });
 
-        // 2. Fallback to /wp-json/potvrdio/v1/order/confirm if 404
         if (!wooRes || wooRes.status === 404) {
           wooRes = await fetch(`${storeDomain}/wp-json/potvrdio/v1/order/confirm`, {
             method: 'POST',
+            signal: AbortSignal.timeout(2500),
             headers: {
               'Content-Type': 'application/json',
               'X-Potvrdio-Signature': signature,
@@ -339,101 +591,6 @@ export default async function handler(req: any, res: any) {
         }
       } catch (err: any) {
         wooError = err?.message;
-      }
-    }
-
-    const nowTime = new Date().toLocaleTimeString('sr-RS', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-
-    const newHistoryEntry = {
-      time: nowTime,
-      type: 'verified',
-      badge: addressChanged ? 'Izmenjena Adresa' : 'Verifikovano',
-      title: addressChanged ? 'Kupac ažurirao podatke i potvrdio' : 'Kupac je potvrdio adresu',
-      desc: addressChanged
-        ? `Kupac je uneo izmene: ${newAddressDisplay}${body.order_note ? ' · Napomena: ' + body.order_note : ''}. Spremno za slanje.`
-        : 'Podaci su tačni. Porudžbina je potvrđena i spremna za prelazak u Processing.',
-    };
-
-    // Persist approval and updated address directly into Supabase orders table
-    if (supabaseUrl && supabaseKey) {
-      try {
-        let existingHistory: any[] = [];
-        let existingShipping: any = {};
-        const filterQuery = payload.apiKey
-          ? `merchant_api_key=eq.${encodeURIComponent(payload.apiKey)}&order_id=eq.${encodeURIComponent(String(orderIdNum))}`
-          : `order_id=eq.${encodeURIComponent(String(orderIdNum))}`;
-
-        const getRes = await fetch(`${supabaseUrl}/rest/v1/orders?${filterQuery}&limit=1`, {
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Accept': 'application/json',
-          },
-        });
-
-        if (getRes.ok) {
-          const rows = await getRes.json();
-          if (Array.isArray(rows) && rows[0]) {
-            existingHistory = Array.isArray(rows[0].history) ? rows[0].history : [];
-            existingShipping = typeof rows[0].shipping_address === 'object' && rows[0].shipping_address ? rows[0].shipping_address : {};
-          }
-        }
-
-        const mergedHistory = [...existingHistory, newHistoryEntry];
-        const updatedShipping = {
-          ...existingShipping,
-          address_1: finalAddr1,
-          address_2: finalAddr2,
-          city: finalCity,
-          postcode: finalPostcode,
-          customer_note: body.order_note || undefined,
-        };
-
-        const updateRes = await fetch(`${supabaseUrl}/rest/v1/orders?${filterQuery}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-            'Prefer': 'return=minimal',
-          },
-          body: JSON.stringify({
-            status: addressChanged ? 'EDITED_ADDRESS' : 'APPROVED',
-            address: newAddressDisplay,
-            city: finalCity,
-            shipping_address: updatedShipping,
-            response_time: '35 sek',
-            warehouse_action: addressChanged
-              ? 'Izmenjena adresa · Spremno za slanje · WooCommerce status "Processing"'
-              : 'Potvrđeno bez izmena · Spremno za slanje · WooCommerce status "Processing"',
-            history: mergedHistory,
-            updated_at: new Date().toISOString(),
-          }),
-        });
-
-        if (!updateRes.ok) {
-          console.warn('[SUPABASE PATCH FAILED]:', updateRes.status, await updateRes.text().catch(() => ''));
-        }
-      } catch (dbErr: any) {
-        console.warn('[SUPABASE SUBMIT UPDATE ERROR]:', dbErr?.message || dbErr);
-      }
-    }
-
-    // In-memory fallback
-    const centralOrders = (global as any).__potvrdio_orders || [];
-    const foundOrder = centralOrders.find((o: any) => o.id === `#${payload.orderId}` || o.id === payload.orderId);
-    if (foundOrder) {
-      foundOrder.status = addressChanged ? 'EDITED_ADDRESS' : 'APPROVED';
-      foundOrder.responseTime = '35 sek';
-      foundOrder.warehouseAction = addressChanged
-        ? 'Izmenjena adresa · Spremno za slanje · WooCommerce status "Processing"'
-        : 'Potvrđeno bez izmena · Spremno za slanje · WooCommerce status "Processing"';
-      if (Array.isArray(foundOrder.history)) {
-        foundOrder.history.push(newHistoryEntry);
       }
     }
 

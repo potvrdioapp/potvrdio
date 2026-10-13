@@ -106,13 +106,20 @@ export default async function handler(req: any, res: any) {
     const queryOrderId = String(req.query?.order_id || req.query?.orderId || '').replace(/\D/g, '');
 
     // Query Supabase orders table if configured
-    if (supabaseUrl && supabaseKey && queryApiKey && queryApiKey !== 'demo' && queryApiKey !== 'demo_api_key_123') {
+    if (supabaseUrl && supabaseKey) {
       try {
-        let endpoint = `${supabaseUrl}/rest/v1/orders?merchant_api_key=eq.${encodeURIComponent(queryApiKey)}`;
-        if (queryOrderId) {
-          endpoint += `&order_id=eq.${encodeURIComponent(queryOrderId)}&limit=1`;
+        let endpoint = `${supabaseUrl}/rest/v1/orders?`;
+        if (queryApiKey && queryApiKey !== 'demo' && queryApiKey !== 'demo_api_key_123') {
+          endpoint += `merchant_api_key=eq.${encodeURIComponent(queryApiKey)}`;
+          if (queryOrderId) {
+            endpoint += `&order_id=eq.${encodeURIComponent(queryOrderId)}&limit=1`;
+          } else {
+            endpoint += `&order=created_at.desc&limit=50`;
+          }
+        } else if (queryOrderId) {
+          endpoint += `order_id=eq.${encodeURIComponent(queryOrderId)}&limit=1`;
         } else {
-          endpoint += `&order=created_at.desc&limit=50`;
+          endpoint += `order=created_at.desc&limit=50`;
         }
 
         const res = await fetch(endpoint, {
@@ -181,11 +188,14 @@ export default async function handler(req: any, res: any) {
     if (queryOrderId) {
       const found = filteredOrders.find((o: any) => o.id === `#${queryOrderId}` || o.id === queryOrderId);
       const isVerified = found ? (found.status === 'APPROVED' || found.status === 'EDITED_ADDRESS') : false;
+      const isCancelled = found ? found.status === 'CANCELLED' : false;
       return res.status(200).json({
         success: true,
         order_id: Number(queryOrderId),
         verified: isVerified,
+        cancelled: isCancelled,
         status: found?.status || 'SMS_FALLBACK',
+        shipping_address: found?.updatedAddress || null,
         orders: found ? [found] : [],
       });
     }
@@ -236,20 +246,31 @@ export default async function handler(req: any, res: any) {
 
       // Persist update in Supabase
       if (supabaseUrl && supabaseKey) {
-        fetch(`${supabaseUrl}/rest/v1/orders?order_id=eq.${encodeURIComponent(orderIdStr)}`, {
-          method: 'PATCH',
-          headers: {
-            'apikey': supabaseKey,
-            'Authorization': `Bearer ${supabaseKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+        try {
+          const updateBody: any = {
             status: body.status || 'APPROVED',
             response_time: body.responseTime || '35 sek',
             warehouse_action: body.warehouseAction || (body.status === 'CANCELLED' ? 'Otkazano od strane kupca · Slanje obustavljeno' : 'Spremno za slanje · WooCommerce status "Processing"'),
             updated_at: new Date().toISOString(),
-          }),
-        }).catch(() => {});
+          };
+          if (body.updated_address) {
+            updateBody.shipping_address = body.updated_address;
+            const u = body.updated_address;
+            updateBody.address = `${u.address_1 || ''}${u.address_2 ? ', ' + u.address_2 : ''}${u.city ? ', ' + u.city : ''}`;
+            if (u.city) updateBody.city = u.city;
+          }
+          await fetch(`${supabaseUrl}/rest/v1/orders?order_id=eq.${encodeURIComponent(orderIdStr)}`, {
+            method: 'PATCH',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateBody),
+          });
+        } catch (dbErr: any) {
+          console.warn('[SUPABASE UPDATE_STATUS ERROR]:', dbErr?.message || dbErr);
+        }
       }
 
       return res.status(200).json({ success: true, updated: Boolean(foundOrder) });
@@ -686,7 +707,7 @@ export default async function handler(req: any, res: any) {
     if (supabaseUrl && supabaseKey) {
       try {
         // 1. Atomically decrement quota in database
-        fetch(`${supabaseUrl}/rest/v1/rpc/decrement_merchant_quota`, {
+        await fetch(`${supabaseUrl}/rest/v1/rpc/decrement_merchant_quota`, {
           method: 'POST',
           headers: {
             'apikey': supabaseKey,
@@ -697,7 +718,26 @@ export default async function handler(req: any, res: any) {
         }).catch(() => {});
 
         // 2. Upsert order in database
-        fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_api_key,order_id`, {
+        const orderData = {
+          merchant_api_key: String(apiKey),
+          order_id: String(order_id),
+          customer_name: customer_name || 'Kupac',
+          customer_phone: String(customer_phone || ''),
+          customer_email: customerEmail || null,
+          city: city || 'Beograd',
+          address: addressDisplay,
+          shipping_address: shipping_address || {},
+          billing_address: billing_address || {},
+          total_amount: Number(total_amount) || 0,
+          currency: currency || 'RSD',
+          status: 'SMS_FALLBACK',
+          channel: orderChannel,
+          response_time: 'Čeka se potvrda kupca...',
+          warehouse_action: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
+          history: newOrderLog.history,
+        };
+
+        const upsertRes = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_api_key,order_id`, {
           method: 'POST',
           headers: {
             'apikey': supabaseKey,
@@ -705,27 +745,26 @@ export default async function handler(req: any, res: any) {
             'Content-Type': 'application/json',
             'Prefer': 'resolution=merge-duplicates,return=minimal',
           },
-          body: JSON.stringify({
-            merchant_api_key: String(apiKey),
-            order_id: String(order_id),
-            customer_name: customer_name || 'Kupac',
-            customer_phone: String(customer_phone || ''),
-            customer_email: customerEmail || null,
-            city: city || 'Beograd',
-            address: addressDisplay,
-            shipping_address: shipping_address || {},
-            billing_address: billing_address || {},
-            total_amount: Number(total_amount) || 0,
-            currency: currency || 'RSD',
-            status: 'SMS_FALLBACK',
-            channel: orderChannel,
-            response_time: 'Čeka se potvrda kupca...',
-            warehouse_action: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
-            history: newOrderLog.history,
-          }),
-        }).catch((err) => {
-          console.warn('[SUPABASE INSERT ORDER ERROR]:', err?.message || err);
+          body: JSON.stringify(orderData),
         });
+
+        if (!upsertRes.ok) {
+          const errBody = await upsertRes.text().catch(() => '');
+          console.warn('[SUPABASE UPSERT FAILED]:', upsertRes.status, errBody);
+          // Fallback to regular POST insert
+          await fetch(`${supabaseUrl}/rest/v1/orders`, {
+            method: 'POST',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Content-Type': 'application/json',
+              'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify(orderData),
+          }).catch((err) => {
+            console.warn('[SUPABASE FALLBACK INSERT ERROR]:', err?.message || err);
+          });
+        }
       } catch (dbErr: any) {
         console.warn('[SUPABASE ORDER PERSIST ERROR]:', dbErr?.message || dbErr);
       }

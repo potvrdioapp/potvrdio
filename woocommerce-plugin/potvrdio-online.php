@@ -1109,7 +1109,10 @@ class Potvrdio_Viber_COD {
             return false;
         }
 
-        if (!empty($data['verified'])) {
+        $is_verified = !empty($data['verified']) || (isset($data['status']) && in_array($data['status'], array('APPROVED', 'EDITED_ADDRESS'), true));
+        $is_cancelled = !empty($data['cancelled']) || (isset($data['status']) && $data['status'] === 'CANCELLED');
+
+        if ($is_verified) {
             // 1. Mark order officially verified by Potvrdio
             $order->update_meta_data('_potvrdio_verified', '1');
             $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
@@ -1144,7 +1147,7 @@ class Potvrdio_Viber_COD {
             return array('verified' => true, 'status' => 'processing');
         }
 
-        if (!empty($data['cancelled'])) {
+        if ($is_cancelled) {
             $order->update_meta_data('_potvrdio_cancelled', '1');
             $order->update_meta_data('_potvrdio_cancelled_at', current_time('mysql'));
             $order->update_status('cancelled', __('Potvrdio: Kupac je otkazao porudžbinu putem linka (usklađeno sa Potvrdio Cloudom).', 'potvrdio-viber-cod'));
