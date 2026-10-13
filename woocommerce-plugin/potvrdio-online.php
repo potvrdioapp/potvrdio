@@ -143,6 +143,8 @@ class Potvrdio_Viber_COD {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_init', array($this, 'check_and_sync_admin_orders'));
+        add_action('init', array($this, 'handle_potvrdio_debug_endpoint'));
+        add_action('wp_ajax_potvrdio_ajax_sync_order', array($this, 'ajax_sync_single_order'));
         add_action('update_option_potvrdio_api_key', array($this, 'ping_central_backend'));
         add_action('update_option_potvrdio_api_endpoint', array($this, 'ping_central_backend'));
 
@@ -1549,17 +1551,160 @@ class Potvrdio_Viber_COD {
             echo '<small>' . esc_html__('Ne predavati kurirskoj službi pre potvrde kupca.', 'potvrdio-viber-cod') . '</small>';
             echo '</div>';
 
-            // Bi-directional Cloud Sync Button
-            $sync_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_cloud_sync&order_id=' . $order->get_id()), 'potvrdio_cloud_sync_action');
-            echo '<p style="margin-top:10px;"><a href="' . esc_url($sync_url) . '" class="button button-primary" style="width:100%; text-align:center; display:block;">' . esc_html__('🔄 Sinhronizuj sa Potvrdio Cloudom', 'potvrdio-viber-cod') . '</a></p>';
+            $ajax_nonce = wp_create_nonce('potvrdio_sync_nonce');
+            $debug_url  = home_url('/?potvrdio_debug=' . $order->get_id());
 
-            // Edge Case 9: Manual Verify Button for Store Manager
-            $verify_url = wp_nonce_url(admin_url('admin-post.php?action=potvrdio_manual_verify&order_id=' . $order->get_id()), 'potvrdio_manual_verify_action');
-            echo '<p style="margin-top:6px;"><a href="' . esc_url($verify_url) . '" class="button button-secondary" style="width:100%; text-align:center; display:block;">' . esc_html__('Ručno odobri (Bypass)', 'potvrdio-viber-cod') . '</a></p>';
+            echo '<div style="margin-top:10px; display:flex; flex-direction:column; gap:6px;">';
+            echo '<button type="button" id="potvrdio-ajax-sync-btn" class="button button-primary" style="width:100%; text-align:center;" onclick="potvrdioRunSync(false)">🔄 Sinhronizuj sa Potvrdio Cloudom</button>';
+            echo '<button type="button" id="potvrdio-ajax-force-btn" class="button button-secondary" style="width:100%; text-align:center;" onclick="potvrdioRunSync(true)">⚡ Prebaci u Processing ODMAH</button>';
+            echo '<div id="potvrdio-ajax-msg" style="display:none; font-size:12px; font-weight:600; text-align:center; padding:6px; border-radius:4px;"></div>';
+            echo '<p style="margin:4px 0 0 0; text-align:center;"><a href="' . esc_url($debug_url) . '" target="_blank" style="font-size:11px; color:#64748B; text-decoration:underline;">🛠️ Testiraj Cloud Vezu (Debug Ekran)</a></p>';
+            echo '</div>';
+            echo '<script>
+            function potvrdioRunSync(force) {
+                var btn = force ? document.getElementById("potvrdio-ajax-force-btn") : document.getElementById("potvrdio-ajax-sync-btn");
+                var msg = document.getElementById("potvrdio-ajax-msg");
+                btn.disabled = true;
+                btn.innerText = "Sinhronizujem...";
+                jQuery.post(ajaxurl, {
+                    action: "potvrdio_ajax_sync_order",
+                    order_id: ' . intval($order->get_id()) . ',
+                    force: force ? 1 : 0,
+                    nonce: "' . esc_js($ajax_nonce) . '"
+                }, function(res) {
+                    if (res && res.success) {
+                        msg.style.display = "block";
+                        msg.style.background = "#dcfce7";
+                        msg.style.color = "#15803d";
+                        msg.innerText = "✅ " + res.data.message + " Osvežavam...";
+                        setTimeout(function() { window.location.reload(); }, 600);
+                    } else {
+                        btn.disabled = false;
+                        btn.innerText = force ? "⚡ Prebaci u Processing ODMAH" : "🔄 Sinhronizuj sa Potvrdio Cloudom";
+                        msg.style.display = "block";
+                        msg.style.background = "#fee2e2";
+                        msg.style.color = "#b91c1c";
+                        msg.innerText = "❌ " + (res && res.data ? res.data.message : "Greška");
+                    }
+                }).fail(function() {
+                    btn.disabled = false;
+                    msg.style.display = "block";
+                    msg.style.background = "#fee2e2";
+                    msg.style.color = "#b91c1c";
+                    msg.innerText = "❌ Mrežna greška (AJAX failed)";
+                });
+            }
+            </script>';
         }
 
         echo '<p style="margin:6px 0;"><strong>' . esc_html__('Verifikovani telefon:', 'potvrdio-viber-cod') . '</strong> ' . esc_html($phone) . '</p>';
         echo '</div>';
+    }
+
+    /**
+     * AJAX Single Order Sync Handler
+     */
+    public function ajax_sync_single_order() {
+        check_ajax_referer('potvrdio_sync_nonce', 'nonce');
+        if (!current_user_can('edit_shop_orders') && !current_user_can('manage_woocommerce') && !current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => 'Unauthorized'), 403);
+        }
+
+        $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            wp_send_json_error(array('message' => 'Order not found'), 404);
+        }
+
+        // Try checking cloud
+        $res = $this->check_order_status_with_cloud($order);
+        if ($res && !empty($res['verified'])) {
+            wp_send_json_success(array('status' => 'processing', 'message' => 'Uspešno usklađeno sa Cloudom!'));
+        }
+
+        // Allow immediate force override
+        if (!empty($_POST['force'])) {
+            $order->update_meta_data('_potvrdio_verified', '1');
+            $order->update_meta_data('_potvrdio_admin_override', '1');
+            $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+            $order->update_status('processing', __('Potvrdio: Ručno odobreno u administraciji.', 'potvrdio-viber-cod'));
+            $order->save();
+            wp_send_json_success(array('status' => 'processing', 'message' => 'Prebačeno u Processing!'));
+        }
+
+        wp_send_json_error(array('message' => 'Bulut sorgusunda onay bulunamadı veya bağlantı hatası oluştu.'));
+    }
+
+    /**
+     * Direct Debug Diagnostic Endpoint for Store Admins
+     * Access via: http://yourstore.local/?potvrdio_debug=63
+     */
+    public function handle_potvrdio_debug_endpoint() {
+        if (!isset($_GET['potvrdio_debug'])) {
+            return;
+        }
+
+        if (!current_user_can('manage_woocommerce') && !current_user_can('manage_options') && !current_user_can('edit_shop_orders')) {
+            wp_die('Molimo prijavite se u WordPress administraciju pre otvaranja ovog linka.');
+        }
+
+        header('Content-Type: text/html; charset=utf-8');
+        echo '<!DOCTYPE html><html><body style="font-family:sans-serif; padding:24px; max-width:700px; margin:0 auto; background:#f8fafc; color:#1e293b;">';
+        echo '<div style="background:#fff; border-radius:12px; padding:24px; border:1px solid #e2e8f0; box-shadow:0 2px 8px rgba(0,0,0,0.06);">';
+        echo '<h2 style="margin-top:0;">Potvrdio Cloud Vezni Test & Sinhronizacija</h2>';
+
+        $order_id = absint($_GET['potvrdio_debug']);
+        if (!$order_id) {
+            $order_id = 63;
+        }
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            echo '<p style="color:red;">Porudžbina #' . esc_html($order_id) . ' nije pronađena u WooCommerce-u.</p>';
+            echo '</div></body></html>';
+            exit;
+        }
+
+        echo '<p><strong>Porudžbina:</strong> #' . esc_html($order_id) . '</p>';
+        echo '<p><strong>Trenutni status u bazi:</strong> <span style="font-weight:bold; color:#d97706;">' . esc_html($order->get_status()) . '</span></p>';
+        echo '<p><strong>Podešeni API Key:</strong> <code>' . esc_html($this->api_key ? substr($this->api_key, 0, 12) . '...' : '(PRAZNO!)') . '</code></p>';
+
+        $base_endpoint = preg_replace('#/api/v1/?$#i', '', rtrim($this->api_endpoint, '/'));
+        $url = $base_endpoint . '/api/v1/orders/intercept?apiKey=' . rawurlencode($this->api_key) . '&order_id=' . rawurlencode($order_id);
+        echo '<p><strong>Cloud URL:</strong> <code>' . esc_html($url) . '</code></p>';
+
+        $res = wp_remote_get($url, array(
+            'timeout'   => 10,
+            'sslverify' => false,
+            'headers'   => array(
+                'Accept'             => 'application/json',
+                'X-Potvrdio-Api-Key' => $this->api_key,
+            ),
+        ));
+
+        if (is_wp_error($res)) {
+            echo '<div style="background:#fee2e2; color:#991b1b; padding:12px; border-radius:8px; margin:12px 0;"><strong>cURL Greška (Mrežni problem):</strong> ' . esc_html($res->get_error_message()) . '</div>';
+            echo '<p>Rešenje: Server ne može da pošalje odlazni zahtev ka <code>' . esc_html($base_endpoint) . '</code>.</p>';
+            echo '</div></body></html>';
+            exit;
+        }
+
+        $code = wp_remote_retrieve_response_code($res);
+        $body = wp_remote_retrieve_body($res);
+        echo '<p><strong>Cloud HTTP Odgovor:</strong> <strong>' . intval($code) . '</strong></p>';
+        echo '<pre style="background:#f1f5f9; padding:12px; border-radius:8px; font-size:12px; overflow-x:auto;">' . esc_html($body) . '</pre>';
+
+        $sync_res = $this->check_order_status_with_cloud($order);
+        $reloaded = wc_get_order($order_id);
+
+        echo '<div style="background:#dcfce7; color:#15803d; padding:16px; border-radius:8px; margin-top:16px;">';
+        echo '<h3 style="margin-top:0;">Rezultat obrade:</h3>';
+        echo '<p><strong>Novi Status u WooCommerce-u:</strong> <span style="font-size:20px; font-weight:800;">' . esc_html($reloaded->get_status()) . '</span></p>';
+        echo '<p><strong>Adresa za isporuku:</strong> ' . esc_html($reloaded->get_shipping_address_1()) . ', ' . esc_html($reloaded->get_shipping_city()) . '</p>';
+        echo '</div>';
+
+        echo '<p style="margin-top:16px;"><a href="' . admin_url('post.php?post=' . $order_id . '&action=edit') . '" style="display:inline-block; background:#0f172a; color:#fff; text-decoration:none; padding:10px 18px; border-radius:6px; font-weight:bold;">&larr; Povratak na porudžbinu #' . $order_id . '</a></p>';
+        echo '</div></body></html>';
+        exit;
     }
 
     /**
