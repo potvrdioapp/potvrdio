@@ -114,6 +114,8 @@ export default function App() {
         trialRemaining: 25,
         credits: 0,
         isDemo: false,
+        isConnected: false,
+        lastPingAt: null,
       };
       const newSession: UserSession = {
         email: params.get('email') || `${store.storeDomain}@merchant.local`,
@@ -222,7 +224,6 @@ export default function App() {
   const [selectedPaymentPlan, setSelectedPaymentPlan] = useState<IpsPaymentPlan | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [testStatus, setTestStatus] = useState<'idle' | 'testing' | 'success'>('idle');
   const [activeStepHighlight, setActiveStepHighlight] = useState<number | null>(null);
   const walkthroughPreviewRef = useRef<HTMLDivElement>(null);
   const [expandedRowId, setExpandedRowId] = useState<string | null>('#7482');
@@ -247,28 +248,33 @@ export default function App() {
     });
   };
 
-  // Option A: Auto-listening for WooCommerce ping
+  // Store connection status synchronization with backend
   useEffect(() => {
-    if (!session || session.isDemo || activeMerchant.isDemo || activeMerchant.isConnected) return;
-    const interval = setInterval(async () => {
+    if (!session || session.isDemo || activeMerchant.isDemo) return;
+    const checkStatus = async () => {
       try {
         const res = await fetch(`${API_URL}/api/v1/merchant/store/status?apiKey=${encodeURIComponent(activeMerchant.apiKey)}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.isConnected) {
-            updateActiveStore((prev) => ({
-              ...prev,
-              isConnected: true,
-              lastPingAt: data.lastPingAt || new Date().toISOString(),
-            }));
-            setConnectionJustVerified(true);
-            setTimeout(() => setConnectionJustVerified(false), 4000);
-          }
+          const serverConnected = Boolean(data.isConnected);
+          updateActiveStore((prev) => {
+            if (prev.isConnected !== serverConnected || prev.lastPingAt !== data.lastPingAt) {
+              return {
+                ...prev,
+                isConnected: serverConnected,
+                lastPingAt: data.lastPingAt || (serverConnected ? new Date().toISOString() : null),
+              };
+            }
+            return prev;
+          });
         }
       } catch {}
-    }, 6000);
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 5000);
     return () => clearInterval(interval);
-  }, [session, activeMerchant.apiKey, activeMerchant.isDemo, activeMerchant.isConnected]);
+  }, [session, activeMerchant.apiKey, activeMerchant.isDemo]);
 
   // Real-time synchronization of intercepted orders from backend
   useEffect(() => {
@@ -777,13 +783,6 @@ export default function App() {
     navigator.clipboard.writeText(text);
     setCopiedField(fieldName);
     setTimeout(() => setCopiedField(null), 2000);
-  };
-
-  const handleTestConnection = () => {
-    setTestStatus('testing');
-    setTimeout(() => {
-      setTestStatus('success');
-    }, 1200);
   };
 
   const [theme, setTheme] = useState<Theme>(() => {
@@ -2526,26 +2525,39 @@ export default function App() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-theme-muted font-semibold uppercase tracking-wider">{t.connStatusTitle}</span>
-                      <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        {t.connStatusActive}
+                      <span className={`flex items-center gap-1.5 text-xs font-bold ${activeMerchant.isConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                        <span className={`w-2 h-2 rounded-full ${activeMerchant.isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></span>
+                        {activeMerchant.isConnected ? t.connStatusActive : t.connPendingBadge}
                       </span>
                     </div>
 
                     <div className="p-4 rounded-xl bg-surface-subtle border border-theme space-y-2 text-xs">
                       <div className="flex items-center justify-between text-theme-muted">
                         <span>{t.connStoreLabel}</span>
-                        <span className="text-theme-primary font-semibold">{t.storeDomain}</span>
+                        <span className="text-theme-primary font-semibold">{activeMerchant.storeDomain}</span>
                       </div>
                       <div className="flex items-center justify-between text-theme-muted">
                         <span>{t.connWooLabel}</span>
-                        <span className="text-teal-600 dark:text-teal-400 font-semibold font-mono">v9.2.1 (HPOS)</span>
+                        <span className="text-teal-600 dark:text-teal-400 font-semibold font-mono">
+                          {activeMerchant.isConnected ? 'WooCommerce (HPOS)' : 'Nije detektovano'}
+                        </span>
                       </div>
                       <div className="flex items-center justify-between text-theme-muted">
                         <span>{t.connPingLabel}</span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold font-mono">24ms (OK)</span>
+                        <span className={`font-semibold font-mono ${activeMerchant.isConnected ? 'text-emerald-600 dark:text-emerald-400' : 'text-theme-muted'}`}>
+                          {activeMerchant.isConnected && activeMerchant.lastPingAt
+                            ? `${new Date(activeMerchant.lastPingAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (OK)`
+                            : 'Nema signala'}
+                        </span>
                       </div>
                     </div>
+
+                    {connectionError && (
+                      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                        <span className="leading-relaxed">{connectionError}</span>
+                      </div>
+                    )}
 
                     <p className="text-[11px] text-theme-muted leading-relaxed">
                       {t.connTestPrompt}
@@ -2554,24 +2566,24 @@ export default function App() {
 
                   <div>
                     <button
-                      onClick={handleTestConnection}
-                      disabled={testStatus === 'testing'}
-                      className="w-full py-2.5 px-4 rounded-xl bg-surface-subtle hover:bg-surface border border-theme text-theme-primary font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                      onClick={handleVerifyStoreConnection}
+                      disabled={isVerifyingConnection}
+                      className="w-full py-2.5 px-4 rounded-xl bg-surface-subtle hover:bg-surface border border-theme text-theme-primary font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-60"
                     >
-                      {testStatus === 'testing' ? (
+                      {isVerifyingConnection ? (
                         <>
                           <RefreshCw className="w-4 h-4 animate-spin text-teal-600 dark:text-teal-400" />
-                          <span>{t.connTestingBtn}</span>
+                          <span>{t.verifyingConnectionBtn}</span>
                         </>
-                      ) : testStatus === 'success' ? (
+                      ) : activeMerchant.isConnected ? (
                         <>
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                          <span className="text-emerald-600 dark:text-emerald-400">{t.connSuccessBtn}</span>
+                          <span className="text-emerald-600 dark:text-emerald-400">{t.connectionSuccessBadge}</span>
                         </>
                       ) : (
                         <>
                           <RefreshCw className="w-4 h-4 text-teal-600 dark:text-teal-400" />
-                          <span>{t.connDefaultBtn}</span>
+                          <span>{t.verifyConnectionBtn}</span>
                         </>
                       )}
                     </button>
