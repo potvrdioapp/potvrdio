@@ -21,6 +21,15 @@ export default async function handler(req: any, res: any) {
 
   const now = new Date().toISOString();
 
+  if (!(global as any).__potvrdio_pings) {
+    (global as any).__potvrdio_pings = new Map();
+  }
+  (global as any).__potvrdio_pings.set(apiKey, {
+    lastPingAt: now,
+    storeDomain: storeDomain || 'store',
+    timestamp: Date.now(),
+  });
+
   return res.status(200).json({
     success: true,
     isConnected: true,

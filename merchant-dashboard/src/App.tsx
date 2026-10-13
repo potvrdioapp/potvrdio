@@ -173,67 +173,44 @@ export default function App() {
   const [isSecretVisible, setIsSecretVisible] = useState(false);
   const merchantSecret = activeMerchant.apiSecret || (activeMerchant.apiKey.startsWith('pk_live_') ? activeMerchant.apiKey.replace(/^pk_live_/, 'sec_live_') : 'demo_secret_456');
 
-  // Zero-state registered orders list (seeded with #54 if empty)
+  // Registered orders list strictly scoped per merchant API key (Zero fake/mock data)
   const [registeredOrders, setRegisteredOrders] = useState<VerificationLogItem[]>(() => {
-    const saved = localStorage.getItem('potvrdio_registered_orders');
-    if (saved) {
-      try {
+    // Purge legacy non-isolated key
+    try { localStorage.removeItem('potvrdio_registered_orders'); } catch {}
+
+    if (activeMerchant.isDemo) return [];
+    try {
+      const scopedKey = `potvrdio_orders_${activeMerchant.apiKey}`;
+      const saved = localStorage.getItem(scopedKey);
+      if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((item: VerificationLogItem) => {
-            if (item.id === '#54' && (item.status === 'SMS_FALLBACK' || item.status === 'PENDING')) {
-              return {
-                ...item,
-                status: 'APPROVED',
-                responseTime: '35 sek',
-                warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
-                costSaved: '€3.50',
-              };
-            }
-            return item;
-          });
+        if (Array.isArray(parsed)) {
+          return parsed.filter((item: VerificationLogItem) => item.id !== '#54');
         }
-      } catch {}
-    }
-    return [
-      {
-        id: '#54',
-        customer: 'Kupac #54 (Test Porudžbina)',
-        phone: '+381 61 603 ****',
-        status: 'APPROVED',
-        channel: 'SMS',
-        city: 'Novi Sad',
-        amount: '3.490 RSD',
-        time: 'Pre nekoliko min',
-        responseTime: '35 sek',
-        warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
-        costSaved: '€3.50',
-        history: [
-          {
-            time: '18:32:10',
-            type: 'order',
-            badge: 'WooCommerce #54',
-            title: 'Porudžbina kreirana (COD)',
-            desc: 'Kupac je završio poručivanje pouzećem u prodavnici. Paket privremeno zadržan do verifikacije.'
-          },
-          {
-            time: '18:32:15',
-            type: 'dispatch',
-            badge: 'SMS Servis',
-            title: 'Verifikacioni SMS link poslat',
-            desc: 'Potvrdio poslao SMS poruku sa 1-klik linkom za proveru adrese.'
-          },
-          {
-            time: '18:32:50',
-            type: 'action',
-            badge: '1-Klik Potvrda',
-            title: 'Adresa potvrđena od strane kupca',
-            desc: 'Kupac je otvorio link na mobilnom uređaju i potvrdio tačnost adrese bez izmena.'
-          }
-        ]
       }
-    ];
+    } catch {}
+    return [];
   });
+
+  // Re-sync orders when active store changes
+  useEffect(() => {
+    if (activeMerchant.isDemo) {
+      setRegisteredOrders([]);
+      return;
+    }
+    try {
+      const scopedKey = `potvrdio_orders_${activeMerchant.apiKey}`;
+      const saved = localStorage.getItem(scopedKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setRegisteredOrders(parsed.filter((item: VerificationLogItem) => item.id !== '#54'));
+          return;
+        }
+      }
+    } catch {}
+    setRegisteredOrders([]);
+  }, [activeMerchant.apiKey, activeMerchant.isDemo]);
 
   const trialRemaining = isTrial
     ? Math.max(0, 25 - registeredOrders.length)
@@ -297,17 +274,24 @@ export default function App() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const apiKey = activeMerchant.apiKey || 'demo_api_key_123';
+        if (activeMerchant.isDemo) return;
+        const apiKey = activeMerchant.apiKey;
+        if (!apiKey || apiKey === 'demo' || apiKey === 'demo_api_key_123') return;
+
         const res = await fetch(`${API_URL}/api/v1/orders/intercept?apiKey=${encodeURIComponent(apiKey)}`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data.orders) && data.orders.length > 0) {
+          if (Array.isArray(data.orders)) {
+            const scopedKey = `potvrdio_orders_${apiKey}`;
+            const cleanOrders = data.orders.filter((o: VerificationLogItem) => o.id !== '#54');
             setRegisteredOrders((prev) => {
               const orderMap = new Map<string, VerificationLogItem>();
-              // Keep previous orders
-              prev.forEach((o) => orderMap.set(o.id, o));
+              // Keep previous orders for this store
+              prev.forEach((o) => {
+                if (o.id !== '#54') orderMap.set(o.id, o);
+              });
               // Merge/update with incoming orders from server
-              data.orders.forEach((incoming: VerificationLogItem) => {
+              cleanOrders.forEach((incoming: VerificationLogItem) => {
                 const existing = orderMap.get(incoming.id);
                 // If local order is already APPROVED, EDITED_ADDRESS or CANCELLED, and incoming is SMS_FALLBACK/PENDING,
                 // do NOT allow stale pending state from server to downgrade it!
@@ -323,21 +307,11 @@ export default function App() {
                     };
                   }
                 }
-                // Order #54 fix: if incoming order is #54 and status is SMS_FALLBACK/PENDING, customer already verified it!
-                if (incoming.id === '#54' && (incoming.status === 'SMS_FALLBACK' || incoming.status === 'PENDING')) {
-                  incoming = {
-                    ...incoming,
-                    status: 'APPROVED',
-                    responseTime: '35 sek',
-                    warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
-                    costSaved: '€3.50',
-                  };
-                }
                 orderMap.set(incoming.id, incoming);
               });
               const merged = Array.from(orderMap.values());
               try {
-                localStorage.setItem('potvrdio_registered_orders', JSON.stringify(merged));
+                localStorage.setItem(scopedKey, JSON.stringify(merged));
               } catch {}
               return merged;
             });
@@ -349,7 +323,7 @@ export default function App() {
     fetchOrders();
     const interval = setInterval(fetchOrders, 4000);
     return () => clearInterval(interval);
-  }, [activeMerchant.apiKey]);
+  }, [activeMerchant.apiKey, activeMerchant.isDemo]);
 
   // Option B: User-initiated verify connection
   const handleVerifyStoreConnection = async () => {
@@ -456,6 +430,9 @@ export default function App() {
       localStorage.removeItem('potvrdio_real_account');
       localStorage.removeItem('potvrdio_registered_merchant');
       localStorage.removeItem('potvrdio_registered_orders');
+      if (activeMerchant.apiKey) {
+        localStorage.removeItem(`potvrdio_orders_${activeMerchant.apiKey}`);
+      }
     } catch {}
     try {
       window.history.replaceState({}, '', window.location.pathname);
@@ -593,7 +570,8 @@ export default function App() {
 
     const updatedOrders = [newOrderLog, ...registeredOrders];
     setRegisteredOrders(updatedOrders);
-    try { localStorage.setItem('potvrdio_registered_orders', JSON.stringify(updatedOrders)); } catch {}
+    const scopedKey = activeMerchant.isDemo ? 'potvrdio_orders_demo' : `potvrdio_orders_${activeMerchant.apiKey}`;
+    try { localStorage.setItem(scopedKey, JSON.stringify(updatedOrders)); } catch {}
 
     const newRemaining = Math.max(0, trialRemaining - 1);
     updateActiveStore(prev => {

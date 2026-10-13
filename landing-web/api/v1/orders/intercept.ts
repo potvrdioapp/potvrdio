@@ -31,25 +31,20 @@ export default async function handler(req: any, res: any) {
   }
 
   if (req.method === 'GET') {
-    let orders = (global as any).__potvrdio_orders || [];
-    // Ensure order #54 reflects approved status once verified
-    orders = orders.map((o: any) => {
-      if (o.id === '#54' && (o.status === 'SMS_FALLBACK' || o.status === 'PENDING')) {
-        return {
-          ...o,
-          status: 'APPROVED',
-          responseTime: '35 sek',
-          warehouseAction: 'Spremno za slanje · WooCommerce status "Processing"',
-          costSaved: '€3.50',
-        };
-      }
-      return o;
-    });
-    (global as any).__potvrdio_orders = orders;
+    const queryApiKey = String(req.query?.apiKey || req.query?.api_key || req.headers['x-potvrdio-api-key'] || '').trim();
+    let allOrders = (global as any).__potvrdio_orders || [];
+    
+    let filteredOrders = allOrders;
+    if (queryApiKey && queryApiKey !== 'demo' && queryApiKey !== 'demo_api_key_123') {
+      filteredOrders = allOrders.filter((o: any) => o.apiKey === queryApiKey);
+    } else if (queryApiKey === 'demo' || queryApiKey === 'demo_api_key_123') {
+      filteredOrders = allOrders.filter((o: any) => !o.apiKey || o.apiKey === 'demo_api_key_123' || o.apiKey === 'demo');
+    }
+
     return res.status(200).json({
       success: true,
-      count: orders.length,
-      orders,
+      count: filteredOrders.length,
+      orders: filteredOrders,
     });
   }
 

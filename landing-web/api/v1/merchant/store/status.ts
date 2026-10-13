@@ -11,14 +11,30 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
-  const apiKey = req.query?.apiKey || req.headers['x-potvrdio-api-key'];
+  const apiKey = String(req.query?.apiKey || req.headers['x-potvrdio-api-key'] || '').trim();
   if (!apiKey) {
     return res.status(400).json({ error: 'Missing apiKey' });
   }
 
+  // Demo store bypass
+  if (apiKey === 'demo' || apiKey === 'demo_api_key_123') {
+    return res.status(200).json({
+      success: true,
+      isConnected: true,
+      lastPingAt: new Date().toISOString(),
+      storeDomain: 'balkanstyleshop.rs',
+    });
+  }
+
+  // Real merchant store status checked against recorded ping registry
+  const pings = (global as any).__potvrdio_pings;
+  const recorded = pings && pings.has(apiKey) ? pings.get(apiKey) : null;
+  const isConnected = Boolean(recorded);
+
   return res.status(200).json({
     success: true,
-    isConnected: true,
-    lastPingAt: new Date().toISOString(),
+    isConnected,
+    lastPingAt: recorded ? recorded.lastPingAt : null,
+    storeDomain: recorded ? recorded.storeDomain : null,
   });
 }
