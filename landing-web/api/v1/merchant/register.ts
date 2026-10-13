@@ -151,6 +151,37 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // Persist new merchant account to Supabase database
+    const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+    if (supabaseUrl && supabaseKey) {
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/merchants`, {
+          method: 'POST',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates,return=minimal',
+          },
+          body: JSON.stringify({
+            store_name: recipientName,
+            store_domain: cleanDomain,
+            email: cleanEmail,
+            phone: body.phone || null,
+            api_key: apiKey,
+            api_secret: apiSecret,
+            plan_type: 'PILOT',
+            trial_verifications_remaining: 25,
+            message_credits_remaining: 0,
+            is_connected: false,
+          }),
+        });
+      } catch (dbErr: any) {
+        console.warn('[SUPABASE MERCHANT SAVE ERROR]:', dbErr?.message || dbErr);
+      }
+    }
+
     return res.status(200).json({
       success: true,
       apiKey,

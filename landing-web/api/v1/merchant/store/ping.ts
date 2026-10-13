@@ -30,6 +30,44 @@ export default async function handler(req: any, res: any) {
     timestamp: Date.now(),
   });
 
+  // Persist ping to Supabase
+  const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+  if (supabaseUrl && supabaseKey) {
+    try {
+      await fetch(`${supabaseUrl}/rest/v1/merchants?api_key=eq.${encodeURIComponent(apiKey)}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          is_connected: true,
+          last_ping_at: now,
+          updated_at: now,
+        }),
+      });
+
+      // Insert audit log
+      fetch(`${supabaseUrl}/rest/v1/store_pings`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          api_key: apiKey,
+          store_domain: storeDomain || null,
+        }),
+      }).catch(() => {});
+    } catch (dbErr: any) {
+      console.warn('[SUPABASE PING ERROR]:', dbErr?.message || dbErr);
+    }
+  }
+
   return res.status(200).json({
     success: true,
     isConnected: true,

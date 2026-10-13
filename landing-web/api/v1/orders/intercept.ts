@@ -30,10 +30,58 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
+  const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+
   if (req.method === 'GET') {
     const queryApiKey = String(req.query?.apiKey || req.query?.api_key || req.headers['x-potvrdio-api-key'] || '').trim();
+
+    // Query Supabase orders table if configured
+    if (supabaseUrl && supabaseKey && queryApiKey && queryApiKey !== 'demo' && queryApiKey !== 'demo_api_key_123') {
+      try {
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/orders?merchant_api_key=eq.${encodeURIComponent(queryApiKey)}&order=created_at.desc&limit=50`,
+          {
+            method: 'GET',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Accept': 'application/json',
+            },
+          }
+        );
+
+        if (res.ok) {
+          const dbRows = await res.json();
+          if (Array.isArray(dbRows) && dbRows.length > 0) {
+            const mappedOrders = dbRows.map((r: any) => ({
+              id: `#${r.order_id}`,
+              customer: r.customer_name || 'Kupac',
+              phone: r.customer_phone || '',
+              status: r.status || 'SMS_FALLBACK',
+              channel: r.channel || 'SMS',
+              city: r.city || 'Beograd',
+              amount: r.total_amount ? `${Number(r.total_amount).toLocaleString()} ${r.currency || 'RSD'}` : 'Plaćanje pouzećem',
+              time: r.created_at ? new Date(r.created_at).toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' }) : 'Pre nekoliko min',
+              responseTime: r.response_time || 'Čeka se potvrda kupca...',
+              warehouseAction: r.warehouse_action || 'Na čekanju (On-Hold) · Poslat verifikacioni link',
+              apiKey: r.merchant_api_key,
+              history: Array.isArray(r.history) ? r.history : [],
+            }));
+
+            return res.status(200).json({
+              success: true,
+              count: mappedOrders.length,
+              orders: mappedOrders,
+            });
+          }
+        }
+      } catch (dbErr: any) {
+        console.warn('[SUPABASE GET ORDERS ERROR]:', dbErr?.message || dbErr);
+      }
+    }
+
     let allOrders = (global as any).__potvrdio_orders || [];
-    
     let filteredOrders = allOrders;
     if (queryApiKey && queryApiKey !== 'demo' && queryApiKey !== 'demo_api_key_123') {
       filteredOrders = allOrders.filter((o: any) => o.apiKey === queryApiKey);
@@ -53,12 +101,12 @@ export default async function handler(req: any, res: any) {
 
     // Action: Update status of an existing intercepted order
     if (body.action === 'UPDATE_STATUS' && body.order_id) {
-      const orderIdStr = String(body.order_id || '');
+      const orderIdStr = String(body.order_id || '').replace(/^#/, '');
       if (!(global as any).__potvrdio_orders) {
         (global as any).__potvrdio_orders = [];
       }
       let foundOrder = (global as any).__potvrdio_orders.find(
-        (o: any) => o.id === `#${orderIdStr}` || o.id === orderIdStr || o.id.replace('#', '') === orderIdStr
+        (o: any) => o.id === `#${orderIdStr}` || o.id === orderIdStr
       );
 
       const nowTime = new Date().toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -84,6 +132,25 @@ export default async function handler(req: any, res: any) {
             : 'Kupac je otvorio link na telefonu i potvrdio tačnost adrese bez izmena. WooCommerce status prebačen u "Processing".',
         });
       }
+
+      // Persist update in Supabase
+      if (supabaseUrl && supabaseKey) {
+        fetch(`${supabaseUrl}/rest/v1/orders?order_id=eq.${encodeURIComponent(orderIdStr)}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            status: body.status || 'APPROVED',
+            response_time: body.responseTime || '35 sek',
+            warehouse_action: body.warehouseAction || (body.status === 'CANCELLED' ? 'Otkazano od strane kupca · Slanje obustavljeno' : 'Spremno za slanje · WooCommerce status "Processing"'),
+            updated_at: new Date().toISOString(),
+          }),
+        }).catch(() => {});
+      }
+
       return res.status(200).json({ success: true, updated: Boolean(foundOrder) });
     }
 
@@ -414,6 +481,55 @@ export default async function handler(req: any, res: any) {
         },
       ],
     };
+
+    // Persist to Supabase orders table & atomically decrement quota
+    if (supabaseUrl && supabaseKey) {
+      try {
+        // 1. Atomically decrement quota in database
+        fetch(`${supabaseUrl}/rest/v1/rpc/decrement_merchant_quota`, {
+          method: 'POST',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ p_api_key: String(apiKey) }),
+        }).catch(() => {});
+
+        // 2. Upsert order in database
+        fetch(`${supabaseUrl}/rest/v1/orders`, {
+          method: 'POST',
+          headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'resolution=merge-duplicates,return=minimal',
+          },
+          body: JSON.stringify({
+            merchant_api_key: String(apiKey),
+            order_id: String(order_id),
+            customer_name: customer_name || 'Kupac',
+            customer_phone: String(customer_phone || ''),
+            customer_email: customerEmail || null,
+            city: city || 'Beograd',
+            address: addressDisplay,
+            shipping_address: shipping_address || {},
+            billing_address: billing_address || {},
+            total_amount: Number(total_amount) || 0,
+            currency: currency || 'RSD',
+            status: 'SMS_FALLBACK',
+            channel: 'SMS',
+            response_time: 'Čeka se potvrda kupca...',
+            warehouse_action: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
+            history: newOrderLog.history,
+          }),
+        }).catch((err) => {
+          console.warn('[SUPABASE INSERT ORDER ERROR]:', err?.message || err);
+        });
+      } catch (dbErr: any) {
+        console.warn('[SUPABASE ORDER PERSIST ERROR]:', dbErr?.message || dbErr);
+      }
+    }
 
     if (!(global as any).__potvrdio_orders) {
       (global as any).__potvrdio_orders = [];

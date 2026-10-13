@@ -214,9 +214,9 @@ export default function App() {
     setRegisteredOrders([]);
   }, [activeMerchant.apiKey, activeMerchant.isDemo]);
 
-  const trialRemaining = isTrial
-    ? Math.max(0, 25 - registeredOrders.length)
-    : activeMerchant.trialRemaining;
+  const trialRemaining = activeMerchant.trialRemaining !== undefined
+    ? activeMerchant.trialRemaining
+    : (isTrial ? Math.max(0, 25 - registeredOrders.length) : 0);
 
   const [, setBalance] = useState(45.00);
   const [isSimulating, setIsSimulating] = useState(false);
@@ -248,7 +248,7 @@ export default function App() {
     });
   };
 
-  // Store connection status synchronization with backend
+  // Store connection status & quota synchronization with backend
   useEffect(() => {
     if (!session || session.isDemo || activeMerchant.isDemo) return;
     const checkStatus = async () => {
@@ -258,11 +258,19 @@ export default function App() {
           const data = await res.json();
           const serverConnected = Boolean(data.isConnected);
           updateActiveStore((prev) => {
-            if (prev.isConnected !== serverConnected || prev.lastPingAt !== data.lastPingAt) {
+            const hasChanged =
+              prev.isConnected !== serverConnected ||
+              prev.lastPingAt !== data.lastPingAt ||
+              (typeof data.trialRemaining === 'number' && prev.trialRemaining !== data.trialRemaining) ||
+              (typeof data.creditsRemaining === 'number' && prev.credits !== data.creditsRemaining);
+
+            if (hasChanged) {
               return {
                 ...prev,
                 isConnected: serverConnected,
                 lastPingAt: data.lastPingAt || (serverConnected ? new Date().toISOString() : null),
+                trialRemaining: typeof data.trialRemaining === 'number' ? data.trialRemaining : prev.trialRemaining,
+                credits: typeof data.creditsRemaining === 'number' ? data.creditsRemaining : prev.credits,
               };
             }
             return prev;
