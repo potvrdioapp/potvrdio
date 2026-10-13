@@ -152,17 +152,20 @@ export default async function handler(req: any, res: any) {
     }
 
     // Persist new merchant account to Supabase database
-    const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
+    const supabaseUrl = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').replace(/\/+$/, '');
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '';
+    let dbSaved = false;
+    let dbError: string | null = null;
+
     if (supabaseUrl && supabaseKey) {
       try {
-        await fetch(`${supabaseUrl}/rest/v1/merchants`, {
+        const dbRes = await fetch(`${supabaseUrl}/rest/v1/merchants?on_conflict=store_domain`, {
           method: 'POST',
           headers: {
             'apikey': supabaseKey,
             'Authorization': `Bearer ${supabaseKey}`,
             'Content-Type': 'application/json',
-            'Prefer': 'resolution=merge-duplicates,return=minimal',
+            'Prefer': 'resolution=merge-duplicates,return=representation',
           },
           body: JSON.stringify({
             store_name: recipientName,
@@ -172,14 +175,26 @@ export default async function handler(req: any, res: any) {
             api_key: apiKey,
             api_secret: apiSecret,
             plan_type: 'PILOT',
+            notification_channel: 'EMAIL_ONLY',
             trial_verifications_remaining: 25,
             message_credits_remaining: 0,
             is_connected: false,
           }),
         });
+
+        if (dbRes.ok) {
+          dbSaved = true;
+        } else {
+          dbError = await dbRes.text().catch(() => 'DB Error');
+          console.error('[SUPABASE MERCHANT INSERT FAILED]:', dbRes.status, dbError);
+        }
       } catch (dbErr: any) {
-        console.warn('[SUPABASE MERCHANT SAVE ERROR]:', dbErr?.message || dbErr);
+        dbError = dbErr?.message || 'Network error';
+        console.warn('[SUPABASE MERCHANT SAVE EXCEPTION]:', dbError);
       }
+    } else {
+      dbError = 'SUPABASE_URL_OR_KEY_MISSING';
+      console.error('[CRITICAL] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set in Vercel environment variables!');
     }
 
     return res.status(200).json({
@@ -191,6 +206,8 @@ export default async function handler(req: any, res: any) {
       emailSent,
       emailMessageId: emailMsgId,
       emailError: emailErr || undefined,
+      dbSaved,
+      dbError: dbError || undefined,
       storeDomain: cleanDomain,
       dashboardUrl: magicDashboardUrl,
     });

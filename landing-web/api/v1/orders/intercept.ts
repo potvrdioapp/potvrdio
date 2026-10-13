@@ -664,7 +664,7 @@ export default async function handler(req: any, res: any) {
         }).catch(() => {});
 
         // 2. Upsert order in database
-        fetch(`${supabaseUrl}/rest/v1/orders`, {
+        fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_api_key,order_id`, {
           method: 'POST',
           headers: {
             'apikey': supabaseKey,
