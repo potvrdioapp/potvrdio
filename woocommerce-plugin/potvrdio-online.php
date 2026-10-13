@@ -23,6 +23,7 @@ add_action('before_woocommerce_init', function() {
     }
 });
 
+if (!class_exists('Potvrdio_Viber_COD')) {
 class Potvrdio_Viber_COD {
     private static $instance = null;
     private $api_endpoint;
@@ -1131,14 +1132,28 @@ class Potvrdio_Viber_COD {
             $order->update_meta_data('_potvrdio_verified', '1');
             $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
 
-            // 2. Update shipping address if modified
+            // 2. Update shipping and billing address if modified
             if (!empty($data['shipping_address']) && is_array($data['shipping_address'])) {
                 $ship = $data['shipping_address'];
-                if (!empty($ship['address_1'])) $order->set_shipping_address_1(sanitize_text_field($ship['address_1']));
-                if (!empty($ship['address_2'])) $order->set_shipping_address_2(sanitize_text_field($ship['address_2']));
-                if (!empty($ship['city']))      $order->set_shipping_city(sanitize_text_field($ship['city']));
-                if (!empty($ship['postcode']))  $order->set_shipping_postcode(sanitize_text_field($ship['postcode']));
-                if (!empty($ship['customer_note'])) $order->add_order_note(__('Potvrdio Customer Note: ', 'potvrdio-viber-cod') . sanitize_text_field($ship['customer_note']));
+                if (!empty($ship['address_1'])) {
+                    $order->set_shipping_address_1(sanitize_text_field($ship['address_1']));
+                    $order->set_billing_address_1(sanitize_text_field($ship['address_1']));
+                }
+                if (!empty($ship['address_2'])) {
+                    $order->set_shipping_address_2(sanitize_text_field($ship['address_2']));
+                    $order->set_billing_address_2(sanitize_text_field($ship['address_2']));
+                }
+                if (!empty($ship['city'])) {
+                    $order->set_shipping_city(sanitize_text_field($ship['city']));
+                    $order->set_billing_city(sanitize_text_field($ship['city']));
+                }
+                if (!empty($ship['postcode'])) {
+                    $order->set_shipping_postcode(sanitize_text_field($ship['postcode']));
+                    $order->set_billing_postcode(sanitize_text_field($ship['postcode']));
+                }
+                if (!empty($ship['customer_note'])) {
+                    $order->add_order_note(__('Potvrdio Customer Note: ', 'potvrdio-viber-cod') . sanitize_text_field($ship['customer_note']));
+                }
             }
 
             // Save phone + address hash for future smart bypass
@@ -1184,24 +1199,21 @@ class Potvrdio_Viber_COD {
      * Runs in admin_init BEFORE WooCommerce renders the order edit screen or order list
      */
     public function check_and_sync_admin_orders() {
-        if (!is_admin() || !current_user_can('manage_woocommerce') || empty($this->api_key)) {
+        if (!is_admin() || empty($this->api_key)) {
             return;
         }
 
-        // 1. Single Order Edit Screen (both Classic post.php and HPOS admin.php?page=wc-order)
+        // 1. Single Order Edit Screen (handles both Classic post.php and HPOS admin.php?page=wc-order/wc-orders)
         $order_id = 0;
         if (isset($_GET['post'])) {
-            $post_id = absint($_GET['post']);
-            if ($post_id && get_post_type($post_id) === 'shop_order') {
-                $order_id = $post_id;
-            }
-        } elseif (isset($_GET['page']) && in_array($_GET['page'], array('wc-order', 'wc-orders'), true) && isset($_GET['id'])) {
+            $order_id = absint($_GET['post']);
+        } elseif (isset($_GET['id'])) {
             $order_id = absint($_GET['id']);
         }
 
         if ($order_id > 0) {
             $order = wc_get_order($order_id);
-            if ($order && 'cod' === $order->get_payment_method() && $order->get_status() === 'on-hold' && !$order->get_meta('_potvrdio_verified')) {
+            if ($order && $order->get_status() === 'on-hold' && !$order->get_meta('_potvrdio_verified')) {
                 $this->check_order_status_with_cloud($order);
             }
             return;
@@ -1212,14 +1224,14 @@ class Potvrdio_Viber_COD {
         $is_orders_list = false;
         if ($pagenow === 'edit.php' && isset($_GET['post_type']) && $_GET['post_type'] === 'shop_order') {
             $is_orders_list = true;
-        } elseif (isset($_GET['page']) && $_GET['page'] === 'wc-orders' && empty($_GET['id'])) {
+        } elseif (isset($_GET['page']) && in_array($_GET['page'], array('wc-orders', 'wc-order'), true) && empty($_GET['id'])) {
             $is_orders_list = true;
         }
 
         if ($is_orders_list) {
             $transient_key = 'potvrdio_list_sync_' . md5($this->api_key);
             if (!get_transient($transient_key)) {
-                set_transient($transient_key, time(), 10); // Throttle to once every 10 seconds per admin
+                set_transient($transient_key, time(), 5); // 5 sec throttle
                 $this->sync_recent_pending_orders();
             }
         }
@@ -1267,7 +1279,7 @@ class Potvrdio_Viber_COD {
             if (!$order_id) continue;
 
             $order = wc_get_order($order_id);
-            if (!$order || 'cod' !== $order->get_payment_method()) {
+            if (!$order) {
                 continue;
             }
 
@@ -1457,23 +1469,36 @@ class Potvrdio_Viber_COD {
      * Admin Order Detail Meta Box: Displays Potvrdio Status in WooCommerce Order view
      */
     public function register_order_meta_box() {
-        $screen = class_exists('\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController') 
-            && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled()
-            ? wc_get_page_screen_id('shop_order')
-            : 'shop_order';
+        $screens = array('shop_order', 'woocommerce_page_wc-orders', 'woocommerce_page_wc-order');
+        if (function_exists('wc_get_page_screen_id')) {
+            $wc_screen = wc_get_page_screen_id('shop_order');
+            if ($wc_screen && !in_array($wc_screen, $screens, true)) {
+                $screens[] = $wc_screen;
+            }
+        }
 
-        add_meta_box(
-            'potvrdio_verification_box',
-            __('Potvrdio - Status verifikacije porudžbine', 'potvrdio-viber-cod'),
-            array($this, 'render_order_meta_box'),
-            $screen,
-            'side',
-            'high'
-        );
+        foreach ($screens as $s) {
+            add_meta_box(
+                'potvrdio_verification_box',
+                __('Potvrdio - Status verifikacije porudžbine', 'potvrdio-viber-cod'),
+                array($this, 'render_order_meta_box'),
+                $s,
+                'side',
+                'high'
+            );
+        }
     }
 
     public function render_order_meta_box($post_or_order_object) {
-        $order = ($post_or_order_object instanceof \WC_Order) ? $post_or_order_object : wc_get_order($post_or_order_object->ID);
+        if ($post_or_order_object instanceof \WC_Order) {
+            $order = $post_or_order_object;
+        } elseif (is_numeric($post_or_order_object)) {
+            $order = wc_get_order($post_or_order_object);
+        } elseif (is_object($post_or_order_object) && isset($post_or_order_object->ID)) {
+            $order = wc_get_order($post_or_order_object->ID);
+        } else {
+            $order = false;
+        }
         if (!$order) return;
 
         $is_cod = ('cod' === $order->get_payment_method());
@@ -1710,6 +1735,11 @@ class Potvrdio_Viber_COD {
         echo '<div class="notice notice-warning is-dismissible"><p><strong>Potvrdio COD Verifikacija:</strong> ' . sprintf(__('Molimo unesite vaš <a href="%s">Potvrdio API ključ i Secret</a> kako bi automatska verifikacija porudžbina bila aktivna.', 'potvrdio-viber-cod'), esc_url($settings_url)) . '</p></div>';
     }
 }
+}
 
 // Initialize Plugin
-add_action('plugins_loaded', array('Potvrdio_Viber_COD', 'get_instance'));
+add_action('plugins_loaded', function() {
+    if (class_exists('Potvrdio_Viber_COD')) {
+        Potvrdio_Viber_COD::get_instance();
+    }
+});
