@@ -125,7 +125,7 @@ export default async function handler(req: any, res: any) {
           endpoint += `order=created_at.desc&limit=50`;
         }
 
-        const res = await fetch(endpoint, {
+        const dbRes = await fetch(endpoint, {
           method: 'GET',
           headers: {
             'apikey': supabaseKey,
@@ -134,10 +134,10 @@ export default async function handler(req: any, res: any) {
           },
         });
 
-        dbQueryStatus = `${res.status}_${res.statusText}`;
+        dbQueryStatus = `${dbRes.status}_${dbRes.statusText}`;
 
-        if (res.ok) {
-          const dbRows = await res.json();
+        if (dbRes.ok) {
+          const dbRows = await dbRes.json();
           if (Array.isArray(dbRows) && dbRows.length > 0) {
             const mappedOrders = dbRows.map((r: any) => ({
               id: `#${r.order_id}`,
@@ -177,8 +177,8 @@ export default async function handler(req: any, res: any) {
             });
           }
         } else {
-          dbQueryError = await res.text().catch(() => '');
-          console.warn('[SUPABASE GET ORDERS FAILED]:', res.status, dbQueryError);
+          dbQueryError = await dbRes.text().catch(() => '');
+          console.warn('[SUPABASE GET ORDERS FAILED]:', dbRes.status, dbQueryError);
         }
       } catch (dbErr: any) {
         dbQueryError = dbErr?.message || String(dbErr);
@@ -206,8 +206,6 @@ export default async function handler(req: any, res: any) {
         status: found?.status || 'SMS_FALLBACK',
         shipping_address: found?.updatedAddress || null,
         orders: found ? [found] : [],
-        _db_query_status: dbQueryStatus,
-        _db_query_error: dbQueryError,
       });
     }
 
