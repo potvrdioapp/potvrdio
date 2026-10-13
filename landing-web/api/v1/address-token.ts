@@ -391,6 +391,9 @@ export default async function handler(req: any, res: any) {
         : 'Podaci su tačni. Porudžbina je potvrđena i spremna za prelazak u Processing.',
     };
 
+    let dbStatus = 'NOT_ATTEMPTED';
+    let dbError: any = null;
+
     // 1. Persist approval and updated address directly into Supabase database FIRST (Immediate & Reliable)
     if (supabaseUrl && supabaseKey) {
       try {
@@ -450,8 +453,10 @@ export default async function handler(req: any, res: any) {
               updated_at: new Date().toISOString(),
             }),
           });
+          dbStatus = `PATCH_${patchRes.status}`;
           if (!patchRes.ok) {
-            console.warn('[SUPABASE PATCH ERROR]:', patchRes.status, await patchRes.text().catch(() => ''));
+            dbError = await patchRes.text().catch(() => '');
+            console.warn('[SUPABASE PATCH ERROR]:', patchRes.status, dbError);
           }
         } else {
           // If the order wasn't previously in database, insert it directly with verified status!
@@ -484,8 +489,10 @@ export default async function handler(req: any, res: any) {
               updated_at: new Date().toISOString(),
             }),
           });
+          dbStatus = `INSERT_${insertRes.status}`;
           if (!insertRes.ok) {
-            console.warn('[SUPABASE INSERT APPROVED ERROR]:', insertRes.status, await insertRes.text().catch(() => ''));
+            dbError = await insertRes.text().catch(() => '');
+            console.warn('[SUPABASE INSERT APPROVED ERROR]:', insertRes.status, dbError);
           }
         }
       } catch (dbErr: any) {
@@ -601,6 +608,8 @@ export default async function handler(req: any, res: any) {
       woo_notified: wooSuccess,
       woo_error: wooError,
       address_changed: addressChanged,
+      db_status: dbStatus,
+      db_error: dbError,
       message: 'Adresa je uspešno potvrđena. Paket je spreman za pakovanje i slanje.',
     });
   }

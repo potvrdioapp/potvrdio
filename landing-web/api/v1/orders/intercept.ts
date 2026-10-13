@@ -105,6 +105,9 @@ export default async function handler(req: any, res: any) {
     const queryApiKey = String(req.query?.apiKey || req.query?.api_key || req.headers['x-potvrdio-api-key'] || '').trim();
     const queryOrderId = String(req.query?.order_id || req.query?.orderId || '').replace(/\D/g, '');
 
+    let dbQueryStatus = 'NOT_CALLED';
+    let dbQueryError: any = null;
+
     // Query Supabase orders table if configured
     if (supabaseUrl && supabaseKey) {
       try {
@@ -130,6 +133,8 @@ export default async function handler(req: any, res: any) {
             'Accept': 'application/json',
           },
         });
+
+        dbQueryStatus = `${res.status}_${res.statusText}`;
 
         if (res.ok) {
           const dbRows = await res.json();
@@ -171,8 +176,12 @@ export default async function handler(req: any, res: any) {
               orders: mappedOrders,
             });
           }
+        } else {
+          dbQueryError = await res.text().catch(() => '');
+          console.warn('[SUPABASE GET ORDERS FAILED]:', res.status, dbQueryError);
         }
       } catch (dbErr: any) {
+        dbQueryError = dbErr?.message || String(dbErr);
         console.warn('[SUPABASE GET ORDERS ERROR]:', dbErr?.message || dbErr);
       }
     }
@@ -197,6 +206,8 @@ export default async function handler(req: any, res: any) {
         status: found?.status || 'SMS_FALLBACK',
         shipping_address: found?.updatedAddress || null,
         orders: found ? [found] : [],
+        _db_query_status: dbQueryStatus,
+        _db_query_error: dbQueryError,
       });
     }
 
