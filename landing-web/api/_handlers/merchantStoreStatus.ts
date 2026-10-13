@@ -36,6 +36,7 @@ export default async function handler(req: any, res: any) {
   let trialRemaining = 25;
   let creditsRemaining = 0;
   let planType = 'PILOT';
+  let notificationChannel = 'EMAIL_ONLY';
 
   if (supabaseUrl && supabaseKey) {
     try {
@@ -58,6 +59,7 @@ export default async function handler(req: any, res: any) {
           trialRemaining = typeof m.trial_verifications_remaining === 'number' ? m.trial_verifications_remaining : 25;
           creditsRemaining = typeof m.message_credits_remaining === 'number' ? m.message_credits_remaining : 0;
           planType = m.plan_type || 'PILOT';
+          notificationChannel = m.notification_channel || 'EMAIL_ONLY';
         }
       }
     } catch (dbErr: any) {
@@ -84,5 +86,6 @@ export default async function handler(req: any, res: any) {
     trialRemaining,
     creditsRemaining,
     planType,
+    notificationChannel,
   });
 }

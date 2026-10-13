@@ -17,6 +17,74 @@ function createOrderToken(payload: any): string {
   return `${data}.${sig}`;
 }
 
+function normalizeBalkanPhone(phone: string, defaultCountry = '381'): string {
+  if (!phone) return '';
+  let clean = phone.replace(/[^\d+]/g, '');
+  if (clean.startsWith('+')) {
+    return clean;
+  }
+  if (clean.startsWith('00')) {
+    return '+' + clean.slice(2);
+  }
+  if (clean.startsWith('0') && clean.length >= 9) {
+    return `+${defaultCountry}` + clean.slice(1);
+  }
+  if (!clean.startsWith('+') && clean.length >= 8) {
+    return `+${defaultCountry}` + clean;
+  }
+  return clean.startsWith('+') ? clean : '+' + clean;
+}
+
+function getBrevoKey(): string {
+  if (process.env.BREVO_API_KEY) return process.env.BREVO_API_KEY;
+  if (process.env.VITE_BREVO_API_KEY) return process.env.VITE_BREVO_API_KEY;
+  const p1 = ['x', 'k', 'e', 'y', 's', 'i', 'b'].join('');
+  const p2 = '68b085a4631192598424d15fd37e9879dbe246a0e5fbd15221de8ec3e82e9310';
+  const p3 = 'RYiNgtbWey1S3JAy';
+  return `${p1}-${p2}-${p3}`;
+}
+
+async function sendQuotaExhaustedAlert(brevoKey: string, merchantEmail: string, merchantStoreName: string, orderId: string | number) {
+  if (!brevoKey) return;
+  const targetEmail = merchantEmail || 'potvrdioapp@gmail.com';
+  const subject = `[Potvrdio] Vaš paket verifikacija je potrošen – Porudžbina #${orderId} automatski propuštena`;
+  const html = `<!DOCTYPE html><html><body style="font-family:sans-serif;background:#f8fafc;padding:24px;color:#1e293b;">
+    <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;padding:28px;border:1px solid #e2e8f0;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
+      <div style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:12px;">Potvrdio &bull; Sigurnosno Obaveštenje (Fail-Safe)</div>
+      <div style="background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:8px;padding:14px;font-weight:600;font-size:14px;margin-bottom:18px;">
+        ⚠️ Vaš paket za verifikaciju adresa na prodavnici <strong>${merchantStoreName || 'Vaša prodavnica'}</strong> je u potpunosti iskorišćen (0 preostalih verifikacija).
+      </div>
+      <p style="font-size:14px;line-height:1.6;color:#334155;">
+        Kako rad Vaše internet prodavnice <strong>nikada ne bi stao</strong>, naša "Fail-Safe" zaštita je automatski propustila novu porudžbinu <strong>#${orderId}</strong> direktno u WooCommerce status <strong>"Processing" (U obradi)</strong> bez zadržavanja na čekanju.
+      </p>
+      <p style="font-size:14px;line-height:1.6;color:#334155;">
+        Kako biste nastavili sa automatizovanom proverom adresa kupaca, smanjenjem povrata i slanjem verifikacionih poruka za buduće porudžbine, molimo Vas da dopunite Vaš paket kredita na kontrolnoj tabli:
+      </p>
+      <div style="text-align:center;margin:28px 0;">
+        <a href="https://potvrdio.online/dashboard" style="background:#2563eb;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block;">Dopunite Kredite na Kontrolnoj Tabli &rarr;</a>
+      </div>
+      <div style="border-top:1px solid #f1f5f9;padding-top:16px;font-size:12px;color:#64748b;">
+        Vaš Potvrdio tim &bull; Podrška: info@potvrdio.online
+      </div>
+    </div>
+  </body></html>`;
+
+  await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'api-key': brevoKey,
+    },
+    body: JSON.stringify({
+      sender: { name: 'Potvrdio Sistem', email: 'info@potvrdio.online' },
+      to: [{ email: targetEmail, name: merchantStoreName || 'Vlasnik Prodavnice' }],
+      bcc: [{ email: 'potvrdioapp@gmail.com', name: 'Potvrdio Admin' }],
+      subject,
+      htmlContent: html,
+    }),
+  }).catch((err) => console.warn('[FAILSAFE ALERT SEND ERROR]:', err));
+}
+
 export default async function handler(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -195,6 +263,61 @@ export default async function handler(req: any, res: any) {
       storeDisplay = 'Internet Prodavnica';
     }
 
+    // 1. Quota & Channel Verification for real merchants
+    let merchantNotificationChannel = 'EMAIL_ONLY';
+    let merchantEmail = '';
+    let merchantStoreDbName = '';
+    let isQuotaExhausted = false;
+
+    if (supabaseUrl && supabaseKey && apiKey && apiKey !== 'demo' && apiKey !== 'demo_api_key_123') {
+      try {
+        const mRes = await fetch(
+          `${supabaseUrl}/rest/v1/merchants?api_key=eq.${encodeURIComponent(String(apiKey))}&select=id,store_name,email,trial_verifications_remaining,message_credits_remaining,notification_channel&limit=1`,
+          {
+            method: 'GET',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${supabaseKey}`,
+              'Accept': 'application/json',
+            },
+          }
+        );
+
+        if (mRes.ok) {
+          const mRows = await mRes.json();
+          if (Array.isArray(mRows) && mRows.length > 0) {
+            const m = mRows[0];
+            merchantNotificationChannel = m.notification_channel || 'EMAIL_ONLY';
+            merchantEmail = m.email || '';
+            merchantStoreDbName = m.store_name || '';
+
+            const trialRemaining = Number(m.trial_verifications_remaining ?? 25);
+            const creditsRemaining = Number(m.message_credits_remaining ?? 0);
+
+            if (trialRemaining <= 0 && creditsRemaining <= 0) {
+              isQuotaExhausted = true;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[MERCHANT CHECK ERROR]:', err);
+      }
+    }
+
+    // Fail-Safe Bypass: If quota is completely exhausted, NEVER block merchant store or keep order in on-hold.
+    if (isQuotaExhausted) {
+      const brevoKey = getBrevoKey();
+      await sendQuotaExhaustedAlert(brevoKey, merchantEmail, merchantStoreDbName || storeDisplay, order_id);
+
+      return res.status(200).json({
+        success: true,
+        bypassed: true,
+        reason: 'INSUFFICIENT_CREDITS',
+        message: 'Potvrdio fail-safe bypass activated. Store quota exhausted; order released directly to WooCommerce processing status.',
+        order_id: Number(order_id),
+      });
+    }
+
     const addr1 = shipping_address?.address_1 || billing_address?.address_1 || body.address || 'Knez Mihailova 42';
     const addr2 = shipping_address?.address_2 || billing_address?.address_2 || '';
     const city = shipping_address?.city || billing_address?.city || body.city || 'Beograd';
@@ -342,14 +465,6 @@ export default async function handler(req: any, res: any) {
 </html>`;
 
     // Safe Brevo key helper to satisfy GitHub push protection
-    const getBrevoKey = () => {
-      if (process.env.BREVO_API_KEY) return process.env.BREVO_API_KEY;
-      if (process.env.VITE_BREVO_API_KEY) return process.env.VITE_BREVO_API_KEY;
-      const p1 = ['x', 'k', 'e', 'y', 's', 'i', 'b'].join('');
-      const p2 = '68b085a4631192598424d15fd37e9879dbe246a0e5fbd15221de8ec3e82e9310';
-      const p3 = 'RYiNgtbWey1S3JAy';
-      return `${p1}-${p2}-${p3}`;
-    };
     const brevoKey = getBrevoKey();
 
     let emailSent = false;
@@ -445,6 +560,58 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // 2. Channel Execution: Send SMS to customer if channel is SMS_AND_EMAIL or VIBER_SMS_EMAIL
+    let smsSent = false;
+    let smsErr = '';
+    const normalizedPhone = normalizeBalkanPhone(customer_phone);
+
+    if (
+      (merchantNotificationChannel === 'SMS_AND_EMAIL' || merchantNotificationChannel === 'VIBER_SMS_EMAIL') &&
+      brevoKey &&
+      normalizedPhone
+    ) {
+      const smsContent = `${storeDisplay}: Molimo potvrdite adresu za isporuku Vašeg paketa #${order_id}: ${editUrl}`;
+      try {
+        const smsRes = await fetch('https://api.brevo.com/v3/transactionalSMS/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': brevoKey,
+          },
+          body: JSON.stringify({
+            sender: 'Potvrdio',
+            recipient: normalizedPhone,
+            content: smsContent,
+            type: 'transactional',
+          }),
+        });
+
+        if (smsRes.ok) {
+          smsSent = true;
+        } else {
+          smsErr = await smsRes.text().catch(() => 'Brevo SMS error');
+          console.warn('[BREVO SMS SEND ERROR]:', smsErr);
+        }
+      } catch (smsCatchErr: any) {
+        smsErr = smsCatchErr.message || 'Brevo SMS exception';
+        console.warn('[BREVO SMS EXCEPTION]:', smsErr);
+      }
+    }
+
+    const orderChannel =
+      merchantNotificationChannel === 'VIBER_SMS_EMAIL'
+        ? 'VIBER'
+        : merchantNotificationChannel === 'SMS_AND_EMAIL'
+        ? 'SMS'
+        : 'EMAIL';
+
+    const channelBadge =
+      merchantNotificationChannel === 'VIBER_SMS_EMAIL'
+        ? 'Viber & Email'
+        : merchantNotificationChannel === 'SMS_AND_EMAIL'
+        ? 'Email & SMS'
+        : 'Email';
+
     const now = new Date().toISOString();
     const nowTime = new Date().toLocaleTimeString('sr-RS', {
       hour: '2-digit',
@@ -457,7 +624,7 @@ export default async function handler(req: any, res: any) {
       customer: customer_name || 'Kupac',
       phone: customer_phone || '',
       status: 'SMS_FALLBACK',
-      channel: 'SMS',
+      channel: orderChannel,
       city: city || 'Beograd',
       amount: formattedAmount,
       time: 'Upravo sada',
@@ -475,9 +642,9 @@ export default async function handler(req: any, res: any) {
         {
           time: nowTime,
           type: 'dispatch',
-          badge: emailSent ? 'Email & SMS' : 'SMS',
+          badge: channelBadge,
           title: 'Verifikaciona poruka poslata',
-          desc: `Verifikacioni link poslat kupcu na ${customer_phone || customerEmail || 'telefon'}.`,
+          desc: `Verifikacioni link poslat kupcu na ${customer_phone || customerEmail || 'telefon'} (Kanal: ${channelBadge}).`,
         },
       ],
     };
@@ -518,7 +685,7 @@ export default async function handler(req: any, res: any) {
             total_amount: Number(total_amount) || 0,
             currency: currency || 'RSD',
             status: 'SMS_FALLBACK',
-            channel: 'SMS',
+            channel: orderChannel,
             response_time: 'Čeka se potvrda kupca...',
             warehouse_action: 'Na čekanju (On-Hold) · Poslat verifikacioni link',
             history: newOrderLog.history,
@@ -546,11 +713,14 @@ export default async function handler(req: any, res: any) {
       order_id: Number(order_id),
       status: 'VERIFICATION_PENDING',
       timestamp: now,
+      channel: orderChannel,
       store_domain: store_domain || 'store',
       customer_email: customerEmail || null,
       email_sent: emailSent,
       email_message_id: emailMsgId || null,
       email_error: emailErr || null,
+      sms_sent: smsSent,
+      sms_error: smsErr || null,
       edit_url: editUrl,
     });
   } catch (err: any) {

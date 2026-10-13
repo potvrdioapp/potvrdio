@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS public.merchants (
     api_key TEXT NOT NULL UNIQUE,
     api_secret TEXT NOT NULL,
     plan_type TEXT NOT NULL DEFAULT 'PILOT',
+    notification_channel TEXT NOT NULL DEFAULT 'EMAIL_ONLY', -- 'EMAIL_ONLY', 'SMS_AND_EMAIL', 'VIBER_SMS_EMAIL'
     trial_verifications_remaining INTEGER NOT NULL DEFAULT 25,
     message_credits_remaining INTEGER NOT NULL DEFAULT 0,
     is_connected BOOLEAN NOT NULL DEFAULT false,
@@ -209,3 +210,7 @@ BEGIN
     );
 END;
 $$;
+
+-- 9. Add notification_channel column if table already exists
+ALTER TABLE public.merchants ADD COLUMN IF NOT EXISTS notification_channel TEXT NOT NULL DEFAULT 'EMAIL_ONLY';
+

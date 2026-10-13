@@ -168,8 +168,9 @@ class Potvrdio_Viber_COD {
         // Target unverified orders trying to jump into processing/completed
         if (in_array($new_status, array('processing', 'completed'), true)) {
             $is_verified = (bool)$order->get_meta('_potvrdio_verified');
+            $is_bypassed = (bool)$order->get_meta('_potvrdio_quota_bypassed');
 
-            if (!$is_verified) {
+            if (!$is_verified && !$is_bypassed) {
                 // Edge Case 9: Allow manual store manager / administrator override in WP-Admin
                 if (is_admin() && current_user_can('manage_woocommerce')) {
                     $order->update_meta_data('_potvrdio_verified', '1');
@@ -346,9 +347,21 @@ class Potvrdio_Viber_COD {
         }
 
         // Immediate real-time dispatch to Potvrdio Cloud backend
-        $sent = $this->send_to_central_backend('/orders/intercept', $payload);
+        $res = $this->send_to_central_backend('/orders/intercept', $payload);
 
-        if ($sent) {
+        if (is_array($res) && !empty($res['bypassed']) && ($res['reason'] ?? '') === 'INSUFFICIENT_CREDITS') {
+            // Fail-Safe Quota Bypass: Store has run out of verifications/credits.
+            // DO NOT block store orders. Release immediately to processing.
+            $order->update_meta_data('_potvrdio_verified', '1');
+            $order->update_meta_data('_potvrdio_quota_bypassed', '1');
+            $order->update_meta_data('_potvrdio_verified_at', current_time('mysql'));
+            $order->add_order_note(__('Potvrdio Fail-Safe: Paket verifikacija za Vaš nalog je potrošen. Porudžbina je automatski propuštena u status "Processing" bez odlaganja. Dopunite kredite na potvrdio.online.', 'potvrdio-viber-cod'));
+            $order->update_status('processing');
+            $order->save();
+            return;
+        }
+
+        if (!empty($res)) {
             $order->add_order_note(__('Potvrdio: Signal uspešno poslat serveru. Verifikacioni e-mail poslat kupcu.', 'potvrdio-viber-cod'));
         } elseif (function_exists('as_schedule_single_action')) {
             // Resilient fallback: If immediate HTTP call failed or timed out, schedule retry in Action Scheduler
@@ -909,7 +922,11 @@ class Potvrdio_Viber_COD {
             return false;
         }
 
-        return true;
+        $code = wp_remote_retrieve_response_code($response);
+        $res_body = wp_remote_retrieve_body($response);
+        $data = json_decode($res_body, true);
+
+        return is_array($data) ? $data : ($code >= 200 && $code < 300);
     }
 
     /**
@@ -1256,7 +1273,9 @@ class Potvrdio_Viber_COD {
             echo '<div style="background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:10px; margin-bottom:10px; color:#065F46;">';
             echo '<div style="display:flex; align-items:center; gap:6px; font-weight:bold; margin-bottom:4px;"><svg style="width:16px; height:16px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' . esc_html__('ADRESA JE VERIFIKOVANA', 'potvrdio-viber-cod') . '</div>';
             echo '<small>' . esc_html__('Vreme potvrde:', 'potvrdio-viber-cod') . ' ' . esc_html($verified_at) . '</small><br>';
-            if ($order->get_meta('_potvrdio_smart_bypass')) {
+            if ($order->get_meta('_potvrdio_quota_bypassed')) {
+                echo '<small style="color:#D97706; font-weight:600;">(' . esc_html__('Fail-Safe: Paket potrošen, automatski propušteno', 'potvrdio-viber-cod') . ')</small><br>';
+            } elseif ($order->get_meta('_potvrdio_smart_bypass')) {
                 echo '<small style="color:#047857; font-weight:600;">(' . esc_html__('Smart Bypass: Prethodno potvrđena adresa', 'potvrdio-viber-cod') . ')</small><br>';
             } elseif ($order->get_meta('_potvrdio_admin_override')) {
                 echo '<small style="color:#047857; font-weight:600;">(' . esc_html__('Ručno odobrenje administratora', 'potvrdio-viber-cod') . ')</small><br>';
