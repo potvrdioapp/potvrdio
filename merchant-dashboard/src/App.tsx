@@ -1558,8 +1558,8 @@ export default function App() {
                             </p>
                           </div>
                           <a
-                            href="/potvrdio-woocommerce.zip"
-                            download="potvrdio-woocommerce.zip"
+                            href="/potvrdio-online.zip"
+                            download="potvrdio-online.zip"
                             className="shrink-0 px-3.5 py-2 rounded-xl btn-brand-cta text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs cursor-pointer transition hover:opacity-95"
                           >
                             <Download className="w-3.5 h-3.5" />

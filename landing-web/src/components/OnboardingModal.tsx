@@ -337,8 +337,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClos
                 </a>
 
                 <a 
-                  href="/potvrdio-viber-cod.zip"
-                  download
+                  href="/potvrdio-online.zip"
+                  download="potvrdio-online.zip"
                   className="w-full btn-brand-cta text-white font-bold py-3 rounded-lg text-xs transition flex items-center justify-center gap-2 shadow-lg min-h-[44px]"
                 >
                   <Rocket className="w-4 h-4" />

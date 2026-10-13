@@ -98,10 +98,10 @@ export default async function handler(req: any, res: any) {
       <div class="steps">
         <h4 style="margin: 0 0 12px 0; font-size: 13px; text-transform: uppercase; color: #334155;">Uputstvo za brzu aktivaciju u 3 koraka:</h4>
         <div class="step-item">
-          <span class="step-num">1.</span> <strong>Preuzmite dodatak:</strong> Preuzmite najnoviju verziju WooCommerce dodatka (<a href="https://potvrdio.online/potvrdio-viber-cod.zip" style="color: #0d9488; font-weight: bold;">potvrdio-viber-cod.zip</a>) i instalirajte je u WordPress administraciji (<em>Dodaci &rarr; Dodaj novi &rarr; Otpremi dodatak</em>).
+          <span class="step-num">1.</span> <strong>Preuzmite dodatak:</strong> Preuzmite najnoviju verziju WooCommerce dodatka (<a href="https://potvrdio.online/potvrdio-online.zip" style="color: #0d9488; font-weight: bold;">potvrdio-online.zip</a>) i instalirajte je u WordPress administraciji (<em>Dodaci &rarr; Dodaj novi &rarr; Otpremi dodatak</em>).
         </div>
         <div class="step-item">
-          <span class="step-num">2.</span> <strong>Povežite parametre:</strong> Otvorite <em>Podešavanja &rarr; Potvrdio Viber COD</em> u WordPressu i nalepite vaš API Ključ i API Secret.
+          <span class="step-num">2.</span> <strong>Povežite parametre:</strong> Otvorite <em>Podešavanja &rarr; Potvrdio Online</em> u WordPressu i nalepite vaš API Ključ i API Secret.
         </div>
         <div class="step-item">
           <span class="step-num">3.</span> <strong>Pratite rezultate:</strong> Svaka narudžbina sa pouzećem biće automatski verifikovana, a detaljne izveštaje možete pratiti u vašem trgovačkom panelu.

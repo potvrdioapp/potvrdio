@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: Potvrdio - WooCommerce Viber COD Verification & Cart Recovery
+ * Plugin Name: Potvrdio Online - WooCommerce COD Verification & Address Protection
  * Plugin URI: https://potvrdio.online
- * Description: Intercepts Cash on Delivery (COD) orders at the state machine level, holds shipping labels, normalizes Balkan phone formats, and releases orders via 2-way Viber verification.
+ * Description: Automatska verifikacija adresa i telefona kupaca za porudžbine pouzećem (COD). Sprečava skupe povrate paketa i lažne porudžbine pre slanja kurirskoj službi.
  * Version: 1.1.2
- * Author: Potvrdio SaaS Team
+ * Author: Potvrdio.online
  * Author URI: https://potvrdio.online
- * Text Domain: potvrdio-viber-cod
+ * Text Domain: potvrdio-online
  * Domain Path: /languages
  * WC requires at least: 5.0
  * WC tests up to: 11.5
