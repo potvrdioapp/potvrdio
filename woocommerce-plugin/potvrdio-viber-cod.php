@@ -566,6 +566,16 @@ class Potvrdio_Viber_COD {
                 'mk' => __('Вашата адреса и нарачка се потврдени преку примената порака. Нарачката е препратена во магацин и се подготвува за испраќање со курир.', 'potvrdio-viber-cod'),
                 'en' => __('Your delivery address and order have been verified via the received message. Your order has been released and is being prepared for courier dispatch.', 'potvrdio-viber-cod'),
             ),
+            'thankyou_cancelled_title' => array(
+                'sr' => __('Potvrdio: Porudžbina #{order_id} je otkazana', 'potvrdio-viber-cod'),
+                'mk' => __('Potvrdio: Нарачката #{order_id} е откажана', 'potvrdio-viber-cod'),
+                'en' => __('Potvrdio: Order #{order_id} is cancelled', 'potvrdio-viber-cod'),
+            ),
+            'thankyou_cancelled_body' => array(
+                'sr' => __('Porudžbina je uspešno otkazana na vaš zahtev. Priprema i slanje paketa su obustavljeni.', 'potvrdio-viber-cod'),
+                'mk' => __('Нарачката е успешно откажана на ваше барање. Подготовката и испраќањето на пратката се прекинати.', 'potvrdio-viber-cod'),
+                'en' => __('The order has been cancelled per your request. Packaging and dispatch have been stopped.', 'potvrdio-viber-cod'),
+            ),
             'privacy_consent' => array(
                 'sr' => __('Saglasan/na sam da primim poruku radi verifikacije adrese i statusa pošiljke (Potvrdio.online).', 'potvrdio-viber-cod'),
                 'mk' => __('Се согласувам да примам порака за верификација на адресата и статусот на пратката (Potvrdio.online).', 'potvrdio-viber-cod'),
@@ -603,7 +613,31 @@ class Potvrdio_Viber_COD {
 
         $displayed_orders[$order_id] = true;
 
-        if ($order->get_meta('_potvrdio_verified')) {
+        // If order is still on-hold locally, perform a quick real-time cloud sync check
+        if (!$order->get_meta('_potvrdio_verified') && !$order->get_meta('_potvrdio_cancelled') && $order->get_status() === 'on-hold') {
+            $this->check_order_status_with_cloud($order);
+            $order = wc_get_order($order_id);
+        }
+
+        $is_cancelled = $order->get_status() === 'cancelled' || (bool) $order->get_meta('_potvrdio_cancelled');
+        $is_verified  = (bool) $order->get_meta('_potvrdio_verified');
+
+        if ($is_cancelled) {
+            $title = $this->get_message('thankyou_cancelled_title', $order, array('order_id' => $order_id));
+            $body  = $this->get_message('thankyou_cancelled_body', $order);
+
+            echo '<div id="potvrdio-thankyou-banner" class="potvrdio-banner-cancelled" style="background:#FEF2F2; border:2px solid #EF4444; border-radius:12px; padding:18px 22px; margin:24px 0; color:#991B1B; font-family:inherit; transition: all 0.3s ease;">';
+            echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
+            echo '<svg style="width:20px; height:20px; stroke:#DC2626; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> <span>' . esc_html($title) . '</span>';
+            echo '</div>';
+            echo '<p style="margin:0; font-size:14px; line-height:1.5; color:#7F1D1D;">';
+            echo wp_kses_post($body);
+            echo '</p>';
+            echo '</div>';
+            return;
+        }
+
+        if ($is_verified) {
             $title = $this->get_message('thankyou_verified_title', $order, array('order_id' => $order_id));
             $body  = $this->get_message('thankyou_verified_body', $order);
 
@@ -1342,6 +1376,29 @@ class Potvrdio_Viber_COD {
                 }, 200);
             }
 
+            function setBannerCancelled(title, body) {
+                if (!banner) return;
+                if (timer) clearInterval(timer);
+
+                banner.style.opacity = '0';
+                setTimeout(function() {
+                    banner.className = 'potvrdio-banner-cancelled';
+                    banner.style.background = '#FEF2F2';
+                    banner.style.borderColor = '#EF4444';
+                    banner.style.color = '#991B1B';
+                    
+                    banner.innerHTML = '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">' +
+                        '<svg style="width:20px; height:20px; stroke:#DC2626; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>' +
+                        '<span>' + (title || 'Porudžbina je otkazana') + '</span>' +
+                        '</div>' +
+                        '<p style="margin:0; font-size:14px; line-height:1.5; color:#7F1D1D;">' +
+                        (body || 'Porudžbina je uspešno otkazana na vaš zahtev. Priprema i slanje paketa su obustavljeni.') +
+                        '</p>';
+                    
+                    banner.style.opacity = '1';
+                }, 200);
+            }
+
             function checkStatus() {
                 if (document.hidden) return; // Tab in background, pause to save battery/server
                 pollCount++;
@@ -1358,8 +1415,12 @@ class Potvrdio_Viber_COD {
                     if (xhr.status === 200) {
                         try {
                             var res = JSON.parse(xhr.responseText);
-                            if (res && res.success && res.data && res.data.verified) {
-                                setBannerVerified(res.data.title, res.data.body);
+                            if (res && res.success && res.data) {
+                                if (res.data.cancelled) {
+                                    setBannerCancelled(res.data.title, res.data.body);
+                                } else if (res.data.verified) {
+                                    setBannerVerified(res.data.title, res.data.body);
+                                }
                             }
                         } catch (e) {}
                     }
@@ -1390,31 +1451,46 @@ class Potvrdio_Viber_COD {
             wp_send_json_error(array('message' => 'Unauthorized'), 403);
         }
 
-        $is_verified = (bool) $order->get_meta('_potvrdio_verified');
+        $is_verified  = (bool) $order->get_meta('_potvrdio_verified');
+        $is_cancelled = (bool) $order->get_meta('_potvrdio_cancelled') || $order->get_status() === 'cancelled';
 
-        // Bi-directional check: If not yet marked verified locally, ask Potvrdio Cloud API!
+        // Bi-directional check: If not yet marked verified or cancelled locally, ask Potvrdio Cloud API!
         // This ensures local test sites, intranet environments or stores behind firewall/NAT
-        // instantly transition to processing when customer confirms on mobile!
-        if (!$is_verified && $order->get_status() === 'on-hold') {
+        // instantly transition when customer confirms or cancels on mobile!
+        if (!$is_verified && !$is_cancelled && $order->get_status() === 'on-hold') {
             $cloud_res = $this->check_order_status_with_cloud($order);
             if ($cloud_res && !empty($cloud_res['verified'])) {
                 $is_verified = true;
+            } elseif ($cloud_res && !empty($cloud_res['cancelled'])) {
+                $is_cancelled = true;
             }
         }
 
-        if ($is_verified) {
+        if ($is_cancelled) {
+            $title = $this->get_message('thankyou_cancelled_title', $order, array('order_id' => $order_id));
+            $body  = $this->get_message('thankyou_cancelled_body', $order);
+            wp_send_json_success(array(
+                'verified'  => false,
+                'cancelled' => true,
+                'status'    => 'cancelled',
+                'title'     => $title,
+                'body'      => $body,
+            ));
+        } elseif ($is_verified) {
             $title = $this->get_message('thankyou_verified_title', $order, array('order_id' => $order_id));
             $body  = $this->get_message('thankyou_verified_body', $order);
             wp_send_json_success(array(
-                'verified' => true,
-                'status'   => $order->get_status(),
-                'title'    => $title,
-                'body'     => $body,
+                'verified'  => true,
+                'cancelled' => false,
+                'status'    => $order->get_status(),
+                'title'     => $title,
+                'body'      => $body,
             ));
         } else {
             wp_send_json_success(array(
-                'verified' => false,
-                'status'   => $order->get_status(),
+                'verified'  => false,
+                'cancelled' => false,
+                'status'    => $order->get_status(),
             ));
         }
     }
