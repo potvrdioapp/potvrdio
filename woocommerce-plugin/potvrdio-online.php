@@ -893,8 +893,9 @@ class Potvrdio_Viber_COD {
 
         $response = wp_remote_post($url, array(
             'method'    => 'POST',
-            'timeout'   => 4,
+            'timeout'   => 6,
             'blocking'  => true, // Reliable synchronous delivery
+            'sslverify' => false,
             'headers'   => array(
                 'Content-Type'          => 'application/json',
                 'X-Potvrdio-Api-Key'    => $this->api_key,
@@ -1087,14 +1088,16 @@ class Potvrdio_Viber_COD {
         $url = $base_endpoint . '/api/v1/orders/intercept?apiKey=' . rawurlencode($this->api_key) . '&order_id=' . rawurlencode($order_id);
 
         $response = wp_remote_get($url, array(
-            'timeout' => 5,
-            'headers' => array(
+            'timeout'   => 8,
+            'sslverify' => false,
+            'headers'   => array(
                 'Accept'             => 'application/json',
                 'X-Potvrdio-Api-Key' => $this->api_key,
             ),
         ));
 
         if (is_wp_error($response)) {
+            error_log('Potvrdio check_order_status_with_cloud error: ' . $response->get_error_message());
             return false;
         }
 
