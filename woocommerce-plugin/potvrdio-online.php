@@ -1083,10 +1083,11 @@ class Potvrdio_Viber_COD {
         }
 
         $order_id = $order->get_id();
-        $url = rtrim($this->api_endpoint, '/') . '/api/v1/orders/intercept?apiKey=' . rawurlencode($this->api_key) . '&order_id=' . rawurlencode($order_id);
+        $base_endpoint = preg_replace('#/api/v1/?$#i', '', rtrim($this->api_endpoint, '/'));
+        $url = $base_endpoint . '/api/v1/orders/intercept?apiKey=' . rawurlencode($this->api_key) . '&order_id=' . rawurlencode($order_id);
 
         $response = wp_remote_get($url, array(
-            'timeout' => 4,
+            'timeout' => 5,
             'headers' => array(
                 'Accept'             => 'application/json',
                 'X-Potvrdio-Api-Key' => $this->api_key,
