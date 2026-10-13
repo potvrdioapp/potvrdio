@@ -606,12 +606,6 @@ class Potvrdio_Viber_COD {
             $body  = $this->get_message('thankyou_body', $order);
             $order_key = $order->get_order_key();
 
-            $is_local_dev = false;
-            $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-            if (strpos($host, '.local') !== false || strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false || (is_user_logged_in() && current_user_can('manage_woocommerce'))) {
-                $is_local_dev = true;
-            }
-
             echo '<div id="potvrdio-thankyou-banner" class="potvrdio-banner-pending" data-order-id="' . esc_attr($order_id) . '" data-order-key="' . esc_attr($order_key) . '" style="background:#FFFBEB; border:2px solid #F59E0B; border-radius:12px; padding:18px 22px; margin:24px 0; color:#92400E; font-family:inherit; transition: all 0.3s ease;">';
             echo '<div style="font-weight:800; font-size:17px; margin-bottom:6px; display:flex; align-items:center; gap:8px;">';
             echo '<span class="potvrdio-pulse-dot" style="display:inline-block; width:10px; height:10px; background:#F59E0B; border-radius:50%; margin-right:4px; animation: potvrdioPulse 1.8s infinite;"></span>';
@@ -620,14 +614,6 @@ class Potvrdio_Viber_COD {
             echo '<p id="potvrdio-banner-body" style="margin:0; font-size:14px; line-height:1.5; color:#78350F;">';
             echo wp_kses_post($body);
             echo '</p>';
-
-            if ($is_local_dev) {
-                echo '<div style="margin-top:12px; padding-top:10px; border-top:1px dashed rgba(245, 158, 11, 0.4); font-size:12px; color:#B45309; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">';
-                echo '<span>🛠️ <strong>Lokalni Test Modu:</strong> Vercel doğrudan <code>' . esc_html($host) . '</code> adresine webhook atamaz (canlı domain/ngrok gerekir).</span>';
-                echo '<button type="button" id="potvrdio-dev-simulate-btn" style="background:#F59E0B; color:#FFF; border:none; border-radius:6px; padding:5px 12px; font-size:11px; font-weight:700; cursor:pointer;">[Test: Onaylandı Say & Canlı Geçişi Gör]</button>';
-                echo '</div>';
-            }
-
             echo '</div>';
 
             $this->render_live_polling_script($order_id, $order_key);
@@ -1127,25 +1113,6 @@ class Potvrdio_Viber_COD {
 
             // Start polling every 3 seconds
             timer = setInterval(checkStatus, 3000);
-
-            // Local development simulation button
-            var devBtn = document.getElementById('potvrdio-dev-simulate-btn');
-            if (devBtn) {
-                devBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    devBtn.disabled = true;
-                    devBtn.innerText = 'Potvrđujem...';
-                    var devXhr = new XMLHttpRequest();
-                    devXhr.open('POST', '/?wc-ajax=potvrdio_dev_simulate_verify', true);
-                    devXhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    devXhr.onload = function() {
-                        if (devXhr.status === 200) {
-                            checkStatus();
-                        }
-                    };
-                    devXhr.send('order_id=' + encodeURIComponent(orderId) + '&order_key=' + encodeURIComponent(orderKey));
-                });
-            }
         })();
         </script>
         <?php
