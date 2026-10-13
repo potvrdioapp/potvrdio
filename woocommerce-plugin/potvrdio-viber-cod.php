@@ -141,8 +141,18 @@ class Potvrdio_Viber_COD {
         // Admin Menu Settings
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
+        add_action('admin_init', array($this, 'check_and_sync_admin_orders'));
         add_action('update_option_potvrdio_api_key', array($this, 'ping_central_backend'));
         add_action('update_option_potvrdio_api_endpoint', array($this, 'ping_central_backend'));
+
+        // Background Cloud Periodic Sync for pending orders
+        add_action('potvrdio_cron_sync_pending_orders', array($this, 'sync_recent_pending_orders'));
+        add_action('potvrdio_wp_cron_sync_orders', array($this, 'sync_recent_pending_orders'));
+        if (function_exists('as_has_scheduled_action') && !as_has_scheduled_action('potvrdio_cron_sync_pending_orders')) {
+            as_schedule_recurring_action(time() + 60, 60, 'potvrdio_cron_sync_pending_orders');
+        } elseif (!wp_next_scheduled('potvrdio_wp_cron_sync_orders')) {
+            wp_schedule_event(time() + 300, 'hourly', 'potvrdio_wp_cron_sync_orders');
+        }
     }
 
     /**
@@ -1139,6 +1149,7 @@ class Potvrdio_Viber_COD {
             if (!empty($addr_hash)) {
                 $order->update_meta_data('_potvrdio_address_phone_hash', $addr_hash);
             }
+            $order->save();
 
             // 3. RELEASE TO PROCESSING
             $order->update_status('processing', __('Potvrdio: Adresa je uspešno verifikovana od strane kupca (usklađeno sa Potvrdio Cloudom).', 'potvrdio-viber-cod'));
@@ -1154,6 +1165,7 @@ class Potvrdio_Viber_COD {
         if ($is_cancelled) {
             $order->update_meta_data('_potvrdio_cancelled', '1');
             $order->update_meta_data('_potvrdio_cancelled_at', current_time('mysql'));
+            $order->save();
             $order->update_status('cancelled', __('Potvrdio: Kupac je otkazao porudžbinu putem linka (usklađeno sa Potvrdio Cloudom).', 'potvrdio-viber-cod'));
             $order->save();
 
@@ -1165,6 +1177,106 @@ class Potvrdio_Viber_COD {
         }
 
         return false;
+    }
+
+    /**
+     * Automatic Pre-Render Cloud Synchronization for WooCommerce Admin
+     * Runs in admin_init BEFORE WooCommerce renders the order edit screen or order list
+     */
+    public function check_and_sync_admin_orders() {
+        if (!is_admin() || !current_user_can('manage_woocommerce') || empty($this->api_key)) {
+            return;
+        }
+
+        // 1. Single Order Edit Screen (both Classic post.php and HPOS admin.php?page=wc-order)
+        $order_id = 0;
+        if (isset($_GET['post'])) {
+            $post_id = absint($_GET['post']);
+            if ($post_id && get_post_type($post_id) === 'shop_order') {
+                $order_id = $post_id;
+            }
+        } elseif (isset($_GET['page']) && in_array($_GET['page'], array('wc-order', 'wc-orders'), true) && isset($_GET['id'])) {
+            $order_id = absint($_GET['id']);
+        }
+
+        if ($order_id > 0) {
+            $order = wc_get_order($order_id);
+            if ($order && 'cod' === $order->get_payment_method() && $order->get_status() === 'on-hold' && !$order->get_meta('_potvrdio_verified')) {
+                $this->check_order_status_with_cloud($order);
+            }
+            return;
+        }
+
+        // 2. Orders List View Screen (both Classic edit.php?post_type=shop_order and HPOS page=wc-orders)
+        global $pagenow;
+        $is_orders_list = false;
+        if ($pagenow === 'edit.php' && isset($_GET['post_type']) && $_GET['post_type'] === 'shop_order') {
+            $is_orders_list = true;
+        } elseif (isset($_GET['page']) && $_GET['page'] === 'wc-orders' && empty($_GET['id'])) {
+            $is_orders_list = true;
+        }
+
+        if ($is_orders_list) {
+            $transient_key = 'potvrdio_list_sync_' . md5($this->api_key);
+            if (!get_transient($transient_key)) {
+                set_transient($transient_key, time(), 10); // Throttle to once every 10 seconds per admin
+                $this->sync_recent_pending_orders();
+            }
+        }
+    }
+
+    /**
+     * Syncs recent pending COD orders from Potvrdio Cloud in one batch
+     */
+    public function sync_recent_pending_orders() {
+        if (empty($this->api_key)) {
+            return;
+        }
+
+        $base_endpoint = preg_replace('#/api/v1/?$#i', '', rtrim($this->api_endpoint, '/'));
+        $url = $base_endpoint . '/api/v1/orders/intercept?apiKey=' . rawurlencode($this->api_key);
+
+        $response = wp_remote_get($url, array(
+            'timeout'   => 8,
+            'sslverify' => false,
+            'headers'   => array(
+                'Accept'             => 'application/json',
+                'X-Potvrdio-Api-Key' => $this->api_key,
+            ),
+        ));
+
+        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
+            return;
+        }
+
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        if (empty($data['success']) || empty($data['orders']) || !is_array($data['orders'])) {
+            return;
+        }
+
+        foreach ($data['orders'] as $cloud_order) {
+            $status = isset($cloud_order['status']) ? $cloud_order['status'] : '';
+            if (!in_array($status, array('APPROVED', 'EDITED_ADDRESS', 'CANCELLED'), true)) {
+                continue;
+            }
+
+            $order_id = 0;
+            if (isset($cloud_order['id'])) {
+                $order_id = absint(ltrim($cloud_order['id'], '#'));
+            }
+            if (!$order_id) continue;
+
+            $order = wc_get_order($order_id);
+            if (!$order || 'cod' !== $order->get_payment_method()) {
+                continue;
+            }
+
+            if ($order->get_meta('_potvrdio_verified') || in_array($order->get_status(), array('processing', 'completed', 'cancelled'), true)) {
+                continue;
+            }
+
+            $this->check_order_status_with_cloud($order);
+        }
     }
 
     /**
@@ -1386,6 +1498,13 @@ class Potvrdio_Viber_COD {
         }
 
         if ($verified) {
+            echo '<script>
+            jQuery(function($) {
+                if ($("#order_status").length && $("#order_status").val() === "wc-on-hold") {
+                    $("#order_status").val("wc-processing").trigger("change");
+                }
+            });
+            </script>';
             echo '<div style="background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:10px; margin-bottom:10px; color:#065F46;">';
             echo '<div style="display:flex; align-items:center; gap:6px; font-weight:bold; margin-bottom:4px;"><svg style="width:16px; height:16px; stroke:#059669; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; shrink:0;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> ' . esc_html__('ADRESA JE VERIFIKOVANA', 'potvrdio-viber-cod') . '</div>';
             echo '<small>' . esc_html__('Vreme potvrde:', 'potvrdio-viber-cod') . ' ' . esc_html($verified_at) . '</small><br>';
@@ -1430,11 +1549,14 @@ class Potvrdio_Viber_COD {
 
         $order_id = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
         $order = wc_get_order($order_id);
+        $res = false;
         if ($order) {
-            $this->check_order_status_with_cloud($order);
+            $res = $this->check_order_status_with_cloud($order);
         }
 
-        wp_safe_redirect(wp_get_referer() ?: admin_url('edit.php?post_type=shop_order'));
+        $redirect_url = wp_get_referer() ?: admin_url('edit.php?post_type=shop_order');
+        $redirect_url = add_query_arg('potvrdio_synced', ($res && !empty($res['verified'])) ? '1' : 'checked', $redirect_url);
+        wp_safe_redirect($redirect_url);
         exit;
     }
 
