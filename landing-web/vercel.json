@@ -10,5 +10,11 @@
       "destination": "https://dashboard.potvrdio.online/:path*",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/register",
+      "destination": "/api/v1/merchant/register"
+    }
   ]
 }
