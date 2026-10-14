@@ -266,8 +266,8 @@ button.nav-btn-register:active {
 
 .big {
   position: absolute;
-  left: 140px;
-  right: 60px;
+  left: 50px;
+  right: 50px;
   text-align: center;
   font-weight: 800;
   font-size: 36px;
@@ -276,17 +276,7 @@ button.nav-btn-register:active {
   letter-spacing: -0.02em;
 }
 .vl {
-  position: absolute;
-  left: 36px;
-  top: 50%;
-  transform: translate(-50%, -50%) rotate(-90deg);
-  transform-origin: center;
-  font-weight: 800;
-  font-size: 16px;
-  color: var(--brand-purple);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
+  display: none !important;
 }
 
 /* Square Brand Logo Badge (Bottom-Left) */
@@ -560,7 +550,7 @@ button.nav-btn-register:active {
   transform: translateY(0);
 }
 
-/* Deck Wrapper & Stage Navigation Arrows in Dark Margins */
+/* Deck Wrapper & Center Stage Container */
 #deck-wrapper {
   display: flex;
   align-items: center;
@@ -568,6 +558,52 @@ button.nav-btn-register:active {
   gap: 22px;
   max-width: 100%;
   max-height: 100%;
+}
+
+#deck-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+}
+
+/* Slide Title Header Above the Slide */
+.slide-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  min-height: 36px;
+  z-index: 10;
+}
+.slide-title-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(13, 18, 31, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 6px 18px;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.slide-title-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand-teal);
+  box-shadow: 0 0 10px var(--brand-teal);
+  flex-shrink: 0;
+}
+.slide-title-text {
+  font-size: 13.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #F8FAFC;
+  white-space: nowrap;
 }
 
 .stage-nav-arrow {
@@ -605,9 +641,195 @@ button.nav-btn-register:active {
   border-color: rgba(255, 255, 255, 0.05);
   box-shadow: none;
 }
+
+/* Mobile Responsive Optimization */
+@media (max-width: 768px) {
+  header {
+    padding: 8px 12px;
+  }
+  .header-brand {
+    font-size: 13.5px;
+    gap: 7px;
+  }
+  .header-brand svg {
+    width: 20px;
+    height: 20px;
+  }
+  #header-sub {
+    display: none;
+  }
+  .header-right {
+    gap: 8px;
+  }
+  .lang-btn {
+    padding: 3px 7px;
+    font-size: 10px;
+  }
+  #count {
+    font-size: 11.5px;
+  }
+
+  main {
+    padding: 8px 6px;
+  }
+  .slide-header {
+    margin-bottom: 8px;
+    min-height: 28px;
+  }
+  .slide-title-badge {
+    padding: 4px 14px;
+    gap: 6px;
+  }
+  .slide-title-dot {
+    width: 6px;
+    height: 6px;
+  }
+  .slide-title-text {
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+  }
+
+  nav {
+    padding: 8px 10px max(8px, env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+  }
+  .nav-step-caption {
+    font-size: 11px;
+    gap: 6px;
+    min-height: 18px;
+  }
+  .step-num-pill {
+    font-size: 8.5px;
+    padding: 1.5px 5px;
+  }
+  .step-text {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+  .nav-controls {
+    gap: 8px;
+    width: 100%;
+    max-width: 440px;
+  }
+  button.nav-btn {
+    padding: 8px 12px;
+    font-size: 11.5px;
+    flex-shrink: 0;
+  }
+  button.nav-btn-register {
+    padding: 8px 14px;
+    font-size: 11.5px;
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .modal-box {
+    padding: 20px 16px;
+    max-height: 90vh;
+  }
+}
+
 @media (max-width: 680px) {
   .stage-nav-arrow {
     display: none;
+  }
+}
+
+@media (max-width: 440px) {
+  #modal-form-view div[style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+  button.nav-btn {
+    padding: 7px 9px;
+    font-size: 11px;
+    gap: 3px;
+  }
+  button.nav-btn-register {
+    padding: 7px 10px;
+    font-size: 11px;
+    gap: 4px;
+  }
+}
+
+/* Mobile Portrait Rotate Hint Badge (Method 1) */
+.rotate-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 10px;
+  background: rgba(20, 184, 166, 0.14);
+  border: 1px solid rgba(20, 184, 166, 0.35);
+  color: #2DD4BF;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  animation: pulseRotate 3s infinite ease-in-out;
+  transition: all 0.22s ease;
+  user-select: none;
+  z-index: 10;
+}
+.rotate-hint:hover {
+  background: rgba(20, 184, 166, 0.24);
+  border-color: #2DD4BF;
+  transform: translateY(-1px);
+}
+.rotate-icon {
+  animation: rotateIcon 4s infinite linear;
+}
+@keyframes rotateIcon {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(90deg); }
+  50% { transform: rotate(90deg); }
+  75% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes pulseRotate {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; box-shadow: 0 4px 18px rgba(20, 184, 166, 0.45); }
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  .rotate-hint {
+    display: inline-flex;
+  }
+}
+@media (orientation: landscape) {
+  .rotate-hint {
+    display: none !important;
+  }
+}
+
+/* Mobile Landscape Fullscreen Optimization */
+@media (max-height: 520px) and (orientation: landscape) {
+  header {
+    padding: 4px 16px;
+  }
+  .slide-header {
+    margin-bottom: 4px;
+    min-height: 24px;
+  }
+  .slide-title-badge {
+    padding: 3px 12px;
+    font-size: 10.5px;
+  }
+  nav {
+    padding: 4px 14px max(4px, env(safe-area-inset-bottom, 0px));
+    gap: 4px;
+  }
+  .nav-step-caption {
+    font-size: 10px;
+    min-height: 16px;
+  }
+  button.nav-btn, button.nav-btn-register {
+    padding: 4px 12px;
+    font-size: 11px;
   }
 }
 </style>
@@ -645,34 +867,52 @@ button.nav-btn-register:active {
       </svg>
     </button>
 
-    <div id="frame">
-      <div id="stage">
-        <!-- Master SVG Symbols (Official Hollow/Outline Potvrdio Logo & Icons) -->
-        <svg width="0" height="0" style="position:absolute" fill="none">
-          <!-- Official Potvrdio Brand Logo (Pure outline, fill="none", hollow speech bubble) -->
-          <symbol id="L" viewBox="0 0 300 280" fill="none">
-            <path d="M 210 56 L 44 56 A 24 24 0 0 0 20 80 L 20 188 A 24 24 0 0 0 44 212 L 68 212 L 72 271 L 118 212 L 224 212 A 24 24 0 0 0 248 188 L 248 120" fill="none" stroke="#361F6F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M 86 118 L 137 170 L 284 20" fill="none" stroke="#22AF75" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
-          </symbol>
+    <div id="deck-center">
+      <!-- Dedicated Slide Title Header Above the Slide -->
+      <div id="slide-header" class="slide-header">
+        <div class="slide-title-badge">
+          <span class="slide-title-dot"></span>
+          <span id="slide-title-text" class="slide-title-text">Kako funkcioniše</span>
+        </div>
+      </div>
 
-          <!-- Brand Colored SVG Click Hand Pointer (Eye-catching Teal #14B8A6 with white border) -->
-          <symbol id="I-cursor" viewBox="0 0 24 24">
-            <path d="M10 2a2 2 0 0 0-2 2v7.1a2 2 0 0 1-1.3-.5l-2.4-2.1a1.5 1.5 0 0 0-2.1 2.1l4.4 5.3a5 5 0 0 0 3.8 1.8h4.6a5 5 0 0 0 5-5V9a2 2 0 0 0-2-2 2 2 0 0 0-2 2v-1a2 2 0 0 0-2-2 2 2 0 0 0-2 2V4a2 2 0 0 0-2-2z" fill="#14B8A6" stroke="#FFFFFF" stroke-width="1.75" stroke-linejoin="round"/>
-          </symbol>
+      <div id="frame">
+        <div id="stage">
+          <!-- Master SVG Symbols (Official Hollow/Outline Potvrdio Logo & Icons) -->
+          <svg width="0" height="0" style="position:absolute" fill="none">
+            <!-- Official Potvrdio Brand Logo (Pure outline, fill="none", hollow speech bubble) -->
+            <symbol id="L" viewBox="0 0 300 280" fill="none">
+              <path d="M 210 56 L 44 56 A 24 24 0 0 0 20 80 L 20 188 A 24 24 0 0 0 44 212 L 68 212 L 72 271 L 118 212 L 224 212 A 24 24 0 0 0 248 188 L 248 120" fill="none" stroke="#361F6F" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M 86 118 L 137 170 L 284 20" fill="none" stroke="#22AF75" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
 
-          <!-- Verification Shield Icon -->
-          <symbol id="I-shield" viewBox="0 0 24 24">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </symbol>
+            <!-- Brand Colored SVG Click Hand Pointer (Eye-catching Teal #14B8A6 with white border) -->
+            <symbol id="I-cursor" viewBox="0 0 24 24">
+              <path d="M10 2a2 2 0 0 0-2 2v7.1a2 2 0 0 1-1.3-.5l-2.4-2.1a1.5 1.5 0 0 0-2.1 2.1l4.4 5.3a5 5 0 0 0 3.8 1.8h4.6a5 5 0 0 0 5-5V9a2 2 0 0 0-2-2 2 2 0 0 0-2 2v-1a2 2 0 0 0-2-2 2 2 0 0 0-2 2V4a2 2 0 0 0-2-2z" fill="#14B8A6" stroke="#FFFFFF" stroke-width="1.75" stroke-linejoin="round"/>
+            </symbol>
 
-          <!-- Checkmark Icon -->
-          <symbol id="I-check" viewBox="0 0 24 24">
-            <polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </symbol>
+            <!-- Verification Shield Icon -->
+            <symbol id="I-shield" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="m9 12 2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+
+            <!-- Checkmark Icon -->
+            <symbol id="I-check" viewBox="0 0 24 24">
+              <polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+          </svg>
+
+          <div id="slides"></div>
+        </div>
+      </div>
+
+      <!-- Mobile Portrait Rotate Hint Badge (Method 1) -->
+      <div id="rotate-hint" class="rotate-hint" onclick="toggleFullscreenLandscape()" title="Kliknite za prikaz preko celog ekrana">
+        <svg class="rotate-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
         </svg>
-
-        <div id="slides"></div>
+        <span id="rotate-hint-text">Okrenite telefon vodoravno za bolji pregled</span>
       </div>
     </div>
 
@@ -836,6 +1076,7 @@ const i18n = {
     vlConfirmed: 'Potvrđeno',
     vlAuto: 'Automatizacija',
     vlSecurity: 'Sigurnost & ZZPL',
+    rotateHint: 'Okrenite telefon vodoravno za bolji pregled',
     subTitle: 'Automatska Verifikacija Porukom za WooCommerce COD',
     probBig1: 'Kupac ne preuzme COD paket,',
     probBig2: 'vi plaćate duplu poštarinu.',
@@ -986,6 +1227,7 @@ const i18n = {
     vlConfirmed: 'Confirmed',
     vlAuto: 'Automation',
     vlSecurity: 'Security & GDPR',
+    rotateHint: 'Rotate device horizontally for best experience',
     subTitle: 'Automated Message Verification for WooCommerce COD',
     probBig1: 'Customer abandons COD parcel,',
     probBig2: 'you pay double shipping.',
@@ -1137,7 +1379,7 @@ const LG = () => `
   </div>
 </div>`;
 
-const HW = t => `<div class="vl"><span data-m="vl">${t || i18n[curLang].vlHow}</span></div>`;
+const HW = () => '';
 
 const scrStore = ok => {
   const T = i18n[curLang];
@@ -1289,10 +1531,10 @@ const side = st => {
     ${m(scrDash(ok),'dash', devTag('dash', T.lblPotvrdioDash, 'position:absolute;left:8px;top:-10px;font-size:9.5px;padding:2px 8px;z-index:20;'))}
   </div>`;
 };
-const lap = (inner, hand, k, tag) => `${HW()}${tag||''}<div class="lap" data-m="lap ${k||''}"><div class="scr">${inner}</div></div>${hand||''}${LG()}`;
+const lap = (inner, hand, k, tag) => `${tag||''}<div class="lap" data-m="lap ${k||''}"><div class="scr">${inner}</div></div>${hand||''}${LG()}`;
 const phoneStack = ph => {
   const T = i18n[curLang];
-  return `${HW()}${side('p')}<div style="position:absolute;right:80px;width:250px;display:flex;justify-content:center;top:5px;z-index:20;">${devTag('phone', T.lblCustomerPhone)}</div>${ph}${LG()}`;
+  return `${side('p')}<div style="position:absolute;right:80px;width:250px;display:flex;justify-content:center;top:5px;z-index:20;">${devTag('phone', T.lblCustomerPhone)}</div>${ph}${LG()}`;
 };
 const bg = (h, k, x, y, tag) => `<div class="mw b" data-m="${k}" style="left:${x}px;top:${y}px">${tag||''}<div class="lap"><div class="scr">${h}</div></div></div>`;
 
@@ -1328,15 +1570,14 @@ function buildSlides() {
 
   // Slide 1: Undeniable Problem Statement
   S.push(`
-  ${HW(T.vlProblem)}
-  <div class="big" style="top:125px;">
+  <div class="big" style="top:125px;left:50px;right:50px;">
     ${T.probBig1}<br>
     <span style="color:#EF4444;">${T.probBig2}</span>
   </div>
-  <div class="abs" style="left:160px;right:80px;top:250px;text-align:center;font-size:21px;color:#475569;line-height:1.65;">
+  <div class="abs" style="left:60px;right:60px;top:250px;text-align:center;font-size:21px;color:#475569;line-height:1.65;">
     ${T.probDesc}
   </div>
-  <div class="abs gr" style="left:140px;right:60px;top:385px;text-align:center;font-weight:800;font-size:28px;">
+  <div class="abs gr" style="left:50px;right:50px;top:385px;text-align:center;font-weight:800;font-size:28px;">
     <span data-m="stop" style="display:inline-block;background:#ECFDF5;border:2px solid #10B981;padding:10px 28px;border-radius:12px;">
       ${T.probStop}
     </span>
@@ -1345,11 +1586,10 @@ function buildSlides() {
 
   // Slide 2: Focused Solution (No bottom junk boxes)
   S.push(`
-  ${HW(T.vlSolution)}
-  <div class="abs gr" style="left:140px;right:60px;top:80px;text-align:center;font-weight:900;font-size:40px;letter-spacing:-0.02em;">
+  <div class="abs gr" style="left:50px;right:50px;top:80px;text-align:center;font-weight:900;font-size:40px;letter-spacing:-0.02em;">
     <span data-m="stop" style="display:inline-block;">${T.solTitle}</span>
   </div>
-  <div class="abs pu" style="left:160px;right:80px;top:180px;font-weight:600;font-size:25px;line-height:1.65;color:#1E293B;">
+  <div class="abs pu" style="left:70px;right:70px;top:180px;font-weight:600;font-size:25px;line-height:1.65;color:#1E293B;text-align:center;">
     ${T.solDesc}
   </div>
   `);
@@ -1405,7 +1645,6 @@ function buildSlides() {
 
   // Slide 7: WooCommerce Admin
   S.push(`
-  ${HW()}
   ${bg(scrStore(0), 'store', 100, 24, devTag('store', T.lblStoreFront, 'position:absolute;left:8px;top:-10px;font-size:9.5px;padding:2px 8px;z-index:25;'))}
   ${devTag('woo', T.lblWpAdmin, 'position:absolute;left:480px;top:52px;transform:translateX(-50%);z-index:20;')}
   <div class="lap" data-m="woo" style="top:90px;"><div class="scr">${scrWoo(0)}</div></div>
@@ -1414,7 +1653,6 @@ function buildSlides() {
 
   // Slide 8: Potvrdio Dashboard
   S.push(`
-  ${HW()}
   ${bg(scrStore(0), 'store', 80, 24, devTag('store', T.lblStoreFront, 'position:absolute;left:8px;top:-10px;font-size:9.5px;padding:2px 8px;z-index:25;'))}
   ${bg(scrWoo(0), 'woo', 560, 24, devTag('woo', T.lblWpAdmin, 'position:absolute;left:8px;top:-10px;font-size:9.5px;padding:2px 8px;z-index:25;'))}
   ${devTag('dash', T.lblPotvrdioDash, 'position:absolute;left:480px;top:52px;transform:translateX(-50%);z-index:20;')}
@@ -1570,7 +1808,6 @@ function buildSlides() {
 
   // Slide 12: Buyer Confirms
   S.push(`
-  ${HW(T.vlConfirmed)}
   ${side('ok')}
   <div style="position:absolute;right:80px;width:250px;display:flex;justify-content:center;top:5px;z-index:20;">${devTag('phone', T.lblCustomerPhone)}</div>
   <div class="ph" data-m="phone" style="background:#F8FAFC;">
@@ -1597,8 +1834,7 @@ function buildSlides() {
 
   // Slide 13: Order State Machine
   S.push(`
-  ${HW(T.vlAuto)}
-  <div class="nb" style="left:310px;top:45px;width:420px;height:54px;line-height:50px;border-color:var(--brand-purple);color:var(--brand-purple);font-size:13px;">
+  <div class="nb" style="left:270px;top:45px;width:420px;height:54px;line-height:50px;border-color:var(--brand-purple);color:var(--brand-purple);font-size:13px;">
     ${T.smHeader}
   </div>
 
@@ -1623,10 +1859,10 @@ function buildSlides() {
     </div>
   `).join('')}
 
-  <div class="abs" style="left:150px;right:50px;top:435px;height:44px;border:2px dashed #CBD5E1;border-radius:10px;text-align:center;line-height:40px;font-size:14px;color:#475569;font-weight:600;">
+  <div class="abs" style="left:100px;right:100px;top:435px;height:44px;border:2px dashed #CBD5E1;border-radius:10px;text-align:center;line-height:40px;font-size:14px;color:#475569;font-weight:600;">
     ${T.smManual}
   </div>
-  <div class="abs" style="left:150px;top:490px;font-size:12px;color:#64748B;">
+  <div class="abs" style="left:100px;top:490px;font-size:12px;color:#64748B;">
     <span style="border:2px solid #A7F3D0;background:#ECFDF5;padding:0 8px;border-radius:4px;">&nbsp;</span> ${T.smLeg1} &nbsp;&nbsp;&nbsp; 
     <span style="border:2px solid #FECACA;background:#FEF2F2;padding:0 8px;border-radius:4px;">&nbsp;</span> ${T.smLeg2}
   </div>
@@ -1635,10 +1871,8 @@ function buildSlides() {
 
   // Slide 14: Data Privacy & Legal Compliance
   S.push(`
-  ${HW(T.vlSecurity)}
-  
   <!-- Left Column: 3 Structured Compliance Feature Cards -->
-  <div class="abs" style="left:112px;top:44px;width:515px;height:442px;display:flex;flex-direction:column;justify-content:space-between;">
+  <div class="abs" style="left:55px;top:44px;width:540px;height:442px;display:flex;flex-direction:column;justify-content:space-between;">
     <!-- Point 1: Minimal Data Principle -->
     <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-left:5px solid #14B8A6;border-radius:14px;padding:16px 20px;box-shadow:0 3px 10px rgba(0,0,0,0.03);">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
@@ -1674,7 +1908,7 @@ function buildSlides() {
   </div>
 
   <!-- Right Column: Dedicated Security Token Badge -->
-  <div class="abs" style="right:48px;top:44px;width:280px;height:442px;border-radius:20px;background:linear-gradient(145deg,#0A0E1A,#1A2337);border:1px solid rgba(255,255,255,0.12);display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:#FFF;padding:32px 22px;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,0.32);">
+  <div class="abs" style="right:55px;top:44px;width:290px;height:442px;border-radius:20px;background:linear-gradient(145deg,#0A0E1A,#1A2337);border:1px solid rgba(255,255,255,0.12);display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:#FFF;padding:32px 22px;text-align:center;box-shadow:0 18px 44px rgba(0,0,0,0.32);">
     <div>
       <div style="width:68px;height:68px;border-radius:20px;background:rgba(20,184,166,0.12);border:1.5px solid rgba(20,184,166,0.35);display:flex;align-items:center;justify-content:center;color:#14B8A6;box-shadow:0 8px 24px rgba(20,184,166,0.22);margin:0 auto 18px;">
         <svg style="width:36px;height:36px;" viewBox="0 0 24 24"><use href="#I-shield"/></svg>
@@ -1741,12 +1975,35 @@ const nextLbl = document.getElementById('next-lbl');
 
 let i = 0, SC = 1, anims = [], out = null, cur = null, touched = [];
 
+function getSlideTitle(index) {
+  const T = i18n[curLang];
+  const titles = [
+    T.vlHow,       // Slide 0: Brand Intro
+    T.vlProblem,   // Slide 1: Problem
+    T.vlSolution,  // Slide 2: Rešenje
+    T.vlHow,       // Slide 3: Checkout
+    T.vlHow,       // Slide 4: Thank You
+    T.vlHow,       // Slide 5: WP Admin
+    T.vlHow,       // Slide 6: Dashboard
+    T.vlHow,       // Slide 7: SMS Notification
+    T.vlHow,       // Slide 8: Messages Chat
+    T.vlHow,       // Slide 9: Address App
+    T.vlConfirmed, // Slide 10: Potvrđeno
+    T.vlAuto,      // Slide 11: Automatizacija
+    T.vlSecurity,  // Slide 12: Sigurnost & ZZPL
+    T.ctaBtn || T.vlHow // Slide 13: Call to Action
+  ];
+  return titles[index] || T.vlHow;
+}
+
 function fit() {
   const isNarrow = main.clientWidth < 680;
-  const sideSpace = isNarrow ? 24 : 172;
+  const sideSpace = isNarrow ? 8 : 160;
+  const slideHeader = document.getElementById('slide-header');
+  const titleH = slideHeader ? (slideHeader.offsetHeight + 10) : 38;
   const w = main.clientWidth - sideSpace;
-  const h = main.clientHeight - 24;
-  const k = Math.max(0.2, Math.min(Math.max(w, 200) / 960, h / 540));
+  const h = main.clientHeight - titleH - (isNarrow ? 8 : 20);
+  const k = Math.max(0.2, Math.min(Math.max(w, 200) / 960, Math.max(h, 150) / 540));
   frame.style.width = (960 * k) + 'px';
   frame.style.height = (540 * k) + 'px';
   stage.style.transform = 'scale(' + k + ')';
@@ -1840,6 +2097,12 @@ function show(t, animate = true) {
   n.disabled = (i === els.length - 1);
   if (arrowPrev) arrowPrev.disabled = (i === 0);
   if (arrowNext) arrowNext.disabled = (i === els.length - 1);
+
+  // Update slide title badge above the slide
+  const titleTextEl = document.getElementById('slide-title-text');
+  if (titleTextEl) {
+    titleTextEl.textContent = getSlideTitle(i);
+  }
   
   // Update bottom process step caption
   const stepInfo = (i18n[curLang].slideSteps || [])[i];
@@ -1869,9 +2132,28 @@ function renderDeck() {
   nextLbl.textContent = i18n[curLang].next;
   const navReg = document.getElementById('nav-reg-lbl');
   if (navReg) navReg.textContent = i18n[curLang].ctaBtn;
+  const rotHint = document.getElementById('rotate-hint-text');
+  if (rotHint) rotHint.textContent = i18n[curLang].rotateHint;
   
   // Show active slide
   show(i, false);
+}
+
+function toggleFullscreenLandscape() {
+  if (!document.fullscreenElement) {
+    const el = document.documentElement;
+    const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+    if (rfs) {
+      rfs.call(el).then(() => {
+        if (screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      }).catch(() => {});
+    }
+  } else {
+    const efs = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if (efs) efs.call(document).catch(() => {});
+  }
 }
 
 function setLang(lang) {
@@ -2178,14 +2460,37 @@ addEventListener('keydown', e => {
   else if (e.key === 'End') show(els.length - 1);
 });
 
-let x0 = null;
-addEventListener('touchstart', e => x0 = e.touches[0].clientX, { passive: true });
-addEventListener('touchend', e => {
-  if (x0 === null) return;
-  const d = e.changedTouches[0].clientX - x0;
-  if (Math.abs(d) > 50) show(i + (d < 0 ? 1 : -1));
-  x0 = null;
-});
+let touchStartX = 0;
+let touchStartY = 0;
+let touchStartTime = 0;
+
+window.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  const modal = document.getElementById('onboarding-modal');
+  if (modal && modal.style.display === 'flex') return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchStartTime = Date.now();
+}, { passive: true });
+
+window.addEventListener('touchend', e => {
+  if (!touchStartTime) return;
+  const modal = document.getElementById('onboarding-modal');
+  if (modal && modal.style.display === 'flex') return;
+
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  const dt = Date.now() - touchStartTime;
+  touchStartTime = 0;
+
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3 && dt < 500) {
+    if (dx < 0) {
+      show(i + 1);
+    } else {
+      show(i - 1);
+    }
+  }
+}, { passive: true });
 
 // Initial boot
 fit();

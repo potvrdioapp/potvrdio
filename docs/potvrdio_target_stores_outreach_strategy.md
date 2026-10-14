@@ -89,25 +89,38 @@ Bu listedeki mağazalar öncelikli pilot çalışma listesine **alınmamıştır
 
 ## 5. Sahaya Dayalı Sırpça Kapalı Beta Outreach Şablonları
 
-### Şablon A (Animal Market İçin — Özel Pitch):
+### Şablon A (Animal Market İçin — Gönderilen Gerçek E-posta):
 **Alıcı:** `shop@animalmarket.rs`  
-**Konu:** Automatizacija provere adrese i potvrde za Animal Market (WooCommerce)
+**Tarih / Saat:** 13 Ekim Salı, 10:06  
+**Konu:** Automatizacija provere adrese i potvrde za Animal Market (WooCommerce)  
 
 > Poštovani,
 >
-> Na vašem sajtu piše da vaš član tima, nakon porudžbine, kontaktira kupce putem poruke radi potvrde porudžbine i informacija o isporuci. Pošto je plaćanje trenutno samo pouzećem, razumem zašto je taj korak važan.
+> Na vašem sajtu piše da vaš tim nakon porudžbine kontaktira kupce radi potvrde porudžbine i isporuke. Kod plaćanja pouzećem to je ručni posao za svaku porudžbinu, a pogrešna adresa se često otkrije tek kada je kurir već krenuo.
 >
-> Razvijam **Potvrdio** (potvrdio.online), WooCommerce dodatak koji deo tog posla radi automatski: kupac dobija SMS poruku sa linkom na kome jednim klikom potvrđuje porudžbinu ili ispravlja adresu, a porudžbina do tada ostaje na čekanju (On-Hold).
+> Razvijam Potvrdio (potvrdio.online), WooCommerce dodatak koji taj korak radi automatski: kupac dobija SMS sa linkom, jednim klikom potvrđuje porudžbinu ili ispravlja adresu, a porudžbina do tada ostaje na čekanju (On-Hold).
 >
-> Trenutno tražim 3 do 5 prodavnica za zatvoreni test. Da li biste imali 10 minuta da vam pokažem kako to izgleda? Zanima me i koje sve podatke vaš tim proverava u toj poruci.
+> Tražim 3 do 5 prodavnica za zatvoreni beta test: dve nedelje, besplatno, na stvarnim porudžbinama. Da li bi vas zanimalo? Dovoljan je kratak odgovor na ovaj mejl, pa vam šaljem detalje.
 >
 > Srdačan pozdrav,  
 > **Atıl Bilge Örüm**  
 > Potvrdio.online • Novi Sad  
 > Tel: +381 61 603 6556  
-> podrska@potvrdio.online
+
+#### Şablon A Takip Mesajı (Follow-up — 24-48 Saat Sonra Reply):
+**Konu:** Re: Automatizacija provere adrese i potvrde za Animal Market (WooCommerce)  
+
+> Poštovani,  
+>
+> Znam da vam je radno vreme puno pakovanja i obrade porudžbina, pa ću biti sasvim kratak.  
+>
+> Testiranje ne zahteva nikakve izmene na vašem sajtu niti tehničke rizike. Ako vas zanima samo da vidite kratak primer (30 sekundi) kako to izgleda na telefonu kupca pre nego što kurir uopšte preuzme paket, mogu vam poslati link?  
+>
+> Pozdrav,  
+> Atıl
 
 ---
+
 
 ### Şablon B (Genel WooCommerce Mağazaları İçin):
 **Alıcı:** `info@fashionstore.rs`, `info@prodajaparfema.rs`, `kontakt@fitaky.rs`, `podrska@sifonjer.rs`, `info@petzooshop.rs` vb.  
@@ -136,7 +149,11 @@ Bu listedeki mağazalar öncelikli pilot çalışma listesine **alınmamıştır
 
 ## 6. Satış ve Uygulama Eylem Planı (Execution Playbook)
 
-1. **Adım 1 — Animal Market Teması:** Doğrudan Şablon A ile `shop@animalmarket.rs` adresine ilk e-posta gönderilir.
-2. **Adım 2 — Öncelikli 14 Mağazaya Ulaşım:** Çalışma listesindeki (Kategori 3) doğrulanmış e-postası olan bağımsız mağazalara Şablon B ile kişiselleştirilmiş (mağaza adı ve sektörü eklenerek) e-posta gönderilir.
-3. **Adım 3 — Hacim Filtresi:** Yanıt veren mağazalarla görüşmede ilk soru: *"Ayda ortalama kaç kapıda ödeme siparişi alıyorsunuz?"* olmalıdır. Ayda en az 50 sipariş almayan mağazalar test sürecinde istatistiksel sonuç vermeyeceği için kibarca elenir.
-4. **Hedef:** 15 odaklı mağazadan **3 ila 5 tasarım ortağını** kapalı test sürecine dahil etmek.
+1. **Adım 1 — Animal Market Teması:** Şablon A ile `shop@animalmarket.rs` adresine ilk e-posta gönderildi (13 Ekim, 10:06).
+2. **Adım 2 — Animal Market Takibi (Follow-up):** Gönderimden 24–48 saat sonra yanıt gelmediğinde:
+   - **E-posta Yanıtı (Re:):** Şablon A altındaki sıfır sürtünmeli ("sadece 30 saniyelik link") takip mesajı atılır.
+   - **Telefon Araması (En Etkili Yol):** Sitedeki iletişim numarasından aranarak yetkiliye bağlanılır: *"Dobar dan, Atil ovde iz Novog Sada. Poslao sam juče kratak mejl u vezi sa WooCommerce porudžbinama i telefonskom proverom adresa kupaca. Video sam da ručno zovete kupce za potvrdu adrese pre slanja paketa, pa sam samo hteo da pitam sa kim bih mogao ukratko popričati oko automatizacije tog koraka?"*
+3. **Adım 3 — Öncelikli 14 Mağazaya Ulaşım:** Çalışma listesindeki (Kategori 3) doğrulanmış e-postası olan bağımsız mağazalara Şablon B ile kişiselleştirilmiş (mağaza adı ve sektörü eklenerek) e-postalar gönderilir.
+4. **Adım 4 — Hacim Filtresi:** Yanıt veren mağazalarla görüşmede ilk soru: *"Ayda ortalama kaç kapıda ödeme siparişi alıyorsunuz?"* olmalıdır. Ayda en az 50 sipariş almayan mağazalar test sürecinde istatistiksel sonuç vermeyeceği için kibarca elenir.
+5. **Hedef:** 15 odaklı mağazadan **3 ila 5 tasarım ortağını** kapalı test sürecine dahil etmek.
+

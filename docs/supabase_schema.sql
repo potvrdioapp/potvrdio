@@ -237,4 +237,42 @@ ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS short_code TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS order_token TEXT;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_short_code ON public.orders(short_code);
 
+-- 11. 30-Day Data Retention & GDPR/ZZPL Automated Anonymization
+CREATE EXTENSION IF NOT EXISTS pg_cron WITH SCHEMA extensions;
+
+CREATE OR REPLACE FUNCTION public.anonymize_expired_orders()
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+    v_count INTEGER;
+BEGIN
+    UPDATE public.orders
+    SET 
+        customer_name = 'Anonimizovan Kupac',
+        customer_phone = SUBSTRING(customer_phone FROM 1 FOR 6) || '****' || RIGHT(customer_phone, 2),
+        customer_email = NULL,
+        address = '[ANONIMIZOVANO - RETENTION 30D]',
+        shipping_address = '{"anonymized": true}'::jsonb,
+        billing_address = '{"anonymized": true}'::jsonb,
+        order_token = NULL,
+        short_code = NULL,
+        updated_at = NOW()
+    WHERE created_at < NOW() - INTERVAL '30 days'
+      AND customer_name != 'Anonimizovan Kupac';
+
+    GET DIAGNOSTICS v_count = ROW_COUNT;
+    RETURN v_count;
+END;
+$$;
+
+-- Schedule nightly execution via pg_cron at 02:00 AM UTC (03:00 / 04:00 CET/CEST)
+SELECT cron.schedule(
+    'nightly-order-anonymization',
+    '0 2 * * *',
+    'SELECT public.anonymize_expired_orders();'
+);
+
+
 
