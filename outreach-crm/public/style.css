@@ -1,0 +1,84 @@
+/* Potvrdio Outreach CRM Style */
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* Tabs */
+.tab-btn.active,
+.followup-tab-btn.active {
+  background-color: #4f46e5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.quick-status-btn:active {
+  transform: scale(0.96);
+}
+
+.quick-date-btn:active {
+  transform: scale(0.96);
+}
+
+
+.store-card.active {
+  border-color: #6366f1 !important;
+  background-color: rgba(99, 102, 241, 0.08) !important;
+}
+
+/* Timeline vertical line tweak */
+#communicationsFeed::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 20px;
+  width: 2px;
+  background: rgba(51, 65, 85, 0.5);
+  z-index: 0;
+}
+
+/* Toast show animation */
+#toast.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* WhatsApp & Viber brand accents */
+.btn-whatsapp {
+  background-color: rgba(37, 211, 102, 0.12);
+  color: #25d366;
+  border-color: rgba(37, 211, 102, 0.25);
+}
+.btn-whatsapp:hover {
+  background-color: rgba(37, 211, 102, 0.22);
+  border-color: rgba(37, 211, 102, 0.45);
+  box-shadow: 0 0 14px rgba(37, 211, 102, 0.25);
+}
+
+.btn-viber {
+  background-color: rgba(115, 96, 242, 0.12);
+  color: #a78bfa;
+  border-color: rgba(115, 96, 242, 0.25);
+}
+.btn-viber:hover {
+  background-color: rgba(115, 96, 242, 0.22);
+  border-color: rgba(115, 96, 242, 0.45);
+  box-shadow: 0 0 14px rgba(115, 96, 242, 0.25);
+}

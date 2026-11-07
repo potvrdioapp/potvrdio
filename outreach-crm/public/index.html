@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potvrdio · Hedef Mağazalar & Outreach CRM</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#1e1b4b',
+            },
+            darkBg: '#090D16',
+            darkCard: '#111827',
+            darkBorder: '#1F2937',
+            darkHover: '#1A2234'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-darkBg text-slate-100 min-h-screen font-['Plus_Jakarta_Sans',sans-serif] antialiased flex flex-col">
+
+  <!-- TOP HEADER & STATS -->
+  <header class="border-b border-darkBorder bg-darkCard/80 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-bold text-lg tracking-wider">
+          P
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold text-white tracking-tight">Potvrdio Outreach CRM</h1>
+            <span class="text-[10px] uppercase font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">SQLite DB</span>
+          </div>
+          <p class="text-xs text-slate-400">Sırbistan WooCommerce Kapalı Beta Adayları & İletişim Geçmişi</p>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Bar -->
+      <div id="statsBar" class="flex items-center gap-2 sm:gap-3 overflow-x-auto text-xs py-1">
+        <button id="statFollowUpBadgeBtn" title="Bugün ve öncesi takipleri filtrele" class="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 flex items-center gap-2 transition-all cursor-pointer group shadow-sm shadow-rose-950/40">
+          <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+          <span class="text-rose-300 font-semibold group-hover:text-rose-200">Takip (Bugün & Öncesi):</span>
+          <span id="statFollowUpDue" class="font-bold text-rose-200">-</span>
+        </button>
+        <div class="px-3 py-1.5 rounded-lg bg-darkBg/60 border border-darkBorder flex items-center gap-2">
+          <span class="text-slate-400">Toplam:</span>
+          <span id="statTotal" class="font-bold text-white">-</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center gap-2">
+          <span class="text-indigo-400">P1 Doğrulanmış:</span>
+          <span id="statP1" class="font-bold text-indigo-300">-</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center gap-2">
+          <span class="text-blue-400">Gönderildi:</span>
+          <span id="statContacted" class="font-bold text-blue-300">-</span>
+        </div>
+        <div class="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2">
+          <span class="text-emerald-400">Beta Ortağı:</span>
+          <span id="statClosedBeta" class="font-bold text-emerald-300">0 / 5</span>
+        </div>
+        <button id="btnNewStore" class="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white font-medium flex items-center gap-1.5 transition-all shadow-md shadow-brand-600/20 text-xs shrink-0">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span>Yeni Mağaza</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- LIVE DRIP QUEUE PROGRESS BAR -->
+    <div id="dripBanner" class="border-t border-darkBorder/80 bg-darkBg/90 px-4 sm:px-6 py-2">
+      <div class="max-w-[1600px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3 flex-1 min-w-[280px]">
+          <span id="dripStatusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500 shrink-0"></span>
+          <span id="dripStatusTitle" class="font-bold text-white whitespace-nowrap">Otomatik Gönderim (2-3 dk aralık):</span>
+          <div class="w-36 sm:w-48 h-2 bg-darkCard rounded-full overflow-hidden border border-darkBorder shrink-0">
+            <div id="dripProgressBar" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
+          </div>
+          <span id="dripCountText" class="font-mono text-emerald-400 font-semibold whitespace-nowrap">0 / 24</span>
+          <span id="dripDetailText" class="text-slate-400 truncate">Hazır — başlatmak için butona tıklayın.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnDripStart" class="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1.5 transition-colors">
+            <span>▶ Kuyruğu Başlat</span>
+          </button>
+          <button id="btnDripStop" class="hidden px-3 py-1 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-semibold flex items-center gap-1.5 transition-colors">
+            <span>⏸ Durdur</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SPLIT WORKSPACE -->
+  <main class="max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-5 flex-1 flex flex-col md:flex-row gap-5 overflow-hidden">
+    
+    <!-- LEFT SIDEBAR: STORE LIST & SEARCH -->
+    <aside class="w-full md:w-[430px] lg:w-[470px] flex-shrink-0 flex flex-col bg-darkCard rounded-2xl border border-darkBorder shadow-xl overflow-hidden h-[calc(100vh-125px)]">
+      
+      <!-- Search & Filters -->
+      <div class="p-3.5 border-b border-darkBorder space-y-2.5 bg-darkCard/95">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Mağaza, domain, sektör veya şehir ara..." 
+            class="w-full bg-darkBg border border-darkBorder rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
+          >
+          <button id="clearSearch" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+            ✕
+          </button>
+        </div>
+
+        <!-- Follow-Up Date Filter Tabs -->
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-[10px] font-semibold text-slate-400 px-0.5 uppercase tracking-wider">
+            <span class="flex items-center gap-1 text-slate-300">
+              <i data-lucide="calendar-clock" class="w-3 h-3 text-brand-400"></i>
+              <span>Takip Tarihi Filtresi</span>
+            </span>
+            <span id="followUpFilterLabel" class="text-[10px] text-slate-400 font-normal">Tüm takipler</span>
+          </div>
+          <div class="flex items-center gap-1 bg-darkBg p-1 rounded-xl border border-darkBorder text-[11px] font-medium overflow-x-auto">
+            <button data-followup="all" class="followup-tab-btn active px-2.5 py-1.5 rounded-lg transition-all text-slate-300 whitespace-nowrap">Tümü</button>
+            <button data-followup="today_and_prior" class="followup-tab-btn px-2.5 py-1.5 rounded-lg transition-all text-rose-400 hover:text-rose-300 whitespace-nowrap flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+              <span>Bugün & Öncesi</span>
+              <span id="badgeFollowUpToday" class="text-[9px] px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-300 font-bold ml-0.5">-</span>
+            </button>
+            <button data-followup="tomorrow_and_prior" class="followup-tab-btn px-2.5 py-1.5 rounded-lg transition-all text-amber-400 hover:text-amber-300 whitespace-nowrap flex items-center gap-1">
+              <span>Yarın & Öncesi</span>
+              <span id="badgeFollowUpTomorrow" class="text-[9px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-bold ml-0.5">-</span>
+            </button>
+            <button data-followup="this_week" class="followup-tab-btn px-2.5 py-1.5 rounded-lg transition-all text-indigo-400 hover:text-indigo-300 whitespace-nowrap">Bu Hafta</button>
+            <button data-followup="has_follow_up" class="followup-tab-btn px-2.5 py-1.5 rounded-lg transition-all text-slate-400 hover:text-slate-300 whitespace-nowrap">Takipli</button>
+            <button data-followup="no_follow_up" class="followup-tab-btn px-2.5 py-1.5 rounded-lg transition-all text-slate-500 hover:text-slate-400 whitespace-nowrap">Takipsiz</button>
+          </div>
+        </div>
+
+        <!-- Status & Priority Dropdowns Filter -->
+        <div class="grid grid-cols-2 gap-2 pt-0.5">
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Statü</label>
+            <select id="statusFilterSelect" class="w-full bg-darkBg border border-darkBorder rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500 cursor-pointer">
+              <option value="all">Tüm Statüler</option>
+              <option value="not_contacted">⏳ Henüz İletişim Yok</option>
+              <option value="contacted">📬 İletişim Kuruldu (Tümü)</option>
+              <option value="email_sent">📨 E-posta Gönderildi</option>
+              <option value="waiting_reply">⏱️ Yanıt Bekleniyor</option>
+              <option value="replied">💬 Yanıt Geldi</option>
+              <option value="call_scheduled">📞 Görüşme Planlandı</option>
+              <option value="closed_beta">🎉 Kapalı Beta Ortağı</option>
+              <option value="on_hold">⏸️ Beklemede</option>
+              <option value="rejected">❌ Pas / İlgilenmiyor</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Öncelik</label>
+            <select id="priorityFilterSelect" class="w-full bg-darkBg border border-darkBorder rounded-xl px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500 cursor-pointer">
+              <option value="all">Tüm Havuz</option>
+              <option value="p1_verified">P1 Doğrulanmış</option>
+              <option value="p2_unverified">P2 İkincil</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-slate-400 px-1 pt-0.5">
+          <span id="storesCountLabel">Yükleniyor...</span>
+          <span id="activeFilterBadge" class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-mono">Tümü</span>
+        </div>
+
+        <!-- Overdue Triage Quick Action Banner -->
+        <div id="overdueTriageBar" class="hidden p-2 rounded-xl bg-rose-950/40 border border-rose-500/30 space-y-1.5">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="font-bold text-rose-300 flex items-center gap-1">
+              <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-400"></i>
+              <span id="overdueCountLabel">25 Takip Gecikmiş</span>
+            </span>
+            <span class="text-[10px] text-rose-400/80 font-mono">Gecikenleri Ertele:</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <button type="button" id="btnTriageToday" class="flex-1 px-2 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-500/40 text-[10px] font-semibold transition-all" title="Geciken tüm mağazaların takip tarihini Bugüne ayarla">
+              ⚡ Bugün
+            </button>
+            <button type="button" id="btnTriageTomorrow" class="flex-1 px-2 py-1 rounded-lg bg-darkBg hover:bg-darkBorder text-slate-200 border border-darkBorder text-[10px] font-semibold transition-all" title="Gecikenleri Yarına ertele">
+              ⏳ Yarın
+            </button>
+            <button type="button" id="btnTriage3Days" class="flex-1 px-2 py-1 rounded-lg bg-darkBg hover:bg-darkBorder text-slate-200 border border-darkBorder text-[10px] font-semibold transition-all" title="Gecikenleri +3 gün ertele">
+              📅 +3 Gün
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stores Scrollable List -->
+      <div id="storeList" class="flex-1 overflow-y-auto divide-y divide-darkBorder/60 p-2 space-y-1">
+        <!-- Rendered by app.js -->
+      </div>
+    </aside>
+
+    <!-- RIGHT MAIN PANEL: STORE DETAILS & TIMELINE -->
+    <section class="flex-1 flex flex-col bg-darkCard rounded-2xl border border-darkBorder shadow-xl overflow-hidden h-[calc(100vh-125px)]">
+      
+      <!-- Empty State when no store selected -->
+      <div id="emptyDetailsState" class="flex-1 flex flex-col items-center justify-center p-8 text-center text-slate-400 space-y-3">
+        <div class="w-16 h-16 rounded-2xl bg-darkBg border border-darkBorder flex items-center justify-center text-slate-500">
+          <i data-lucide="store" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-base font-semibold text-slate-200">Bir Mağaza Seçin</h3>
+        <p class="text-xs max-w-sm text-slate-500 leading-relaxed">
+          Soldaki listeden bir mağazaya tıklayarak saha kancalarını, kurumsal iletişim detaylarını, statü güncellemesini ve takip takvimini yönetin.
+        </p>
+      </div>
+
+      <!-- Active Store Details Container -->
+      <div id="storeDetailsContent" class="hidden flex-1 flex flex-col overflow-y-auto">
+        
+        <!-- Store Header -->
+        <div class="p-5 border-b border-darkBorder bg-darkCard/95 sticky top-0 z-20 backdrop-blur flex flex-wrap items-start justify-between gap-4">
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <h2 id="detailStoreName" class="text-xl font-bold text-white tracking-tight">Store Name</h2>
+              <a id="detailStoreWebsiteLink" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-xs text-brand-400 hover:text-brand-300 font-mono bg-brand-500/10 px-2.5 py-1 rounded-lg border border-brand-500/20 transition-colors">
+                <span id="detailStoreWebsite">website.rs</span>
+                <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+              <span id="detailStorePriority" class="text-[10px] font-semibold px-2 py-0.5 rounded-full border">P1</span>
+            </div>
+            <div class="flex items-center gap-3 text-xs text-slate-400">
+              <span id="detailStoreSector" class="flex items-center gap-1">
+                <i data-lucide="tag" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span class="text-slate-300">Sektör</span>
+              </span>
+              <span>•</span>
+              <span id="detailStoreCity" class="flex items-center gap-1">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span class="text-slate-300">Şehir</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Status & Action Buttons -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="flex items-center gap-1.5 bg-darkBg border border-darkBorder rounded-xl px-2.5 py-1">
+              <span class="text-[10px] uppercase font-bold text-slate-400">Statü:</span>
+              <div class="relative">
+                <select id="detailStatusSelect" class="bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer appearance-none pr-6">
+                  <option value="not_contacted">⏳ Henüz İletişim Yok</option>
+                  <option value="email_sent">📨 E-posta Gönderildi</option>
+                  <option value="waiting_reply">⏱️ Yanıt Bekleniyor</option>
+                  <option value="replied">💬 Yanıt Geldi</option>
+                  <option value="call_scheduled">📞 Telefon Görüşmesi Planlandı</option>
+                  <option value="closed_beta">🎉 Tasarım Ortağı (Kapalı Beta)</option>
+                  <option value="on_hold">⏸️ Beklemede</option>
+                  <option value="rejected">❌ İlgilenmiyor / Pas</option>
+                </select>
+                <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+              </div>
+            </div>
+
+            <div id="headerDirectChatGroup" class="hidden items-center gap-1.5">
+              <a id="headerWhatsAppBtn" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm" title="WhatsApp'ta Sohbet Başlat">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.13.56 4.129 1.535 5.864l-1.635 5.969 6.136-1.61c1.7.94 3.655 1.477 5.738 1.477 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/></svg>
+                <span>WhatsApp</span>
+              </a>
+              <a id="headerViberBtn" href="#" class="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm" title="Viber'da Mesaj Gönder">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.01 2c-5.52 0-9.99 4.47-9.99 9.99 0 2.12.67 4.09 1.8 5.72l-1.8 4.79 5-1.5c1.48.81 3.19 1.27 4.99 1.27 5.52 0 10-4.48 10-10s-4.48-10.27-10-10.27zm4.78 13.9c-.27.4-.87.72-1.37.74-.47.02-.95-.12-1.42-.31-1.99-.81-3.5-2.22-4.52-4.04-.42-.76-.73-1.58-.69-2.45.02-.45.23-.87.58-1.16.27-.23.6-.33.95-.27.24.04.44.2.53.42.34.82.72 1.62 1.14 2.41.13.24.09.52-.09.72l-.47.53c-.11.13-.13.31-.05.46.54 1.04 1.34 1.89 2.34 2.51.17.1.37.08.51-.05l.6-.57c.22-.21.54-.25.8-.1.74.43 1.5 1.06 2.05 1.7.19.22.18.55-.02.77-.18.19-.38.35-.58.46z"/></svg>
+                <span>Viber</span>
+              </a>
+            </div>
+
+            <button id="btnOpenTemplates" class="px-3.5 py-1.5 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-medium flex items-center gap-1.5 transition-all">
+              <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+              <span>Outreach Şablonu</span>
+            </button>
+
+            <button id="btnAddCommunication" class="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium flex items-center gap-1.5 transition-all shadow-md shadow-brand-600/20">
+              <i data-lucide="message-square-plus" class="w-3.5 h-3.5"></i>
+              <span>İletişim Kaydet</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- INTERACTIVE QUICK ACTION BAR: STATUS & FOLLOW-UP -->
+        <div class="px-5 py-3 bg-darkBg/80 border-b border-darkBorder flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          <!-- Quick Status Buttons -->
+          <div class="space-y-1.5 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>
+                <span>Hızlı Statü Değiştir:</span>
+              </span>
+              <span id="quickStatusActiveBadge" class="text-[10px] font-semibold px-2 py-0.2 rounded-full border">Durum</span>
+            </div>
+            <div id="quickStatusButtonsGroup" class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" data-status-btn="not_contacted" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-slate-400 hover:text-white transition-all">
+                ⏳ Bekliyor
+              </button>
+              <button type="button" data-status-btn="email_sent" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-blue-400 hover:bg-blue-500/15 transition-all">
+                📨 E-posta Gönderildi
+              </button>
+              <button type="button" data-status-btn="waiting_reply" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-amber-400 hover:bg-amber-500/15 transition-all">
+                ⏱️ Yanıt Bekleniyor
+              </button>
+              <button type="button" data-status-btn="replied" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-emerald-400 hover:bg-emerald-500/15 transition-all">
+                💬 Yanıt Geldi
+              </button>
+              <button type="button" data-status-btn="call_scheduled" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-purple-400 hover:bg-purple-500/15 transition-all">
+                📞 Görüşme
+              </button>
+              <button type="button" data-status-btn="closed_beta" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-emerald-300 hover:bg-emerald-500/20 transition-all">
+                🎉 Beta Ortağı
+              </button>
+              <button type="button" data-status-btn="on_hold" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-yellow-400 hover:bg-yellow-500/15 transition-all">
+                ⏸️ Beklemede
+              </button>
+              <button type="button" data-status-btn="rejected" class="quick-status-btn px-2 py-1 rounded-lg text-[10px] font-semibold border border-darkBorder bg-darkCard text-rose-400 hover:bg-rose-500/15 transition-all">
+                ❌ Pas
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Follow-up Date Scheduler -->
+          <div class="lg:w-[380px] flex-shrink-0 bg-darkCard p-3 rounded-xl border border-darkBorder space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <i data-lucide="calendar" class="w-3.5 h-3.5 text-brand-400"></i>
+                <span>Takip Tarihi (Follow-up)</span>
+              </span>
+              <span id="detailFollowUpStatusBadge" class="text-[10px] font-mono px-2 py-0.5 rounded-full border border-darkBorder text-slate-400">Takip Yok</span>
+            </div>
+            
+            <div class="flex items-center gap-1.5">
+              <div class="relative flex-1">
+                <input type="date" id="detailFollowUpInput" class="w-full bg-darkBg border border-darkBorder rounded-lg px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-brand-500 transition-colors" title="Tarih seçtiğiniz anda otomatik kaydedilir">
+              </div>
+              <button id="detailSaveFollowUpBtn" class="px-3 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow transition-all flex items-center gap-1">
+                <i data-lucide="check" class="w-3 h-3"></i>
+                <span>Kaydet</span>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-1 text-[10px] flex-wrap">
+              <span class="text-slate-500 font-semibold">Hızlı:</span>
+              <button type="button" data-quick-date="today" class="quick-date-btn px-2 py-0.5 rounded-md bg-darkBg hover:bg-darkBorder text-amber-300 hover:text-white border border-darkBorder transition-all font-medium">Bugün</button>
+              <button type="button" data-quick-date="tomorrow" class="quick-date-btn px-2 py-0.5 rounded-md bg-darkBg hover:bg-darkBorder text-indigo-300 hover:text-white border border-darkBorder transition-all font-medium">Yarın</button>
+              <button type="button" data-quick-date="+2" class="quick-date-btn px-2 py-0.5 rounded-md bg-darkBg hover:bg-darkBorder text-slate-300 hover:text-white border border-darkBorder transition-all">+2G</button>
+              <button type="button" data-quick-date="+3" class="quick-date-btn px-2 py-0.5 rounded-md bg-darkBg hover:bg-darkBorder text-slate-300 hover:text-white border border-darkBorder transition-all">+3G</button>
+              <button type="button" data-quick-date="+7" class="quick-date-btn px-2 py-0.5 rounded-md bg-darkBg hover:bg-darkBorder text-slate-300 hover:text-white border border-darkBorder transition-all">+1H</button>
+              <button type="button" data-quick-date="+14" class="quick-date-btn px-2 py-0.5 rounded-md bg-darkBg hover:bg-darkBorder text-slate-300 hover:text-white border border-darkBorder transition-all">+2H</button>
+              <button type="button" data-quick-date="clear" class="quick-date-btn px-2 py-0.5 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 ml-auto transition-all">Kaldır</button>
+            </div>
+            <div id="detailFollowUpFeedback" class="text-[10px] text-emerald-400 font-mono hidden items-center gap-1">
+              <i data-lucide="check-circle-2" class="w-3 h-3"></i>
+              <span>Kaydedildi</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Store Main Content Body -->
+        <div class="p-6 space-y-6">
+          
+          <!-- Hook Card & Contact Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            <!-- Value Hook Card (2 cols) -->
+            <div class="lg:col-span-2 p-4 rounded-xl bg-gradient-to-br from-indigo-950/30 to-slate-900/60 border border-indigo-500/20 space-y-2">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                  <i data-lucide="crosshair" class="w-3.5 h-3.5"></i>
+                  <span>Saha Kancası & Değer Önerisi (Pitch Angle)</span>
+                </h4>
+                <span class="text-[10px] text-indigo-300/70 font-mono">WooCommerce Hipotezi</span>
+              </div>
+              <p id="detailHookNote" class="text-xs text-slate-200 leading-relaxed bg-darkBg/50 p-3 rounded-lg border border-indigo-500/10">
+                -
+              </p>
+            </div>
+
+            <!-- Verified Contact Card (1 col) -->
+            <div class="p-4 rounded-xl bg-darkBg/60 border border-darkBorder space-y-3">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="contact" class="w-3.5 h-3.5"></i>
+                <span>Doğrulanmış İletişim</span>
+              </h4>
+
+              <div class="space-y-2 text-xs">
+                <div>
+                  <span class="text-[10px] text-slate-500 block uppercase font-medium">Kurumsal E-posta</span>
+                  <div class="flex items-center justify-between group mt-0.5">
+                    <a id="detailEmailLink" href="#" class="font-mono text-slate-200 hover:text-brand-400 truncate">
+                      <span id="detailEmail">-</span>
+                    </a>
+                    <button id="copyEmailBtn" title="Kopyala" class="text-slate-500 hover:text-white p-1 rounded transition-colors">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <span class="text-[10px] text-slate-500 block uppercase font-medium">Telefon</span>
+                  <div class="flex items-center justify-between mt-0.5">
+                    <a id="detailPhoneLink" href="#" class="font-mono text-slate-200 hover:text-brand-400">
+                      <span id="detailPhone">-</span>
+                    </a>
+                    <button id="copyPhoneBtn" title="Kopyala" class="text-slate-500 hover:text-white p-1 rounded transition-colors">
+                      <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Direct WhatsApp & Viber Actions -->
+                <div id="directChatBox" class="pt-2 border-t border-darkBorder/60 space-y-1.5 hidden">
+                  <span class="text-[10px] text-slate-500 block uppercase font-semibold">Doğrudan Mesaj (Chat)</span>
+                  <div class="grid grid-cols-2 gap-2">
+                    <a 
+                      id="detailWhatsAppLink" 
+                      href="#" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      class="flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 text-xs font-semibold transition-all group"
+                      title="WhatsApp'ta Sohbet Başlat"
+                    >
+                      <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.13.56 4.129 1.535 5.864l-1.635 5.969 6.136-1.61c1.7.94 3.655 1.477 5.738 1.477 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/></svg>
+                      <span>WhatsApp</span>
+                    </a>
+
+                    <a 
+                      id="detailViberLink" 
+                      href="#" 
+                      class="flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/25 text-xs font-semibold transition-all group"
+                      title="Viber'da Mesaj Gönder"
+                    >
+                      <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.01 2c-5.52 0-9.99 4.47-9.99 9.99 0 2.12.67 4.09 1.8 5.72l-1.8 4.79 5-1.5c1.48.81 3.19 1.27 4.99 1.27 5.52 0 10-4.48 10-10s-4.48-10.27-10-10.27zm4.78 13.9c-.27.4-.87.72-1.37.74-.47.02-.95-.12-1.42-.31-1.99-.81-3.5-2.22-4.52-4.04-.42-.76-.73-1.58-.69-2.45.02-.45.23-.87.58-1.16.27-.23.6-.33.95-.27.24.04.44.2.53.42.34.82.72 1.62 1.14 2.41.13.24.09.52-.09.72l-.47.53c-.11.13-.13.31-.05.46.54 1.04 1.34 1.89 2.34 2.51.17.1.37.08.51-.05l.6-.57c.22-.21.54-.25.8-.1.74.43 1.5 1.06 2.05 1.7.19.22.18.55-.02.77-.18.19-.38.35-.58.46z"/></svg>
+                      <span>Viber</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div>
+                  <span class="text-[10px] text-slate-500 block uppercase font-medium">Tüzel Kişilik / Adres</span>
+                  <p id="detailLegalEntity" class="text-slate-300 truncate text-[11px] mt-0.5">-</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Growth & Technical Opportunities Card -->
+          <div class="p-4 rounded-xl bg-gradient-to-br from-amber-950/20 via-slate-900/60 to-darkBg border border-amber-500/20 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                </div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-amber-400">
+                  Geliştirme & Fırsat Alanları (Growth & Tech Opportunities)
+                </h4>
+              </div>
+              <button id="saveOpportunitiesBtn" class="text-xs text-amber-400 hover:text-amber-300 font-semibold px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 transition-all">Fırsatları Kaydet</button>
+            </div>
+
+            <!-- Tech Stack Pills -->
+            <div id="detailTechStackContainer" class="flex items-center gap-2 flex-wrap text-[11px]">
+              <span class="text-[10px] uppercase font-semibold text-slate-500">Tespit Edilen Altyapı:</span>
+              <span id="detailTechStackText" class="font-mono text-slate-300 bg-darkBg px-2 py-0.5 rounded border border-darkBorder">-</span>
+            </div>
+
+            <!-- Opportunities Text / Textarea -->
+            <textarea id="detailOpportunitiesInput" rows="4" placeholder="Bu mağazaya özel geliştirme ve optimizasyon fırsatları..." class="w-full bg-darkBg/80 border border-amber-500/20 rounded-lg p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-400 font-mono leading-relaxed"></textarea>
+          </div>
+
+          <!-- Internal Notes (Editable) -->
+          <div class="p-4 rounded-xl bg-darkBg/40 border border-darkBorder space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>Dahili Notlar & Takip Notu</span>
+              </h4>
+              <button id="saveNotesBtn" class="text-xs text-brand-400 hover:text-brand-300 font-medium">Kaydet</button>
+            </div>
+            <textarea id="detailNotesInput" rows="2" class="w-full bg-darkBg border border-darkBorder rounded-lg p-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500 font-mono"></textarea>
+          </div>
+
+          <!-- Timeline Section (İletişim Geçmişi) -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i data-lucide="history" class="w-4 h-4 text-brand-400"></i>
+                <span>İletişim Geçmişi & Mesajlar</span>
+                <span id="commCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-darkBg border border-darkBorder text-slate-400">0</span>
+              </h3>
+              <button id="btnQuickAddLog" class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1">
+                <i data-lucide="plus" class="w-3 h-3"></i>
+                <span>Yeni Etkileşim Ekle</span>
+              </button>
+            </div>
+
+            <!-- Feed Container -->
+            <div id="communicationsFeed" class="space-y-3 relative before:absolute before:inset-0 before:left-5 before:w-0.5 before:bg-darkBorder/60">
+              <!-- Rendered by app.js -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: YENİ İLETİŞİM / LOG EKLE -->
+  <div id="commModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-darkCard border border-darkBorder rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-5 border-b border-darkBorder flex items-center justify-between">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="message-square-plus" class="w-4 h-4 text-brand-400"></i>
+          <span>Yeni İletişim / Etkileşim Kaydet</span>
+        </h3>
+        <button id="closeCommModal" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+      </div>
+
+      <form id="commForm" class="p-5 space-y-4 overflow-y-auto">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Kanal</label>
+            <select id="modalCommChannel" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+              <option value="email">✉️ E-posta</option>
+              <option value="whatsapp">🟢 WhatsApp Mesajı</option>
+              <option value="viber">🟣 Viber Mesajı</option>
+              <option value="phone">📞 Telefon Görüşmesi</option>
+              <option value="sms">📱 SMS</option>
+              <option value="note">📝 Dahili Not / Gözlem</option>
+              <option value="in_person">🤝 Yüz Yüze</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Yön</label>
+            <select id="modalCommDirection" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+              <option value="outbound">↗️ Giden (Outbound)</option>
+              <option value="inbound">↙️ Gelen (Inbound - Yanıt)</option>
+              <option value="internal">🔒 Dahili Not</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Tarih & Saat</label>
+            <input type="datetime-local" id="modalCommTimestamp" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Takip Tarihi (Follow-up)</label>
+            <input type="date" id="modalCommFollowUp" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+            <div class="flex items-center gap-1 text-[10px] mt-1.5 flex-wrap">
+              <span class="text-slate-500 font-medium">Hızlı:</span>
+              <button type="button" data-modal-quick-date="today" class="modal-quick-date-btn px-1.5 py-0.5 rounded bg-darkBg hover:bg-darkBorder text-amber-300 border border-darkBorder">Bugün</button>
+              <button type="button" data-modal-quick-date="tomorrow" class="modal-quick-date-btn px-1.5 py-0.5 rounded bg-darkBg hover:bg-darkBorder text-indigo-300 border border-darkBorder">Yarın</button>
+              <button type="button" data-modal-quick-date="+2" class="modal-quick-date-btn px-1.5 py-0.5 rounded bg-darkBg hover:bg-darkBorder text-slate-300 border border-darkBorder">+2G</button>
+              <button type="button" data-modal-quick-date="+3" class="modal-quick-date-btn px-1.5 py-0.5 rounded bg-darkBg hover:bg-darkBorder text-slate-300 border border-darkBorder">+3G</button>
+              <button type="button" data-modal-quick-date="+7" class="modal-quick-date-btn px-1.5 py-0.5 rounded bg-darkBg hover:bg-darkBorder text-slate-300 border border-darkBorder">+1H</button>
+              <button type="button" data-modal-quick-date="clear" class="modal-quick-date-btn px-1.5 py-0.5 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 ml-auto">Kaldır</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Konu Başlığı</label>
+          <input type="text" id="modalCommSubject" placeholder="Örn: Automatizacija provere adrese i potvrde za..." class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Mesaj / Görüşme İçeriği</label>
+          <textarea id="modalCommContent" rows="6" placeholder="Gönderilen e-posta metni, telefon konuşma notları veya gelen cevap..." required class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-xs text-white font-mono focus:outline-none focus:border-brand-500 leading-relaxed"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Mağaza Durumunu Güncelle</label>
+          <select id="modalCommStatusUpdate" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+            <option value="">(Değiştirme, Mevcut Durumu Koru)</option>
+            <option value="email_sent">📨 E-posta Gönderildi Olarak İşaretle</option>
+            <option value="waiting_reply">⏱️ Yanıt Bekleniyor Olarak İşaretle</option>
+            <option value="replied">💬 Yanıt Geldi Olarak İşaretle</option>
+            <option value="call_scheduled">📞 Telefon Görüşmesi Planlandı Olarak İşaretle</option>
+            <option value="closed_beta">🎉 Tasarım Ortağı (Kapalı Beta) Olarak İşaretle</option>
+            <option value="rejected">❌ Reddedildi / İlgilenmiyor</option>
+          </select>
+        </div>
+
+        <div class="pt-3 border-t border-darkBorder flex items-center justify-end gap-2">
+          <button type="button" id="cancelCommBtn" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-xs font-medium">Vazgeç</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-lg shadow-brand-600/20">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: OUTREACH ŞABLONLARI -->
+  <div id="templatesModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-darkCard border border-darkBorder rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-5 border-b border-darkBorder flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="mail" class="w-4 h-4 text-indigo-400"></i>
+            <span>Sırpça Outreach Şablonları & Hızlı Gönderim</span>
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Seçili mağaza için otomatik değişken yerleştirilmiş şablonlar</p>
+        </div>
+        <button id="closeTemplatesModal" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+      </div>
+
+      <div class="p-5 space-y-4 overflow-y-auto">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Şablon Seçin</label>
+          <select id="templateSelector" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+            <!-- Populated by app.js -->
+          </select>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[11px] font-semibold text-slate-400 uppercase">Alıcı E-posta (To)</label>
+            <button id="copyEmailBtn" type="button" class="text-[11px] text-brand-400 hover:text-brand-300 flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>E-postayı Kopyala</span>
+            </button>
+          </div>
+          <div class="relative">
+            <input type="text" id="templateEmailOutput" readonly class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-slate-200 font-mono pr-20" placeholder="E-posta adresi bulunmuyor">
+            <button id="copyEmailInputBtn" type="button" class="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-darkSurface hover:bg-darkBorder text-slate-300 hover:text-white text-[10px] font-medium border border-darkBorder flex items-center gap-1 transition-colors">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Kopyala</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[11px] font-semibold text-slate-400 uppercase">E-posta Konusu (Subject)</label>
+            <button id="copySubjectBtn" class="text-[11px] text-brand-400 hover:text-brand-300 flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Konuyu Kopyala</span>
+            </button>
+          </div>
+          <input type="text" id="templateSubjectOutput" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[11px] font-semibold text-slate-400 uppercase">E-posta Metni (Serbian Copy)</label>
+            <button id="copyBodyBtn" class="text-[11px] text-brand-400 hover:text-brand-300 flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3"></i>
+              <span>Metni Kopyala</span>
+            </button>
+          </div>
+          <textarea id="templateBodyOutput" rows="10" class="w-full bg-darkBg border border-darkBorder rounded-xl p-3 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-brand-500"></textarea>
+        </div>
+
+        <!-- Custom Next Follow-up Date Setting -->
+        <div class="p-3 rounded-xl bg-darkBg border border-darkBorder space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-semibold text-slate-300 uppercase flex items-center gap-1.5">
+              <i data-lucide="calendar-clock" class="w-3.5 h-3.5 text-brand-400"></i>
+              <span>Gönderim Sonrası Takip Tarihi (Follow-up)</span>
+            </label>
+            <span class="text-[10px] text-brand-400 font-mono" id="templateFollowUpPreviewText">+2 Gün (Varsayılan)</span>
+          </div>
+          
+          <div class="flex items-center gap-2 flex-wrap">
+            <input type="date" id="templateFollowUpInput" class="bg-darkCard border border-darkBorder rounded-lg px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-brand-500">
+            <div class="flex items-center gap-1 text-[10px]">
+              <button type="button" data-tpl-quick="+1" class="tpl-quick-date-btn px-2 py-1 rounded-md bg-darkCard hover:bg-darkBorder text-indigo-300 border border-darkBorder">Yarın</button>
+              <button type="button" data-tpl-quick="+2" class="tpl-quick-date-btn active px-2 py-1 rounded-md bg-brand-600 text-white border border-brand-500 font-semibold">+2G</button>
+              <button type="button" data-tpl-quick="+3" class="tpl-quick-date-btn px-2 py-1 rounded-md bg-darkCard hover:bg-darkBorder text-slate-300 border border-darkBorder">+3G</button>
+              <button type="button" data-tpl-quick="+7" class="tpl-quick-date-btn px-2 py-1 rounded-md bg-darkCard hover:bg-darkBorder text-slate-300 border border-darkBorder">+1H</button>
+              <button type="button" data-tpl-quick="none" class="tpl-quick-date-btn px-2 py-1 rounded-md bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20">Takip Yok</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-between gap-3">
+          <div class="text-xs text-brand-300">
+            <p class="font-medium">Hızlı Eylem</p>
+            <p class="text-[11px] text-brand-400/80">Mail uygulamasında aç veya doğrudan gönderildi olarak geçmişe kaydet.</p>
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <a id="btnOpenWhatsAppTemplate" href="#" target="_blank" rel="noopener noreferrer" class="hidden px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold items-center gap-1.5 transition-colors" title="WhatsApp ile İletişim Kur">
+              <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.13.56 4.129 1.535 5.864l-1.635 5.969 6.136-1.61c1.7.94 3.655 1.477 5.738 1.477 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/></svg>
+              <span>WhatsApp</span>
+            </a>
+            <a id="btnOpenMailClient" href="#" class="px-3 py-1.5 rounded-lg bg-darkCard hover:bg-darkBorder border border-darkBorder text-slate-300 text-xs font-medium flex items-center gap-1.5 transition-colors">
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+              <span>Mail Aç</span>
+            </a>
+            <button id="btnMarkSentAndLog" class="px-3 py-1.5 rounded-lg bg-darkCard hover:bg-darkBorder border border-darkBorder text-slate-300 text-xs font-medium flex items-center gap-1.5 transition-colors">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              <span>Sadece Kaydet</span>
+            </button>
+            <button id="btnSendSmtpAndLog" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow-lg shadow-emerald-600/20 transition-colors">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+              <span>PrivateEmail ile Gönder & Kaydet</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: YENİ MAĞAZA EKLE -->
+  <div id="newStoreModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-darkCard border border-darkBorder rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-5 border-b border-darkBorder flex items-center justify-between">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="store" class="w-4 h-4 text-brand-400"></i>
+          <span>Yeni Hedef Mağaza Ekle</span>
+        </h3>
+        <button id="closeNewStoreModal" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+      </div>
+
+      <form id="newStoreForm" class="p-5 space-y-3.5 overflow-y-auto">
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Mağaza Adı *</label>
+          <input type="text" id="addStoreName" required placeholder="Örn: Butik Kraljica" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Web Sitesi *</label>
+          <input type="url" id="addStoreWebsite" required placeholder="https://..." class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Sektör</label>
+            <input type="text" id="addStoreSector" placeholder="Örn: Ayakkabı & Çanta" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Şehir</label>
+            <input type="text" id="addStoreCity" placeholder="Örn: Novi Sad" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Kurumsal E-posta</label>
+            <input type="email" id="addStoreEmail" placeholder="info@..." class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Telefon</label>
+            <input type="text" id="addStorePhone" placeholder="+381..." class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Kanca & Saha İnceleme Notu</label>
+          <textarea id="addStoreHook" rows="2" placeholder="Neden bu mağaza? Kapıda ödeme, desi riski, 1-of-1 ürün..." class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500"></textarea>
+        </div>
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Öncelik Havuzu</label>
+          <select id="addStorePriority" class="w-full bg-darkBg border border-darkBorder rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-brand-500">
+            <option value="p1_verified">P1 Doğrulanmış (Canlı WooCommerce, Kapıda Ödeme, Açık E-posta)</option>
+            <option value="p2_unverified">P2 İkincil Havuz (Açık E-posta yok / Form)</option>
+            <option value="disqualified">Diskalifiye / Çok Büyük Distribütör</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">İlk Takip / Ulaşım Tarihi (Opsiyonel)</label>
+          <div class="flex items-center gap-2">
+            <input type="date" id="addStoreFollowUp" class="flex-1 bg-darkBg border border-darkBorder rounded-xl p-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono">
+            <button type="button" id="btnAddStoreToday" class="px-2.5 py-2 rounded-xl bg-darkBg hover:bg-darkBorder border border-darkBorder text-xs text-amber-300">Bugün</button>
+            <button type="button" id="btnAddStoreTomorrow" class="px-2.5 py-2 rounded-xl bg-darkBg hover:bg-darkBorder border border-darkBorder text-xs text-indigo-300">Yarın</button>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-darkBorder flex items-center justify-end gap-2">
+          <button type="button" id="cancelNewStoreBtn" class="px-4 py-2 rounded-xl text-slate-400 hover:text-white text-xs font-medium">Vazgeç</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-lg shadow-brand-600/20">Mağazayı Ekle</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: HIZLI TAKİP TARİHİ GÜNCELLE (CARD QUICK RESCHEDULE MODAL) -->
+  <div id="cardRescheduleModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-darkCard border border-darkBorder rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150">
+      <div class="p-4 border-b border-darkBorder flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-brand-500/15 border border-brand-500/30 flex items-center justify-center text-brand-400">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-white truncate max-w-[210px]" id="cardRescheduleStoreName">Mağaza Takvimi</h3>
+            <p class="text-[10px] text-slate-400" id="cardRescheduleCurrentBadge">Mevcut Takip: -</p>
+          </div>
+        </div>
+        <button id="closeCardRescheduleModal" class="text-slate-400 hover:text-white p-1 rounded-lg">✕</button>
+      </div>
+
+      <div class="p-4 space-y-3">
+        <div>
+          <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tek Tıkla Ertele / Ayarla</label>
+          <div class="grid grid-cols-3 gap-1.5 text-xs font-medium">
+            <button type="button" data-card-quick="today" class="card-quick-date-btn px-2 py-2 rounded-xl bg-darkBg hover:bg-brand-600 hover:text-white border border-darkBorder text-amber-300 transition-all flex flex-col items-center">
+              <span class="font-bold">⚡ Bugün</span>
+              <span class="text-[9px] opacity-70 font-mono" id="labelQuickToday">Bugün</span>
+            </button>
+            <button type="button" data-card-quick="tomorrow" class="card-quick-date-btn px-2 py-2 rounded-xl bg-darkBg hover:bg-brand-600 hover:text-white border border-darkBorder text-indigo-300 transition-all flex flex-col items-center">
+              <span class="font-bold">⏳ Yarın</span>
+              <span class="text-[9px] opacity-70 font-mono" id="labelQuickTomorrow">Yarın</span>
+            </button>
+            <button type="button" data-card-quick="+2" class="card-quick-date-btn px-2 py-2 rounded-xl bg-darkBg hover:bg-brand-600 hover:text-white border border-darkBorder text-slate-200 transition-all flex flex-col items-center">
+              <span class="font-bold">+2 Gün</span>
+              <span class="text-[9px] opacity-70 font-mono" id="labelQuickPlus2">+2G</span>
+            </button>
+            <button type="button" data-card-quick="+3" class="card-quick-date-btn px-2 py-2 rounded-xl bg-darkBg hover:bg-brand-600 hover:text-white border border-darkBorder text-slate-200 transition-all flex flex-col items-center">
+              <span class="font-bold">+3 Gün</span>
+              <span class="text-[9px] opacity-70 font-mono" id="labelQuickPlus3">+3G</span>
+            </button>
+            <button type="button" data-card-quick="+7" class="card-quick-date-btn px-2 py-2 rounded-xl bg-darkBg hover:bg-brand-600 hover:text-white border border-darkBorder text-slate-200 transition-all flex flex-col items-center">
+              <span class="font-bold">+1 Hafta</span>
+              <span class="text-[9px] opacity-70 font-mono" id="labelQuickPlus7">+1H</span>
+            </button>
+            <button type="button" data-card-quick="+14" class="card-quick-date-btn px-2 py-2 rounded-xl bg-darkBg hover:bg-brand-600 hover:text-white border border-darkBorder text-slate-200 transition-all flex flex-col items-center">
+              <span class="font-bold">+2 Hafta</span>
+              <span class="text-[9px] opacity-70 font-mono" id="labelQuickPlus14">+2H</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-darkBorder/60">
+          <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Özel Takvim Tarihi Seç</label>
+          <div class="flex items-center gap-2">
+            <input type="date" id="cardRescheduleCustomDate" class="flex-1 bg-darkBg border border-darkBorder rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-brand-500">
+            <button type="button" id="cardRescheduleSaveCustomBtn" class="px-3.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow transition-all">
+              Kaydet
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-darkBorder/60 flex items-center justify-between">
+          <button type="button" id="cardRescheduleClearBtn" class="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-medium border border-rose-500/20 transition-all">
+            🗑️ Takip Tarihini Kaldır
+          </button>
+          <button type="button" id="cardRescheduleCancelBtn" class="px-3 py-1 rounded-lg text-slate-400 hover:text-white text-xs font-medium">
+            Vazgeç
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-12 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 border border-slate-700 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2">
+    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-400"></i>
+    <span id="toastMessage">İşlem başarıyla gerçekleştirildi.</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

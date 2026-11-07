@@ -171,6 +171,7 @@ export const Footer: React.FC<FooterProps> = ({
             </h4>
             <ul className="space-y-1.5 text-slate-400 text-xs">
               <li className="font-semibold text-slate-200">{t.company_name}</li>
+              <li className="text-[11px]"><a href="https://lilanovadigital.com" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline font-mono">lilanovadigital.com</a></li>
               <li className="text-[11px] text-slate-400">{t.address_1}</li>
               <li className="text-[11px] text-slate-400">{t.address_2}</li>
               <li className="text-[11px]"><span className="text-slate-500 font-mono">{t.pib_label}</span> <span className="font-mono text-slate-300">115512104</span></li>

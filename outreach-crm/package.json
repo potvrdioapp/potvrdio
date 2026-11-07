@@ -1,0 +1,15 @@
+{
+  "name": "potvrdio-outreach-crm",
+  "version": "1.0.0",
+  "description": "Local lightweight CRM & SQLite DB for Potvrdio WooCommerce target stores outreach",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js",
+    "db": "sqlite3 data/potvrdio_outreach.db"
+  },
+  "keywords": ["potvrdio", "outreach", "crm", "sqlite"],
+  "author": "Potvrdio",
+  "license": "ISC"
+}
